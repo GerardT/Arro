@@ -240,7 +240,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 	private InputStream openMETAStream(IFile file, String diagramName) throws CoreException {
 		String contents = 	"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
 							"<metadata>\n" +
-							"	<entry key=\"type\" value=" + Constants.FUNCTION_BLOCK + "/>\n" +
+							"	<entry key=\"type\" value=\"" + Constants.FUNCTION_BLOCK + "\"/>\n" +
 							"	<entry key=\"version\" value=\"0.90\"/>\n" +
 							"</metadata>\n";
 		return new ByteArrayInputStream(contents.getBytes());
