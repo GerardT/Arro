@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+    <extension
+         point="org.eclipse.graphiti.ui.diagramTypes">
+         <diagramType
+            name="Arro Node Diagram Type"
+            type="Arro"
+            id="Arro.ArroNodeDiagramType">
+         </diagramType>
+         <diagramType
+            name="Arro Pad Diagram Type"
+            type="Pad"
+            id="Arro.ArroPadDiagramType">
+         </diagramType>
+    </extension>
+    <extension
+         point="org.eclipse.graphiti.ui.diagramTypeProviders">
+         <diagramTypeProvider
+            name="Arro Node Diagram Type Provider"
+            class="arro.node.diagram.ArroNodeDiagramTypeProvider"
+            id="Arro.ArroNodeDiagramTypeProvider">
+            <diagramType
+               id="Arro.ArroNodeDiagramType">
+            </diagramType>
+            <imageProvider
+               id="Arro.imageProvider">
+            </imageProvider>
+            
+         </diagramTypeProvider>
+    </extension>
+   
+   
+   
+   
+    <extension
+        point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+        <!-- The contributorId is calculated from the diagram-type-id by the formula:  Diagram.getDiagramTypeId() + ".PropertyContributor".-->
+        <propertyContributor contributorId="Arro.PropertyContributor"> 
+           <propertyCategory category="Graphiti"> 
+           </propertyCategory> 
+        </propertyContributor> 
+    </extension>
+       
+    <extension
+      point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs
+          contributorId="Arro.PropertyContributor">
+          <propertyTab
+             category="Graphiti"
+             id="arro.main.tab"
+             label="Main">
+          </propertyTab>
+          <propertyTab
+             category="Graphiti"
+             id="arro.sub.tab"
+             label="Main">
+          </propertyTab>
+          <propertyTab
+                afterTab="arro.main.tab"
+                category="Graphiti"
+                id="arro.param.tab"
+                label="Parameters">
+          </propertyTab>
+      </propertyTabs>
+    </extension>
+     
+    <extension
+      point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections
+          contributorId="Arro.PropertyContributor">
+          <propertySection
+              class="property.ArroNodeSectionStandard"
+              filter="property.ArroNodeFilterStandard"
+              id="arro.node.section"
+              tab="arro.main.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroNodeSectionDevice"
+              filter="property.ArroNodeFilterDevice"
+              id="arro.node.section"
+              tab="arro.main.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroParamSectionStandard"
+              filter="property.ArroParamFilterStandard"
+              id="arro.param.section.standard"
+              tab="arro.param.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroParamSectionDevice"
+              filter="property.ArroParamFilterDevice"
+              id="arro.param.section.device"
+              tab="arro.param.tab">
+          </propertySection>
+
+          <propertySection
+              class="property.ArroPadSection"
+              filter="property.ArroPadFilter"
+              id="arro.pad.section"
+              tab="arro.sub.tab">
+          </propertySection>
+      </propertySections>
+    </extension>
+   
+    
+    <extension
+       point = "org.eclipse.ui.editors">
+       <editor
+             class="arro.messageeditor.MessageEditor"
+             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+             extensions="amsg"
+             icon="icons/sample.gif"
+             id="arro.editors.MessageEditor"
+             name="Message Type Editor">
+       </editor>
+       <editor
+             class="arro.editors.MultiPageEditor"
+             contributorClass="arro.editors.MultiPageEditorContributor"
+             extensions="anod,adev"
+             icon="icons/sample.gif"
+             id="arro.editors.MultiPageEditor"
+             name="Function Diagram Editor">
+       </editor>
+       
+    </extension>
+    
+    
+    <extension
+      point="org.eclipse.core.expressions.definitions">
+      <definition
+        id="arro.editors.MessageEditor.inView">
+         <with
+           variable="activePartId">
+        <equals
+              value="arro.editors.MessageEditor">
+        </equals>
+         </with>
+      </definition>
+    </extension>
+ 
+    
+    <extension
+        point="org.eclipse.ui.commands">
+        <category
+              id="Arro.sampleNature.category"
+              name="Sample Project Nature commands">
+        </category>
+        <command
+              categoryId="Arro.sampleNature.category"
+              defaultHandler="arro.builder.AddRemoveSampleNatureHandler"
+              id="Arro.addRemoveSampleNature"
+              name="Add/RemoveSample Project Nature">
+        </command>
+    </extension>
+    
+    <extension
+        point="org.eclipse.ui.handlers">
+        <handler
+            class="arro.messageeditor.AddRowHandler"
+            commandId="org.eclipse.ui.edit.delete">
+            <activeWhen>
+                <reference
+                    definitionId="arro.editors.MessageEditor.inView">
+                </reference>
+            </activeWhen>
+        </handler>
+     </extension>
+     
+     <extension
+       point="org.eclipse.ui.bindings">
+       <key
+          commandId="Arro.commands.deleteItemCommand"
+          contextId="org.eclipse.ui.contexts.window"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+6">
+      </key>
+    </extension>
+    <extension
+       point="org.eclipse.ui.menus">
+       <menuContribution
+          locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+          <toolbar
+             id="Arro.toolbars.sampleToolbar">
+             <command
+                commandId="org.eclipse.ui.edit.delete"
+                icon="icons/sample.gif"
+                id="Arro.toolbars.deleteItemCommand"
+                tooltip="Remove selected item">
+             </command>
+          </toolbar>
+       </menuContribution>
+       <menuContribution
+          locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
+          <command
+             commandId="Arro.addRemoveSampleNature"
+             label="Disable Sample builder"
+             style="push">
+             <visibleWhen
+                checkEnabled="false">
+                <with
+                   variable="selection">
+                   <count
+                      value="1">
+                   </count>
+                   <iterate>
+                      <adapt
+                         type="org.eclipse.core.resources.IProject">
+                         <test
+                            property="org.eclipse.core.resources.projectNature"
+                            value="Arro.sampleNature">
+                         </test>
+                      </adapt>
+                   </iterate>
+                </with>
+             </visibleWhen>
+          </command>
+          <command
+             commandId="Arro.addRemoveSampleNature"
+             label="Enable Sample builder"
+             style="push">
+             <visibleWhen
+                checkEnabled="false">
+                <with
+                   variable="selection">
+                   <count
+                      value="1">
+                   </count>
+                   <iterate>
+                      <adapt
+                         type="org.eclipse.core.resources.IProject">
+                         <not>
+                            <test
+                               property="org.eclipse.core.resources.projectNature"
+                               value="Arro.sampleNature">
+                            </test>
+                         </not>
+                      </adapt>
+                   </iterate>
+                </with>
+             </visibleWhen>
+          </command>
+       </menuContribution>
+       </extension>
+       <extension
+          point="org.eclipse.help.contexts">
+          <contexts
+             file="contexts.xml">
+          </contexts>
+       </extension>
+    
+       <extension
+         point="org.eclipse.ui.perspectives">
+         <perspective
+            class="arro.perspective.ArroPerspective"
+            fixed="false"
+            icon="icons/rialto16.gif"
+            id="arro.perspective.ArroPerspective"
+            name="Arro"/>
+       </extension>
+    
+       <extension
+        point = "org.eclipse.ui.newWizards">
+        <category
+            id="Arro"
+            name="Arro">
+        </category>
+        
+        <wizard
+            category="Arro"
+            class="arro.wizards.project.CreateProjectWizard"
+            finalPerspective="arro.perspective.ArroPerspective"
+            icon="icons/rialto16.gif"
+            id="arro.projectexplorer.NewProjectWizard"
+            name="Arro Project"
+            project="true">
+            <description>
+                New Arro Project
+            </description>
+            <selection class="org.eclipse.core.resources.IResource"/>
+        </wizard>
+        <wizard
+            category="Arro"
+            class="arro.wizards.message.NewMessageWizard"
+            icon="icons/sample.gif"
+            id="arro.wizards.SampleNewWizard"
+            name="Message Definition">
+        </wizard>
+        <wizard
+              category="Arro"
+              class="arro.wizards.functionblock.NewFunctionBlockWizard"
+              icon="icons/sample.gif"
+              id="arro.wizards.SampleNewWizard"
+              name="Function Block">
+        </wizard>
+        <wizard
+              category="Arro"
+              class="arro.wizards.codeblock.NewCodeBlockWizard"
+              icon="icons/sample.gif"
+              id="arro.wizards.NewDeviceWizard"
+              name="Python Code Block">
+        </wizard>
+    </extension>
+    
+    <extension
+        point="org.eclipse.core.resources.natures"
+        id="sampleNature"
+        name="Sample Project Nature">
+        <runtime>
+            <run class="arro.builder.ProjectNature">
+            </run>
+        </runtime>
+        <builder
+              id="Arro.sampleBuilder">
+        </builder>
+    </extension>
+    <extension
+          point="org.eclipse.ui.dropActions">
+    </extension>
+    <extension
+          id="sampleBuilder"
+          name="Sample Project Builder"
+          point="org.eclipse.core.resources.builders">
+       <builder
+             hasNature="true">
+          <run
+                class="arro.builder.ArroBuilder">
+          </run>
+       </builder>
+    </extension>
+    <extension
+          id="xmlProblem"
+          name="XML Problem"
+          point="org.eclipse.core.resources.markers">
+       <super
+             type="org.eclipse.core.resources.problemmarker">
+       </super>
+       <persistent
+             value="true">
+       </persistent>
+    </extension>
+    
+    
+    <extension
+          point="org.eclipse.debug.core.launchConfigurationTypes">
+       <launchConfigurationType
+             delegate="arro.launcher.ArroLauncher"
+             modes= "run, debug"
+             id="Arro.launchConfigurationType"
+             name="Arro launcher">
+       </launchConfigurationType>
+    </extension>
+    <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+        <launchConfigurationTabGroup
+            type="Arro.launchConfigurationType"
+            class="arro.launcher.ArroTabGroup"
+            id="arro.tabgroup">
+        </launchConfigurationTabGroup>
+    </extension>
+    <extension
+          point="org.eclipse.debug.ui.launchShortcuts">
+       <shortcut
+             class="arro.launcher.LaunchShortcut1"
+             id="Arro.shortcut1"
+             label="label"
+             modes="Arro.shortcut1">
+       </shortcut>
+    </extension>
+    <extension
+          point="org.eclipse.graphiti.ui.imageProviders">
+       <imageProvider
+             class="arro.ArroImageProvider"
+             id="Arro.imageProvider">
+       </imageProvider>
+    </extension>
+    
+    
+
+</plugin>

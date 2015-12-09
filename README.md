@@ -2,8 +2,8 @@
 Soft PLC implementation with Eclipse plugin as client and (Raspberry) server. For simple robotics.
 
 System consists of
-- client sw - this is an Eclipse plugin using Java, XML, and connected to server over TCP/IP
-- server sw - this should run on Raspberry Pi or other such systems, using C++, Protocol Buffers, XML, Python.
+- client sw 'Arro' - this is an Eclipse plugin using Java, XML, and connected to server over TCP/IP
+- server sw 'Runtime' - this should run on Raspberry Pi or other such systems, using C++, Protocol Buffers, XML, Python.
 
 Goal is to provide sort of a Soft PLC environment that has low threshold so might be used by anyone. Building blocks in this PLC are:
 - function blocks - those consists of other blocks (function / code blocks)
@@ -19,6 +19,7 @@ System is running with server sw on host (over localhost). Still many details to
 - icons
 - graphics details.
 - language support
+- fix the Runtime Makefile (it is bad..)
 - etc.
 
 
