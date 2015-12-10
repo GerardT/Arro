@@ -1,26 +1,15 @@
 package arro.launcher;
 
-import java.io.IOException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.accessibility.AccessibleAdapter;
-import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -30,9 +19,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
 import util.Logger;
-import util.Misc;
 import arro.Constants;
-import arro.launcher.TCPClient.Result;
 
 
 
@@ -40,7 +27,6 @@ public class ArroMainTab  extends AbstractLaunchConfigurationTab {
 
 	private Text ipAddressText;
 	private Text projectNameText;
-	private Button checkButton;
 
 	@Override
 	public void createControl(Composite parent) {
@@ -96,71 +82,23 @@ public class ArroMainTab  extends AbstractLaunchConfigurationTab {
 		
 		
 		ipAddressText = createSingleText(comp, 1);
-//		ipAddressText.getAccessible().addAccessibleListener(new AccessibleAdapter() {
-//			@Override
-//			public void getName(AccessibleEvent e) {
-//				Logger.out.trace(Logger.STD, e.toString());
-//
-//				e.result =  "result";
-//			}
-//		});
 		ipAddressText.addModifyListener(fBasicModifyListener);
 		
 		projectNameText = createSingleText(comp, 1);
-		projectNameText.addModifyListener(fBasicModifyListener);
-		
-//		checkButton = new Button (comp, SWT.PUSH);
-//		checkButton.setText ("Check");
-//		checkButton.addSelectionListener(new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(SelectionEvent e) {
-//				Logger.out.trace(Logger.STD, "Check " + ipAddressText.getText());
-//				TCPClient temp = new TCPClient(ipAddressText.getText());
-//				testConnection(temp);
-//			}
-//		});		
+		projectNameText.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent evt) {
+				
+				if(!validateProjectName()) {
+					setErrorMessage("Invalid Project Name");
+				}
+				
+				scheduleUpdateJob();
+			}
+
+		});
 	}
 	
-//	private void testConnection(final TCPClient client) {
-//		ExecutorService executor = Executors.newCachedThreadPool();
-//		Callable<TCPClient.Result> task = new Callable<TCPClient.Result>() {
-//		   public TCPClient.Result call() {
-//		      return connectAndTest(client);
-//		   }
-//		};
-//		Future<TCPClient.Result> future = executor.submit(task);
-//		try {
-//			Result r = future.get(5, TimeUnit.SECONDS);
-//			if(r.result == true) {
-//				Logger.writeToConsole("Server available");
-//			}
-//			else {
-//				Logger.writeToConsole("Server NOT available");
-//			}
-//		} catch (TimeoutException ex) {
-//		   // handle the timeout
-//		} catch (InterruptedException e) {
-//		   // handle the interrupts
-//		} catch (ExecutionException e) {
-//		   // handle other exceptions
-//		} finally {
-//		   future.cancel(true); // may or may not desire this
-//		}
-//	}
-//	private Result connectAndTest(TCPClient client) {
-//		Result r = client.connect(13000);
-//		if(r.result) {
-//			client.writeln("echo");
-//			String s = client.readln();
-//			if(s.equals("echo")) {
-//			    Logger.out.trace(Logger.STD, "Good");
-//			} else {
-//				Logger.out.trace(Logger.STD, "Bad");
-//			}
-//			client.close();
-//		}
-//		return r;
-//	}
 
 	private Group createGroup(Composite parent, String text, int columns, int hspan, int fill) {
     	Group g = new Group(parent, SWT.NONE);
@@ -192,5 +130,21 @@ public class ArroMainTab  extends AbstractLaunchConfigurationTab {
     	t.setLayoutData(gd);
     	return t;
     }
+	
+	private boolean validateProjectName() {
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IProject project = root.getProject(projectNameText.getText());
+		return project.exists();
+	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
+	 */
+	@Override
+	public boolean isValid(ILaunchConfiguration config) {
+		setMessage(null);
+		setErrorMessage(null);
+		
+		return validateProjectName();
+	}
 }
