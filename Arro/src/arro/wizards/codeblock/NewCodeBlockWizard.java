@@ -127,7 +127,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 		if (!resource.exists() || !(resource instanceof IContainer)) {
 			throwCoreException("Container \"" + containerName + "\" does not exist.");
 		}
-		String fileName = nodeName + "." + arro.Constants.DEVICE_EXT;
+		String fileName = nodeName + "." + arro.Constants.NODE_EXT;
 		
 		IFolder f = null;
 		if(resource instanceof IProject) {
@@ -257,6 +257,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 	private InputStream openMETAStream(IFile file, String diagramName) throws CoreException {
 		String contents = 	"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
 							"<metadata>\n" +
+							"	<entry key=\"name\" value=\"" + diagramName + "\"/>\n" +
 							"	<entry key=\"type\" value=\"" + Constants.CODE_BLOCK + "\"/>\n" +
 							"	<entry key=\"version\" value=\"0.90\"/>\n" +
 							"</metadata>\n";
@@ -307,7 +308,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 	}
 
 	private InputStream openPythonStream(IFile file, String diagramName) throws CoreException {
-		String contents = 	"class Pid:\n" +
+		String contents = 	"class " + diagramName + ":\n" +
 					        "   b1 = 20\n" +
 					        "\n" +
 					        "   def __init__(self, usefonts=0):\n" +

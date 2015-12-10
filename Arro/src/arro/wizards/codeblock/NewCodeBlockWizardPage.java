@@ -44,7 +44,7 @@ public class NewCodeBlockWizardPage extends WizardPage {
 	public NewCodeBlockWizardPage(ISelection selection) {
 		super("wizardPage");
 		setTitle("Arro Code Block");
-		setDescription("This wizard creates a new file with *." + Constants.DEVICE_EXT + " extension that can be opened by the diagram editor.");
+		setDescription("This wizard creates a new file with *." + Constants.NODE_EXT + " extension that can be opened by the diagram editor.");
 		this.selection = selection;
 	}
 
