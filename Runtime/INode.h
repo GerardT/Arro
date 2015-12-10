@@ -11,7 +11,7 @@ class INode {
 private:
 	std::string name;
 public:
-    INode(std::string name);
+    INode(const std::string& name);
     virtual ~INode() {};
     std::string& getName() { return name; };
     virtual void runCycle() = 0;

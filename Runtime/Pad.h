@@ -12,7 +12,7 @@ public:
     NodeDb::NodeSingleInput* in;
     NodeDb::NodeMultiOutput* out;
 
-    Pad(NodeDb& nodeDb, string datatype, string name);
+    Pad(NodeDb& nodeDb, const string& datatype, const string& name);
     void runCycle() {};
 };
 

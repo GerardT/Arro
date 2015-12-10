@@ -112,7 +112,7 @@ NodeDb::NodeMultiOutput::submitMessageBuffer(const char* msg) {
  * Get a node from its name.
  */
 INode*
-NodeDb::getNode(string name) {
+NodeDb::getNode(string& name) {
     try {
         INode* n = allNodes[name];
         return (INode*)n;
@@ -128,12 +128,12 @@ NodeDb::getNode(string name) {
  * INode is the NodeDb-internal representation of a Node.
  * A Node first registers itself, then registers inputs and outputs.
  */
-INode::INode(string n) {
+INode::INode(const string& n) {
     name = n;
 }
 
 INode*
-NodeDb::registerNode(INode* node, string name) {
+NodeDb::registerNode(INode* node, const string& name) {
      allNodes[name] = node;
      return node;
 }
@@ -145,7 +145,7 @@ NodeDb::registerNode(INode* node, string name) {
  * @param n The instance of the node.
  */
 NodeDb::NodeSingleInput*
-NodeDb::registerNodeInput(INode* node, string interfaceName, NodeDb::NodeSingleInput::IListener* listen) {
+NodeDb::registerNodeInput(INode* node, const string& interfaceName, NodeDb::NodeSingleInput::IListener* listen) {
 	NodeDb::NodeSingleInput* n = new NodeDb::NodeSingleInput(/*interfaceName, */listen, node);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
@@ -166,7 +166,7 @@ NodeDb::registerNodeInput(INode* node, string interfaceName, NodeDb::NodeSingleI
  * @param n The instance of the node.
  */
 NodeDb::NodeMultiOutput*
-NodeDb::registerNodeOutput(INode* node, string interfaceName) {
+NodeDb::registerNodeOutput(INode* node, const string& interfaceName) {
 	NodeDb::NodeMultiOutput* n = new NodeDb::NodeMultiOutput(/*interfaceName*/this);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
@@ -184,7 +184,7 @@ NodeDb::registerNodeOutput(INode* node, string interfaceName) {
  * Find an output from a name "node.subnode.subsub.output".
  */
 NodeDb::NodeMultiOutput*
-NodeDb::getOutput(string name) {
+NodeDb::getOutput(const string& name) {
 	return (NodeMultiOutput*)(allOutputs[name]);
 }
 
@@ -279,7 +279,7 @@ NodeDb::stop() {
  * example: connect("main.pid1.output", "main.pid1.input")
  */
 void
-NodeDb::connect(string output, string input) {
+NodeDb::connect(string& output, string& input) {
     NodeMultiOutput* out = NULL;
     NodeSingleInput* in = NULL;
 

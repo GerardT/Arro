@@ -78,7 +78,7 @@ Process::runCycle() {
  * it installs a listener for this Pad that handles incoming messages.
  */
 void
-Process::registerInput(string interfaceName, bool enableRunCycle) {
+Process::registerInput(const string& interfaceName, bool enableRunCycle) {
 	/* Almost anonymous class (if 'Anon' removed), but needed constructor */
     class Anon: public NodeDb::NodeSingleInput::IListener {
         Process* owner;
@@ -101,7 +101,7 @@ Process::registerInput(string interfaceName, bool enableRunCycle) {
  * Called from ConfigReader in order to register an output Pad as output.
  */
 void
-Process::registerOutput(string interfaceName) {
+Process::registerOutput(const string& interfaceName) {
 	nodeDb.registerNodeOutput(this, interfaceName);
 }
 
@@ -109,7 +109,7 @@ Process::registerOutput(string interfaceName) {
  * Lookup an output by its name, which is concatenated: "procesname.name".
  */
 NodeDb::NodeMultiOutput*
-Process::getOutput(string name) {
+Process::getOutput(const string& name) {
 	NodeDb::NodeMultiOutput* out = nodeDb.getOutput(getName() + "." + name);
 	if(out) {
 		return out;

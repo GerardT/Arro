@@ -2,7 +2,7 @@
 #include <NodeLinear.h>
 
 
-NodeLinear::NodeLinear(Process* d, string name, ConfigReader::StringMap params):
+NodeLinear::NodeLinear(Process* d, string /*name*/, ConfigReader::StringMap params):
     trace(string("NodeLinear"), true),
 	device(d) {
 
@@ -25,7 +25,7 @@ NodeLinear::NodeLinear(Process* d, string name, ConfigReader::StringMap params):
     public:
         AnonSp(NodeLinear* n){owner = n; };
 
-        void handleMessage(MessageBuf* m, string padName) {
+        void handleMessage(MessageBuf* m, string /*padName*/) {
         	Value* msg = new Value();
         	msg->ParseFromString(m->c_str());
 
@@ -44,7 +44,7 @@ NodeLinear::NodeLinear(Process* d, string name, ConfigReader::StringMap params):
     public:
         AnonTick(NodeLinear* n){owner = n; };
 
-        void handleMessage(MessageBuf* m, string padName) {
+        void handleMessage(MessageBuf* m, string /*padName*/) {
         	Tick* msg = new Tick();
         	msg->ParseFromString(m->c_str());
 
@@ -65,7 +65,7 @@ NodeLinear::NodeLinear(Process* d, string name, ConfigReader::StringMap params):
     public:
         AnonMode(NodeLinear* n){owner = n; };
 
-        void handleMessage(MessageBuf* m, string padName) {
+        void handleMessage(MessageBuf* m, string /*padName*/) {
         	Mode* msg = new Mode();
         	msg->ParseFromString(m->c_str());
 
@@ -81,7 +81,7 @@ NodeLinear::NodeLinear(Process* d, string name, ConfigReader::StringMap params):
     //result = n->registerNodeOutput("Value", "result");
 }
 
-void NodeLinear::handleMessage(MessageBuf* m, string padName) {
+void NodeLinear::handleMessage(MessageBuf* m, string /*padName*/) {
 	Value* msg = new Value();
 	msg->ParseFromString(m->c_str());
 

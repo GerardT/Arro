@@ -94,15 +94,15 @@ public:
     ~NodeDb();
 
     void toggleQueue();
-    INode* registerNode(INode* node, string name);
-    NodeSingleInput* registerNodeInput(INode* node, string interfaceName, NodeDb::NodeSingleInput::IListener* listen);
-    NodeMultiOutput* registerNodeOutput(INode* node, string interfaceName);
+    INode* registerNode(INode* node, const string& name);
+    NodeSingleInput* registerNodeInput(INode* node, const string& interfaceName, NodeDb::NodeSingleInput::IListener* listen);
+    NodeMultiOutput* registerNodeOutput(INode* node, const string& interfaceName);
     void start();
     void stop();
-    void connect(string output, string input);
+    void connect(string& output, string& input);
     static void runCycle(NodeDb* nm);
-    INode* getNode(string name);
-    NodeMultiOutput* getOutput(string name);
+    INode* getNode(string& name);
+    NodeMultiOutput* getOutput(const string& name);
 };
 
 

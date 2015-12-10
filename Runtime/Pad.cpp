@@ -8,7 +8,7 @@
  * Basically it just installs a listener that forwards incoming messages.
  * TODO: maybe we could remove Pads and connect Process outputs directly to Process inputs.
  */
-Pad::Pad(NodeDb& nodeDb, string /*datatype*/, string name):
+Pad::Pad(NodeDb& nodeDb, const string& /*datatype*/, const string& name):
 	INode(name),
     trace(string("Pad"), false),
 	in(NULL),
@@ -30,6 +30,7 @@ Pad::Pad(NodeDb& nodeDb, string /*datatype*/, string name):
         }
     };
 
-    in = nodeDb.registerNodeInput(n, "", new Anon(this));
-	out = nodeDb.registerNodeOutput(n, "");
+    string empty("");
+    in = nodeDb.registerNodeInput(n, empty, new Anon(this));
+	out = nodeDb.registerNodeOutput(n, empty);
 }

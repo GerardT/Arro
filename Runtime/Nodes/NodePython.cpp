@@ -10,7 +10,7 @@
  * Will instantiate an object of class className inside Python that
  * will be used for the lifetime of the Process.
  */
-NodePython::NodePython(Process* d, string& className, ConfigReader::StringMap params):
+NodePython::NodePython(Process* d, string& className, ConfigReader::StringMap /*params*/):
     trace(string("NodePython"), true),
 	device(d)
 {

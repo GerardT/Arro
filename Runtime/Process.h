@@ -35,10 +35,10 @@ public:
 
     Process(NodeDb& nodeDb, const string* url, string* instance, ConfigReader::StringMap params);
     ~Process();
-    void registerInput(string interfaceName, bool enableRunCycle);
-    void registerOutput(string interfaceName);
+    void registerInput(const string& interfaceName, bool enableRunCycle);
+    void registerOutput(const string& interfaceName);
     void setListener(IPadListener* listener) { this->listener = listener; };
-    NodeDb::NodeMultiOutput* getOutput(string name);
+    NodeDb::NodeMultiOutput* getOutput(const string& name);
     void runCycle();
 };
 
