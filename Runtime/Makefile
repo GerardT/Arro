@@ -32,8 +32,6 @@ SRCS         := main.cpp \
 		Nodes/NodePython.cpp \
 		Nodes/NodeLinear.cpp \
 		Nodes/NodeTimer.cpp \
-		Nodes/NodeStartToken.cpp \
-		Nodes/NodeTransition.cpp \
 		tinyxmlparser.cpp \
 		tinyxmlerror.cpp \
 		tinyxml.cpp \

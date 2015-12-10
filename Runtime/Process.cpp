@@ -10,8 +10,6 @@
 #include <NodeServo.h>
 #include <NodePass.h>
 #include <NodeTimer.h>
-#include <NodeStartToken.h>
-#include <NodeTransition.h>
 
 #include <ConfigReader.h>
 #include <NodeDb.h>
@@ -162,14 +160,6 @@ Process::getPrimitive(const string* url, string* instance, ConfigReader::StringM
         device = new NodeTimer(this, *instance, params);
     }
     else if(*url == "pass") {
-    }
-    else if(*url == "start") {
-        trace.println("new NodeStartToken(" + *instance + ")");
-        device = new NodeStartToken(this, *instance, params);
-    }
-    else if(*url == "transition") {
-        trace.println("new NodeTransition(" + *instance + ")");
-        device = new NodeTransition(this, *instance, params);
     }
     else {
         trace.println("unknown node" + *instance );
