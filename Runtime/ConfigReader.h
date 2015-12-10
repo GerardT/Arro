@@ -36,7 +36,7 @@ private:
     DefinitionMap definitions;
 public:
 
-    ConfigReader(string filename, NodeDb& nodeDb);
+    ConfigReader(string& filename, NodeDb& nodeDb);
     void getDefinition(TiXmlElement* node);
 
     void getPrimitive(string* url, string* instance, StringMap& params);
@@ -44,7 +44,7 @@ public:
     void getParamsAndSubstitute(TiXmlElement* node, StringMap& import_params, StringMap& params);
 
 public:
-    void makeNodeInstance(string className, string instanceName, string instancePrefix, StringMap& import_params);
+    void makeNodeInstance(const string& className, const string& instanceName, const string& instancePrefix, StringMap& import_params);
 };
 
 #endif

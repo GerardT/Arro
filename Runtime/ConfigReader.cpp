@@ -16,7 +16,7 @@ using namespace std;
  * Constructor, which is passed the filename of the file to parse. It
  * will populate the passed (empty) NodeDb instance.
  */
-ConfigReader::ConfigReader(std::string filename, NodeDb& db):
+ConfigReader::ConfigReader(string& filename, NodeDb& db):
 
      trace(string("ConfigReader"), true),
      nodeDb(db)
@@ -43,8 +43,12 @@ ConfigReader::ConfigReader(std::string filename, NodeDb& db):
     }
     trace.println("");
 
+    string stringMain("Main");
+    string stringmain("main");
+    string stringempty("");
+
     // Recursively process all nodedefinitions, starting with "Main"
-    makeNodeInstance(string("Main"), string("main"), string(""), *params);
+    makeNodeInstance(stringMain, stringmain, stringempty, *params);
 }
 
 /**
@@ -141,7 +145,7 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
  *
  */
 void
-ConfigReader::makeNodeInstance(string typeName, string instanceName, string instancePrefix, StringMap& import_params) {
+ConfigReader::makeNodeInstance(const string& typeName, const string& instanceName, const string& instancePrefix, StringMap& import_params) {
     Definition* def = definitions[typeName];
     Process* device = NULL;
 

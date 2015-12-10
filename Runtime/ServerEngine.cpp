@@ -223,7 +223,8 @@ static void server()
                     try {
                 		pg = new PythonGlue("arro");
 
-                        ConfigReader reader(string(filename), *nodeDb);
+                		string stringfilename(filename);
+                        ConfigReader reader(stringfilename, *nodeDb);
                         ServerEngine::console("loading successful");
 
                         nodeDb->start();

@@ -1,6 +1,6 @@
-/arro.pyc
-/arro.py
+*.pyc
+*.py
 /Arro
 *.d
 *.o
-
+*.xml
