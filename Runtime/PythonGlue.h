@@ -34,7 +34,7 @@ private:
     std::map<PyObject *, NodePython*> instanceMap;
 
 public:
-	PythonGlue(char* filename);
+	PythonGlue(const string& filename);
 	~PythonGlue();
 
 	static PyObject* getDict();

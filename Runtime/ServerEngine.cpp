@@ -26,6 +26,8 @@
 static std::thread* thrd;
 static int newsockfd = -1;
 
+
+
 /**
  * Blocking read from socket until '\n' received. If socket is closed
  * then 'terminate' is returned in string buffer.
@@ -79,7 +81,6 @@ static int readln(int sockfd, char* buffer, size_t n/*size*/) {
 	*buf = '\0';
 	return totRead;
 }
-
 
 /**
  * Server thread for Eclipse client.
@@ -221,7 +222,7 @@ static void server()
             	{
                     nodeDb = new NodeDb();
                     try {
-                		pg = new PythonGlue("arro");
+                		pg = new PythonGlue(StringRef("arro"));
 
                 		string stringfilename(filename);
                         ConfigReader reader(stringfilename, *nodeDb);

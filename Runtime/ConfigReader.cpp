@@ -5,6 +5,7 @@
 
 #include <Trace.h>
 #include "ConfigReader.h"
+#include "ServerEngine.h"
 #include <NodeDb.h>
 #include <Pad.h>
 #include <Process.h>
@@ -43,12 +44,8 @@ ConfigReader::ConfigReader(string& filename, NodeDb& db):
     }
     trace.println("");
 
-    string stringMain("Main");
-    string stringmain("main");
-    string stringempty("");
-
     // Recursively process all nodedefinitions, starting with "Main"
-    makeNodeInstance(stringMain, stringmain, stringempty, *params);
+    makeNodeInstance(StringRef("Main"), StringRef("main"), StringRef(""), *params);
 }
 
 /**

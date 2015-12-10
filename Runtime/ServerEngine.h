@@ -11,4 +11,19 @@ public:
 	static void console(std::string s);
 };
 
+/**
+ * Little utility class.
+ */
+class StringRef {
+private:
+	std::string s;
+public:
+	StringRef(const char* str):
+		s(str){};
+
+	operator std::string&() {
+		return s;
+	}
+};
+
 #endif

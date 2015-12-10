@@ -12,7 +12,7 @@ void pythonModuleInit() {
  * Constructor, setup the Python interpreter and interface to C.
  * Created and deleted by ServerEngine.
  */
-PythonGlue::PythonGlue(char* filename):
+PythonGlue::PythonGlue(const string& filename):
 	pModule(NULL),
 	pDict(NULL)
 {
@@ -24,7 +24,8 @@ PythonGlue::PythonGlue(char* filename):
 	/*
 	 * Setup for C -> Python.
 	 */
-	if(loadModule(filename) == NULL) {
+	const char* modName = filename.c_str();
+	if(loadModule((char*)modName) == NULL) {
 	    // Undo Py_Initialize
 	    Py_Finalize();
 
