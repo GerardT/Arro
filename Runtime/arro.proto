@@ -1,0 +1,23 @@
+syntax = "proto3";
+package arro;
+message Value {
+    int32 value = 1;
+}
+
+message Token {
+    int32 value = 1;
+}
+
+message Tick {
+    int32 ms = 1;
+}
+
+message Mode {
+    string mode = 1;
+}
+
+message KeyValuePair {
+    string key = 1;
+    string value = 2;
+}
+
