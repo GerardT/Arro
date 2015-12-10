@@ -98,7 +98,7 @@ public class ArroNodeFeatureProvider extends DefaultFeatureProvider {
 			return new ArroBoxAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof IFile) {
 			IFile file = (IFile)context.getNewObject();
-			if(file.getName().endsWith(".anod")) {
+			if(file.getName().endsWith("." + Constants.NODE_EXT)) {
 				// Add a Node even if a diagram was added...
 				return new ArroNodeAddFeature(this);
 			} else if(file.getName().endsWith("." + Constants.DEVICE_EXT)) {

@@ -77,10 +77,10 @@ public class ResourceCache {
 	        IFolder folder = getDiagramFolder(null);
 
 	        
-	        if(folder.getFile(typeName + ".anod").exists()) {
-		        zip = new ArroZipFile(folder.getFile(typeName + ".anod"));
-	        } else if(folder.getFile(typeName + ".adev").exists()) {
-		        zip = new ArroZipFile(folder.getFile(typeName + ".adev"));
+	        if(folder.getFile(typeName + "." + Constants.NODE_EXT).exists()) {
+		        zip = new ArroZipFile(folder.getFile(typeName + "." + Constants.NODE_EXT));
+	        } else if(folder.getFile(typeName + "." + Constants.DEVICE_EXT).exists()) {
+		        zip = new ArroZipFile(folder.getFile(typeName + "." + Constants.DEVICE_EXT));
 	        }
 
 			DomainNodeDiagram domainDiagram = loadNodeDiagram(zip, typeName);
