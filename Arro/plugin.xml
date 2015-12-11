@@ -346,7 +346,7 @@
           point="org.eclipse.debug.core.launchConfigurationTypes">
        <launchConfigurationType
              delegate="arro.launcher.ArroLauncher"
-             modes= "run, debug"
+             modes= "run"
              id="Arro.launchConfigurationType"
              name="Arro launcher">
        </launchConfigurationType>
