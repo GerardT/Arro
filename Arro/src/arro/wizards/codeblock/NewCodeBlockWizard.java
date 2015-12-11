@@ -191,7 +191,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 		        // fill with initial data
 		        // Not very nice: we borrow the file for temporarily writing the diagram data into.
 		        // The file is actually used for storing the ZIP file
-				InputStream stream = openXmlStream(file, nodeName);
+				InputStream stream = openXmlStream(file, nodeName, language);
 		        byte[] b = new byte[1024];
 		        int count;
 
@@ -299,11 +299,11 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 		return diagramFile.getContents();
 	}
 
-	private InputStream openXmlStream(IFile file, String diagramName) throws CoreException {
+	private InputStream openXmlStream(IFile file, String diagramName, String language) throws CoreException {
 		String contents = 	"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
 							"<diagram>\n" +
 							"    <nodedefinition id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
-							"        <device id=\"" + device.getId() + "\"/>\n" +
+							"        <device id=\"" + device.getId() + "\" url=\"" + language + ":" + diagramName + "\"/>\n" +
 							"    </nodedefinition>\n" +
 							"</diagram>\n";
 		return new ByteArrayInputStream(contents.getBytes());

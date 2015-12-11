@@ -20,8 +20,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
@@ -51,6 +53,7 @@ public class ArroNodeSectionDevice extends GFPropertySection implements ITabbedP
 	    
 	    //valueLabel = factory.createCLabel(composite, "Node name:");
 	    UrlTextVal = factory.createText(composite, "");
+	    UrlTextVal.setEnabled(false);
 
 	    handleProperty(factory, composite, UrlTextVal);
 	}

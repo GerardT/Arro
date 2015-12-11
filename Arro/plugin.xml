@@ -299,7 +299,7 @@
               class="arro.wizards.codeblock.NewCodeBlockWizard"
               icon="icons/sample.gif"
               id="arro.wizards.NewDeviceWizard"
-              name="Python Code Block">
+              name="Code Block">
         </wizard>
     </extension>
     

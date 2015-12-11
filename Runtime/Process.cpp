@@ -135,36 +135,45 @@ Process::getPrimitive(const string* url, string* instance, ConfigReader::StringM
 
         }
 	}
-    if(*url == "pid") {
-        trace.println("new NodePid(" + *instance + ")");
-        device = new NodePid(this, *instance, params);
-    }
-    //else if(*url == "servo") {
-    //   trace.println("new NodeServo(" + *instance + ")");
-    //    new NodeServo(*instance, params);
-    //}
-    else if(*url == "linear") {
-        trace.println("new NodeLinear(" + *instance + ")");
-        device = new NodeLinear(this, *instance, params);
-    }
-    else if(*url == "tsReader") {
-        trace.println("new NodeTsReader(" + *instance + ")");
-        //device = new NodeTsReader(instance, params);
-    }
-    else if(*url == "tsSection") {
-        trace.println("new NodeTsSection(" + *instance + ")");
-        //device = new NodeTsSection(instance, params);
-    }
-    else if(*url == "timer") {
-        trace.println("new NodeTimer(" + *instance + ")");
-        device = new NodeTimer(this, *instance, params);
-    }
-    else if(*url == "pass") {
-    }
-    else {
-        trace.println("unknown node" + *instance );
-        ServerEngine::console(string("unknown node ") + *url);
-    }
+    else if(url->find("native:") == 0) {
+        trace.println("new NodePython(" + *instance + ")");
+        try {
+        	string className = url->substr(7);
+
+            if(className == "pid") {
+                trace.println("new NodePid(" + *instance + ")");
+                device = new NodePid(this, *instance, params);
+            }
+            //else if(className == "Servo") {
+            //   trace.println("new NodeServo(" + *instance + ")");
+            //    new NodeServo(*instance, params);
+            //}
+            else if(className == "Linear") {
+                trace.println("new NodeLinear(" + *instance + ")");
+                device = new NodeLinear(this, *instance, params);
+            }
+            else if(className == "TsReader") {
+                trace.println("new NodeTsReader(" + *instance + ")");
+                //device = new NodeTsReader(instance, params);
+            }
+            else if(className == "TsSection") {
+                trace.println("new NodeTsSection(" + *instance + ")");
+                //device = new NodeTsSection(instance, params);
+            }
+            else if(className == "Timer") {
+                trace.println("new NodeTimer(" + *instance + ")");
+                device = new NodeTimer(this, *instance, params);
+            }
+            else if(className == "pass") {
+            }
+            else {
+                trace.println("unknown node" + *instance );
+                ServerEngine::console(string("unknown node ") + className);
+            }
+        } catch(out_of_range &) {
+
+        }
+	}
 }
 
 
