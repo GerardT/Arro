@@ -91,11 +91,8 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
             // obtain contents from file, such as IO pads.
             className = ((IFile) obj).getName();
             int index1 = className.indexOf("." + Constants.NODE_EXT);
-            int index2 = className.indexOf("." + Constants.DEVICE_EXT);
             if(index1 > 0) {
                 className = className.substring(0, index1);
-            } else if(index2 > 0) {
-                className = className.substring(0, index2);
             } else {
             	return null;
             }

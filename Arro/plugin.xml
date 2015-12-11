@@ -118,7 +118,7 @@
        <editor
              class="arro.editors.MultiPageEditor"
              contributorClass="arro.editors.MultiPageEditorContributor"
-             extensions="anod,adev"
+             extensions="anod"
              icon="icons/sample.gif"
              id="arro.editors.MultiPageEditor"
              name="Function Diagram Editor">

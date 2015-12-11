@@ -12,9 +12,6 @@ public class PathUtil {
 		if(s.endsWith("." + Constants.NODE_EXT)) {
 			ret = s.substring(0, s.length() - 5 /* sizeof ".amsg" */);
 			s = ret;
-		} else if(s.endsWith("." + Constants.DEVICE_EXT)) {
-			ret = s.substring(0, s.length() - 5 /* sizeof ".amsg" */);
-			s = ret;
 		} else 	if(s.endsWith(".amsg")) {
 			ret = s.substring(0, s.length() - 5 /* sizeof ".amsg" */);
 			s = ret;

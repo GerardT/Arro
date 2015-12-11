@@ -372,8 +372,7 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 		        }
 			}
 		} else if (resource instanceof IFile && 
-				(resource.getName().endsWith("." + Constants.NODE_EXT)) ||
-				(resource.getName().endsWith("." + Constants.DEVICE_EXT))) {
+				(resource.getName().endsWith("." + Constants.NODE_EXT))) {
 			// Just concatenate XML files
 			IFile file = (IFile) resource;
 			

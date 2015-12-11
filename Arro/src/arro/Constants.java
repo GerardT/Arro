@@ -11,7 +11,6 @@ public class Constants {
 	public final static String HIDDEN_RESOURCE = ".";
 	public final static String NODE_EXT = "anod";
 	public final static String MESSAGE_EXT = "amsg";
-	public final static String DEVICE_EXT = "adev"; // FIXME make same extension; ArroNode doesn't know if refers device or node!!
 	public final static String DIAGRAM_TYPE = "Arro"; // must match with plugin.xml
 	
 	public final static String FUNCTION_BLOCK = "Function";

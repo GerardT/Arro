@@ -101,9 +101,6 @@ public class ArroNodeFeatureProvider extends DefaultFeatureProvider {
 			if(file.getName().endsWith("." + Constants.NODE_EXT)) {
 				// Add a Node even if a diagram was added...
 				return new ArroNodeAddFeature(this);
-			} else if(file.getName().endsWith("." + Constants.DEVICE_EXT)) {
-				// Add a Node even if a diagram was added...
-				return new ArroNodeAddFeature(this);
 			} else if(file.getName().endsWith(".amsg")) {
 				// Add a Node even if a diagram was added...
 				return new ArroPadAddFeature(this);

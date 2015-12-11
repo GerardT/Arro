@@ -60,10 +60,9 @@ public class ResourceCache {
 	/**
 	 * Open Function Diagram file <typeName> by unzipping it:
 	 * - <typeName>.anod into .<typeName>.anod and .<typeName>.anod.xml
-	 * - <typeName>.adev into .<typeName>.adev and .<typeName>.adev.xml
 	 * 
-	 * Then read the domain file (.<typeName>.anod or .<typeName>.adev) into
-	 * a DomainNodeDiagram instance and register this instance in the cache.
+	 * Then read the domain file (.<typeName>.anod) into a DomainNodeDiagram
+	 * instance and register this instance in the cache.
 	 * 
 	 * FIXME: must search all resources in the open project.
 	 */
@@ -79,8 +78,6 @@ public class ResourceCache {
 	        
 	        if(folder.getFile(typeName + "." + Constants.NODE_EXT).exists()) {
 		        zip = new ArroZipFile(folder.getFile(typeName + "." + Constants.NODE_EXT));
-	        } else if(folder.getFile(typeName + "." + Constants.DEVICE_EXT).exists()) {
-		        zip = new ArroZipFile(folder.getFile(typeName + "." + Constants.DEVICE_EXT));
 	        }
 
 			DomainNodeDiagram domainDiagram = loadNodeDiagram(zip, typeName);
