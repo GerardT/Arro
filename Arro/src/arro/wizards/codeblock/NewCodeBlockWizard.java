@@ -89,11 +89,12 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 	public boolean performFinish() {
 		final String containerName = page.getContainerName();
 		final String fileName = page.getFileName();
+		final String language = page.getLanguage();
 
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					doFinish(containerName, fileName, monitor);
+					doFinish(containerName, fileName, language, monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -119,7 +120,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 	 * the editor on the newly created file.
 	 */
 
-	private void doFinish(String containerName,	String nodeName, IProgressMonitor monitor) throws CoreException {
+	private void doFinish(String containerName,	String nodeName, String language, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
 		monitor.beginTask("Creating " + nodeName, 2);
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -157,7 +158,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 		        // fill with initial data
 		        // Not very nice: we borrow the file for temporarily writing the diagram data into.
 		        // The file is actually used for storing the ZIP file
-				InputStream stream = openMETAStream(file, nodeName);
+				InputStream stream = openMETAStream(file, nodeName, language);
 		        byte[] b = new byte[1024];
 		        int count;
 	
@@ -254,11 +255,12 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 	 * @throws CoreException 
 	 */
 
-	private InputStream openMETAStream(IFile file, String diagramName) throws CoreException {
+	private InputStream openMETAStream(IFile file, String diagramName, String language) throws CoreException {
 		String contents = 	"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
 							"<metadata>\n" +
 							"	<entry key=\"name\" value=\"" + diagramName + "\"/>\n" +
 							"	<entry key=\"type\" value=\"" + Constants.CODE_BLOCK + "\"/>\n" +
+							"	<entry key=\"language\" value=\"" + language + "\"/>\n" +
 							"	<entry key=\"version\" value=\"0.90\"/>\n" +
 							"</metadata>\n";
 		return new ByteArrayInputStream(contents.getBytes());

@@ -62,10 +62,11 @@ public class Constants {
      
 	public static final IColorConstant CLASS_BACKGROUND = new ColorConstant(255, 204, 153);
 
-	public static final int FunctionFile = 1;
-	public static final int DeviceDiagram = 2;
-	public static final int MessageDiagram = 3;
-	public static final int PrimitiveMessageDiagram = 4;
+	public static final int FunctionBlock = 1;
+	public static final int CodeBlockPython = 2;
+	public static final int CodeBlockNative = 3;
+	public static final int MessageDiagram = 4;
+	public static final int PrimitiveMessageDiagram = 5;
 	
 	public static final String PLUGIN_ID = "arro";
 

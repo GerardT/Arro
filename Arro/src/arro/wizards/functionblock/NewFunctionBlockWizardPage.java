@@ -58,6 +58,9 @@ public class NewFunctionBlockWizardPage extends WizardPage {
 		container.setLayout(layout);
 		layout.numColumns = 3;
 		layout.verticalSpacing = 9;
+		
+		// Row 1
+		
 		Label label = new Label(container, SWT.NULL);
 		label.setText("&Project:");
 
@@ -77,6 +80,9 @@ public class NewFunctionBlockWizardPage extends WizardPage {
 				handleBrowse();
 			}
 		});
+		
+		// Row 2
+		
 		label = new Label(container, SWT.NULL);
 		label.setText("&Node name:");
 
@@ -88,6 +94,8 @@ public class NewFunctionBlockWizardPage extends WizardPage {
 				dialogChanged();
 			}
 		});
+		
+		
 		initialize();
 		dialogChanged();
 		setControl(container);

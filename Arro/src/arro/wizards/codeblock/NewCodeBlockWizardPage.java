@@ -16,6 +16,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -33,6 +34,7 @@ public class NewCodeBlockWizardPage extends WizardPage {
 	private Text containerText;
 
 	private Text fileText;
+	private Combo language;
 
 	private ISelection selection;
 
@@ -57,6 +59,9 @@ public class NewCodeBlockWizardPage extends WizardPage {
 		container.setLayout(layout);
 		layout.numColumns = 3;
 		layout.verticalSpacing = 9;
+		
+		// Row 1
+		
 		Label label = new Label(container, SWT.NULL);
 		label.setText("&Project:");
 
@@ -76,6 +81,9 @@ public class NewCodeBlockWizardPage extends WizardPage {
 				handleBrowse();
 			}
 		});
+		
+		// Row 2
+		
 		label = new Label(container, SWT.NULL);
 		label.setText("&Node name:");
 
@@ -87,6 +95,25 @@ public class NewCodeBlockWizardPage extends WizardPage {
 				dialogChanged();
 			}
 		});
+		// dummy label to fill 3rd column... don't know a better solution.
+		label = new Label(container, SWT.NULL);
+
+		
+		// Row 3
+		
+		label = new Label(container, SWT.NULL);
+		label.setText("&Code:");
+
+		language = new Combo(container, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+		String items[] = {"Python", "Native"};
+		language.setItems(items);
+		language.select(0);
+		language.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				dialogChanged();
+			}
+		});
+		
 		initialize();
 		dialogChanged();
 		setControl(container);
@@ -179,5 +206,9 @@ public class NewCodeBlockWizardPage extends WizardPage {
 
 	public String getFileName() {
 		return fileText.getText();
+	}
+	
+	public String getLanguage() {
+		return language.getText();
 	}
 }

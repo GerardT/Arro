@@ -16,8 +16,6 @@ import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -44,7 +42,7 @@ public class ArroParamSection extends GFPropertySection/*AbstractPropertySection
 	private UndoActionHandler undoAction;
 	private RedoActionHandler redoAction;
 	private IUndoContext undoContext;
-	private boolean isDeviceDiagram;
+	private boolean isCodeDiagram;
 	
 
 	private TableViewer viewer;
@@ -52,7 +50,7 @@ public class ArroParamSection extends GFPropertySection/*AbstractPropertySection
 
 	public ArroParamSection(boolean b) {
 		
-		isDeviceDiagram = b;
+		isCodeDiagram = b;
 	    undoContext = new ObjectUndoContext(this);
 	    IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
 	    undoAction = new UndoActionHandler(part.getSite(), undoContext);
@@ -120,14 +118,14 @@ public class ArroParamSection extends GFPropertySection/*AbstractPropertySection
 		String[] titlesStandard = { "Key", "Value", "External Name" };
 		String[] titlesDevice   = { "External Name", "Value",  };
 		String[] titles;
-		if(isDeviceDiagram) {
+		if(isCodeDiagram) {
 			titles = titlesDevice;
 		}else {
 			titles = titlesStandard;
 		}
 		int[] bounds = { 100, 100, 100, 100 };
 
-	    if(isDeviceDiagram) {
+	    if(isCodeDiagram) {
 			// first column is for the type
 			TableViewerColumn col1 = createTableViewerColumn(titles[0], bounds[0], 0);
 			col1.setLabelProvider(new ColumnLabelProvider() {
@@ -260,7 +258,7 @@ public class ArroParamSection extends GFPropertySection/*AbstractPropertySection
 	    return null;
 	}
 	public boolean isDevice() {
-		return isDeviceDiagram;
+		return isCodeDiagram;
 	}
 
 	/**

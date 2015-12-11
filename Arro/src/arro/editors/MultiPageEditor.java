@@ -61,7 +61,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     
     private ArroZipFile zip = null;
 
-	private int documentType = Constants.FunctionFile;
+	private int documentType = Constants.FunctionBlock;
 
     /** The font chosen in page 1. */
     private Font font;
@@ -169,14 +169,18 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         zip = ResourceCache.getInstance().getZip(PathUtil.truncExtension(fileName));
         
         if(zip.getMETA("type").equals(Constants.FUNCTION_BLOCK)) {
-			documentType = Constants.FunctionFile;
-		} else {
-			documentType = Constants.DeviceDiagram;
+			documentType = Constants.FunctionBlock;
+		} else if(zip.getMETA("type").equals(Constants.CODE_BLOCK)){
+	        if(zip.getMETA("language").equals("Python")) {
+	        	documentType = Constants.CodeBlockPython;
+	        } else if(zip.getMETA("language").equals("Native")) {
+		        documentType = Constants.CodeBlockNative;
+	        }
         }
 
         // Create page 0 containing Graphiti editor. File was just unzipped in ResourceCache.
         createPage0(fei.getName(), zip);
-        if(documentType == Constants.DeviceDiagram) {
+        if(documentType == Constants.CodeBlockPython) {
             createPage1(fei.getName(), zip);
         }
         //createPage2();
@@ -199,7 +203,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
      */
     public void doSave(IProgressMonitor monitor) {
         getEditor(0).doSave(monitor);
-        if(documentType == Constants.DeviceDiagram) {
+        if(documentType == Constants.CodeBlockPython) {
             getEditor(1).doSave(monitor);
         }
         

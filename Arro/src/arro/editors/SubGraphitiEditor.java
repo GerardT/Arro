@@ -29,7 +29,7 @@ import arro.domain.ResourceCache;
 public class SubGraphitiEditor extends DiagramEditor {
 
 	//public final static String ID = "org.activiti.designer.diagrameditor"; //$NON-NLS-1$
-	private int documentType = Constants.FunctionFile;
+	private int documentType = Constants.FunctionBlock;
 	
 	private String pojoFilePath;
 	private String diagramName;

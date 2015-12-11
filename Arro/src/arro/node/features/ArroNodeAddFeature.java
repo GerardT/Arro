@@ -17,7 +17,6 @@ import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
-import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -69,7 +68,8 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
         DomainNodeDiagram domainNodeDiagram =  ((SubGraphitiEditor)dc).getDomainNodeDiagram();
         
 
-        if(((SubGraphitiEditor)dc).getDocumentType() == Constants.DeviceDiagram) {
+        int docType = ((SubGraphitiEditor)dc).getDocumentType();
+        if(docType == Constants.CodeBlockPython || docType == Constants.CodeBlockNative) {
         	// cannot add nodes in device diagram.
 
         	IStatus status = new Status(IStatus.ERROR, "Arro", /*reason*/"Not allowed to drop Node into Device diagram");

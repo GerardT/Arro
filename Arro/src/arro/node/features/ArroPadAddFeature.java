@@ -42,7 +42,8 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
         	Logger.out.trace(Logger.EDITOR, "not an editor");
         	return false;
         }
-        if(((SubGraphitiEditor)dc).getDocumentType() == Constants.DeviceDiagram) {
+        int docType = ((SubGraphitiEditor)dc).getDocumentType();
+        if(docType == Constants.CodeBlockPython || docType == Constants.CodeBlockNative) {
     		// If target diagram is device diagram then only allow dropping inside the box.
     		return context.getNewObject() instanceof IFile && !(context.getTargetContainer() instanceof Diagram);
         } else {
@@ -166,7 +167,8 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 //        
         ///////////////////////
 
-        if(((SubGraphitiEditor)dc).getDocumentType() != Constants.DeviceDiagram) {
+        int docType = ((SubGraphitiEditor)dc).getDocumentType();
+        if(docType != Constants.CodeBlockPython && docType != Constants.CodeBlockNative) {
         	/////// anchor ///////
     		// create an additional box relative anchor at middle-right
     		final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
