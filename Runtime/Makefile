@@ -35,8 +35,7 @@ SRCS         := main.cpp \
 		tinyxmlparser.cpp \
 		tinyxmlerror.cpp \
 		tinyxml.cpp \
-		tinystr.cpp \
-		socket.cpp
+		tinystr.cpp
 
 OBJS         := $(addprefix $(OBJDIR)/,$(SRCS:.cpp=.o))
 SRCS         := $(addprefix $(SRCDIR)/,$(SRCS))
