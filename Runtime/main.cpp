@@ -17,6 +17,7 @@ extern "C" {
 }
 
 using namespace std;
+using namespace Arro;
 
 #include <ServerEngine.h>
 

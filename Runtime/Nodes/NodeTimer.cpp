@@ -6,6 +6,8 @@
 #include <chrono>
 #include <thread>
 
+using namespace std;
+using namespace Arro;
 
 #define TIMEOUT 1000
 
@@ -13,7 +15,7 @@ static std::list<NodeTimer*> timers;
 static bool running = false;
 
 NodeTimer::NodeTimer(Process* d, string /*name*/, ConfigReader::StringMap& params):
-    trace(string("NodePid"), true),
+    trace("NodePid", true),
 	device(d) {
 
     try {
@@ -57,7 +59,7 @@ void NodeTimer::timer () {
     try {
     	device->getOutput("aTick")->submitMessage(tick);
     }
-    catch(null_pointer*) {
+    catch(runtime_error&) {
 
     }
 }

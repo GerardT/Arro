@@ -3,7 +3,7 @@
 
 #include <Trace.h>
 
-
+namespace Arro {
 class NodePass: public IDevice {
 public:
     Trace trace;
@@ -13,5 +13,6 @@ public:
     void handleMessage(MessageBuf* msg, std::string padName);
     void runCycle();
 };
+}
 
 #endif

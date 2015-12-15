@@ -16,7 +16,7 @@ using namespace google;
 using namespace protobuf;
 using namespace arro;
 
-
+namespace Arro {
 class NodeServo: public IDevice {
 public:
     Trace trace;
@@ -30,11 +30,12 @@ public:
     NodeDb::NodeMultiOutput* result;
     ConfigReader::StringMap params;
 	
-    NodeServo(string name, ConfigReader::StringMap p_params);
+    NodeServo(std::string name, ConfigReader::StringMap p_params);
     void doIt (int ms_elapsed);
     void handleMessage(MessageBuf* msg, std::string padName);
     void runCycle();
 };
+}
 
 #endif
 

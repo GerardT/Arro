@@ -2,9 +2,12 @@
 #include <NodeDb.h>
 #include <NodePid.h>
 
+using namespace std;
+using namespace Arro;
+
 
 NodePid::NodePid(Process* d, string /*name*/, ConfigReader::StringMap params):
-    trace(string("NodePid"), true),
+    trace("NodePid", true),
 	device(d) {
 
     previous_error = 0;

@@ -4,7 +4,7 @@
 
 
 NodePass::NodePass(string datatype, string name):
-    trace(string("NodePass"), false) {
+    trace("NodePass", false) {
 }
 
 void NodePass::handleMessage(MessageBuf* m, string padName) {

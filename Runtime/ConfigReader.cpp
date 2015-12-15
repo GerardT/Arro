@@ -3,23 +3,20 @@
 #include <vector>
 #include <exception>
 
-#include <Trace.h>
+#include "Trace.h"
 #include "ConfigReader.h"
 #include "ServerEngine.h"
-#include <NodeDb.h>
-#include <Pad.h>
-#include <Process.h>
+#include "NodeDb.h"
+#include "Pad.h"
+#include "Process.h"
 
 
 using namespace std;
+using namespace Arro;
 
-/**
- * Constructor, which is passed the filename of the file to parse. It
- * will populate the passed (empty) NodeDb instance.
- */
-ConfigReader::ConfigReader(string& filename, NodeDb& db):
+ConfigReader::ConfigReader(const string& filename, NodeDb& db):
 
-     trace(string("ConfigReader"), true),
+     trace("ConfigReader", true),
      nodeDb(db)
 {
     StringMap* params = new StringMap();
@@ -39,29 +36,24 @@ ConfigReader::ConfigReader(string& filename, NodeDb& db):
     // Collect all nodedefinition blocks and store them in map 'definitions'.
     TiXmlElement* elt = node->FirstChildElement("nodedefinition");
     while (elt) {
-        getDefinition(elt);
+        storeDefinition(elt);
         elt = elt->NextSiblingElement("nodedefinition");
     }
     trace.println("");
 
     // Recursively process all nodedefinitions, starting with "Main"
-    makeNodeInstance(StringRef("Main"), StringRef("main"), StringRef(""), *params);
+    makeNodeInstance("Main", "main", "", *params);
 }
 
-/**
- * Find a "nodedefinition" and store in map.
- * A nodedefinition for example:
- * <nodedefinition id="c02854c7-2cbc-4c30-9cb2-76872b3186b0" type="NewNode">
- *    :
- * </nodedefinition>
- *
- * @param node
- */
+ConfigReader::~ConfigReader() {
+	// empty
+}
+
 void
-ConfigReader::getDefinition(TiXmlElement* node) {
+ConfigReader::storeDefinition(TiXmlElement* node) {
     const char* attr = node->Attribute("type");
 
-    if(attr != NULL){
+    if(attr != nullptr){
         definitions[attr] = new Definition(node);
         trace.println(string("Added definition ") + attr);
     }
@@ -72,22 +64,6 @@ ConfigReader::getDefinition(TiXmlElement* node) {
 
 
 
-/**
- * Process parameters for a node in a diagram.
- * For example:
- * <nodedefinition id="c02854c7-2cbc-4c30-9cb2-76872b3186b0" type="NewNode">
- *     <node id="609bb62b-8f4c-4708-b168-7de11c6826e3" name="aNewDevice" type="NewDevice"/>
- *     <pad id="02b7ccf9-fe1f-43fe-8441-0da0b8a04b8d" input="true" name="afixed32" type="fixed32"/>
- *     <pad id="955c676e-d808-4aad-836b-2d376afa352c" input="true" name="abool" type="bool"/>
- *     <param key="P1" subst="Motor1" value="1"/>
- * </nodedefinition>
- *
- * If a parameter in import_params has a key equal to the 'subst' value in the param element,then
- * use the value of import_param to replace value in param element.
- * Return resulting map in 'params'.
- *
- * In the end, the parameters are really only used in primitive nodes.
- */
 void
 ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_params, StringMap& params) {
     //trace.println("getParamsAndSubstitute");
@@ -118,42 +94,19 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
 }
 
 
-/**
- * In a recursive way, process nodedefinition XML blocks (node).
- * For example:
- * <nodedefinition id="c02854c7-2cbc-4c30-9cb2-76872b3186b0" type="NewNode">
- *     <node id="609bb62b-8f4c-4708-b168-7de11c6826e3" name="aNewDevice" type="NewDevice"/>
- *     <pad id="02b7ccf9-fe1f-43fe-8441-0da0b8a04b8d" input="true" name="afixed32" type="fixed32"/>
- *     <pad id="955c676e-d808-4aad-836b-2d376afa352c" input="true" name="abool" type="bool"/>
- *     <param key="P1" subst="Motor1" value="1"/>
- * </nodedefinition>
- *
- * If (definition) node has subnodes, instantiate them as well.
- * If (definition) node has no subnodes, then assumed to be primitive node.
- *
-    new NodePid("main.pid1");
-    new NodePid("main.pid2");
-    NodeConfig c = new NodeConfig("main.config");
-    NodeTimer t = new NodeTimer("main.timer");
-
-    nodeDb().connect("main.timer.result", "main.pid1.timer");
-    nodeDb().connect("main.pid1.result", "main.pid1.sub1");
-    nodeDb().connect("main.config.result", "main.pid1.sub1");
- *
- */
 void
 ConfigReader::makeNodeInstance(const string& typeName, const string& instanceName, const string& instancePrefix, StringMap& import_params) {
     Definition* def = definitions[typeName];
-    Process* device = NULL;
+    Process* device = nullptr;
 
-    if(def == NULL)
+    if(def == nullptr)
     {
     	trace.fatal("Element not found: " + typeName);
     	return;
     }
     string instance = "";
 
-    instance = instancePrefix + NAME_SEPARATOR + instanceName;
+    instance = instancePrefix + ARRO_NAME_SEPARATOR + instanceName;
 
     trace.println("makeNodeInstance for " + typeName + ", " + instance);
     TiXmlElement* elt;
@@ -164,13 +117,13 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
     while(elt) {
         const string* typeURL = elt->Attribute(string("url"));
 
-        if(typeURL != NULL) {
+        if(typeURL != nullptr) {
             // collect all parameters
             StringMap* params = new StringMap();
             getParamsAndSubstitute(elt, import_params, *params);
 
         	// create Process object; inputs & outputs to be added later.
-            device = new Process(nodeDb, typeURL, &instance, *params);
+            device = new Process(nodeDb, *typeURL, instance, *params);
 
             delete params;
         }
@@ -183,7 +136,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
         const string* typeAttr = elt->Attribute(string("type"));
         const string* idAttr = elt->Attribute(string("name"));
         // trace.println("New node def ");
-        if(typeAttr != NULL && idAttr != NULL) {
+        if(typeAttr != nullptr && idAttr != nullptr) {
             //StringMap* params = new StringMap();
             //getParamsAndSubstitute(elt, import_params, *params);
             // collect all parameters
@@ -205,11 +158,11 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
         const string* inputAttr = elt->Attribute(string("input"));
         const string* runAttr = elt->Attribute(string("run"));
 
-        if(datatypeAttr != NULL && idAttr != NULL) {
-            string inst = instance + NAME_SEPARATOR + *idAttr;
+        if(datatypeAttr != nullptr && idAttr != nullptr) {
+            string inst = instance + ARRO_NAME_SEPARATOR + *idAttr;
             if(device) {
             	if(*inputAttr == "true") {
-            		if(runAttr != NULL && *runAttr == "true") {
+            		if(runAttr != nullptr && *runAttr == "true") {
                     	device->registerInput(*idAttr, true);
             		} else {
                     	device->registerInput(*idAttr, false);
@@ -231,10 +184,10 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
     while(elt) {
         const string* fromAttr = elt->Attribute(string("source"));
         const string* toAttr = elt->Attribute(string("target"));
-        if(fromAttr != NULL && toAttr != NULL) {
-            string from = instance + NAME_SEPARATOR + *fromAttr;
+        if(fromAttr != nullptr && toAttr != nullptr) {
+            string from = instance + ARRO_NAME_SEPARATOR + *fromAttr;
 
-            string to = instance + NAME_SEPARATOR + *toAttr;
+            string to = instance + ARRO_NAME_SEPARATOR + *toAttr;
 
             trace.println("nodeDb.connect(" + from + ", " + to + ")");
             nodeDb.connect(from, to);

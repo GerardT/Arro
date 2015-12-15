@@ -17,7 +17,7 @@ using namespace google;
 using namespace protobuf;
 using namespace arro;
 
-
+namespace Arro {
 class NodePid: public IDevice {
 public:
     Trace trace;
@@ -37,11 +37,12 @@ public:
     ConfigReader::StringMap params;
     Process* device;
 	
-    NodePid(Process* device, string name, ConfigReader::StringMap p_params);
+    NodePid(Process* device, std::string name, ConfigReader::StringMap p_params);
     void doIt (int ms_elapsed);
     void handleMessage(MessageBuf* msg, std::string padName);
     void runCycle();
 };
+}
 
 #endif
 

@@ -1,21 +1,24 @@
 #include "PythonGlue.h"
 #include "ServerEngine.h"
 
-static PythonGlue* instance = NULL;
+using namespace Arro;
+
+static PythonGlue* instance = nullptr;
 
 void pythonModuleInit() {
 
 }
 
 
-/**
- * Constructor, setup the Python interpreter and interface to C.
- * Created and deleted by ServerEngine.
- */
 PythonGlue::PythonGlue(const string& filename):
-	pModule(NULL),
-	pDict(NULL)
+	trace("PythonGlue", true),
+	pModule(nullptr),
+	pDict(nullptr)
 {
+	if(instance) {
+		trace.fatal("Tried to instantiate PythonGlue more than once.");
+	}
+
 	instance = this;
 
     // Initialize the Python Interpreter
@@ -25,7 +28,7 @@ PythonGlue::PythonGlue(const string& filename):
 	 * Setup for C -> Python.
 	 */
 	const char* modName = filename.c_str();
-	if(loadModule((char*)modName) == NULL) {
+	if(loadModule((char*)modName) == nullptr) {
 	    // Undo Py_Initialize
 	    Py_Finalize();
 
@@ -40,12 +43,8 @@ PythonGlue::PythonGlue(const string& filename):
 	insertFunctionToModule();
 }
 
-/**
- * Destructor, cleanup the Python interpreter and interface to C.
- * Created and deleted by ServerEngine.
- */
 PythonGlue::~PythonGlue() {
-	instance = NULL;
+	instance = nullptr;
 
 	/*
 	 * Cleanup for Python -> C.
@@ -62,33 +61,22 @@ PythonGlue::~PythonGlue() {
 }
 
 
-/**
- * This function getMessage is inserted in Python module and callable by
- * Python code. This function looks up the NodePython object that created the
- * Python object, and will call getMessage on that object.
- */
 PyObject*
 PythonGlue::getMessage(PyObject * /*self*/, PyObject *args)
 {
 	PyObject *obj;
 
     if(!PyArg_ParseTuple(args, "O", &obj))
-        return NULL;
+        return nullptr;
 
     NodePython* np = instance->instanceMap[obj];
     if(!np) {
-    	return NULL; // FIXME: do i need to set an error?
+    	return nullptr; // FIXME: do i need to set an error?
     } else {
     	return np->getMessage();
     }
 }
 
-
-/**
- * This function sendMessage is inserted in Python module and callable by
- * Python code. This function looks up the NodePython object that created the
- * Python object, and will call getMessage on that object.
- */
 PyObject*
 PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
 {
@@ -98,12 +86,12 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
 
     if(!PyArg_ParseTuple(args, "Oss", &obj, &pad, &string)) {
     	printf("wrong arguments\n");
-        return NULL;
+        return nullptr;
     }
 
     NodePython* np = instance->instanceMap[obj];
     if(!np) {
-    	return NULL; // FIXME: do i need to set an error?
+    	return nullptr; // FIXME: do i need to set an error?
     } else {
     	return np->sendMessage(pad, string);
     }
@@ -118,28 +106,12 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
 static PyMethodDef ArroMethods[] = {
 	{"getMessage",  PythonGlue::getMessage, METH_VARARGS, "Get a message from the queue."},
 	{"sendMessage",  PythonGlue::sendMessage, METH_VARARGS, "Send a message into the queue."},
-    {NULL, NULL, 0, NULL}        /* Sentinel */
+    {nullptr, nullptr, 0, nullptr}        /* Sentinel */
 };
 
-/**
- * The method table must be passed to the interpreter in the module’s initialization
- * function. The initialization function must be named initname(), where name is the
- * name of the module, and should be the only non-static item defined in the module file.
- */
-//PyMODINIT_FUNC
-//initarro(void)
-//{
-//    (void) Py_InitModule("arro", ArroMethods);
-//}
-//
-
-/**
- * Load Python program and return its module dictionary
- * so few extra C functions can be inserted into it.
- */
 PyObject*
 PythonGlue::loadModule(char* filename) {
-	PyObject *pName = NULL;
+	PyObject *pName = nullptr;
 
     // Build the name object
     pName = PyString_FromString(filename);
@@ -148,7 +120,7 @@ PythonGlue::loadModule(char* filename) {
     pModule = PyImport_Import(pName);
     Py_DECREF(pName);
 
-    if (pModule != NULL) {
+    if (pModule != nullptr) {
         // pDict is a borrowed reference
         pDict = PyModule_GetDict(pModule);
     }
@@ -156,28 +128,21 @@ PythonGlue::loadModule(char* filename) {
         //PyErr_Print();
         //fprintf(stderr, "Failed to load \"%s\"\n", filename);
         captureError();
-        return NULL;
+        return nullptr;
     }
 
     return pDict;
 }
 
-/**
- * Insert all function from ArroMethods into Python module.
- */
 void
 PythonGlue::insertFunctionToModule() {
-	for(PyMethodDef* def = ArroMethods; def->ml_name != NULL; def++) {
-		PyObject *func = PyCFunction_New(def, NULL);
+	for(PyMethodDef* def = ArroMethods; def->ml_name != nullptr; def++) {
+		PyObject *func = PyCFunction_New(def, nullptr);
 		PyDict_SetItemString(pDict, def->ml_name, func);
 		Py_DECREF(func);
 	}
 }
 
-/**
- * Let NodePython objects register themselves to allow getMessage and sendMessage
- * to forward Python calls to them.
- */
 void
 PythonGlue::registerInstance(PyObject* obj, NodePython* node) {
 	instance->instanceMap[obj] = node;

@@ -1,36 +1,37 @@
-#ifndef IDEVICE
-#define IDEVICE
+#ifndef ARRO_IDEVICE
+#define ARRO_IDEVICE
 
 #include <string>
 
-#include <google/protobuf/message.h>
 
-typedef std::string MessageBuf;
+namespace Arro {
+    typedef std::string MessageBuf;
 
-using namespace google;
-using namespace protobuf;
+    /**
+     * \brief Interface to be implemented by all devices.
+     *
+     * This interface is for implementing device instances:
+     * - handleMessage will pass data to the device.
+     * - runCycle will trigger running one execution cycle.
+     */
+    class IDevice {
+    public:
+        virtual ~IDevice() {};
 
-/**
- * Listener for updates to NodeSingleInput objects, invoked by
- * NodeSingleInput::handleMessage().
- */
-class IPadListener {
-public:
-	virtual ~IPadListener() {};
-	virtual void handleMessage(MessageBuf* msg, std::string padName) = 0;
-};
+        /**
+         * Handle a message that is sent to this node.
+         *
+         * \param msg Message sent to this node.
+         * \param padName name of pad that message was sent to.
+         */
+        virtual void handleMessage(MessageBuf* msg, std::string padName) = 0;
 
-/**
- * Interface to be implemented by all devices.
- * - handleMessage will pass data to the device.
- * - runCycle will trigger running one execution cycle.
- */
-class IDevice {
-public:
-	virtual ~IDevice() {};
-    virtual void handleMessage(MessageBuf* msg, std::string padName) = 0;
-    virtual void runCycle() = 0;
-};
+        /**
+         * Make the node execute a processing cycle.
+         */
+        virtual void runCycle() = 0;
+    };
+}
 
 #endif
 

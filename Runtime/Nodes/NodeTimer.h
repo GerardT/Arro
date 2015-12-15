@@ -18,6 +18,9 @@ using namespace google;
 using namespace protobuf;
 using namespace arro;
 
+namespace Arro
+{
+
 
 class NodeTimer: public IDevice {
     Trace trace;
@@ -39,5 +42,6 @@ public:
     static void start ();
     static void stop ();
 };
+}
 
 #endif

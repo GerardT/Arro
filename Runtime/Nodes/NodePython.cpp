@@ -4,6 +4,9 @@
 #include <NodePython.h>
 #include <ServerEngine.h>
 
+using namespace std;
+using namespace Arro;
+
 
 /**
  * Create Process instance that executes Python code.
@@ -11,7 +14,7 @@
  * will be used for the lifetime of the Process.
  */
 NodePython::NodePython(Process* d, string& className, ConfigReader::StringMap /*params*/):
-    trace(string("NodePython"), true),
+    trace("NodePython", true),
 	device(d)
 {
 	PyObject *pDict = PythonGlue::getDict();
@@ -22,8 +25,8 @@ NodePython::NodePython(Process* d, string& className, ConfigReader::StringMap /*
 	// Create an instance of the class
 	if (PyCallable_Check(pClass))
 	{
-		pInstance = PyObject_CallObject(pClass, NULL);
-		if(pInstance == NULL) {
+		pInstance = PyObject_CallObject(pClass, nullptr);
+		if(pInstance == nullptr) {
 	        throw std::runtime_error("Failed to instantiate Python class");
 		}
 		PythonGlue::registerInstance(pInstance, this);
@@ -57,8 +60,8 @@ NodePython::handleMessage(MessageBuf* msg, std::string padName) {
  */
 void
 NodePython::runCycle() {
-	pValue = PyObject_CallMethod(pInstance, "runCycle", NULL); // no parameters
-	if (pValue != NULL)
+	pValue = PyObject_CallMethod(pInstance, "runCycle", nullptr); // no parameters
+	if (pValue != nullptr)
 	{
 		printf("Return of call : %ld\n", PyInt_AsLong(pValue));
 		Py_DECREF(pValue);
@@ -101,7 +104,7 @@ NodePython::sendMessage(char* padName, char* message) {
 	    Py_INCREF(Py_None);
 	    return Py_None;
     }
-    return NULL;
+    return nullptr;
 }
 
 

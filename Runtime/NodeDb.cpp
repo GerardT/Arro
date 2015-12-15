@@ -10,17 +10,10 @@
 
 #define TIMEOUT 100
 
-/**
- * NodeDb is basically the runtime process. This is the constructor.
- * Instead of just registering a list of nodes where each node maintains its
- * own inputs and outputs, here we have:
- * - a dictionary of nodes, key e.g. node.subnode.subsubnode
- * - a dictionary of inputs, key e.g. node.subnode.subsubnode.inputpad
- * - a dictionary of outputs, key e.g. node.subnode.subsubnode.outputpad
- * Also the message queues are created here.
- */
+using namespace Arro;
+
 NodeDb::NodeDb():
-    trace(string("NodeDb"), true),
+    trace("NodeDb", true),
     allInputs(),
     allOutputs(),
 	allNodes(),
@@ -31,9 +24,6 @@ NodeDb::NodeDb():
 	running(false) {
 }
 
-/**
- * Destructor. Cleanup message queues and static structures.
- */
 NodeDb::~NodeDb() {
     while(outQueue.empty() != true) {
         FullMsg* fm = outQueue.front();
@@ -55,8 +45,8 @@ NodeDb::~NodeDb() {
 		delete elt.second;
 	}
 
-	for(std::map<string, INode*>::iterator it = allNodes.begin(); it != allNodes.end() ; ++it) {
-		std::pair<string, INode*> elt = *it;
+	for(std::map<string, AbstractNode*>::iterator it = allNodes.begin(); it != allNodes.end() ; ++it) {
+		std::pair<string, AbstractNode*> elt = *it;
 		delete elt.second;
 	}
 }
@@ -66,17 +56,11 @@ NodeDb::NodeSingleInput::handleMessage(MessageBuf* msg) {
 	listen->handleMessage(msg);
 }
 
-/**
- * Constructor for output.
- */
 NodeDb::NodeMultiOutput::NodeMultiOutput(NodeDb* n):
 		nm(n),
 		inputs() {
 }
 
-/**
- * Connect one input to the node output.
- */
 void
 NodeDb::NodeMultiOutput::connectInput(NodeSingleInput* i) {
 	if(i) {
@@ -87,7 +71,7 @@ NodeDb::NodeMultiOutput::connectInput(NodeSingleInput* i) {
 	}
 }
 void
-NodeDb::NodeMultiOutput::forwardMessage(string* msg) {
+NodeDb::NodeMultiOutput::forwardMessage(MessageBuf* msg) {
     for(std::vector<NodeSingleInput*>::iterator it = inputs.begin(); it != inputs.end() ; ++it) {
         NodeSingleInput* i = *it;
         i->handleMessage(msg);
@@ -108,44 +92,27 @@ NodeDb::NodeMultiOutput::submitMessageBuffer(const char* msg) {
 
 
 
-/**
- * Get a node from its name.
- */
-INode*
-NodeDb::getNode(string& name) {
+AbstractNode*
+NodeDb::getNode(const string& name) {
     try {
-        INode* n = allNodes[name];
-        return (INode*)n;
+        AbstractNode* n = allNodes[name];
+        return (AbstractNode*)n;
     }
     catch (const std::out_of_range& oor) {
         trace.fatal("### non-registered name " + name);
-        return NULL;
+        return nullptr;
     }
 }
 
 
-/**
- * INode is the NodeDb-internal representation of a Node.
- * A Node first registers itself, then registers inputs and outputs.
- */
-INode::INode(const string& n) {
-    name = n;
-}
-
-INode*
-NodeDb::registerNode(INode* node, const string& name) {
+AbstractNode*
+NodeDb::registerNode(AbstractNode* node, const string& name) {
      allNodes[name] = node;
      return node;
 }
 
-/**
- * Register an input with the node.
- * Note: a pad registers as node with one input and one output.
- * @param name Name of the interface as "node.node.interface".
- * @param n The instance of the node.
- */
 NodeDb::NodeSingleInput*
-NodeDb::registerNodeInput(INode* node, const string& interfaceName, NodeDb::NodeSingleInput::IListener* listen) {
+NodeDb::registerNodeInput(AbstractNode* node, const string& interfaceName, NodeDb::NodeSingleInput::IListener* listen) {
 	NodeDb::NodeSingleInput* n = new NodeDb::NodeSingleInput(/*interfaceName, */listen, node);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
@@ -153,20 +120,14 @@ NodeDb::registerNodeInput(INode* node, const string& interfaceName, NodeDb::Node
     	trace.println(string("registering input ") + node->getName());
         return (NodeDb::NodeSingleInput*)n;
     } else {
-    	allInputs[node->getName() + NAME_SEPARATOR + interfaceName] = n;
-    	trace.println(("registering input ") + node->getName() + NAME_SEPARATOR + interfaceName);
+    	allInputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = n;
+    	trace.println(("registering input ") + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
         return (NodeDb::NodeSingleInput*)n;
     }
 }
 
-/**
- * Register an output with the node.
- * Note: a pad registers as node with one input and one output.
- * @param name Name of the interface as "node.node.interface".
- * @param n The instance of the node.
- */
 NodeDb::NodeMultiOutput*
-NodeDb::registerNodeOutput(INode* node, const string& interfaceName) {
+NodeDb::registerNodeOutput(AbstractNode* node, const string& interfaceName) {
 	NodeDb::NodeMultiOutput* n = new NodeDb::NodeMultiOutput(/*interfaceName*/this);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
@@ -174,32 +135,23 @@ NodeDb::registerNodeOutput(INode* node, const string& interfaceName) {
     	trace.println("registering output " + node->getName());
         return (NodeMultiOutput*)n;
     } else {
-    	allOutputs[node->getName() + NAME_SEPARATOR + interfaceName] = n;
-    	trace.println("registering output " + node->getName() + NAME_SEPARATOR + interfaceName);
+    	allOutputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = n;
+    	trace.println("registering output " + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
         return (NodeMultiOutput*)n;
     }
 }
 
-/**
- * Find an output from a name "node.subnode.subsub.output".
- */
 NodeDb::NodeMultiOutput*
 NodeDb::getOutput(const string& name) {
 	return (NodeMultiOutput*)(allOutputs[name]);
 }
 
-/**
- * Constructor for (addressable) message container.
- */
 NodeDb::FullMsg::FullMsg(NodeMultiOutput* o /*string s*/, MessageBuf* m) {
     //target = s;
     output = o;
     msg = m;
 }
 
-/**
- * Swap (full) input queue and (empty) output queue.
- */
 void
 NodeDb::toggleQueue() {
 	  queue<FullMsg*>* tmp = pOutQueue;
@@ -209,10 +161,6 @@ NodeDb::toggleQueue() {
 
 
 
-/**
- * Send all messages in queue to nodes, trigger runCycle methods on nodes.
- * Then swap queues.
- */
 void
 NodeDb::runCycle(NodeDb* nm) {
 
@@ -224,7 +172,7 @@ NodeDb::runCycle(NodeDb* nm) {
 		        FullMsg* fm = nm->pOutQueue->front();
 		        nm->trace.println("====================> new msg");
 		        nm->pOutQueue->pop();
-		        if(fm != NULL) {
+		        if(fm != nullptr) {
 		        	MessageBuf* msg = fm->msg;
 		            fm->output->forwardMessage(msg);
 					delete msg;
@@ -234,8 +182,8 @@ NodeDb::runCycle(NodeDb* nm) {
 		    }
 
 		    /* Then trigger all runCycle methods on nodes */
-		    for(map<string, INode*>::iterator it = nm->allNodes.begin(); it != nm->allNodes.end() ; ++it) {
-		    	std::pair<string, INode*> n = *it;
+		    for(map<string, AbstractNode*>::iterator it = nm->allNodes.begin(); it != nm->allNodes.end() ; ++it) {
+		    	std::pair<string, AbstractNode*> n = *it;
 		    	n.second->runCycle();
 		    }
 
@@ -246,9 +194,6 @@ NodeDb::runCycle(NodeDb* nm) {
 	}
 }
 
-/**
- * Start the runtime process by creating and starting thread for it.
- */
 void
 NodeDb::start() {
 	running = true;
@@ -258,9 +203,6 @@ NodeDb::start() {
 	NodeTimer::start();
 }
 
-/**
- * Stop the runtime process by stopping the thread.
- */
 void
 NodeDb::stop() {
 	if(running) {
@@ -274,14 +216,10 @@ NodeDb::stop() {
 }
 
 
-/**
- * Connect node output to node input.
- * example: connect("main.pid1.output", "main.pid1.input")
- */
 void
 NodeDb::connect(string& output, string& input) {
-    NodeMultiOutput* out = NULL;
-    NodeSingleInput* in = NULL;
+    NodeMultiOutput* out = nullptr;
+    NodeSingleInput* in = nullptr;
 
     try {
         out = allOutputs[output];

@@ -30,7 +30,6 @@ SRCS         := main.cpp \
 		PythonGlue.cpp \
 		Nodes/NodePid.cpp \
 		Nodes/NodePython.cpp \
-		Nodes/NodeLinear.cpp \
 		Nodes/NodeTimer.cpp \
 		tinyxmlparser.cpp \
 		tinyxmlerror.cpp \
@@ -39,6 +38,9 @@ SRCS         := main.cpp \
 
 OBJS         := $(addprefix $(OBJDIR)/,$(SRCS:.cpp=.o))
 SRCS         := $(addprefix $(SRCDIR)/,$(SRCS))
+
+-include $(OBJS:.o=.d)
+
 
 all: $(OBJS)
 	$(CXX) -o Arro $(LFLAGS) $(OBJS) $(LIBS) 

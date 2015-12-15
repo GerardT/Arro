@@ -1,29 +1,44 @@
-#ifndef SERVER_ENGINE_H
-#define SERVER_ENGINE_H
+#ifndef ARRO_SERVER_ENGINE_H
+#define ARRO_SERVER_ENGINE_H
 
 #include <string>
 
-class ServerEngine {
 
-public:
-	static void start();
-	static void stop();
-	static void console(std::string s);
-};
+namespace Arro {
 
-/**
- * Little utility class.
- */
-class StringRef {
-private:
-	std::string s;
-public:
-	StringRef(const char* str):
-		s(str){};
+    /**
+     * \brief Wrapper class that encapsulates ServerEngine functions.
+     *
+     * Should not be instantiated.
+     */
+    class ServerEngine {
 
-	operator std::string&() {
-		return s;
-	}
-};
+    public:
+        /**
+         * This class is not for instantiation.
+         */
+        ServerEngine() = delete;
+        ServerEngine(const ServerEngine&) = delete;
+        ServerEngine& operator=(const ServerEngine& other) = delete;
+
+        /**
+         * Start server thread for Eclipse client.
+         */
+        static void start();
+
+        /**
+         * Stop server thread for Eclipse client. Will never be called.
+         */
+        static void stop();
+
+        /**
+         * Send text message to Eclipse client. Client will filter for these
+         * message in order to determine success or failure of command sent.
+         *
+         * \param s String to send to Eclipse console.
+         */
+        static void console(std::string s);
+    };
+}
 
 #endif

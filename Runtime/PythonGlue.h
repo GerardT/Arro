@@ -1,49 +1,107 @@
-#ifndef PYTHON_H
-#define PYTHON_H
+#ifndef ARRO_PYTHON_GLUE_H
+#define ARRO_PYTHON_GLUE_H
 
 
-#include "Python.h"
+#include <Python.h>
 
 #include <tinyxml.h>
 #include <iostream>
 #include <sstream>
 #include <map>
 
-#include <arro.pb.h>
-#include "../ConfigReader.h"
-#include "../NodeDb.h"
-#include "../Process.h"
+#include "arro.pb.h"
+#include "ConfigReader.h"
+#include "NodeDb.h"
+#include "Process.h"
 #include "NodePython.h"
 
-using namespace std;
-using namespace google;
-using namespace protobuf;
-using namespace arro;
 
-/**
- * C <-> Python interface. This clas should be used as singleton.
- * Construction it will setup Python interfaces.
- */
-class PythonGlue {
-private:
-    PyObject *pModule, *pDict;
+namespace Arro {
 
-	PyObject* loadModule(char* filename);
-	void insertFunctionToModule();
+    /**
+     * \brief C --> Python interface.
+     *
+     * This class should be used as singleton.
+     * Construction it will setup Python interfaces.
+     */
+    class PythonGlue {
+    public:
+        /**
+         * Constructor, setup the Python interpreter and interface to C.
+         * Created and deleted by ServerEngine.
+         *
+         * Only max one instance of this class may exist at any time.
+         *
+         * \param filename Name of Python module to load.
+         */
+        PythonGlue(const std::string& filename);
+        ~PythonGlue();
 
-    std::map<PyObject *, NodePython*> instanceMap;
+        // Copy and assignment is not supported.
+        PythonGlue(const PythonGlue&) = delete;
+        PythonGlue& operator=(const PythonGlue& other) = delete;
 
-public:
-	PythonGlue(const string& filename);
-	~PythonGlue();
+        /**
+         * Get Python dictionary of the loaded module.
+         *
+         * \return Python dictionary.
+         */
+        static PyObject* getDict();
 
-	static PyObject* getDict();
-	static void registerInstance(PyObject* instance, NodePython* node);
-	static PyObject* getMessage(PyObject *self, PyObject *args);
-	static PyObject* sendMessage(PyObject *self, PyObject *args);
-	static void captureError();
-};
+        /**
+         * Let NodePython objects register themselves to allow getMessage and sendMessage
+         * to forward Python calls to them.
+         *
+         * \param instance Python instance.
+         * \param node NodePython instance that corresponds to Python instance.
+         */
+        static void registerInstance(PyObject* instance, NodePython* node);
 
+        /**
+         * This function getMessage is inserted in Python module and callable by
+         * Python code. This function looks up the NodePython object that created the
+         * Python object, and will call getMessage on that object.
+         *
+         * \param self Python self object.
+         * \args Python arguments.
+         */
+        static PyObject* getMessage(PyObject *self, PyObject *args);
+
+        /**
+         * This function sendMessage is inserted in Python module and callable by
+         * Python code. This function looks up the NodePython object that created the
+         * Python object, and will call getMessage on that object.
+         *
+         * \param self Python self object.
+         * \args Python arguments.
+         */
+        static PyObject* sendMessage(PyObject *self, PyObject *args);
+
+        /**
+         * In case of Python error, capture the error code and send to Eclipse client.
+         */
+        static void captureError();
+
+    private:
+
+        /**
+         * Insert all functions from ArroMethods into Python module.
+         */
+        void insertFunctionToModule();
+
+        /**
+         * Load Python program and return its module dictionary
+         * so few extra C functions can be inserted into it.
+         *
+         * \param filename Name of Python module to load.
+         */
+        PyObject* loadModule(char* filename);
+
+        Trace trace;
+        PyObject *pModule, *pDict;
+        std::map<PyObject *, NodePython*> instanceMap;
+    };
+}
 
 #endif
 

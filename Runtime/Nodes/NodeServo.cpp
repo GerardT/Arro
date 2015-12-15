@@ -138,10 +138,10 @@ public:
 
 #include <NodeServo.h>
 
-static Servo* pServo = NULL;
+static Servo* pServo = nullptr;
 
 NodeServo::NodeServo(string name, ConfigReader::StringMap params):
-    trace(string("NodeServo"), true) {
+    trace("NodeServo", true) {
 
     if(!pServo) {
         pServo = new Servo();
@@ -159,7 +159,7 @@ NodeServo::NodeServo(string name, ConfigReader::StringMap params):
         exit(1);
     }
 
-    //INode* n = NodeDb::getRef()->registerNode(name);
+    //AbstractNode* n = NodeDb::getRef()->registerNode(name);
 
     /* Almost anonymous class (if 'Anon' removed), but needed constructor */
     class AnonValue: public IPadListener {

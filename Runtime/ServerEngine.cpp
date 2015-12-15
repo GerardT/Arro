@@ -9,28 +9,30 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <thread>
+#include <sys/stat.h>  /*for getting file size using stat()*/
+#include <sys/sendfile.h>  /*for sendfile()*/
+#include <fcntl.h>  /*for O_RDONLY*/
 
-
-/*for getting file size using stat()*/
-#include <sys/stat.h>
-
-/*for sendfile()*/
-#include <sys/sendfile.h>
-
-/*for O_RDONLY*/
-#include <fcntl.h>
-#include <NodeDb.h>
-#include <Nodes/NodeTimer.h>
+#include "NodeDb.h"
+#include "NodeTimer.h"
 #include "PythonGlue.h"
 
-static std::thread* thrd;
+using namespace std;
+using namespace Arro;
+
+static thread* thrd = nullptr;
 static int newsockfd = -1;
-
-
+static Trace trace("ServerEngine", true);
 
 /**
  * Blocking read from socket until '\n' received. If socket is closed
  * then 'terminate' is returned in string buffer.
+ *
+ * \param sockfd File descriptor for IP socket.
+ * \param buffer Buffer to return string into. May contain "terminate" if socket closed or EOF received.
+ * \param n Max nr of characters to read.
+ *
+ * \return Actual nr of characters read.
  */
 static int readln(int sockfd, char* buffer, size_t n/*size*/) {
     ssize_t numRead;                    /* # of bytes fetched by last read() */
@@ -38,12 +40,12 @@ static int readln(int sockfd, char* buffer, size_t n/*size*/) {
     char *buf;
     char ch;
 
-    if (n <= 0 || buffer == NULL) {
+    if (n <= 0 || buffer == nullptr) {
         errno = EINVAL;
         return -1;
     }
 
-	buf = buffer;                       /* No pointer arithmetic on "void *" */
+	buf = buffer;
 
 	totRead = 0;
 	for (;;) {
@@ -53,18 +55,17 @@ static int readln(int sockfd, char* buffer, size_t n/*size*/) {
 			if (errno == EINTR)         /* Interrupted --> restart read() */
 				continue;
 			else {
-				// Make loosing socket to terminate process.
+				// Make losing socket to terminate process.
 				strcpy(buffer, "terminate");
 				return strlen("terminate");
 			}
 
 		} else if (numRead == 0) {      /* EOF */
-			if (totRead == 0) {          /* No bytes read; return 0 */
-//				return 0;
+			if (totRead == 0) {         /* No bytes read */
 				strcpy(buffer, "terminate");
 				return strlen("terminate");
 			}
-			else                        /* Some bytes read; add '\0' */
+			else
 				break;
 
 		} else {                        /* 'numRead' must be 1 if we get here */
@@ -100,8 +101,8 @@ static void server()
     char buffer[256];
     struct sockaddr_in serv_addr, cli_addr;
     int i, n;
-    NodeDb* nodeDb = NULL;
-    PythonGlue* pg = NULL;
+    NodeDb* nodeDb = nullptr;
+    PythonGlue* pg = nullptr;
 
     /* First call to socket() function */
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -169,7 +170,7 @@ static void server()
                 size = obj.st_size;
                 send(newsockfd, &size, sizeof(int),0);
                 filehandle = open("temps.txt", O_RDONLY);
-                sendfile(newsockfd,filehandle,NULL,size);
+                sendfile(newsockfd,filehandle,nullptr,size);
             }
             else if(!strcmp(command,"get"))
             {
@@ -181,7 +182,7 @@ static void server()
                     size = 0;
                 send(newsockfd, &size, sizeof(int), 0);
                 if(size)
-                    sendfile(newsockfd, filehandle, NULL, size);
+                    sendfile(newsockfd, filehandle, nullptr, size);
 
             }
             else if(!strcmp(command, "put"))
@@ -222,10 +223,9 @@ static void server()
             	{
                     nodeDb = new NodeDb();
                     try {
-                		pg = new PythonGlue(StringRef("arro"));
+                		pg = new PythonGlue("arro");
 
-                		string stringfilename(filename);
-                        ConfigReader reader(stringfilename, *nodeDb);
+                        ConfigReader reader(filename, *nodeDb);
                         ServerEngine::console("loading successful");
 
                         nodeDb->start();
@@ -246,12 +246,12 @@ static void server()
             	/* 2: stop python */
             	if(pg) {
             		delete pg;
-                	pg = NULL;
+                	pg = nullptr;
             	}
 
             	/* 3: delete node database */
             	delete nodeDb; // will automatically stop timers etc.
-            	nodeDb = NULL;
+            	nodeDb = nullptr;
 
             	/* 4: close socket - probably already closed by Eclipse client */
                 //ServerEngine::console("stopped");
@@ -272,31 +272,28 @@ static void server()
     }
 }
 
-/**
- * Start server thread for Eclipse client.
- */
 void ServerEngine::start()
 {
-    thrd = new std::thread(server);     // spawn new thread that calls server()
+	if(!thrd) {
+	    thrd = new std::thread(server);     // spawn new thread that calls server()
+	}
+	else {
+		trace.fatal("Thread already present");
+	}
 
-    std::cout << "server started...\n";
+    trace.println("server started...");
 }
 
-/**
- * Stop server thread for Eclipse client. Will never be called.
- */
 void ServerEngine::stop()
 {
-  // synchronize threads:
-    thrd->join();                // pauses until first finishes
+    // synchronize threads:
+    thrd->join();                // pauses until finishes
 
-    std::cout << "server completed.\n";
+    delete thrd;
+
+    trace.println("server completed.");
 }
 
-/**
- * Send text message to Eclipse client. Client will filter for these
- * message in order to determine success or failure of command sent.
- */
 void ServerEngine::console(string s)
 {
 	if(newsockfd >= 0) {

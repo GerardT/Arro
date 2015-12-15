@@ -21,6 +21,7 @@ using namespace protobuf;
 using namespace arro;
 
 
+namespace Arro {
 class NodePython: public IDevice {
 private:
     PyObject *pFunc, *pValue, *pArgs, *pClass, *pInstance;
@@ -40,6 +41,7 @@ public:
     PyObject* getMessage();
     PyObject* sendMessage(char* pad, char* string);
 };
+}
 
 #endif
 
