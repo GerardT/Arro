@@ -184,7 +184,7 @@ NodeDb::runCycle(NodeDb* nm) {
             }
 
             /* Then trigger all runCycle methods on nodes */
-            for_each(nm->allNodes.begin(), nm->allNodes.end(), [](pair<string, AbstractNode*> n) { n.second->runCycle(); });
+            for_each(nm->allNodes.begin(), nm->allNodes.end(), [&](pair<string, AbstractNode*> n) { n.second->runCycle(); });
 
             /* And switch the queues */
             nm->toggleQueue();

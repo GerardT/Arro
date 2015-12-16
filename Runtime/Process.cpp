@@ -61,7 +61,6 @@ Process::runCycle() {
 void
 Process::registerInput(const string& interfaceName, bool enableRunCycle) {
     // Almost anonymous class (if 'Anon' removed), but needed constructor.
-    // TODO thinking of using a lambda here.
 
     class Anon: public NodeDb::NodeSingleInput::IListener {
         Process* owner;
