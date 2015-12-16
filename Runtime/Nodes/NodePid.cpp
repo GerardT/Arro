@@ -29,7 +29,8 @@ NodePid::NodePid(Process* d, string& /*name*/, ConfigReader::StringMap& params):
     }
 }
 
-void NodePid::handleMessage(MessageBuf* m, const std::string& padName) {
+void
+NodePid::handleMessage(MessageBuf* m, const std::string& padName) {
     if(padName == "actualValue") {
         Value* msg = new Value();
         msg->ParseFromString(m->c_str());
@@ -62,7 +63,8 @@ void NodePid::handleMessage(MessageBuf* m, const std::string& padName) {
     }
 }
 
-void NodePid::runCycle() {
+void
+NodePid::runCycle() {
 
     trace.println(string("NodePid input = ") + to_string((long double)actual_position));
 

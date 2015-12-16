@@ -23,7 +23,7 @@ namespace Arro {
          * \param c Name of the class, this is shown in output.
          * \param on Switch if serial output is enabled for this instance.
          */
-        Trace(std::string c, bool on) {
+        Trace(const std::string& c, bool on) {
             cl = c;
             out = on;
         }
@@ -39,7 +39,12 @@ namespace Arro {
          *
          * \param s String to be printed.
          */
-        void println(const std::string s) const {
+        void println(const std::string& s, int err) const {
+            if(out == true) {
+                std::cout << cl << "==>" << s << " ==> " << err  << std::endl;
+            }
+        }
+        void println(const std::string& s) const {
             if(out == true) {
                 std::cout << cl << "==>" << s << std::endl;
             }
@@ -50,7 +55,11 @@ namespace Arro {
          *
          * \param s String to be printed.
          */
-        void fatal(const std::string s) const {
+        void fatal(const std::string& s, int err) const {
+            std::cout << cl << "==>" << s << " ==> " << err << std::endl;
+            exit(0);
+        }
+        void fatal(const std::string& s) const {
             std::cout << cl << "==>" << s << std::endl;
             exit(0);
         }
@@ -61,7 +70,7 @@ namespace Arro {
          * \params s String to be printed
          * \param node XML node to be printed as well.
          */
-        void println(const std::string s, TiXmlElement* node) const {
+        void println(const std::string& s, TiXmlElement* node) const {
             if(out == true) {
                 std::cout << cl << "==>" << s << node << std::endl;
             }

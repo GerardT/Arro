@@ -31,6 +31,7 @@ SRCS         := main.cpp \
 		Nodes/NodePid.cpp \
 		Nodes/NodePython.cpp \
 		Nodes/NodeTimer.cpp \
+		Nodes/NodeServo.cpp \
 		tinyxmlparser.cpp \
 		tinyxmlerror.cpp \
 		tinyxml.cpp \

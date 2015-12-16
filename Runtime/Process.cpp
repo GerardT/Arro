@@ -8,6 +8,7 @@
 #include "NodePython.h"
 #include "NodePass.h"
 #include "NodeTimer.h"
+#include "NodeServo.h"
 #include "ConfigReader.h"
 #include "NodeDb.h"
 #include "Process.h"
@@ -116,10 +117,10 @@ Process::getPrimitive(const string& url, string& instance, ConfigReader::StringM
                 trace.println("new NodePid(" + instance + ")");
                 device = new NodePid(this, instance, params);
             }
-//            else if(className == "Servo") {
-//               trace.println("new NodeServo(" + *instance + ")");
-//                new NodeServo(*instance, params);
-//            }
+            else if(className == "Servo") {
+               trace.println("new NodeServo(" + instance + ")");
+                new NodeServo(this, instance, params);
+            }
 //            else if(className == "Linear") {
 //                trace.println("new NodeLinear(" + instance + ")");
 //                device = new NodeLinear(this, instance, params);
