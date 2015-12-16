@@ -39,7 +39,7 @@ namespace Arro {
          *
          * \param s String to be printed.
          */
-        void println(std::string s) const {
+        void println(const std::string s) const {
             if(out == true) {
                 std::cout << cl << "==>" << s << std::endl;
             }
@@ -50,7 +50,7 @@ namespace Arro {
          *
          * \param s String to be printed.
          */
-        void fatal(std::string s) const {
+        void fatal(const std::string s) const {
             std::cout << cl << "==>" << s << std::endl;
             exit(0);
         }
@@ -61,7 +61,7 @@ namespace Arro {
          * \params s String to be printed
          * \param node XML node to be printed as well.
          */
-        void println(std::string s, TiXmlElement* node) const {
+        void println(const std::string s, TiXmlElement* node) const {
             if(out == true) {
                 std::cout << cl << "==>" << s << node << std::endl;
             }

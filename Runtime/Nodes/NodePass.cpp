@@ -1,15 +1,14 @@
-#include <NodePass.h>
+#include "NodePass.h"
+#include "NodeDb.h"
 
-#include "../NodeDb.h"
 
-
-NodePass::NodePass(string datatype, string name):
+NodePass::NodePass(string& datatype, string& name):
     trace("NodePass", false) {
 }
 
-void NodePass::handleMessage(MessageBuf* m, string padName) {
-	Value* msg = new Value();
-	msg->ParseFromString(m);
+void NodePass::handleMessage(MessageBuf* m, const string& padName) {
+    Value* msg = new Value();
+    msg->ParseFromString(m);
 
     // do not put in queue but instead forward directly to target node.
     trace.println("NodePass forward ");
@@ -17,6 +16,6 @@ void NodePass::handleMessage(MessageBuf* m, string padName) {
 }
 
 void NodePass::runCycle() {
-
+    // empty
 }
 

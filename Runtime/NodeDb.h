@@ -254,7 +254,7 @@ namespace Arro
         std::queue<FullMsg*> inQueue, *pInQueue;
         std::queue<FullMsg*> outQueue, *pOutQueue;
         bool running;
-        std::thread* thread;
+        std::thread* thrd;
     };
 }
 

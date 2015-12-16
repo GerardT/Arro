@@ -30,7 +30,7 @@ ConfigReader::ConfigReader(const string& filename, NodeDb& db):
     TiXmlElement* node = doc.FirstChildElement("diagrams");
 
     if(!node) {
-    	trace.fatal("node 'diagrams' missing");
+        trace.fatal("node 'diagrams' missing");
     }
 
     // Collect all nodedefinition blocks and store them in map 'definitions'.
@@ -46,7 +46,7 @@ ConfigReader::ConfigReader(const string& filename, NodeDb& db):
 }
 
 ConfigReader::~ConfigReader() {
-	// empty
+    // empty
 }
 
 void
@@ -66,8 +66,6 @@ ConfigReader::storeDefinition(TiXmlElement* node) {
 
 void
 ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_params, StringMap& params) {
-    //trace.println("getParamsAndSubstitute");
-    // non-primitive node
     TiXmlElement* elt;
     elt = node->FirstChildElement("param");
     while(elt) {
@@ -79,14 +77,14 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
            params[*keyAttr] = *valueAttr;
            if(substAttr && *substAttr != "") {
                 // use value from import_params if any
-            	if(import_params.count(*substAttr) == 1) {
-					params[*keyAttr] = import_params[*substAttr];
-					//trace.println("param " + *keyAttr + " value " + *valueAttr + " = " + import_params[*keyAttr]);
-            	}
+                if(import_params.count(*substAttr) == 1) {
+                    params[*keyAttr] = import_params[*substAttr];
+                    //trace.println("param " + *keyAttr + " value " + *valueAttr + " = " + import_params[*keyAttr]);
+                }
             }
         }
         else {
-        	trace.fatal("faulty parameter block");
+            trace.fatal("faulty parameter block");
         }
         trace.println("updated parameter: key " + *keyAttr + ", value " + params[*keyAttr]);
         elt = elt->NextSiblingElement("param");
@@ -97,22 +95,20 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
 void
 ConfigReader::makeNodeInstance(const string& typeName, const string& instanceName, const string& instancePrefix, StringMap& import_params) {
     Definition* def = definitions[typeName];
-    Process* device = nullptr;
+    Process* processNode = nullptr;
 
     if(def == nullptr)
     {
-    	trace.fatal("Element not found: " + typeName);
-    	return;
+        trace.fatal("Element not found: " + typeName);
+        return;
     }
-    string instance = "";
-
-    instance = instancePrefix + ARRO_NAME_SEPARATOR + instanceName;
+    string instance = instancePrefix + ARRO_NAME_SEPARATOR + instanceName;
 
     trace.println("makeNodeInstance for " + typeName + ", " + instance);
     TiXmlElement* elt;
 
 
-    // Read devices
+    // Read devices (the leaves in the tree)
     elt = def->node->FirstChildElement("device");
     while(elt) {
         const string* typeURL = elt->Attribute(string("url"));
@@ -122,23 +118,21 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             StringMap* params = new StringMap();
             getParamsAndSubstitute(elt, import_params, *params);
 
-        	// create Process object; inputs & outputs to be added later.
-            device = new Process(nodeDb, *typeURL, instance, *params);
+            // create Process object; inputs & outputs to be added later.
+            processNode = new Process(nodeDb, *typeURL, instance, *params);
 
             delete params;
         }
         elt = elt->NextSiblingElement("device");
     }
 
-    // Read nodes
+    // Read nodes (the branches in the tree)
     elt = def->node->FirstChildElement("node");
     while(elt) {
         const string* typeAttr = elt->Attribute(string("type"));
         const string* idAttr = elt->Attribute(string("name"));
         // trace.println("New node def ");
         if(typeAttr != nullptr && idAttr != nullptr) {
-            //StringMap* params = new StringMap();
-            //getParamsAndSubstitute(elt, import_params, *params);
             // collect all parameters
             StringMap* params = new StringMap();
             getParamsAndSubstitute(elt, import_params, *params);
@@ -150,7 +144,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
         elt = elt->NextSiblingElement("node");
     }
 
-    // Read pads
+    // Read pads (other leaves in the tree)
     elt = def->node->FirstChildElement("pad");
     while(elt) {
         const string* datatypeAttr = elt->Attribute(string("type"));
@@ -160,18 +154,18 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
         if(datatypeAttr != nullptr && idAttr != nullptr) {
             string inst = instance + ARRO_NAME_SEPARATOR + *idAttr;
-            if(device) {
-            	if(*inputAttr == "true") {
-            		if(runAttr != nullptr && *runAttr == "true") {
-                    	device->registerInput(*idAttr, true);
-            		} else {
-                    	device->registerInput(*idAttr, false);
-            		}
-            	} else {
-            		device->registerOutput(*idAttr);
-            	}
+            if(processNode) {
+                if(*inputAttr == "true") {
+                    if(runAttr != nullptr && *runAttr == "true") {
+                        processNode->registerInput(*idAttr, true);
+                    } else {
+                        processNode->registerInput(*idAttr, false);
+                    }
+                } else {
+                    processNode->registerOutput(*idAttr);
+                }
             } else {
-            	// create Pad object with input and output.
+                // create Pad object with input and output.
                 trace.println("new Pad(" + *datatypeAttr + ", " + inst + ")");
                 new Pad(nodeDb, *datatypeAttr, inst);
             }

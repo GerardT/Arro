@@ -1,22 +1,24 @@
-#include <NodeDb.h>
-#include <NodeTimer.h>
-
 // hack, see http://stackoverflow.com/questions/12523122/what-is-glibcxx-use-nanosleep-all-about
 #define _GLIBCXX_USE_NANOSLEEP 1
 #include <chrono>
 #include <thread>
+#include <algorithm>
+
+#include "NodeDb.h"
+#include "NodeTimer.h"
 
 using namespace std;
 using namespace Arro;
+using namespace arro;
 
-#define TIMEOUT 1000
+#define ARRO_TIMEOUT 1000
 
-static std::list<NodeTimer*> timers;
+static list<NodeTimer*> timers;
 static bool running = false;
 
-NodeTimer::NodeTimer(Process* d, string /*name*/, ConfigReader::StringMap& params):
+NodeTimer::NodeTimer(Process* d, string& /*name*/, ConfigReader::StringMap& params):
     trace("NodePid", true),
-	device(d) {
+    device(d) {
 
     try {
         ticks = stoi(params.at("ms"));
@@ -30,67 +32,59 @@ NodeTimer::NodeTimer(Process* d, string /*name*/, ConfigReader::StringMap& param
 }
 
 NodeTimer::~NodeTimer() {
-	timers.remove(this);
+    timers.remove(this);
 }
 
-void NodeTimer::handleMessage(MessageBuf* m, std::string padName) {
-	//Class<?> cl = msg.getClass();
-    //assert(msg->GetTypeName() == "tutorial.Value");
+void NodeTimer::handleMessage(MessageBuf* m, const std::string& padName) {
+    if (padName == "mode") {
+        Mode* msg = new Mode();
+        msg->ParseFromString(m->c_str());
 
-	if (padName == "mode") {
-		Mode* msg = new Mode();
-		msg->ParseFromString(m->c_str());
-
-		assert(msg->GetTypeName() == "tutorial.Mode");
-		actual_mode = ((Mode*)msg)->mode();
+        assert(msg->GetTypeName() == "tutorial.Mode");
+        actual_mode = ((Mode*)msg)->mode();
     }
 }
 
 void NodeTimer::runCycle() {
-
+    // empty
 }
 
 
 void NodeTimer::timer () {
     Tick* tick = new Tick();
 
-    tick->set_ms(TIMEOUT /* elapsed time in ms */);
+    tick->set_ms(ARRO_TIMEOUT /* elapsed time in ms */);
 
     try {
-    	device->getOutput("aTick")->submitMessage(tick);
+        device->getOutput("aTick")->submitMessage(tick);
     }
     catch(runtime_error&) {
-
+        trace.println("Timer failed to update");
     }
 }
 
 
 static void refresh() {
-    // int ticks;
-
     while(true)
     {
-    	if(running) {
-            for(std::list<NodeTimer*>::iterator it = timers.begin(); it != timers.end() ; ++it) {
-        		(*it)->timer();
-            }
-    	}
-        std::chrono::milliseconds timespan(TIMEOUT);
+        if(running) {
+            for_each(timers.begin(), timers.end(), [](NodeTimer* t) {t->timer(); });
+        }
+        std::chrono::milliseconds timespan(ARRO_TIMEOUT);
         std::this_thread::sleep_for(timespan);
-        //usleep(t->ticks /*ms*/);
     }
 }
 
 
 void NodeTimer::init () {
-    // std::thread* first;
-	/* first = */new std::thread(refresh);     // spawn new thread that calls refresh()
+    // thread will run forever
+    /* std::thread* first = */new std::thread(refresh);     // spawn new thread that calls refresh()
 }
 
 void NodeTimer::start() {
-	running = true;
+    running = true;
 }
 void NodeTimer::stop() {
-	running = false;
+    running = false;
 }
 

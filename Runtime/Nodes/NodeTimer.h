@@ -1,5 +1,5 @@
-#ifndef NODE_TIMER_H
-#define NODE_TIMER_H
+#ifndef ARRO_NODE_TIMER_H
+#define ARRO_NODE_TIMER_H
 
 
 #include <tinyxml.h>
@@ -9,39 +9,52 @@
 #include <list>
 #include <thread>
 
-#include <arro.pb.h>
-#include "../ConfigReader.h"
-#include "../Process.h"
-
-using namespace std;
-using namespace google;
-using namespace protobuf;
-using namespace arro;
+#include "arro.pb.h"
+#include "ConfigReader.h"
+#include "Process.h"
 
 namespace Arro
 {
+    class NodeTimer: public IDevice {
+    public:
+    	/**
+    	 * Constructor
+    	 *
+    	 * \param d The Process node instance.
+    	 * \param name Name of this node.
+    	 * \param params List of parameters passed to this node.
+    	 */
+        NodeTimer(Process* d, std::string& name, ConfigReader::StringMap& params);
+        virtual ~NodeTimer();
 
+        // Copy and assignment is not supported.
+        NodeTimer(const NodeTimer&) = delete;
+        NodeTimer& operator=(const NodeTimer& other) = delete;
 
-class NodeTimer: public IDevice {
-    Trace trace;
-private:
-	
-    int ticks;
-    Process* device;
-    string actual_mode;
+        /**
+         * Handle a message that is sent to this node.
+         *
+         * \param msg Message sent to this node.
+         * \param padName name of pad that message was sent to.
+         */
+        void handleMessage(MessageBuf* msg, const std::string& padName);
+
+        /**
+         * Make the node execute a processing cycle.
+         */
+        void runCycle();
     
-public:
+        void timer ();
+        static void init ();
+        static void start ();
+        static void stop ();
 
-    NodeTimer(Process* d, string name, ConfigReader::StringMap& p_params);
-    ~NodeTimer();
-    void handleMessage(MessageBuf* msg, std::string padName);
-    void runCycle();
-
-    void timer ();
-    static void init ();
-    static void start ();
-    static void stop ();
-};
+    private:
+        Trace trace;
+        int ticks;
+        Process* device;
+        std::string actual_mode;
+    };
 }
 
 #endif

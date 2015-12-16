@@ -1,14 +1,15 @@
-#include <arro.pb.h>
-#include <NodeDb.h>
-#include <NodePid.h>
+#include "arro.pb.h"
+#include "NodeDb.h"
+#include "NodePid.h"
 
 using namespace std;
 using namespace Arro;
+using namespace arro;
 
 
-NodePid::NodePid(Process* d, string /*name*/, ConfigReader::StringMap params):
+NodePid::NodePid(Process* d, string& /*name*/, ConfigReader::StringMap& params):
     trace("NodePid", true),
-	device(d) {
+    device(d) {
 
     previous_error = 0;
     integral = 0;
@@ -28,37 +29,34 @@ NodePid::NodePid(Process* d, string /*name*/, ConfigReader::StringMap params):
     }
 }
 
-void NodePid::handleMessage(MessageBuf* m, std::string padName) {
-    //Class<?> cl = msg.getClass();
-    //assert(msg->GetTypeName() == "tutorial.Value");
+void NodePid::handleMessage(MessageBuf* m, const std::string& padName) {
+    if(padName == "actualValue") {
+        Value* msg = new Value();
+        msg->ParseFromString(m->c_str());
 
-	if(padName == "actualValue") {
-    	Value* msg = new Value();
-    	msg->ParseFromString(m->c_str());
-
-		assert(msg->GetTypeName() == "arro.Value");
+        assert(msg->GetTypeName() == "arro.Value");
         actual_position = ((Value*)msg)->value();
     } else if(padName == "targetValue") {
-    	Value* msg = new Value();
-    	msg->ParseFromString(m->c_str());
+        Value* msg = new Value();
+        msg->ParseFromString(m->c_str());
 
-    	assert(msg->GetTypeName() == "arro.Value");
-		setpoint = ((Value*)msg)->value();
+        assert(msg->GetTypeName() == "arro.Value");
+        setpoint = ((Value*)msg)->value();
     } else if(padName == "aTick") {
-    	Tick* msg = new Tick();
-    	msg->ParseFromString(m->c_str());
+        Tick* msg = new Tick();
+        msg->ParseFromString(m->c_str());
 
-    	trace.println(string(msg->GetTypeName()));
-		assert(msg->GetTypeName() == "arro.Tick");
-		Tick* tick = (Tick*)msg;
-		ms_elapsed = tick->ms();
+        trace.println(string(msg->GetTypeName()));
+        assert(msg->GetTypeName() == "arro.Tick");
+        Tick* tick = (Tick*)msg;
+        ms_elapsed = tick->ms();
 
     } else if (padName == "mode") {
-    	Mode* msg = new Mode();
-    	msg->ParseFromString(m->c_str());
+        Mode* msg = new Mode();
+        msg->ParseFromString(m->c_str());
 
-    	assert(msg->GetTypeName() == "arro.Mode");
-		actual_mode = ((Mode*)msg)->mode();
+        assert(msg->GetTypeName() == "arro.Mode");
+        actual_mode = ((Mode*)msg)->mode();
     } else {
         trace.println(string("Message received from ") + padName);
     }

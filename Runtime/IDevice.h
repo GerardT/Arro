@@ -24,7 +24,7 @@ namespace Arro {
          * \param msg Message sent to this node.
          * \param padName name of pad that message was sent to.
          */
-        virtual void handleMessage(MessageBuf* msg, std::string padName) = 0;
+        virtual void handleMessage(MessageBuf* msg, const std::string& padName) = 0;
 
         /**
          * Make the node execute a processing cycle.

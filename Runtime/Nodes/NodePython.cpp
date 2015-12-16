@@ -13,29 +13,26 @@ using namespace Arro;
  * Will instantiate an object of class className inside Python that
  * will be used for the lifetime of the Process.
  */
-NodePython::NodePython(Process* d, string& className, ConfigReader::StringMap /*params*/):
+NodePython::NodePython(Process* d, string& className, ConfigReader::StringMap& /*params*/):
     trace("NodePython", true),
-	device(d)
+    device(d)
 {
-	PyObject *pDict = PythonGlue::getDict();
+    PyObject *pDict = PythonGlue::getDict();
 
-	// Build the name of a callable class
-	pClass = PyDict_GetItemString(pDict, className.c_str());
+    // Build the name of a callable class
+    pClass = PyDict_GetItemString(pDict, className.c_str());
 
-	// Create an instance of the class
-	if (PyCallable_Check(pClass))
-	{
-		pInstance = PyObject_CallObject(pClass, nullptr);
-		if(pInstance == nullptr) {
-	        throw std::runtime_error("Failed to instantiate Python class");
-		}
-		PythonGlue::registerInstance(pInstance, this);
-	}
+    // Create an instance of the class
+    if (PyCallable_Check(pClass))
+    {
+        pInstance = PyObject_CallObject(pClass, nullptr);
+        if(pInstance == nullptr) {
+            throw std::runtime_error("Failed to instantiate Python class");
+        }
+        PythonGlue::registerInstance(pInstance, this);
+    }
 }
 
-/**
- * Destructor.
- */
 NodePython::~NodePython() {
     while(!messages.empty()) {
         messages.pop();  // FIXME messages should be deleted properly
@@ -48,10 +45,10 @@ NodePython::~NodePython() {
  * storing in temp queue.
  */
 void
-NodePython::handleMessage(MessageBuf* msg, std::string padName) {
-	PyObject* tuple = Py_BuildValue("s s", padName.c_str(), msg->c_str());
+NodePython::handleMessage(MessageBuf* msg, const string& padName) {
+    PyObject* tuple = Py_BuildValue("s s", padName.c_str(), msg->c_str());
 
-	messages.push(tuple);
+    messages.push(tuple);
 }
 
 /**
@@ -60,18 +57,18 @@ NodePython::handleMessage(MessageBuf* msg, std::string padName) {
  */
 void
 NodePython::runCycle() {
-	pValue = PyObject_CallMethod(pInstance, "runCycle", nullptr); // no parameters
-	if (pValue != nullptr)
-	{
-		printf("Return of call : %ld\n", PyInt_AsLong(pValue));
-		Py_DECREF(pValue);
-	}
-	else
-	{
-		PythonGlue::captureError();
+    pValue = PyObject_CallMethod(pInstance, "runCycle", nullptr); // no parameters
+    if (pValue != nullptr)
+    {
+        trace.println("Return of call: " + PyInt_AsLong(pValue));
+        Py_DECREF(pValue);
+    }
+    else
+    {
+        PythonGlue::captureError();
 
-	    throw std::runtime_error("Failed to call Python method");
-	}
+        throw std::runtime_error("Failed to call Python method");
+    }
 }
 
 /**
@@ -85,7 +82,7 @@ NodePython::getMessage() {
         messages.pop();
         return tuple;
     } else {
-    	// insert None object
+        // insert None object
         Py_INCREF(Py_None);
         return Py_None;
     }
@@ -96,13 +93,13 @@ NodePython::getMessage() {
  */
 PyObject*
 NodePython::sendMessage(char* padName, char* message) {
-	NodeDb::NodeMultiOutput* pad = device->getOutput(padName);
+    NodeDb::NodeMultiOutput* pad = device->getOutput(padName);
 
     if(pad) {
-    	pad->submitMessageBuffer(message);
+        pad->submitMessageBuffer(message);
 
-	    Py_INCREF(Py_None);
-	    return Py_None;
+        Py_INCREF(Py_None);
+        return Py_None;
     }
     return nullptr;
 }

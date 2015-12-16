@@ -1,15 +1,5 @@
 
-#include <iostream>
-#include <vector>
-#include <exception>
-
-#include <Trace.h>
-#include <ConfigReader.h>
-#include <NodeDb.h>
-#include <tinyxml.h>
-#include <iostream>
-#include <sstream>
-#include <unordered_map>
+#include "ServerEngine.h"
 
 // Debugger wants to have 'real' main.
 extern "C" {
@@ -19,12 +9,9 @@ extern "C" {
 using namespace std;
 using namespace Arro;
 
-#include <ServerEngine.h>
 
 int main()
 {
-    cout << "Running Arro" << endl;
-
     ServerEngine::start();
 
     // Never exit, run as server. stop_server();

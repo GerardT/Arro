@@ -1,27 +1,29 @@
-#include <NodeDb.h>
 #include <tinyxml.h>
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
 #include <map>
 #include <queue>
-#include <NodeTimer.h>
+#include <algorithm>
 
+#include "NodeDb.h"
+#include "NodeTimer.h"
 
-#define TIMEOUT 100
 
 using namespace Arro;
+using namespace std;
 
 NodeDb::NodeDb():
     trace("NodeDb", true),
     allInputs(),
     allOutputs(),
-	allNodes(),
-	inQueue(),
-	pInQueue(&inQueue),
-	outQueue(),
-	pOutQueue(&outQueue),
-	running(false) {
+    allNodes(),
+    inQueue(),
+    pInQueue(&inQueue),
+    outQueue(),
+    pOutQueue(&outQueue),
+    running(false),
+	thrd(nullptr) {
 }
 
 NodeDb::~NodeDb() {
@@ -36,56 +38,56 @@ NodeDb::~NodeDb() {
         delete fm;
     }
 
-	for(std::map<string, NodeMultiOutput*>::iterator it = allOutputs.begin(); it != allOutputs.end() ; ++it) {
-		std::pair<string, NodeMultiOutput*> elt = *it;
-		delete elt.second;
-	}
-	for(std::map<string, NodeSingleInput*>::iterator it = allInputs.begin(); it != allInputs.end() ; ++it) {
-		std::pair<string, NodeSingleInput*> elt = *it;
-		delete elt.second;
-	}
 
-	for(std::map<string, AbstractNode*>::iterator it = allNodes.begin(); it != allNodes.end() ; ++it) {
-		std::pair<string, AbstractNode*> elt = *it;
-		delete elt.second;
-	}
+    // Not sure below can be done with std::for_each loop.
+    for(map<string, NodeMultiOutput*>::iterator it = allOutputs.begin(); it != allOutputs.end() ; ++it) {
+        pair<string, NodeMultiOutput*> elt = *it;
+        delete elt.second;
+    }
+    for(map<string, NodeSingleInput*>::iterator it = allInputs.begin(); it != allInputs.end() ; ++it) {
+        pair<string, NodeSingleInput*> elt = *it;
+        delete elt.second;
+    }
+
+    for(map<string, AbstractNode*>::iterator it = allNodes.begin(); it != allNodes.end() ; ++it) {
+        pair<string, AbstractNode*> elt = *it;
+        delete elt.second;
+    }
 }
 
 void
 NodeDb::NodeSingleInput::handleMessage(MessageBuf* msg) {
-	listen->handleMessage(msg);
+    listen->handleMessage(msg);
 }
 
 NodeDb::NodeMultiOutput::NodeMultiOutput(NodeDb* n):
-		nm(n),
-		inputs() {
+    nm(n),
+    inputs() {
 }
 
 void
 NodeDb::NodeMultiOutput::connectInput(NodeSingleInput* i) {
-	if(i) {
+    if(i) {
         inputs.push_back((NodeSingleInput*)i);
-	}
-	else {
+    }
+    else {
         nm->trace.println("### cannot connect ");
-	}
-}
-void
-NodeDb::NodeMultiOutput::forwardMessage(MessageBuf* msg) {
-    for(std::vector<NodeSingleInput*>::iterator it = inputs.begin(); it != inputs.end() ; ++it) {
-        NodeSingleInput* i = *it;
-        i->handleMessage(msg);
     }
 }
+
 void
-NodeDb::NodeMultiOutput::submitMessage(MessageLite* msg) {
-	string s = msg->SerializeAsString();
-	submitMessageBuffer(s.c_str());
+NodeDb::NodeMultiOutput::forwardMessage(MessageBuf* msg) {
+    for_each(inputs.begin(), inputs.end(), [msg](NodeSingleInput* i) { i->handleMessage(msg); });
+}
+void
+NodeDb::NodeMultiOutput::submitMessage(google::protobuf::MessageLite* msg) {
+    string s = msg->SerializeAsString();
+    submitMessageBuffer(s.c_str());
 }
 
 void
 NodeDb::NodeMultiOutput::submitMessageBuffer(const char* msg) {
-	MessageBuf* s = new MessageBuf(msg);
+    MessageBuf* s = new MessageBuf(msg);
     FullMsg* fm = new FullMsg(this, s);
     nm->pInQueue->push(fm);
 }
@@ -113,37 +115,37 @@ NodeDb::registerNode(AbstractNode* node, const string& name) {
 
 NodeDb::NodeSingleInput*
 NodeDb::registerNodeInput(AbstractNode* node, const string& interfaceName, NodeDb::NodeSingleInput::IListener* listen) {
-	NodeDb::NodeSingleInput* n = new NodeDb::NodeSingleInput(/*interfaceName, */listen, node);
+    NodeDb::NodeSingleInput* n = new NodeDb::NodeSingleInput(/*interfaceName, */listen, node);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
-    	allInputs[node->getName()] = n;
-    	trace.println(string("registering input ") + node->getName());
+        allInputs[node->getName()] = n;
+        trace.println(string("registering input ") + node->getName());
         return (NodeDb::NodeSingleInput*)n;
     } else {
-    	allInputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = n;
-    	trace.println(("registering input ") + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
+        allInputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = n;
+        trace.println(("registering input ") + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
         return (NodeDb::NodeSingleInput*)n;
     }
 }
 
 NodeDb::NodeMultiOutput*
 NodeDb::registerNodeOutput(AbstractNode* node, const string& interfaceName) {
-	NodeDb::NodeMultiOutput* n = new NodeDb::NodeMultiOutput(/*interfaceName*/this);
+    NodeDb::NodeMultiOutput* n = new NodeDb::NodeMultiOutput(/*interfaceName*/this);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
-    	allOutputs[node->getName()] = n;
-    	trace.println("registering output " + node->getName());
+        allOutputs[node->getName()] = n;
+        trace.println("registering output " + node->getName());
         return (NodeMultiOutput*)n;
     } else {
-    	allOutputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = n;
-    	trace.println("registering output " + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
+        allOutputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = n;
+        trace.println("registering output " + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
         return (NodeMultiOutput*)n;
     }
 }
 
 NodeDb::NodeMultiOutput*
 NodeDb::getOutput(const string& name) {
-	return (NodeMultiOutput*)(allOutputs[name]);
+    return (NodeMultiOutput*)(allOutputs[name]);
 }
 
 NodeDb::FullMsg::FullMsg(NodeMultiOutput* o /*string s*/, MessageBuf* m) {
@@ -154,9 +156,9 @@ NodeDb::FullMsg::FullMsg(NodeMultiOutput* o /*string s*/, MessageBuf* m) {
 
 void
 NodeDb::toggleQueue() {
-	  queue<FullMsg*>* tmp = pOutQueue;
-	  pOutQueue = pInQueue;
-	  pInQueue = tmp;
+      queue<FullMsg*>* tmp = pOutQueue;
+      pOutQueue = pInQueue;
+      pInQueue = tmp;
 }
 
 
@@ -164,55 +166,53 @@ NodeDb::toggleQueue() {
 void
 NodeDb::runCycle(NodeDb* nm) {
 
-	try {
-		while(nm->running)
-		{
-			/* First deliver all message to right nodes */
-		    while(nm->pOutQueue->empty() != true) {
-		        FullMsg* fm = nm->pOutQueue->front();
-		        nm->trace.println("====================> new msg");
-		        nm->pOutQueue->pop();
-		        if(fm != nullptr) {
-		        	MessageBuf* msg = fm->msg;
-		            fm->output->forwardMessage(msg);
-					delete msg;
-					delete fm;
+    try {
+        while(nm->running)
+        {
+            /* First deliver all message to right nodes */
+            while(nm->pOutQueue->empty() != true) {
+                FullMsg* fm = nm->pOutQueue->front();
+                nm->trace.println("====================> new msg");
+                nm->pOutQueue->pop();
+                if(fm != nullptr) {
+                    MessageBuf* msg = fm->msg;
+                    fm->output->forwardMessage(msg);
+                    delete msg;
+                    delete fm;
 
-		        }
-		    }
+                }
+            }
 
-		    /* Then trigger all runCycle methods on nodes */
-		    for(map<string, AbstractNode*>::iterator it = nm->allNodes.begin(); it != nm->allNodes.end() ; ++it) {
-		    	std::pair<string, AbstractNode*> n = *it;
-		    	n.second->runCycle();
-		    }
+            /* Then trigger all runCycle methods on nodes */
+            for_each(nm->allNodes.begin(), nm->allNodes.end(), [](pair<string, AbstractNode*> n) { n.second->runCycle(); });
 
-		    /* And switch the queues */
-		    nm->toggleQueue();
-		}
-	} catch (std::runtime_error& e) {
-	}
+            /* And switch the queues */
+            nm->toggleQueue();
+        }
+    } catch (std::runtime_error& e) {
+    }
 }
 
 void
 NodeDb::start() {
-	running = true;
+    running = true;
 
-	thread = new std::thread(&NodeDb::runCycle, this);
+    thrd = new thread(&NodeDb::runCycle, this);
 
-	NodeTimer::start();
+    NodeTimer::start();
 }
 
 void
 NodeDb::stop() {
-	if(running) {
-		running = false;
+    if(running) {
+        running = false;
 
-		NodeTimer::stop();
+        NodeTimer::stop();
 
-		thread->join();
-		delete thread;
-	}
+        thrd->join();
+        delete thrd;
+        thrd = nullptr;
+    }
 }
 
 
