@@ -2,6 +2,7 @@
 #define _GLIBCXX_USE_NANOSLEEP 1
 #include <chrono>
 #include <thread>
+#include <list>
 #include <algorithm>
 
 #include "NodeDb.h"

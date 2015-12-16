@@ -1,11 +1,6 @@
 #ifndef ARRO_NODE_PYTHON_H
 #define ARRO_NODE_PYTHON_H
 
-
-#include <tinyxml.h>
-#include <iostream>
-#include <sstream>
-#include <map>
 #include <queue>
 #include <Python.h>
 

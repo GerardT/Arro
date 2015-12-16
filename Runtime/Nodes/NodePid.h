@@ -1,12 +1,6 @@
 #ifndef ARRO_NODE_PID_H
 #define ARRO_NODE_PID_H
 
-
-#include <tinyxml.h>
-#include <iostream>
-#include <sstream>
-#include <map>
-
 #include "arro.pb.h"
 #include "ConfigReader.h"
 #include "NodeDb.h"
@@ -29,7 +23,6 @@ namespace Arro {
         NodePid(const NodePid&) = delete;
         NodePid& operator=(const NodePid& other) = delete;
 
-        void doIt (int ms_elapsed);
         /**
          * Handle a message that is sent to this node.
          *
