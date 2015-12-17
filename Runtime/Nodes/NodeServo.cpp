@@ -45,8 +45,8 @@ NodeServo::Servo::i2c_readU8(unsigned char command) {
         trace.fatal("Failed i2c_read errno", errno);
     } else {
         // buf[0] contains the read byte
-        return ret;
     }
+    return ret;
 }
 
 void

@@ -34,7 +34,7 @@ Process::Process(NodeDb& db, const string& url, string& instance, ConfigReader::
     for (iter = params.begin(); iter != params.end(); ++iter) {
         trace.println("    " + iter->first + " " + iter->second);
 
-        arro::KeyValuePair* kv = new arro::KeyValuePair();
+        auto kv = new arro::KeyValuePair();
         kv->set_key(iter->first.c_str());
         kv->set_value(iter->second.c_str());
         string s = kv->SerializeAsString();
@@ -87,7 +87,7 @@ Process::registerOutput(const string& interfaceName) {
 
 NodeDb::NodeMultiOutput*
 Process::getOutput(const string& name) {
-    NodeDb::NodeMultiOutput* out = nodeDb.getOutput(getName() + "." + name);
+    auto out = nodeDb.getOutput(getName() + "." + name);
     if(out) {
         return out;
     } else {

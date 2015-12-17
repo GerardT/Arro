@@ -15,11 +15,10 @@ using namespace std;
 using namespace Arro;
 
 ConfigReader::ConfigReader(const string& filename, NodeDb& db):
-
      trace("ConfigReader", true),
      nodeDb(db)
 {
-    StringMap* params = new StringMap();
+    auto params = new StringMap();
 
     TiXmlDocument doc(filename);
     if (!doc.LoadFile()) {

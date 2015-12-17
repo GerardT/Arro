@@ -28,30 +28,26 @@ NodeDb::NodeDb():
 
 NodeDb::~NodeDb() {
     while(outQueue.empty() != true) {
-        FullMsg* fm = outQueue.front();
+        auto fm = outQueue.front();
         outQueue.pop();
         delete fm;
     }
     while(inQueue.empty() != true) {
-        FullMsg* fm = inQueue.front();
+        auto fm = inQueue.front();
         inQueue.pop();
         delete fm;
     }
 
 
-    // Not sure below can be done with std::for_each loop.
-    for(map<string, NodeMultiOutput*>::iterator it = allOutputs.begin(); it != allOutputs.end() ; ++it) {
-        pair<string, NodeMultiOutput*> elt = *it;
-        delete elt.second;
+    for(auto it = allOutputs.begin(); it != allOutputs.end() ; ++it) {
+        delete it->second;
     }
-    for(map<string, NodeSingleInput*>::iterator it = allInputs.begin(); it != allInputs.end() ; ++it) {
-        pair<string, NodeSingleInput*> elt = *it;
-        delete elt.second;
+    for(auto it = allInputs.begin(); it != allInputs.end() ; ++it) {
+        delete it->second;
     }
 
-    for(map<string, AbstractNode*>::iterator it = allNodes.begin(); it != allNodes.end() ; ++it) {
-        pair<string, AbstractNode*> elt = *it;
-        delete elt.second;
+    for(auto it = allNodes.begin(); it != allNodes.end() ; ++it) {
+        delete it->second;
     }
 }
 
@@ -87,8 +83,8 @@ NodeDb::NodeMultiOutput::submitMessage(google::protobuf::MessageLite* msg) {
 
 void
 NodeDb::NodeMultiOutput::submitMessageBuffer(const char* msg) {
-    MessageBuf* s = new MessageBuf(msg);
-    FullMsg* fm = new FullMsg(this, s);
+    auto s = new MessageBuf(msg);
+    auto fm = new FullMsg(this, s);
     nm->pInQueue->push(fm);
 }
 
@@ -97,8 +93,8 @@ NodeDb::NodeMultiOutput::submitMessageBuffer(const char* msg) {
 AbstractNode*
 NodeDb::getNode(const string& name) {
     try {
-        AbstractNode* n = allNodes[name];
-        return (AbstractNode*)n;
+        auto n = allNodes[name];
+        return n;
     }
     catch (const std::out_of_range& oor) {
         trace.fatal("### non-registered name " + name);
@@ -115,7 +111,7 @@ NodeDb::registerNode(AbstractNode* node, const string& name) {
 
 NodeDb::NodeSingleInput*
 NodeDb::registerNodeInput(AbstractNode* node, const string& interfaceName, NodeDb::NodeSingleInput::IListener* listen) {
-    NodeDb::NodeSingleInput* n = new NodeDb::NodeSingleInput(/*interfaceName, */listen, node);
+    auto n = new NodeDb::NodeSingleInput(/*interfaceName, */listen, node);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
         allInputs[node->getName()] = n;
@@ -130,7 +126,8 @@ NodeDb::registerNodeInput(AbstractNode* node, const string& interfaceName, NodeD
 
 NodeDb::NodeMultiOutput*
 NodeDb::registerNodeOutput(AbstractNode* node, const string& interfaceName) {
-    NodeDb::NodeMultiOutput* n = new NodeDb::NodeMultiOutput(/*interfaceName*/this);
+    auto n = new NodeDb::NodeMultiOutput(this);
+
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
         allOutputs[node->getName()] = n;

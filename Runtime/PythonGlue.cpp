@@ -36,7 +36,6 @@ PythonGlue::PythonGlue(const string& filename):
      * Setup for Python -> C.
      * Py_Initialize() already done.
      */
-    //initarro();
     insertFunctionToModule();
 }
 

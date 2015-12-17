@@ -15,6 +15,8 @@
 #include "NodeTimer.h"
 #include "PythonGlue.h"
 
+#define ARRO_BUFFER_SIZE 250
+
 using namespace std;
 using namespace Arro;
 
@@ -93,10 +95,10 @@ static void server()
     int sockfd, portno;
     socklen_t clilen;
     struct stat obj;
-    char command[256], filename[100];
+    char command[ARRO_BUFFER_SIZE], filename[ARRO_BUFFER_SIZE];
     int size;
     int filehandle;
-    char buffer[256];
+    char buffer[ARRO_BUFFER_SIZE];
     struct sockaddr_in serv_addr, cli_addr;
     int i, n;
     NodeDb* nodeDb = nullptr;
@@ -144,8 +146,8 @@ static void server()
         ServerEngine::console("========================");
 
         /* If connection is established then start communicating */
-        bzero(buffer,256);
-        while ((n = readln( newsockfd,buffer,255 )) != 0)
+        bzero(buffer,ARRO_BUFFER_SIZE);
+        while ((n = readln( newsockfd,buffer, ARRO_BUFFER_SIZE - 1 )) != 0)
         {
             trace.println(string("command: ") + buffer);
 
@@ -166,19 +168,6 @@ static void server()
                 send(newsockfd, &size, sizeof(int),0);
                 filehandle = open("temps.txt", O_RDONLY);
                 sendfile(newsockfd,filehandle,nullptr,size);
-            }
-            else if(!strcmp(command,"get"))
-            {
-                sscanf(buffer, "%s%s", filename, filename);
-                stat(filename, &obj);
-                filehandle = open(filename, O_RDONLY);
-                size = obj.st_size;
-                if(filehandle == -1)
-                    size = 0;
-                send(newsockfd, &size, sizeof(int), 0);
-                if(size)
-                    sendfile(newsockfd, filehandle, nullptr, size);
-
             }
             else if(!strcmp(command, "put"))
             {
@@ -258,7 +247,7 @@ static void server()
                 system("pwd>temp.txt");
                 i = 0;
                 FILE*f = fopen("temp.txt","r");
-                while(!feof(f))
+                while(!feof(f) && i < ARRO_BUFFER_SIZE)
                     buffer[i++] = fgetc(f);
                 buffer[i-1] = '\0';
                 send(newsockfd, buffer, 100, 0);
