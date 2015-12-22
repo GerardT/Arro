@@ -24,6 +24,14 @@ PythonGlue::PythonGlue(const string& filename):
     /*
      * Setup for C -> Python.
      */
+    PyObject *dot = PyString_FromString(".");
+    PyObject *sys = PyImport_ImportModule("sys");
+    PyObject *path = PyObject_GetAttrString(sys, "path");
+    PyList_Append(path, dot);
+    Py_DECREF(sys);
+    Py_DECREF(path);
+    Py_DECREF(dot);
+
     const char* modName = filename.c_str();
     if(loadModule((char*)modName) == nullptr) {
         // Undo Py_Initialize

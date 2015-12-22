@@ -12,6 +12,8 @@
 #include <unordered_map>
 #include <map>
 #include <queue>
+#include <mutex>
+#include <condition_variable>
 
 #include "AbstractNode.h"
 #include "Trace.h"
@@ -252,9 +254,10 @@ namespace Arro
         std::map<std::string, NodeMultiOutput*> allOutputs;
         std::map<std::string, AbstractNode*> allNodes;
         std::queue<FullMsg*> inQueue, *pInQueue;
-        std::queue<FullMsg*> outQueue, *pOutQueue;
         bool running;
         std::thread* thrd;
+        std::mutex mutex;
+        std::condition_variable condition;
     };
 }
 

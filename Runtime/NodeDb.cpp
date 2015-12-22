@@ -20,18 +20,11 @@ NodeDb::NodeDb():
     allNodes(),
     inQueue(),
     pInQueue(&inQueue),
-    outQueue(),
-    pOutQueue(&outQueue),
     running(false),
 	thrd(nullptr) {
 }
 
 NodeDb::~NodeDb() {
-    while(outQueue.empty() != true) {
-        auto fm = outQueue.front();
-        outQueue.pop();
-        delete fm;
-    }
     while(inQueue.empty() != true) {
         auto fm = inQueue.front();
         inQueue.pop();
@@ -85,7 +78,12 @@ void
 NodeDb::NodeMultiOutput::submitMessageBuffer(const char* msg) {
     auto s = new MessageBuf(msg);
     auto fm = new FullMsg(this, s);
+
+    std::lock_guard<std::mutex> lock(nm->mutex);
     nm->pInQueue->push(fm);
+
+    nm->condition.notify_one();
+
 }
 
 
@@ -151,13 +149,6 @@ NodeDb::FullMsg::FullMsg(NodeMultiOutput* o /*string s*/, MessageBuf* m) {
     msg = m;
 }
 
-void
-NodeDb::toggleQueue() {
-      queue<FullMsg*>* tmp = pOutQueue;
-      pOutQueue = pInQueue;
-      pInQueue = tmp;
-}
-
 
 
 void
@@ -166,25 +157,33 @@ NodeDb::runCycle(NodeDb* nm) {
     try {
         while(nm->running)
         {
-            /* First deliver all message to right nodes */
-            while(nm->pOutQueue->empty() != true) {
-                FullMsg* fm = nm->pOutQueue->front();
-                nm->trace.println("====================> new msg");
-                nm->pOutQueue->pop();
-                if(fm != nullptr) {
-                    MessageBuf* msg = fm->msg;
-                    fm->output->forwardMessage(msg);
-                    delete msg;
-                    delete fm;
+            // Deliver all messages to the right nodes until empty
+        	{
+                std::unique_lock<std::mutex> lock(nm->mutex);
 
+                while(nm->pInQueue->empty() != true) {
+                    FullMsg* fm = nm->pInQueue->front();
+                    nm->trace.println("new msg");
+                    nm->pInQueue->pop();
+                    if(fm != nullptr) {
+                        MessageBuf* msg = fm->msg;
+                        fm->output->forwardMessage(msg);
+                        delete msg;
+                        delete fm;
+
+                    }
                 }
-            }
+        	} // make sure mutex is unlocked here
 
             /* Then trigger all runCycle methods on nodes */
             for_each(nm->allNodes.begin(), nm->allNodes.end(), [&](pair<string, AbstractNode*> n) { n.second->runCycle(); });
 
-            /* And switch the queues */
-            nm->toggleQueue();
+            {
+                std::unique_lock<std::mutex> lock(nm->mutex);
+
+                // And wait until new message arrive in queue
+                nm->condition.wait(lock);  // keep waiting if queue empty
+            } // make sure mutex is unlocked here
         }
     } catch (std::runtime_error& e) {
     }
@@ -203,6 +202,8 @@ void
 NodeDb::stop() {
     if(running) {
         running = false;
+
+        condition.notify_one();
 
         NodeTimer::stop();
 

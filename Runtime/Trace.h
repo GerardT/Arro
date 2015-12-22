@@ -1,6 +1,5 @@
 #ifndef ARRO_TRACE_H
 #define ARRO_TRACE_H
-
 #include <iostream>
 #include <streambuf>
 #include <string>
@@ -41,12 +40,12 @@ namespace Arro {
          */
         void println(const std::string& s, int err) const {
             if(out == true) {
-                std::cout << cl << "==>" << s << " ==> " << err  << std::endl;
+                std::cout << cl << " ==> " << s << " ==> " << err  << std::endl;
             }
         }
         void println(const std::string& s) const {
             if(out == true) {
-                std::cout << cl << "==>" << s << std::endl;
+                std::cout << cl << " ==> " << s << std::endl;
             }
         }
 
@@ -56,11 +55,11 @@ namespace Arro {
          * \param s String to be printed.
          */
         void fatal(const std::string& s, int err) const {
-            std::cout << cl << "==>" << s << " ==> " << err << std::endl;
+            std::cout << cl << " ==> " << s << " ==> " << err << std::endl;
             exit(0);
         }
         void fatal(const std::string& s) const {
-            std::cout << cl << "==>" << s << std::endl;
+            std::cout << cl << " ==> " << s << std::endl;
             exit(0);
         }
 
@@ -72,7 +71,7 @@ namespace Arro {
          */
         void println(const std::string& s, TiXmlElement* node) const {
             if(out == true) {
-                std::cout << cl << "==>" << s << node << std::endl;
+                std::cout << cl << " ==> " << s << node << std::endl;
             }
         }
 

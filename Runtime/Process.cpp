@@ -109,7 +109,6 @@ Process::getPrimitive(const string& url, string& instance, ConfigReader::StringM
         }
     }
     else if(url.find("native:") == 0) {
-        trace.println("new NodePython(" + instance + ")");
         try {
             string className = url.substr(7);
 
