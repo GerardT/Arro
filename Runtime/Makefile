@@ -14,6 +14,9 @@ LIBS          = -L/usr/local/lib -lprotobuf `python-config --ldflags`
 DEL_FILE      = rm
 OBJDIR       := debug
 SRCDIR       := ../Runtime
+MKDIR_P      := mkdir -p
+_dummy1      := $(shell mkdir -p debug)
+_dummy2      := $(shell mkdir -p debug/Nodes)
 
 
 DEPS         := $(SRCS:.cpp=.d)
@@ -42,6 +45,7 @@ SRCS         := $(addprefix $(SRCDIR)/,$(SRCS))
 
 -include $(OBJS:.o=.d)
 
+.PHONY: all clean
 
 all: $(OBJS)
 	$(CXX) -o Arro $(LFLAGS) $(OBJS) $(LIBS) 
@@ -54,6 +58,6 @@ $(OBJDIR)/arro.pb.o: $(SRCDIR)/arro.proto
 	$(CXX) -MMD -c $(CXXFLAGS) $(INCPATH) -o $(OBJDIR)/arro.pb.o arro.pb.cc
 
 clean:
-	$(RM) debug/* debug/Nodes/*
+	rm -rf debug
 
 
