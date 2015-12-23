@@ -254,7 +254,7 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 						"sys.path.append('.')\n" +
 						"import arro_pb2\n\n").getBytes());
 	    	
-			IFile resultPython = folder.getFile("arro.py");
+			IFile resultPython = folder.getFile("arro_pgm.py");
 
 			if (resultPython.exists()) {
 				resultPython.setContents(new ByteArrayInputStream(baos.toByteArray()), true, true, null);

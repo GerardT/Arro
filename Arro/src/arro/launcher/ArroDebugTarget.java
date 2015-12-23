@@ -54,7 +54,7 @@ public class ArroDebugTarget implements IDebugTarget {
 //			
 //			engine.filterReply("put");
 //			
-//			file = build.getFile("arro.py");
+//			file = build.getFile("arro_pgm.py");
 //			
 //			engine.sendFile(file);
 //			

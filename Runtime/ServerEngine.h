@@ -3,6 +3,10 @@
 
 #include <string>
 
+#define ARRO_PROGRAM_FILE    "arro_pgm"
+#define ARRO_API_FILE        "arro_api"
+#define ARRO_CONFIG_FILE     "arro.xml"
+
 
 namespace Arro {
 

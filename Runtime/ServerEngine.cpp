@@ -207,9 +207,9 @@ static void server()
                 {
                     nodeDb = new NodeDb();
                     try {
-                        pg = new PythonGlue("arro");
+                        pg = new PythonGlue();
 
-                        ConfigReader reader(filename, *nodeDb);
+                        ConfigReader reader(ARRO_CONFIG_FILE, *nodeDb);
                         ServerEngine::console("loading successful");
 
                         nodeDb->start();
@@ -227,15 +227,15 @@ static void server()
                 /* 1: stop message flow */
                 nodeDb->stop();
 
-                /* 2: stop python */
+                /* 2: delete node database */
+                delete nodeDb; // will automatically stop timers etc.
+                nodeDb = nullptr;
+
+                /* 3: stop python */
                 if(pg) {
                     delete pg;
                     pg = nullptr;
                 }
-
-                /* 3: delete node database */
-                delete nodeDb; // will automatically stop timers etc.
-                nodeDb = nullptr;
 
                 /* 4: close socket - probably already closed by Eclipse client */
                 //ServerEngine::console("stopped");

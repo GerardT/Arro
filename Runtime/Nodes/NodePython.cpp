@@ -21,6 +21,7 @@ NodePython::NodePython(Process* d, string& className, ConfigReader::StringMap& /
 
     // Build the name of a callable class
     pClass = PyDict_GetItemString(pDict, className.c_str());
+    Py_DECREF(pDict);
 
     // Create an instance of the class
     if (PyCallable_Check(pClass))
@@ -37,6 +38,9 @@ NodePython::~NodePython() {
     while(!messages.empty()) {
         messages.pop();  // FIXME messages should be deleted properly
     }
+
+    Py_DECREF(pClass);
+    Py_DECREF(pInstance);
 }
 
 /**

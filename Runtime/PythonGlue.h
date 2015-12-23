@@ -34,7 +34,7 @@ namespace Arro {
          *
          * \param filename Name of Python module to load.
          */
-        PythonGlue(const std::string& filename);
+        PythonGlue();
         ~PythonGlue();
 
         // Copy and assignment is not supported.
@@ -47,6 +47,13 @@ namespace Arro {
          * \return Python dictionary.
          */
         static PyObject* getDict();
+
+        /**
+         * Get Python dictionary of the loaded module.
+         *
+         * \return Python dictionary.
+         */
+        static PyObject* getDictApi();
 
         /**
          * Let NodePython objects register themselves to allow getMessage and sendMessage
@@ -95,10 +102,10 @@ namespace Arro {
          *
          * \param filename Name of Python module to load.
          */
-        PyObject* loadModule(char* filename);
+        PyObject* loadModule();
 
         Trace trace;
-        PyObject *pModule, *pDict;
+        PyObject *pModule, *pModuleApi, *pDict, *pDictApi;
         std::map<PyObject *, NodePython*> instanceMap;
     };
 }

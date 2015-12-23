@@ -7,10 +7,11 @@ using namespace std;
 static PythonGlue* instance = nullptr;
 
 
-PythonGlue::PythonGlue(const string& filename):
+PythonGlue::PythonGlue():
     trace("PythonGlue", true),
     pModule(nullptr),
-    pDict(nullptr)
+    pDict(nullptr),
+    pDictApi(nullptr)
 {
     if(instance) {
         trace.fatal("Tried to instantiate PythonGlue more than once.");
@@ -32,8 +33,7 @@ PythonGlue::PythonGlue(const string& filename):
     Py_DECREF(path);
     Py_DECREF(dot);
 
-    const char* modName = filename.c_str();
-    if(loadModule((char*)modName) == nullptr) {
+    if(loadModule() == nullptr) {
         // Undo Py_Initialize
         Py_Finalize();
 
@@ -57,8 +57,7 @@ PythonGlue::~PythonGlue() {
     /*
      * Cleanup for C -> Python.
      */
-    Py_DECREF(pModule);
-    Py_DECREF(pDict);
+    // Don't Py_DECREF pDict, pDictApi, pModule, pModuleApi since it will crash ModuleImport after restart.
 
     // Finish the Python Interpreter
     Py_Finalize();
@@ -113,19 +112,30 @@ static PyMethodDef ArroMethods[] = {
 };
 
 PyObject*
-PythonGlue::loadModule(char* filename) {
-    PyObject *pName = nullptr;
-
+PythonGlue::loadModule() {
     // Build the name object
-    pName = PyString_FromString(filename);
+    PyObject *pName = PyString_FromString(ARRO_PROGRAM_FILE);
 
-    // Load the module object
+    // Load the arro module object
     pModule = PyImport_Import(pName);
     Py_DECREF(pName);
 
     if (pModule != nullptr) {
-        // pDict is a borrowed reference
         pDict = PyModule_GetDict(pModule);
+    }
+    else {
+        captureError();
+        return nullptr;
+    }
+
+    // Build the name object
+    PyObject *pNameApi = PyString_FromString(ARRO_API_FILE);
+    // Load the arro_api module object
+    pModuleApi = PyImport_Import(pNameApi);
+    Py_DECREF(pNameApi);
+
+    if (pModuleApi != nullptr) {
+        pDictApi = PyModule_GetDict(pModuleApi);
     }
     else {
         captureError();
@@ -139,7 +149,7 @@ void
 PythonGlue::insertFunctionToModule() {
     for(PyMethodDef* def = ArroMethods; def->ml_name != nullptr; def++) {
         PyObject *func = PyCFunction_New(def, nullptr);
-        PyDict_SetItemString(pDict, def->ml_name, func);
+        PyDict_SetItemString(pDictApi, def->ml_name, func);
         Py_DECREF(func);
     }
 }
@@ -152,6 +162,11 @@ PythonGlue::registerInstance(PyObject* obj, NodePython* node) {
 PyObject*
 PythonGlue::getDict() {
     return instance->pDict;
+};
+
+PyObject*
+PythonGlue::getDictApi() {
+    return instance->pDictApi;
 };
 
 void
