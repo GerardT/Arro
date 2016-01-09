@@ -22,6 +22,8 @@ using namespace Arro;
 
 static thread* thrd = nullptr;
 static int newsockfd = -1;
+static NodeDb* nodeDb = nullptr;
+static PythonGlue* pg = nullptr;
 static Trace trace("ServerEngine", true);
 
 /**
@@ -84,6 +86,33 @@ static int readln(int sockfd, char* buffer, size_t n/*size*/) {
 }
 
 /**
+ * Cleanup after exception of terminate command.
+ */
+static void cleanup()
+{
+	if(nodeDb) {
+        /* 1: stop message flow */
+        nodeDb->stop();
+
+        /* 2: delete node database */
+        delete nodeDb; // will automatically stop timers etc.
+        nodeDb = nullptr;
+	}
+
+    /* 3: stop python */
+    if(pg) {
+        delete pg;
+        pg = nullptr;
+    }
+
+    /* 4: close socket - probably already closed by Eclipse client */
+    if(newsockfd != -1) {
+        close(newsockfd);
+        newsockfd = -1;
+    }
+}
+
+/**
  * Server thread for Eclipse client.
  * Should keep running forever and serve multiple client 'debugging' sessions.
  * For duration of each 'debugging' session from client the server will keep
@@ -101,8 +130,6 @@ static void server()
     char buffer[ARRO_BUFFER_SIZE];
     struct sockaddr_in serv_addr, cli_addr;
     int i, n;
-    NodeDb* nodeDb = nullptr;
-    PythonGlue* pg = nullptr;
 
     /* First call to socket() function */
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -215,31 +242,15 @@ static void server()
                         nodeDb->start();
                         ServerEngine::console("run successful");
                     } catch ( const std::runtime_error& e ) {
-                         ServerEngine::console("run failed");
-                        // Nothing to do, just don't run it.
-                    }
+                    	cleanup();
 
+                        ServerEngine::console("run failed");
+                    }
                 }
             }
             else if(!strcmp(command, "terminate"))
             {
-
-                /* 1: stop message flow */
-                nodeDb->stop();
-
-                /* 2: delete node database */
-                delete nodeDb; // will automatically stop timers etc.
-                nodeDb = nullptr;
-
-                /* 3: stop python */
-                if(pg) {
-                    delete pg;
-                    pg = nullptr;
-                }
-
-                /* 4: close socket - probably already closed by Eclipse client */
-                //ServerEngine::console("stopped");
-                close(newsockfd);
+            	cleanup();
                 break;
             }
             else if(!strcmp(command, "pwd"))

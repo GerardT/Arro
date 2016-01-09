@@ -43,6 +43,7 @@ namespace Arro {
 
         /**
          * Get Python dictionary of the loaded module.
+         * Don't Py_DECREF it.
          *
          * \return Python dictionary.
          */
@@ -50,6 +51,7 @@ namespace Arro {
 
         /**
          * Get Python dictionary of the loaded module.
+         * Don't Py_DECREF it.
          *
          * \return Python dictionary.
          */

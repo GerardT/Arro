@@ -25,17 +25,15 @@ PythonGlue::PythonGlue():
     /*
      * Setup for C -> Python.
      */
-    PyObject *dot = PyString_FromString(".");
-    PyObject *sys = PyImport_ImportModule("sys");
-    PyObject *path = PyObject_GetAttrString(sys, "path");
-    PyList_Append(path, dot);
+    PyObject *dot = PyUnicode_FromString(".");  // Return value: New reference.
+    PyObject *sys = PyImport_ImportModule("sys");  // Return value: New reference.
+    PyObject *path = PyObject_GetAttrString(sys, "path");  //Return value: New reference.
+    PyList_Append(path, dot); // Return value: int
     Py_DECREF(sys);
     Py_DECREF(path);
     Py_DECREF(dot);
 
     if(loadModule() == nullptr) {
-        // Undo Py_Initialize
-        Py_Finalize();
 
         throw std::runtime_error("Failed to load");
     }
@@ -57,7 +55,8 @@ PythonGlue::~PythonGlue() {
     /*
      * Cleanup for C -> Python.
      */
-    // Don't Py_DECREF pDict, pDictApi, pModule, pModuleApi since it will crash ModuleImport after restart.
+    // Don't Py_DECREF pDict, pDictApi.
+    Py_DECREF(pModule);
 
     // Finish the Python Interpreter
     Py_Finalize();
@@ -69,7 +68,7 @@ PythonGlue::getMessage(PyObject * /*self*/, PyObject *args)
 {
     PyObject *obj;
 
-    if(!PyArg_ParseTuple(args, "O", &obj))
+    if(!PyArg_ParseTuple(args, "O", &obj))  // Return value: int
         return nullptr;
 
     NodePython* np = instance->instanceMap[obj];
@@ -87,7 +86,7 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
     char* pad;
     char* string;
 
-    if(!PyArg_ParseTuple(args, "Oss", &obj, &pad, &string)) {
+    if(!PyArg_ParseTuple(args, "Oss", &obj, &pad, &string)) {  // Return value: int
         return nullptr;
     }
 
@@ -114,14 +113,13 @@ static PyMethodDef ArroMethods[] = {
 PyObject*
 PythonGlue::loadModule() {
     // Build the name object
-    PyObject *pName = PyString_FromString(ARRO_PROGRAM_FILE);
-
+    PyObject *pName = PyUnicode_FromString(ARRO_PROGRAM_FILE);  // Return value: New reference.
     // Load the arro module object
-    pModule = PyImport_Import(pName);
+    pModule = PyImport_Import(pName);  // Return value: New reference.
     Py_DECREF(pName);
 
     if (pModule != nullptr) {
-        pDict = PyModule_GetDict(pModule);
+        pDict = PyModule_GetDict(pModule);  // Return value: Borrowed reference.
     }
     else {
         captureError();
@@ -129,13 +127,13 @@ PythonGlue::loadModule() {
     }
 
     // Build the name object
-    PyObject *pNameApi = PyString_FromString(ARRO_API_FILE);
+    PyObject *pNameApi = PyUnicode_FromString(ARRO_API_FILE);
     // Load the arro_api module object
-    pModuleApi = PyImport_Import(pNameApi);
+    pModuleApi = PyImport_Import(pNameApi);  // Return value: New reference.
     Py_DECREF(pNameApi);
 
     if (pModuleApi != nullptr) {
-        pDictApi = PyModule_GetDict(pModuleApi);
+        pDictApi = PyModule_GetDict(pModuleApi);  // Return value: Borrowed reference.
     }
     else {
         captureError();
@@ -179,35 +177,33 @@ PythonGlue::captureError() {
     PyObject *type, *value, *traceback, *mod, *list;
 
     /* Save the current exception */
-    PyErr_Fetch(&type, &value, &traceback);
+    PyErr_Fetch(&type, &value, &traceback);  // No return, seems the parameters should NOT be Py_DECREF-ed.
     if(traceback == 0) {
         Py_INCREF(Py_None);
         traceback = Py_None;
     }
-    mod = PyImport_ImportModule("traceback");
+    mod = PyImport_ImportModule("traceback");  // Return value: New reference.
     if (!mod) {
         /* print some error */
         return;
     }
 
-    list= PyObject_CallMethod(mod, "format_exception", "OOO", type,    value, traceback);
+    list= PyObject_CallMethod(mod, "format_exception", "OOO", type,    value, traceback);  // Return value: New reference.
 
     Py_ssize_t size = PyList_Size(list);
 
     for(Py_ssize_t i = 0; i < size; i++) {
-        PyObject *item = PyList_GetItem(list, i);
+        PyObject *item = PyList_GetItem(list, i);  // Return value: Borrowed reference.
 
+#if 0 /* Python3 */
+        ServerEngine::console(string("Python ") + PyUnicode_AsUTF8(item));
+#else
         ServerEngine::console(string("Python ") + PyString_AsString(item));
-
-        // Doing DECREF on item makes Python crash next time. Not sure why...
-        // Py_DECREF(item);
+#endif
     }
 
     Py_DECREF(list);
     Py_DECREF(mod);
-    Py_DECREF(type);
-    Py_DECREF(value);
-    Py_DECREF(traceback);
     // PyErr_Clear();
 }
 

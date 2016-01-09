@@ -20,13 +20,12 @@ NodePython::NodePython(Process* d, string& className, ConfigReader::StringMap& /
     PyObject *pDict = PythonGlue::getDict();
 
     // Build the name of a callable class
-    pClass = PyDict_GetItemString(pDict, className.c_str());
-    Py_DECREF(pDict);
+    pClass = PyDict_GetItemString(pDict, className.c_str());  // Return value: Borrowed reference
 
     // Create an instance of the class
-    if (PyCallable_Check(pClass))
+    if (PyCallable_Check(pClass))  // Return value: int
     {
-        pInstance = PyObject_CallObject(pClass, nullptr);
+        pInstance = PyObject_CallObject(pClass, nullptr);  // Return value: New reference.
         if(pInstance == nullptr) {
             throw std::runtime_error("Failed to instantiate Python class");
         }
@@ -39,7 +38,6 @@ NodePython::~NodePython() {
         messages.pop();  // FIXME messages should be deleted properly
     }
 
-    Py_DECREF(pClass);
     Py_DECREF(pInstance);
 }
 
@@ -50,7 +48,7 @@ NodePython::~NodePython() {
  */
 void
 NodePython::handleMessage(MessageBuf* msg, const string& padName) {
-    PyObject* tuple = Py_BuildValue("s s", padName.c_str(), msg->c_str());
+    PyObject* tuple = Py_BuildValue("s s", padName.c_str(), msg->c_str());  // Return value: New reference.
 
     messages.push(tuple);
 }
@@ -61,17 +59,16 @@ NodePython::handleMessage(MessageBuf* msg, const string& padName) {
  */
 void
 NodePython::runCycle() {
-    pValue = PyObject_CallMethod(pInstance, "runCycle", nullptr); // no parameters
+    pValue = PyObject_CallMethod(pInstance, "runCycle", nullptr); // no parameters, Return value: New reference.
     if (pValue != nullptr)
     {
-        trace.println("Return of call: " + PyInt_AsLong(pValue));
         Py_DECREF(pValue);
     }
     else
     {
         PythonGlue::captureError();
 
-        throw std::runtime_error("Failed to call Python method");
+        throw std::runtime_error("Calling runCycle inside Python resulted in error");
     }
 }
 

@@ -161,7 +161,7 @@ NodeDb::runCycle(NodeDb* nm) {
         	{
                 std::unique_lock<std::mutex> lock(nm->mutex);
 
-                while(nm->pInQueue->empty() != true) {
+                while(!(nm->pInQueue->empty())) {
                     FullMsg* fm = nm->pInQueue->front();
                     nm->trace.println("new msg");
                     nm->pInQueue->pop();
@@ -170,7 +170,6 @@ NodeDb::runCycle(NodeDb* nm) {
                         fm->output->forwardMessage(msg);
                         delete msg;
                         delete fm;
-
                     }
                 }
         	} // make sure mutex is unlocked here
@@ -186,6 +185,8 @@ NodeDb::runCycle(NodeDb* nm) {
             } // make sure mutex is unlocked here
         }
     } catch (std::runtime_error& e) {
+    	// If exception, for instance Python (syntax) error, then thread exits here.
+    	// User can stop NodeDb after that.
     }
 }
 
