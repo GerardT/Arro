@@ -210,6 +210,7 @@ static void server()
                     size -= r;
                 }
                 close(filehandle);
+                free(f);
                 if(c != -1)
                 {
                     ServerEngine::console("put successful");
