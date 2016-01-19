@@ -87,17 +87,8 @@ public class ArroNodeLayoutFeature extends AbstractLayoutFeature implements
             	for(ArroPad pad: pads) {
             		ContainerShape anchorContainer = anchors.get(pad.getName());
             		GraphicsAlgorithm text = anchorContainer.getGraphicsAlgorithm();
-            		if(pad.getInput()) {
-            			// Left side
-                        gaService.setLocationAndSize(text,
-                        		rect.getX() - Constants.HALF_PAD_SIZE, 45 + (15 * i),
-                        		80, Constants.PAD_SIZE);
-            		} else {
-            			// Right side
-                        gaService.setLocationAndSize(text,
-                        		rect.getX() + rect.getWidth() - 80 + Constants.HALF_PAD_SIZE, 45 + (15 * i),
-                        		80, Constants.PAD_SIZE);
-            		}
+                    ArroNodeAnchorPosition pos = new ArroNodeAnchorPosition(rect, pad.getInput(), i);
+                    gaService.setLocationAndSize(text, pos.boxPosX(), pos.boxPosY(), pos.boxSizeX(), pos.boxSizeY());
                     i++;
             	}
             }

@@ -131,6 +131,9 @@ public class ArroNodeUpdateFeature  extends DefaultUpdateDiagramFeature {
             WidgetUtil.getTextType(cs).setValue(type + " :");
             WidgetUtil.getTextName(cs).setValue(name);
             
+            
+            // new plan: remove texts, then do update as below, then add back all new texts.
+            
             // Update anchors - first find out how many anchors and their name
             NonEmfDomainObject domainObject = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(cs);
             if(domainObject instanceof ArroNode) {
@@ -164,15 +167,9 @@ public class ArroNodeUpdateFeature  extends DefaultUpdateDiagramFeature {
             			// GA for this shape is the Text below.
         	    		ContainerShape shape = peCreateService.createContainerShape(cs, true);
                         final Rectangle invs = gaService.createInvisibleRectangle(shape);
-                		if(pad.getInput()) {
-                			// Left side
-                            gaService.setLocationAndSize(invs, rect.getX() - Constants.HALF_PAD_SIZE, 45 + (15 * i), 80, Constants.PAD_SIZE);
-                		} else {
-                			// Right side
-                            gaService.setLocationAndSize(invs, rect.getX() + rect.getWidth() - 80 + Constants.HALF_PAD_SIZE, 45 + (15 * i), 80, Constants.PAD_SIZE);
-                		}
-
-                        
+                        ArroNodeAnchorPosition pos = new ArroNodeAnchorPosition(rect, pad.getInput(), i);
+                        gaService.setLocationAndSize(invs, pos.boxPosX(), pos.boxPosY(), pos.boxSizeX(), pos.boxSizeY());
+                      
                         Graphiti.getPeService().setPropertyValue(shape, Constants.PROP_PICT_KEY, Constants.PROP_PICT_PASSIVE);
 
             			createAnchor(shape, invs, pad.getInput(), pad.getName());
@@ -222,16 +219,11 @@ public class ArroNodeUpdateFeature  extends DefaultUpdateDiagramFeature {
    		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		IGaService gaService = Graphiti.getGaService();
    		
-   		
  		final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(shape);                 		
 		boxAnchor.setReferencedGraphicsAlgorithm(shape.getGraphicsAlgorithm());
 		
 		
-		if(leftSide) {
-    		boxAnchor.setRelativeWidth(0.0);
-		} else {
-    		boxAnchor.setRelativeWidth(0.0);
-		}
+		boxAnchor.setRelativeWidth(0.0);
 		boxAnchor.setRelativeHeight(0.0/*0.38*/); // Use golden section
         
         Graphiti.getPeService().setPropertyValue(shape, Constants.PROP_PAD_NAME_KEY, padName);
@@ -253,17 +245,10 @@ public class ArroNodeUpdateFeature  extends DefaultUpdateDiagramFeature {
         Graphiti.getPeService().setPropertyValue(text, Constants.PROP_PICT_KEY, Constants.PROP_PICT_PASSIVE);
 
 		
-		if(leftSide) {
-			// Left side
-            gaService.setLocationAndSize(text, Constants.PAD_SIZE, 0, 80 - Constants.PAD_SIZE, Constants.PAD_SIZE);
-            gaService.setLocationAndSize(anch, 0, 0, Constants.PAD_SIZE, Constants.PAD_SIZE);
-            text.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
-		} else {
-			// Right side
-            gaService.setLocationAndSize(text, 0, 0, 80 - Constants.PAD_SIZE, Constants.PAD_SIZE);
-            gaService.setLocationAndSize(anch, 80 - Constants.PAD_SIZE, 0, Constants.PAD_SIZE, Constants.PAD_SIZE);
-            text.setHorizontalAlignment(Orientation.ALIGNMENT_RIGHT);
-		}
+        ArroNodeAnchorPosition pos = new ArroNodeAnchorPosition(text, leftSide, 0);
+        gaService.setLocationAndSize(text, pos.textPosX(), pos.textPosY(), pos.textSizeX(), pos.textSizeY());
+        gaService.setLocationAndSize(anch, pos.anchorPosX(), pos.anchorPosY(), pos.anchorSizeX(), pos.anchorSizeY());
+        text.setHorizontalAlignment(leftSide ? Orientation.ALIGNMENT_LEFT : Orientation.ALIGNMENT_RIGHT);
     	
     }
     
