@@ -1,4 +1,4 @@
-package arro.node.features;
+package arro.diagram.features;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IRemoveContext;

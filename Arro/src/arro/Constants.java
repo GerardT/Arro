@@ -11,7 +11,8 @@ public class Constants {
 	public final static String HIDDEN_RESOURCE = ".";
 	public final static String NODE_EXT = "anod";
 	public final static String MESSAGE_EXT = "amsg";
-	public final static String DIAGRAM_TYPE = "Arro"; // must match with plugin.xml
+	public final static String FUNCTION_DIAGRAM_TYPE = "Arro"; // must match with plugin.xml
+	public final static String STATE_DIAGRAM_TYPE = "ArroStateDiagram"; // must match with plugin.xml
 	
 	public final static String FUNCTION_BLOCK = "Function";
 	public final static String CODE_BLOCK = "Code";

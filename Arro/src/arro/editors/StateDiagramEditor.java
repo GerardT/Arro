@@ -8,17 +8,13 @@ import org.eclipse.gef.editparts.LayerManager;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
 import util.ArroZipFile;
 import util.PathUtil;
-import arro.Constants;
 import arro.domain.DomainNodeDiagram;
-import arro.domain.POJOIndependenceSolver;
 import arro.domain.ResourceCache;
 
 /**
@@ -26,20 +22,17 @@ import arro.domain.ResourceCache;
  * standard behavior, basically to connect it to the domain object.
  * 
  */
-public class SubGraphitiEditor extends DiagramEditor {
+public class StateDiagramEditor extends DiagramEditor {
 
 	//public final static String ID = "org.activiti.designer.diagrameditor"; //$NON-NLS-1$
-	private int documentType = Constants.FunctionBlock;
 	
-	private String pojoFilePath;
 	private String diagramName;
 	private DomainNodeDiagram domainNodeDiagram;
 	private ArroZipFile zip;
 	
 
-	public SubGraphitiEditor(ArroZipFile zip, int documentType) {
+	public StateDiagramEditor(ArroZipFile zip) {
 		super();
-		this.documentType = documentType;
 		this.zip = zip;
 	}
 	
@@ -58,7 +51,6 @@ public class SubGraphitiEditor extends DiagramEditor {
 		
 		diagramName = PathUtil.truncExtension(zip.getName());
 		
-		//DomainNodeDiagram domainObject = POJOIndependenceSolver.getInstance().loadNodeDiagram(diagramName, pojoFilePath);
 		DomainNodeDiagram domainObject = (DomainNodeDiagram)zip.getDomainDiagram();
 		if(domainObject != null && domainObject instanceof DomainNodeDiagram) {
 			domainNodeDiagram = (DomainNodeDiagram)domainObject;
@@ -73,10 +65,6 @@ public class SubGraphitiEditor extends DiagramEditor {
 		return domainNodeDiagram;
 	}
 	
-	public int getDocumentType() {
-		return documentType;
-	}
-
 	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);

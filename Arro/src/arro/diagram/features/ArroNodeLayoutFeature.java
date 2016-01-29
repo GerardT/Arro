@@ -1,4 +1,4 @@
-package arro.node.features;
+package arro.diagram.features;
 
 
 import java.util.Collection;
@@ -75,7 +75,7 @@ public class ArroNodeLayoutFeature extends AbstractLayoutFeature implements
 			points.get(1).setX(invisibleRectangle.getWidth() - Constants.HALF_PAD_SIZE);
 			
             // Update anchors - first find out how many anchors and their name
-            NonEmfDomainObject domainObject = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(cs);
+            NonEmfDomainObject domainObject = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(cs, getFeatureProvider());
             if(domainObject instanceof ArroNode) {
             	// Read the Node info using node-type
             	Collection<ArroPad> pads = ((ArroNode)domainObject).getPads();

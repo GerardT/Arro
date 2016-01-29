@@ -1,4 +1,4 @@
-package arro.node.features;
+package arro.diagram.features;
 
 
 import org.eclipse.emf.common.util.EList;
@@ -56,7 +56,7 @@ public class ArroPadLayoutFeature extends AbstractLayoutFeature implements
 			if (outerGraphicsAlgorithm instanceof RoundedRectangle) {
 				RoundedRectangle roundedRectangle = (RoundedRectangle) outerGraphicsAlgorithm;
 				
-				layoutNode(containerShape, roundedRectangle, pictogramElement);
+				layoutNode(containerShape, roundedRectangle, pictogramElement, getFeatureProvider());
 				
 				return true;
 			}
@@ -64,7 +64,7 @@ public class ArroPadLayoutFeature extends AbstractLayoutFeature implements
 		return false;
 	}
 	
-	private static void layoutNode(ContainerShape containerShape, RoundedRectangle roundedRectangle, PictogramElement pictogramElement) {
+	private static void layoutNode(ContainerShape containerShape, RoundedRectangle roundedRectangle, PictogramElement pictogramElement, IFeatureProvider fp) {
 		
 		EList<Shape> children = containerShape.getChildren();
 		int i = 0;
@@ -81,7 +81,7 @@ public class ArroPadLayoutFeature extends AbstractLayoutFeature implements
 			}
 		}
         //boolean input = (Graphiti.getPeService().getPropertyValue(containerShape, Constants.PROP_PAD_INPUT_KEY).equals(Constants.PROP_TRUE_VALUE));
-        NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement);
+        NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement, fp);
         boolean input = true;
         if(bo instanceof ArroPad) {
         	input = ((ArroPad) bo).getInput();

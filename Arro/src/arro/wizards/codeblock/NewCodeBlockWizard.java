@@ -267,7 +267,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 	}
 
 	private InputStream openContentStream(IFile file, String diagramName) throws CoreException {
-		final String diagramTypeId = arro.Constants.DIAGRAM_TYPE;
+		final String diagramTypeId = arro.Constants.FUNCTION_DIAGRAM_TYPE;
 		
 		Diagram diagram = Graphiti.getPeCreateService().createDiagram(diagramTypeId, diagramName, true);
 		
@@ -276,7 +276,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 		URI uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
 		
 		// Create 'ID' in device diagram
-		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, "Arro.ArroNodeDiagramTypeProvider");
+		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, "Arro.FunctionDiagramTypeProvider");
 		AddContext context = new AddContext();
 		
 		nodeDiagram = new DomainNodeDiagram();

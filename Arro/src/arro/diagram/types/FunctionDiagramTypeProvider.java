@@ -1,4 +1,4 @@
-package arro.node.diagram;
+package arro.diagram.types;
 
 
 import java.util.HashMap;
@@ -21,12 +21,12 @@ import util.Logger;
  * Even for same diagram type there will be one instance of this class.
  *
  */
-public class ArroNodeDiagramTypeProvider extends AbstractDiagramTypeProvider {
+public class FunctionDiagramTypeProvider extends AbstractDiagramTypeProvider {
 	
-	private static HashMap<Diagram, ArroNodeDiagramTypeProvider> diagrams = new HashMap<Diagram, ArroNodeDiagramTypeProvider>();
-	public ArroNodeDiagramTypeProvider() {
+	private static HashMap<Diagram, FunctionDiagramTypeProvider> diagrams = new HashMap<Diagram, FunctionDiagramTypeProvider>();
+	public FunctionDiagramTypeProvider() {
 		super();
-		setFeatureProvider(new ArroNodeFeatureProvider(this));
+		setFeatureProvider(new FunctionDiagramFeatureProvider(this));
 	    IResourceChangeListener listener = new MyResourceChangeReporter();
 	    ResourcesPlugin.getWorkspace().addResourceChangeListener(
 	      listener, IResourceChangeEvent.POST_CHANGE);
@@ -63,7 +63,7 @@ public class ArroNodeDiagramTypeProvider extends AbstractDiagramTypeProvider {
 	    public IToolBehaviorProvider[] getAvailableToolBehaviorProviders() {
 	        if (toolBehaviorProviders == null) {
 	            toolBehaviorProviders =
-	                new IToolBehaviorProvider[] { new ArroToolBehaviorProvider(
+	                new IToolBehaviorProvider[] { new FunctionDiagramToolBehaviorProvider(
 	                    this) };
 	        }
 	        return toolBehaviorProviders;

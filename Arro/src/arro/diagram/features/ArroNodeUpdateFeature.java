@@ -1,4 +1,4 @@
-package arro.node.features;
+package arro.diagram.features;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,8 +54,8 @@ public class ArroNodeUpdateFeature  extends DefaultUpdateDiagramFeature {
 	 */
     public IReason updateNeeded(IUpdateContext context) {
         PictogramElement pictogramElement = context.getPictogramElement();
-        NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement);
-        
+        NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement, getFeatureProvider());;
+
         String type = ((ArroNode)bo).getType();
         String name = bo.getName();
         
@@ -63,7 +63,7 @@ public class ArroNodeUpdateFeature  extends DefaultUpdateDiagramFeature {
             ContainerShape cs = (ContainerShape) pictogramElement;
             
             // Update anchors - first find out how many anchors and their name
-            NonEmfDomainObject domainObject = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(cs);
+            NonEmfDomainObject domainObject = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(cs, getFeatureProvider());
             if(domainObject instanceof ArroNode) {
             
 	            // cannot do updates here, just check if the same
@@ -117,7 +117,7 @@ public class ArroNodeUpdateFeature  extends DefaultUpdateDiagramFeature {
      */
     public boolean update(IUpdateContext context) {
         PictogramElement pictogramElement = context.getPictogramElement();
-        NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement);
+        NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement, getFeatureProvider());
         
         String type = ((ArroNode)bo).getType();
         String name = bo.getName();
@@ -135,7 +135,7 @@ public class ArroNodeUpdateFeature  extends DefaultUpdateDiagramFeature {
             // new plan: remove texts, then do update as below, then add back all new texts.
             
             // Update anchors - first find out how many anchors and their name
-            NonEmfDomainObject domainObject = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(cs);
+            NonEmfDomainObject domainObject = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(cs, getFeatureProvider());
             if(domainObject instanceof ArroNode) {
             	boolean changed = false;
             	

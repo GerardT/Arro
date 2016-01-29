@@ -56,7 +56,8 @@ public class MultiPageEditor extends MultiPageEditorPart implements
 
     /** The text editor used in page 0. */
     // private TextEditor editor;
-    private SubGraphitiEditor editor;
+    private FunctionDiagramEditor functionEditor;
+    private StateDiagramEditor stateEditor;
     private TextEditor pythonEditor;
     
     private ArroZipFile zip = null;
@@ -89,9 +90,9 @@ public class MultiPageEditor extends MultiPageEditorPart implements
 
             try {
             	// pass the file so later it knows where to store the .xml file.
-                editor = new SubGraphitiEditor(zip, documentType);
+                functionEditor = new FunctionDiagramEditor(zip, documentType);
                 
-                int index = addPage(editor, fei2);
+                int index = addPage(functionEditor, fei2);
                 setPageText(index, "Function Diagram");
             } catch (PartInitException e) {
                 ErrorDialog.openError(getSite().getShell(),
@@ -125,10 +126,34 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     }
 
     /**
-     * Creates page 2 of the multi-page editor, which allows you to change the
-     * font used in page 2.
+     * Creates page 0 of the multi-page editor, which contains a text editor.
      */
-    void createPage2() {
+    void createPage2(String fileName, ArroZipFile zip) {
+
+        //IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + fileName);
+        IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + Constants.STATE_DIAGRAM_TYPE);
+        if(file != null) {
+        	FileEditorInput fei2 = new FileEditorInput(file);
+        	
+
+            try {
+            	// pass the file so later it knows where to store the .xml file.
+                stateEditor = new StateDiagramEditor(zip);
+                
+                int index = addPage(stateEditor, fei2);
+                setPageText(index, "State Diagram");
+            } catch (PartInitException e) {
+                ErrorDialog.openError(getSite().getShell(),
+                        "Error creating nested state editor", null, e.getStatus());
+            }
+        }
+    }
+
+    /**
+     * Creates page 3 of the multi-page editor, which allows you to change the
+     * font used in page 3.
+     */
+    void createPage3() {
 
         Composite composite = new Composite(getContainer(), SWT.NONE);
         GridLayout layout = new GridLayout();
@@ -183,6 +208,8 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         if(documentType == Constants.CodeBlockPython) {
             createPage1(fei.getName(), zip);
         }
+        createPage2(fei.getName(), zip);
+
         //createPage2();
     }
 
@@ -276,10 +303,10 @@ public class MultiPageEditor extends MultiPageEditorPart implements
                     IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
                             .getPages();
                     for (int i = 0; i < pages.length; i++) {
-                        if (((FileEditorInput) editor.getEditorInput())
+                        if (((FileEditorInput) functionEditor.getEditorInput())
                                 .getFile().getProject()
                                 .equals(event.getResource())) {
-                            IEditorPart editorPart = pages[i].findEditor(editor
+                            IEditorPart editorPart = pages[i].findEditor(functionEditor
                                     .getEditorInput());
                             pages[i].closeEditor(editorPart, true);
                         }

@@ -36,7 +36,7 @@ public class MultiPageEditorContributor extends MultiPageEditorActionBarContribu
 	 * Returns the action registed with the given text editor.
 	 * @return IAction or null if editor is null.
 	 */
-	protected IAction getAction(SubGraphitiEditor editor, String actionID) {
+	protected IAction getAction(FunctionDiagramEditor editor, String actionID) {
 		return (editor == null ? null : editor.getActionRegistry().getAction(actionID) /*  getAction(actionID)*/);
 	}
 	/* (non-JavaDoc)
@@ -53,7 +53,7 @@ public class MultiPageEditorContributor extends MultiPageEditorActionBarContribu
 		if (actionBars != null) {
 
 			//ITextEditor editor = (part instanceof ITextEditor) ? (ITextEditor) part : null;
-			SubGraphitiEditor editor = (part instanceof SubGraphitiEditor) ? (SubGraphitiEditor) part : null;
+			FunctionDiagramEditor editor = (part instanceof FunctionDiagramEditor) ? (FunctionDiagramEditor) part : null;
 
 			actionBars.setGlobalActionHandler(
 				ActionFactory.DELETE.getId(),

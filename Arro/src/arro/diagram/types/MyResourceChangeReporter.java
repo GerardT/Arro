@@ -1,4 +1,4 @@
-package arro.node.diagram;
+package arro.diagram.types;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;

@@ -1,4 +1,4 @@
-package arro.node.features;
+package arro.diagram.features;
 
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -7,9 +7,13 @@ import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
+import arro.domain.ArroState;
 import arro.domain.DomainNodeDiagram;
 
-
+/**
+ * One feature for both Function and State diagrams.
+ *
+ */
 public class ArroIDAddFeature extends AbstractAddFeature implements IAddFeature {
 
 	public ArroIDAddFeature(IFeatureProvider fp) {
@@ -21,17 +25,16 @@ public class ArroIDAddFeature extends AbstractAddFeature implements IAddFeature 
 	}
 
 	/**
-	 * Called when a Node is added to the diagram, both for adding and 
-	 * drag and drop (DND).
+	 * Used to register a business object ID to the diagram.
 	 */
 	public PictogramElement add(IAddContext context) {
-		// Just create dummy function diagram so its ID can be used in editor.
-		DomainNodeDiagram d = (DomainNodeDiagram) context.getNewObject();
+		Object d = context.getNewObject();
 		
-	    // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
-		link(getDiagram(), d);
-		//POJOIndependenceSolver.getInstance().RegisterPOJOObject(addedDomainObject);
-		
+		if(d instanceof DomainNodeDiagram || d instanceof ArroState) {
+		    // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
+			link(getDiagram(), d);
+		}
+
 		return getDiagram();
 	}
 }

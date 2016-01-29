@@ -35,7 +35,7 @@ import arro.domain.ArroDevice;
 import arro.domain.ArroNode;
 import arro.domain.ArroParameter;
 import arro.domain.NonEmfDomainObject;
-import arro.editors.SubGraphitiEditor;
+import arro.editors.FunctionDiagramEditor;
 
 public class ArroParamSection extends GFPropertySection/*AbstractPropertySection*/ {
 
@@ -98,8 +98,8 @@ public class ArroParamSection extends GFPropertySection/*AbstractPropertySection
 		updateModelData(messageList);
 
 	    IDiagramEditor editor = getDiagramEditor();
-	    if(editor instanceof SubGraphitiEditor) {
-	    	((SubGraphitiEditor)editor).updateDirtyState();
+	    if(editor instanceof FunctionDiagramEditor) {
+	    	((FunctionDiagramEditor)editor).updateDirtyState();
 	    }
 	}
 

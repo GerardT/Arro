@@ -1,4 +1,4 @@
-package arro.node.features;
+package arro.diagram.features;
 
 import org.eclipse.graphiti.features.ICreateConnectionFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -53,7 +53,7 @@ public class ArroConnectionCreateFeature extends AbstractCreateConnectionFeature
 			
 			ContainerShape cs = WidgetUtil.getCsFromAnchor(anchor);	
 			
-	        NonEmfDomainObject domainObject = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(cs);
+	        NonEmfDomainObject domainObject = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(cs, getFeatureProvider());
 	        if(domainObject instanceof ArroNode) {
 		        String name = Graphiti.getPeService().getPropertyValue(anchor.getParent(), Constants.PROP_PAD_NAME_KEY);
 		        Logger.out.trace(Logger.EDITOR, "parent " + anchor + " name " + name);

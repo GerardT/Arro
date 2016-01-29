@@ -1,4 +1,4 @@
-package arro.node.features;
+package arro.diagram.features;
 
 import org.eclipse.graphiti.features.ICustomUndoableFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -9,13 +9,13 @@ import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 
 import util.Logger;
 import arro.Constants;
-import arro.domain.ArroNode;
+import arro.domain.ArroPad;
 import arro.domain.DomainNodeDiagram;
-import arro.editors.SubGraphitiEditor;
+import arro.editors.FunctionDiagramEditor;
 
-public class ArroNodeDeleteFeature extends DefaultDeleteFeature implements ICustomUndoableFeature {
+public class ArroPadDeleteFeature extends DefaultDeleteFeature implements ICustomUndoableFeature {
 
-	public ArroNodeDeleteFeature(IFeatureProvider fp) {
+	public ArroPadDeleteFeature(IFeatureProvider fp) {
 		super(fp);
 	}
 	
@@ -25,11 +25,11 @@ public class ArroNodeDeleteFeature extends DefaultDeleteFeature implements ICust
 	
 	public void delete(IDeleteContext context) {
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
-        if(!(dc instanceof SubGraphitiEditor)) {
+        if(!(dc instanceof FunctionDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");
         } else {
-        	DomainNodeDiagram domainNodeDiagram =  ((SubGraphitiEditor)dc).getDomainNodeDiagram();
-	        context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainNodeDiagram.cloneNodeList());
+        	DomainNodeDiagram domainNodeDiagram =  ((FunctionDiagramEditor)dc).getDomainNodeDiagram();
+	        context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainNodeDiagram.clonePadList());
 	        context.putProperty(Constants.PROP_UNDO_CONNECTION_KEY, domainNodeDiagram.cloneConnectionList());
 	        context.putProperty(Constants.PROP_DOMAIN_NODE_KEY, domainNodeDiagram);
         }
@@ -44,10 +44,10 @@ public class ArroNodeDeleteFeature extends DefaultDeleteFeature implements ICust
 
 	@Override
 	protected void deleteBusinessObject(Object bo) {
-		if(bo instanceof ArroNode) {
-			ArroNode obj = (ArroNode)bo;
+		if(bo instanceof ArroPad) {
+			ArroPad obj = (ArroPad)bo;
 			
-			obj.getParent().removeSubNode(obj);
+			obj.getParent().removePad(obj);
 			obj.getParent().purgeConnections();
 			
 			//POJOIndependenceSolver.getInstance().removeBusinessObject(bo);
@@ -59,9 +59,9 @@ public class ArroNodeDeleteFeature extends DefaultDeleteFeature implements ICust
 		DomainNodeDiagram domainNodeDiagram = (DomainNodeDiagram) context.getProperty(Constants.PROP_DOMAIN_NODE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "undo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
-        context.putProperty(Constants.PROP_REDO_NODE_KEY, domainNodeDiagram.cloneNodeList());
+        context.putProperty(Constants.PROP_REDO_NODE_KEY, domainNodeDiagram.clonePadList());
 		Object undoList = context.getProperty(Constants.PROP_UNDO_NODE_KEY);
-		domainNodeDiagram.setNodeList(undoList);
+		domainNodeDiagram.setPadList(undoList);
 		
         context.putProperty(Constants.PROP_REDO_CONNECTION_KEY, domainNodeDiagram.cloneConnectionList());
 		undoList = context.getProperty(Constants.PROP_UNDO_CONNECTION_KEY);
@@ -78,9 +78,9 @@ public class ArroNodeDeleteFeature extends DefaultDeleteFeature implements ICust
 		DomainNodeDiagram domainNodeDiagram = (DomainNodeDiagram) context.getProperty(Constants.PROP_DOMAIN_NODE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "redo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
-        context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainNodeDiagram.cloneNodeList());
+        context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainNodeDiagram.clonePadList());
 		Object redoList = context.getProperty(Constants.PROP_REDO_NODE_KEY);
-		domainNodeDiagram.setNodeList(redoList);
+		domainNodeDiagram.setPadList(redoList);
 		
         context.putProperty(Constants.PROP_UNDO_CONNECTION_KEY, domainNodeDiagram.cloneConnectionList());
 		redoList = context.getProperty(Constants.PROP_REDO_CONNECTION_KEY);

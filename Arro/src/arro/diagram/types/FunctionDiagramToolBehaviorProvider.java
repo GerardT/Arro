@@ -1,4 +1,4 @@
-package arro.node.diagram;
+package arro.diagram.types;
 
 import java.util.ArrayList;
 
@@ -21,16 +21,19 @@ import arro.domain.ArroNode;
 import arro.domain.NonEmfDomainObject;
 import arro.domain.POJOIndependenceSolver;
 
-public class ArroToolBehaviorProvider extends DefaultToolBehaviorProvider{
+public class FunctionDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider{
 
-    public ArroToolBehaviorProvider(IDiagramTypeProvider dtp) {
+    public FunctionDiagramToolBehaviorProvider(IDiagramTypeProvider dtp) {
         super(dtp);
     }
     
     public boolean isShowFlyoutPalette() {
     	return true;
     }
-    @Override
+    
+    /**
+     * Remove unneeded entries from Palette.
+     */
     public IPaletteCompartmentEntry[] getPalette() {
     	ArrayList<IPaletteCompartmentEntry> ret = new ArrayList<IPaletteCompartmentEntry>();
     	
@@ -46,7 +49,10 @@ public class ArroToolBehaviorProvider extends DefaultToolBehaviorProvider{
         return ret.toArray(new IPaletteCompartmentEntry[ret.size()]);
     }
     
-    @Override
+    /**
+     * If the node needs update then return a decorator that shows an icon on top
+     * of the node.
+     */
     public IDecorator[] getDecorators(PictogramElement pe) {
         IFeatureProvider featureProvider = getFeatureProvider();
         Object bo = featureProvider.getBusinessObjectForPictogramElement(pe);

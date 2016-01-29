@@ -1,4 +1,4 @@
-package arro.node.features;
+package arro.diagram.features;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IStatus;
@@ -32,7 +32,7 @@ import util.Logger;
 import arro.Constants;
 import arro.domain.ArroNode;
 import arro.domain.DomainNodeDiagram;
-import arro.editors.SubGraphitiEditor;
+import arro.editors.FunctionDiagramEditor;
 
 
 public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeature, ICustomUndoableFeature {
@@ -61,14 +61,14 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
         
         
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
-        if(!(dc instanceof SubGraphitiEditor)) {
+        if(!(dc instanceof FunctionDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");
         	return null;
         }
-        DomainNodeDiagram domainNodeDiagram =  ((SubGraphitiEditor)dc).getDomainNodeDiagram();
+        DomainNodeDiagram domainNodeDiagram =  ((FunctionDiagramEditor)dc).getDomainNodeDiagram();
         
 
-        int docType = ((SubGraphitiEditor)dc).getDocumentType();
+        int docType = ((FunctionDiagramEditor)dc).getDocumentType();
         if(docType == Constants.CodeBlockPython || docType == Constants.CodeBlockNative) {
         	// cannot add nodes in device diagram.
 

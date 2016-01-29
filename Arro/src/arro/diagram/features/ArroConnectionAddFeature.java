@@ -1,4 +1,4 @@
-package arro.node.features;
+package arro.diagram.features;
 
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -18,7 +18,7 @@ import util.Logger;
 import arro.Constants;
 import arro.domain.ArroConnection;
 import arro.domain.DomainNodeDiagram;
-import arro.editors.SubGraphitiEditor;
+import arro.editors.FunctionDiagramEditor;
 
 
 public class ArroConnectionAddFeature extends AbstractAddFeature implements
@@ -34,11 +34,11 @@ public class ArroConnectionAddFeature extends AbstractAddFeature implements
 
 	public PictogramElement add(IAddContext context) {
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
-        if(!(dc instanceof SubGraphitiEditor)) {
+        if(!(dc instanceof FunctionDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");
         	return null;
         }
-        DomainNodeDiagram domainNodeDiagram =  ((SubGraphitiEditor)dc).getDomainNodeDiagram();
+        DomainNodeDiagram domainNodeDiagram =  ((FunctionDiagramEditor)dc).getDomainNodeDiagram();
 
 		ArroConnection newConnection = new ArroConnection();
 		newConnection.setSource((String) context.getProperty(Constants.PROP_SOURCE_PAD_KEY));

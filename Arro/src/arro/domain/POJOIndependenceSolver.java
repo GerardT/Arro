@@ -1,35 +1,20 @@
 package arro.domain;
 
-import java.io.File;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
+import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.impl.AbstractFeatureProvider;
 import org.eclipse.graphiti.features.impl.IIndependenceSolver;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import util.ArroZipFile;
 import util.Logger;
-import arro.Constants;
-import arro.node.diagram.ArroNodeFeatureProvider;
+import arro.diagram.types.FunctionDiagramFeatureProvider;
 
 
 /**
@@ -46,8 +31,6 @@ public class POJOIndependenceSolver implements IIndependenceSolver {
 	/* Make it a singleton, used for all PictogramElements in all diagrams. */
 	private static POJOIndependenceSolver pojoIndependenceSolver = null;
 	
-	private AbstractFeatureProvider fp = null;
-
 	/* for XML load / store */
 	DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 	
@@ -69,11 +52,6 @@ public class POJOIndependenceSolver implements IIndependenceSolver {
 
 		return pojoIndependenceSolver;
 	}
-
-	public void setFeatureProvider(ArroNodeFeatureProvider fp) {
-		this.fp = fp;
-	}
-
 
 	/**
 	 * This function provides the key for the given business object.
@@ -148,8 +126,8 @@ public class POJOIndependenceSolver implements IIndependenceSolver {
     }
     
     // Helper method to get POJO from PE
-    public NonEmfDomainObject findPOJOObjectByPictureElement(PictogramElement pe) {
-		Object[] obj = fp.getAllBusinessObjectsForPictogramElement(pe);
+    public NonEmfDomainObject findPOJOObjectByPictureElement(PictogramElement pe, IFeatureProvider afp) {
+		Object[] obj = afp.getAllBusinessObjectsForPictogramElement(pe);
 		if(obj == null || obj.length == 0) {
 			return null;
 		} else {

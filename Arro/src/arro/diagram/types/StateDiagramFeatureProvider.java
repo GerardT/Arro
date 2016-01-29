@@ -1,4 +1,4 @@
-package arro.node.diagram;
+package arro.diagram.types;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
@@ -31,36 +31,35 @@ import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
 import util.Logger;
 import arro.Constants;
+import arro.diagram.features.ArroBoxAddFeature;
+import arro.diagram.features.ArroConnectionAddFeature;
+import arro.diagram.features.ArroConnectionCreateFeature;
+import arro.diagram.features.ArroConnectionDeleteFeature;
+import arro.diagram.features.ArroIDAddFeature;
+import arro.diagram.features.ArroNodeAddFeature;
+import arro.diagram.features.ArroNodeCreateFeature;
+import arro.diagram.features.ArroNodeDeleteFeature;
+import arro.diagram.features.ArroNodeLayoutFeature;
+import arro.diagram.features.ArroNodeUpdateFeature;
+import arro.diagram.features.ArroPadAddFeature;
+import arro.diagram.features.ArroPadDeleteFeature;
+import arro.diagram.features.ArroPadLayoutFeature;
+import arro.diagram.features.ArroPadUpdateFeature;
+import arro.diagram.features.NullRemoveFeature;
+import arro.diagram.features.StateBlockCreateFeature;
 import arro.domain.ArroDevice;
 import arro.domain.ArroNode;
+import arro.domain.ArroState;
 import arro.domain.DomainNodeDiagram;
 import arro.domain.POJOIndependenceSolver;
-import arro.node.features.ArroBoxAddFeature;
-import arro.node.features.ArroConnectionAddFeature;
-import arro.node.features.ArroConnectionCreateFeature;
-import arro.node.features.ArroConnectionDeleteFeature;
-import arro.node.features.ArroIDAddFeature;
-import arro.node.features.ArroNodeAddFeature;
-import arro.node.features.ArroNodeCreateFeature;
-import arro.node.features.ArroNodeDeleteFeature;
-import arro.node.features.ArroNodeLayoutFeature;
-import arro.node.features.ArroNodeUpdateFeature;
-import arro.node.features.ArroPadAddFeature;
-import arro.node.features.ArroPadDeleteFeature;
-import arro.node.features.ArroPadLayoutFeature;
-import arro.node.features.ArroPadUpdateFeature;
-import arro.node.features.NullRemoveFeature;
 
 
-public class ArroNodeFeatureProvider extends DefaultFeatureProvider {
+public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 	
-	public ArroNodeFeatureProvider(IDiagramTypeProvider dtp) {
+	public StateDiagramFeatureProvider(IDiagramTypeProvider dtp) {
 		super(dtp);
 		
-		POJOIndependenceSolver pojoIndependenceSolver = POJOIndependenceSolver.getInstance();
-		pojoIndependenceSolver.setFeatureProvider(this);
-
-		setIndependenceSolver(pojoIndependenceSolver);
+		setIndependenceSolver(POJOIndependenceSolver.getInstance());
 		
 	}
 	public Diagram getDiagram() {
@@ -69,15 +68,7 @@ public class ArroNodeFeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
-		/* original
-		return new ICreateFeature[] {new ArroNodeCreateFeature(this)};
-		*/
-		ICreateFeature[] features = new ICreateFeature[1];
-		
-		// Add 1 Create...features 1 right side of screen.
-		// FIXME: remove this
-		features[0] = new ArroNodeCreateFeature(this);
-		return features;
+		return new ICreateFeature[] {new StateBlockCreateFeature(this)};
 	}
 	
 	@Override
@@ -90,10 +81,11 @@ public class ArroNodeFeatureProvider extends DefaultFeatureProvider {
 		Logger.out.trace(Logger.EDITOR, " ");
 		if (context instanceof IAddConnectionContext /* && context.getNewObject() instanceof <DomainObject> */) {
 			return new ArroConnectionAddFeature(this);
+		} else if (context instanceof IAddContext && 
+				(context.getNewObject() instanceof DomainNodeDiagram || context.getNewObject() instanceof ArroState)) {
+			return new ArroIDAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroNode) {
 			return new ArroNodeAddFeature(this);
-		} else if (context instanceof IAddContext && context.getNewObject() instanceof DomainNodeDiagram) {
-			return new ArroIDAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroDevice) {
 			return new ArroBoxAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof IFile) {

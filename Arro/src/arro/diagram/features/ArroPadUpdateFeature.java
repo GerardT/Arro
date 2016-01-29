@@ -1,4 +1,4 @@
-package arro.node.features;
+package arro.diagram.features;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IReason;
@@ -35,7 +35,7 @@ public class ArroPadUpdateFeature  extends DefaultUpdateDiagramFeature {
     public boolean update(IUpdateContext context) {
         PictogramElement pictogramElement = context.getPictogramElement();
         
-        NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement);
+        NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement, getFeatureProvider());
         if(bo instanceof ArroPad) {
         	ArroPad pad = (ArroPad) bo;
         	

@@ -10,17 +10,26 @@
             id="Arro.ArroNodeDiagramType">
          </diagramType>
          <diagramType
-            name="Arro Pad Diagram Type"
-            type="Pad"
-            id="Arro.ArroPadDiagramType">
+            name="Arro State Diagram Type"
+            type="ArroStateDiagram"
+            id="Arro.StateDiagramType">
          </diagramType>
     </extension>
     <extension
          point="org.eclipse.graphiti.ui.diagramTypeProviders">
-         <diagramTypeProvider
+       <diagramTypeProvider
+            class="arro.diagram.types.StateDiagramTypeProvider"
+            context="org.eclipse.graphiti.ui.diagramEditor"
+            id="Arro.StateDiagramTypeProvider"
+            name="Arro State Diagram Type Provider">
+            <diagramType
+               id="Arro.StateDiagramType">
+            </diagramType>
+       </diagramTypeProvider>
+       <diagramTypeProvider
             name="Arro Node Diagram Type Provider"
-            class="arro.node.diagram.ArroNodeDiagramTypeProvider"
-            id="Arro.ArroNodeDiagramTypeProvider">
+            class="arro.diagram.types.FunctionDiagramTypeProvider"
+            id="Arro.FunctionDiagramTypeProvider">
             <diagramType
                id="Arro.ArroNodeDiagramType">
             </diagramType>
@@ -28,7 +37,7 @@
                id="Arro.imageProvider">
             </imageProvider>
             
-         </diagramTypeProvider>
+       </diagramTypeProvider>
     </extension>
    
    
