@@ -26,7 +26,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
 import util.Logger;
 import arro.Constants;
 import arro.domain.ArroPad;
-import arro.domain.DomainNodeDiagram;
+import arro.domain.DomainModule;
 import arro.editors.FunctionDiagramEditor;
 
 
@@ -74,7 +74,7 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
         	Logger.out.trace(Logger.EDITOR, "not an editor");
         	return null;
         }
-        DomainNodeDiagram domainNodeDiagram =  ((FunctionDiagramEditor)dc).getDomainNodeDiagram();
+        DomainModule domainModule =  ((FunctionDiagramEditor)dc).getDomainModule();
 
         Object obj = context.getNewObject();
         if(obj instanceof IFile) {
@@ -93,7 +93,7 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
             className = className.substring(0, index);
             newPad.setType(className);
             instanceName = "a" + className;
-            while(domainNodeDiagram.getPadByName(instanceName) != null) {
+            while(domainModule.getPadByName(instanceName) != null) {
             	instanceName += "1";
             }
             obj = newPad;
@@ -193,10 +193,10 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 	    layoutFeature.layout(layoutContext);
 
 		
-        context.putProperty(Constants.PROP_UNDO_PAD_KEY, domainNodeDiagram.clonePadList());
-        context.putProperty(Constants.PROP_DOMAIN_NODE_KEY, domainNodeDiagram);
+        context.putProperty(Constants.PROP_UNDO_PAD_KEY, domainModule.clonePadList());
+        context.putProperty(Constants.PROP_DOMAIN_MODULE_KEY, domainModule);
 
-        domainNodeDiagram.addPad(addedDomainObject);
+        domainModule.addPad(addedDomainObject);
         
 	    // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
 		link(containerShape, addedDomainObject);
@@ -207,12 +207,12 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 
 	@Override
 	public void undo(IContext context) {
-		DomainNodeDiagram domainNodeDiagram = (DomainNodeDiagram) context.getProperty(Constants.PROP_DOMAIN_NODE_KEY);
+		DomainModule domainModule = (DomainModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "undo " + context.getProperty(Constants.PROP_UNDO_PAD_KEY));
-        context.putProperty(Constants.PROP_REDO_PAD_KEY, domainNodeDiagram.clonePadList());
+        context.putProperty(Constants.PROP_REDO_PAD_KEY, domainModule.clonePadList());
 		Object undoList = context.getProperty(Constants.PROP_UNDO_PAD_KEY);
-		domainNodeDiagram.setPadList(undoList);
+		domainModule.setPadList(undoList);
 	}
 
 	@Override
@@ -223,12 +223,12 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 
 	@Override
 	public void redo(IContext context) {
-		DomainNodeDiagram domainNodeDiagram = (DomainNodeDiagram) context.getProperty(Constants.PROP_DOMAIN_NODE_KEY);
+		DomainModule domainModule = (DomainModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "redo " + context.getProperty(Constants.PROP_UNDO_PAD_KEY));
-        context.putProperty(Constants.PROP_UNDO_PAD_KEY, domainNodeDiagram.clonePadList());
+        context.putProperty(Constants.PROP_UNDO_PAD_KEY, domainModule.clonePadList());
 		Object redoList = context.getProperty(Constants.PROP_REDO_PAD_KEY);
-		domainNodeDiagram.setPadList(redoList);
+		domainModule.setPadList(redoList);
 	}
 }
 

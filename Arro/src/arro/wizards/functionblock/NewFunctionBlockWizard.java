@@ -42,8 +42,8 @@ import org.eclipse.ui.ide.IDE;
 
 import arro.Constants;
 import arro.domain.ArroNode;
-import arro.domain.ArroState;
-import arro.domain.DomainNodeDiagram;
+import arro.domain.ArroStateDiagram;
+import arro.domain.DomainModule;
 import arro.wizards.FileService;
 
 /**
@@ -60,8 +60,8 @@ import arro.wizards.FileService;
 public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 	private NewFunctionBlockWizardPage page;
 	private ISelection selection;
-	private DomainNodeDiagram nodeDiagram;
-	private ArroState stateNode;
+	private DomainModule nodeDiagram;
+	private ArroStateDiagram stateNode;
 
 
 
@@ -142,9 +142,9 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 			throwCoreException("Container \"" + containerName + "\" is not a project.");
 		}
 		
-		nodeDiagram = new DomainNodeDiagram();
-        stateNode = new ArroState();
-        nodeDiagram.addSubNode(stateNode);
+		nodeDiagram = new DomainModule();
+        stateNode = new ArroStateDiagram();
+        nodeDiagram.setStateDiagram(stateNode);
 
 		final IFile file = f.getFile(new Path(fileName));
 		try {
@@ -322,7 +322,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 		String contents = 	"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
 							"<diagram>\n" +
 							"    <nodedefinition id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
-						    "        <node id=\"" + stateNode.getId() + "\" name=\"_aState\" type=\"_State\"/>\n" +
+						    "        <state id=\"" + stateNode.getId() + "\" name=\"_aState\" type=\"_State\"/>\n" +
 							"    </nodedefinition>\n" +
 							"</diagram>\n";
 		return new ByteArrayInputStream(contents.getBytes());

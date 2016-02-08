@@ -32,7 +32,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 import arro.domain.ArroDevice;
 import arro.domain.ArroNode;
-import arro.domain.DomainNodeDiagram;
+import arro.domain.DomainModule;
 import arro.domain.NonEmfDomainObject;
 
 public class ArroNodeSectionDevice extends GFPropertySection implements ITabbedPropertyConstants {
@@ -60,11 +60,11 @@ public class ArroNodeSectionDevice extends GFPropertySection implements ITabbedP
 	
 	@Override
 	public void refresh() {
-//		DomainNodeDiagram n = null;
+//		DomainModule n = null;
 //	    PictogramElement pe = getSelectedPictogramElement();
 //	    if(pe != null && pe.eContainer() instanceof Diagram) {
 //	    	diagram = (Diagram)pe.eContainer();
-//	    	n = (DomainNodeDiagram)getNode(diagram);
+//	    	n = (DomainModule)getNode(diagram);
 //	        if (n != null) {
 //		        String name = n.getUrl();
 //		        UrlTextVal.setText(name == null ? "" : name);
@@ -120,11 +120,11 @@ public class ArroNodeSectionDevice extends GFPropertySection implements ITabbedP
 				return true;
 			}
 			public void execute(IContext context) {
-//				DomainNodeDiagram n = null;
+//				DomainModule n = null;
 //			    PictogramElement pe = getSelectedPictogramElement();
 //			    if(pe != null && pe.eContainer() instanceof Diagram) {
 //			    	diagram = (Diagram)pe.eContainer();
-//			    	n = (DomainNodeDiagram)getNode(diagram);
+//			    	n = (DomainModule)getNode(diagram);
 //			    	n.setUrl(typedValue);
 //			    }
 				final PictogramElement pe = getSelectedPictogramElement();

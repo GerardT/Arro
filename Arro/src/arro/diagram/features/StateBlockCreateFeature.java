@@ -7,12 +7,14 @@ import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 import arro.domain.ArroNode;
+import arro.domain.ArroStateDiagram;
+import arro.domain.ArroState;
 
 public class StateBlockCreateFeature extends AbstractCreateFeature implements
 		ICreateFeature {
 
 	public StateBlockCreateFeature(IFeatureProvider fp) {
-		super(fp, "State", "Creates a new Node");
+		super(fp, "State", "Creates a new State");
 	}
 
 	public boolean canCreate(ICreateContext context) {
@@ -21,12 +23,11 @@ public class StateBlockCreateFeature extends AbstractCreateFeature implements
 
 	public Object[] create(ICreateContext context) {
 		
-		
 		// TODO: in case of an EMF object add the new object to a suitable resource
 		// getDiagram().eResource().getContents().add(newDomainObject);
 		
 	    // create EClass
-        ArroNode newClass = new ArroNode();
+		ArroState newClass = new ArroState();
         // Add model element to resource.
         // We add the model element to the resource of the diagram for
         // simplicity's sake. Normally, a customer would use its own

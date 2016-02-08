@@ -1,6 +1,5 @@
 package arro.diagram.types;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateConnectionFeature;
@@ -31,26 +30,20 @@ import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
 import util.Logger;
 import arro.Constants;
-import arro.diagram.features.ArroBoxAddFeature;
 import arro.diagram.features.ArroConnectionAddFeature;
 import arro.diagram.features.ArroConnectionCreateFeature;
 import arro.diagram.features.ArroConnectionDeleteFeature;
 import arro.diagram.features.ArroIDAddFeature;
-import arro.diagram.features.ArroNodeAddFeature;
-import arro.diagram.features.ArroNodeCreateFeature;
-import arro.diagram.features.ArroNodeDeleteFeature;
-import arro.diagram.features.ArroNodeLayoutFeature;
-import arro.diagram.features.ArroNodeUpdateFeature;
-import arro.diagram.features.ArroPadAddFeature;
-import arro.diagram.features.ArroPadDeleteFeature;
-import arro.diagram.features.ArroPadLayoutFeature;
 import arro.diagram.features.ArroPadUpdateFeature;
 import arro.diagram.features.NullRemoveFeature;
+import arro.diagram.features.StateBlockAddFeature;
 import arro.diagram.features.StateBlockCreateFeature;
-import arro.domain.ArroDevice;
-import arro.domain.ArroNode;
+import arro.diagram.features.StateBlockLayoutFeature;
+import arro.diagram.features.StateBlockDeleteFeature;
+import arro.diagram.features.StateBlockUpdateFeature;
 import arro.domain.ArroState;
-import arro.domain.DomainNodeDiagram;
+import arro.domain.ArroStateDiagram;
+import arro.domain.DomainModule;
 import arro.domain.POJOIndependenceSolver;
 
 
@@ -82,21 +75,10 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 		if (context instanceof IAddConnectionContext /* && context.getNewObject() instanceof <DomainObject> */) {
 			return new ArroConnectionAddFeature(this);
 		} else if (context instanceof IAddContext && 
-				(context.getNewObject() instanceof DomainNodeDiagram || context.getNewObject() instanceof ArroState)) {
+				(context.getNewObject() instanceof DomainModule || context.getNewObject() instanceof ArroStateDiagram)) {
 			return new ArroIDAddFeature(this);
-		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroNode) {
-			return new ArroNodeAddFeature(this);
-		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroDevice) {
-			return new ArroBoxAddFeature(this);
-		} else if (context instanceof IAddContext && context.getNewObject() instanceof IFile) {
-			IFile file = (IFile)context.getNewObject();
-			if(file.getName().endsWith("." + Constants.NODE_EXT)) {
-				// Add a Node even if a diagram was added...
-				return new ArroNodeAddFeature(this);
-			} else if(file.getName().endsWith(".amsg")) {
-				// Add a Node even if a diagram was added...
-				return new ArroPadAddFeature(this);
-			}
+		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroState) {
+			return new StateBlockAddFeature(this);
 		}
 
 		return super.getAddFeature(context);
@@ -107,12 +89,7 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 		PictogramElement pictogramElement = context.getPictogramElement();
 		if (pictogramElement instanceof ContainerShape) {
 			Logger.out.trace(Logger.EDITOR, " ");
-			ContainerShape cs = (ContainerShape)pictogramElement;
-			
-			String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
 			return new NullRemoveFeature(this);				
-		} else if(pictogramElement instanceof BoxRelativeAnchor) {
-			return null;
 		}
 		return super.getRemoveFeature(context);
 
@@ -127,16 +104,11 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 			
 			String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
 			
-			if(pict != null && pict.equals(Constants.PROP_PICT_NODE)) {
-				return  new ArroNodeDeleteFeature(this);				
-			} else if(pict != null && pict.equals(Constants.PROP_PICT_PAD)) {
-				return  new ArroPadDeleteFeature(this);				
+			if(pict != null && pict.equals(Constants.PROP_PICT_STATE)) {
+				return  new StateBlockDeleteFeature(this);				
 			} else if(pict != null && pict.equals(Constants.PROP_PICT_CONNECTION)) {
+				// TODO is this ever used??
 				return  new ArroConnectionDeleteFeature(this);				
-			} else if(pict != null && pict.equals(Constants.PROP_PICT_BOX)) {
-				return  null; //new ArroBoxDeleteFeature(this);				
-			} else if(pict != null && pict.equals(Constants.PROP_PICT_PASSIVE)) {
-				return  null; //new ArroBoxDeleteFeature(this);				
 			} 
 		} else if(pictogramElement instanceof FreeFormConnection) {
 			FreeFormConnection ffc = (FreeFormConnection)pictogramElement;
@@ -162,11 +134,9 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 			
 			String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
 			
-			if(pict != null && pict.equals(Constants.PROP_PICT_NODE)) {
-				return  new ArroNodeLayoutFeature(this);				
-			} else if(pict != null && pict.equals(Constants.PROP_PICT_PAD)) {
-				return  new ArroPadLayoutFeature(this);				
-			} 
+			if(pict != null && pict.equals(Constants.PROP_PICT_STATE)) {
+				return  new StateBlockLayoutFeature(this);				
+			}
 		}
 	
 		return super.getLayoutFeature(context);
@@ -180,8 +150,8 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 
 			String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
 			
-			if(pict != null && pict.equals(Constants.PROP_PICT_NODE)) {
-				return  new ArroNodeUpdateFeature(this);				
+			if(pict != null && pict.equals(Constants.PROP_PICT_STATE)) {
+				return  new StateBlockUpdateFeature(this);				
 			} else if(pict != null && pict.equals(Constants.PROP_PICT_PAD)) {
 				return  new ArroPadUpdateFeature(this);				
 			}

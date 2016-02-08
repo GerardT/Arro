@@ -8,7 +8,7 @@ import org.w3c.dom.Node;
 public class ArroConnection extends NonEmfDomainObject {
 	
 	private String type;
-	private DomainNodeDiagram parent;
+	private DomainModule parent;
 	private String source, target;
 	
 	public ArroConnection() {
@@ -72,11 +72,11 @@ public class ArroConnection extends NonEmfDomainObject {
     	setTarget(eElement.getAttribute("target"));
 	}
 
-	public void setParent(DomainNodeDiagram domainNodeDiagram) {
-		this.parent = domainNodeDiagram;
+	public void setParent(DomainModule domainModule) {
+		this.parent = domainModule;
 	}
 
-	public DomainNodeDiagram getParent() {
+	public DomainModule getParent() {
 		return parent;
 	}
 

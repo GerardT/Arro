@@ -8,7 +8,7 @@ import org.w3c.dom.Node;
 public class ArroPad extends NonEmfDomainObject {
 	
 	private String nodeClass;
-	private DomainNodeDiagram parent;
+	private DomainModule parent;
 	private boolean input = true;
 	private boolean run = true;
 	
@@ -67,11 +67,11 @@ public class ArroPad extends NonEmfDomainObject {
     	setRun(run.equals("true")? true: false);
 	}
 
-	public void setParent(DomainNodeDiagram domainNodeDiagram) {
-		this.parent = domainNodeDiagram;
+	public void setParent(DomainModule domainModule) {
+		this.parent = domainModule;
 	}
 
-	public DomainNodeDiagram getParent() {
+	public DomainModule getParent() {
 		return parent;
 	}
 

@@ -21,6 +21,7 @@ public class Constants {
 	public final static String PROP_PAD_INPUT_KEY = "pad_input";
 	public final static String PROP_PICT_KEY = "pictogram";
 	public final static String PROP_PICT_NODE = "node";
+	public final static String PROP_PICT_STATE = "state_block";
 	public final static String PROP_PICT_BOX = "box";
 	public final static String PROP_PICT_PAD = "pad";
 	public final static String PROP_PICT_CONNECTION = "connection";
@@ -36,7 +37,7 @@ public class Constants {
 	public static final String PROP_UNDO_CONNECTION_KEY = "undo_connection";
 	public static final String PROP_REDO_CONNECTION_KEY = "redo_connection";
 	
-	public static final String PROP_DOMAIN_NODE_KEY = "domain_node";  // domain diagram ID
+	public static final String PROP_DOMAIN_MODULE_KEY = "domain_node";  // domain diagram ID
 	public static final String PROP_PAD_NAME_KEY = "pad_name";
 	public static final Object PROP_SOURCE_PAD_KEY = "source_pad";
 	public static final Object PROP_TARGET_PAD_KEY = "target_pad";

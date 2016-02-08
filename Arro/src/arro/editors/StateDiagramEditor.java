@@ -14,7 +14,7 @@ import org.eclipse.ui.PartInitException;
 
 import util.ArroZipFile;
 import util.PathUtil;
-import arro.domain.DomainNodeDiagram;
+import arro.domain.DomainModule;
 import arro.domain.ResourceCache;
 
 /**
@@ -27,7 +27,7 @@ public class StateDiagramEditor extends DiagramEditor {
 	//public final static String ID = "org.activiti.designer.diagrameditor"; //$NON-NLS-1$
 	
 	private String diagramName;
-	private DomainNodeDiagram domainNodeDiagram;
+	private DomainModule domainModule;
 	private ArroZipFile zip;
 	
 
@@ -51,18 +51,18 @@ public class StateDiagramEditor extends DiagramEditor {
 		
 		diagramName = PathUtil.truncExtension(zip.getName());
 		
-		DomainNodeDiagram domainObject = (DomainNodeDiagram)zip.getDomainDiagram();
-		if(domainObject != null && domainObject instanceof DomainNodeDiagram) {
-			domainNodeDiagram = (DomainNodeDiagram)domainObject;
+		DomainModule domainObject = (DomainModule)zip.getDomainDiagram();
+		if(domainObject != null && domainObject instanceof DomainModule) {
+			domainModule = (DomainModule)domainObject;
 		} else {
 	    	// Then it must be that a new diagram is created...
-	    	domainNodeDiagram = new DomainNodeDiagram();
-	    	domainNodeDiagram.setType(diagramName);
+	    	domainModule = new DomainModule();
+	    	domainModule.setType(diagramName);
 		}
 	}
 	
-	public DomainNodeDiagram getDomainNodeDiagram() {
-		return domainNodeDiagram;
+	public DomainModule getDomainModule() {
+		return domainModule;
 	}
 	
 	@Override
@@ -77,20 +77,6 @@ public class StateDiagramEditor extends DiagramEditor {
 					.getLayer(LayerConstants.GRID_LAYER);
 			gridFigure.setVisible(true);
 		}
-	}
-
-	@Override
-	public void doSave(final IProgressMonitor monitor) {
-		// Regular save
-		try {
-			super.doSave(monitor);
-			
-			ResourceCache.getInstance().storeDomainDiagram(zip);
-
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	@Override

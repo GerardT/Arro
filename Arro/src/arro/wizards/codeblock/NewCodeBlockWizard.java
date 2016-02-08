@@ -42,7 +42,7 @@ import org.eclipse.ui.ide.IDE;
 
 import arro.Constants;
 import arro.domain.ArroDevice;
-import arro.domain.DomainNodeDiagram;
+import arro.domain.DomainModule;
 import arro.wizards.FileService;
 
 /**
@@ -59,7 +59,7 @@ import arro.wizards.FileService;
 public class NewCodeBlockWizard extends Wizard implements INewWizard {
 	private NewCodeBlockWizardPage page;
 	private ISelection selection;
-	private DomainNodeDiagram nodeDiagram;
+	private DomainModule nodeDiagram;
 	private ArroDevice device;
 	
 
@@ -279,7 +279,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, "Arro.FunctionDiagramTypeProvider");
 		AddContext context = new AddContext();
 		
-		nodeDiagram = new DomainNodeDiagram();
+		nodeDiagram = new DomainModule();
 
 		context.setNewObject(nodeDiagram);
 		context.setTargetContainer(diagram);

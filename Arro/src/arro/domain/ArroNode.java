@@ -20,7 +20,7 @@ import util.Logger;
 public class ArroNode extends NonEmfDomainObject {
 		
 	private String nodeType;
-	private DomainNodeDiagram parent = null;
+	private DomainModule parent = null;
 	private ArrayList<ArroParameter> parameterList = new ArrayList<ArroParameter>();
 	private boolean needsUpdate;
 	
@@ -46,7 +46,7 @@ public class ArroNode extends NonEmfDomainObject {
 	
 	public ArroPad getPadByName(String name) {
 		// return the Pad info based on the name.
-		DomainNodeDiagram domainObject = (DomainNodeDiagram)ResourceCache.getInstance().getZip(getType()).getDomainDiagram();		
+		DomainModule domainObject = (DomainModule)ResourceCache.getInstance().getZip(getType()).getDomainDiagram();		
 		
 		return domainObject.getPadByName(name);
 	}
@@ -114,19 +114,19 @@ public class ArroNode extends NonEmfDomainObject {
 
 	/**
 	 * Get the list of pads defined by this ArroNode. Those are defined
-	 * in the DomainNodeDiagram that this ArroNode is an instantiation of.
+	 * in the DomainModule that this ArroNode is an instantiation of.
 	 * 
 	 * @return
 	 */
 	public Collection<ArroPad> getPads() {
-		DomainNodeDiagram domainObject = (DomainNodeDiagram)ResourceCache.getInstance().getZip(getType()).getDomainDiagram();		
+		DomainModule domainObject = (DomainModule)ResourceCache.getInstance().getZip(getType()).getDomainDiagram();		
 
 		return domainObject.getPads();
 	}
 	
 	/**
 	 * Get the list of parameters defined by this ArroNode. Those are defined
-	 * in the DomainNodeDiagram that this ArroNode is an instantiation of.
+	 * in the DomainModule that this ArroNode is an instantiation of.
 	 * 
 	 * @return
 	 */
@@ -142,7 +142,7 @@ public class ArroNode extends NonEmfDomainObject {
 	
 	/**
 	 * Get the list of parameters that is defined by this ArroNode. Those
-	 * are defined in the DomainNodeDiagram that this ArroNode is an instantiation
+	 * are defined in the DomainModule that this ArroNode is an instantiation
 	 * of.
 	 * 
 	 * @return
@@ -155,17 +155,17 @@ public class ArroNode extends NonEmfDomainObject {
 	
 
 
-	public void setParent(DomainNodeDiagram domainNodeDiagram) {
-		this.parent = domainNodeDiagram;
+	public void setParent(DomainModule domainModule) {
+		this.parent = domainModule;
 	}
-	public DomainNodeDiagram getParent() {
+	public DomainModule getParent() {
 		return parent;
 	}
 	
 	public void updateParameters() {
 		ArrayList<ArroParameter> allParameters = new ArrayList<ArroParameter>();
 		
-		DomainNodeDiagram domainObject = (DomainNodeDiagram)ResourceCache.getInstance().getZip(getType()).getDomainDiagram();
+		DomainModule domainObject = (DomainModule)ResourceCache.getInstance().getZip(getType()).getDomainDiagram();
 		
 		HashMap<String, ArroParameter> paramMap = domainObject.getParameterExports();
 		

@@ -17,7 +17,7 @@ import org.w3c.dom.NodeList;
 public class ArroDevice extends NonEmfDomainObject {
 		
 	private String url;
-	private DomainNodeDiagram parent = null;
+	private DomainModule parent = null;
 	private ArrayList<ArroParameter> parameterList = new ArrayList<ArroParameter>();
 	
 	public ArroDevice() {
@@ -91,7 +91,7 @@ public class ArroDevice extends NonEmfDomainObject {
 
 	/**
 	 * Get the list of parameters defined by this ArroNode. Those are defined
-	 * in the DomainNodeDiagram that this ArroNode is an instantiation of.
+	 * in the DomainModule that this ArroNode is an instantiation of.
 	 * 
 	 * @return
 	 */
@@ -103,10 +103,10 @@ public class ArroDevice extends NonEmfDomainObject {
 	    parameterList = params;
 	}
 
-	public void setParent(DomainNodeDiagram domainNodeDiagram) {
-		this.parent = domainNodeDiagram;
+	public void setParent(DomainModule domainModule) {
+		this.parent = domainModule;
 	}
-	public DomainNodeDiagram getParent() {
+	public DomainModule getParent() {
 		return parent;
 	}
 

@@ -61,7 +61,7 @@ public class ResourceCache {
 	 * Open Function Diagram file <typeName> by unzipping it:
 	 * - <typeName>.anod into .<typeName>.anod and .<typeName>.anod.xml
 	 * 
-	 * Then read the domain file (.<typeName>.anod) into a DomainNodeDiagram
+	 * Then read the domain file (.<typeName>.anod) into a DomainModule
 	 * instance and register this instance in the cache.
 	 * 
 	 * FIXME: must search all resources in the open project.
@@ -80,7 +80,7 @@ public class ResourceCache {
 		        zip = new ArroZipFile(folder.getFile(typeName + "." + Constants.NODE_EXT));
 	        }
 
-			DomainNodeDiagram domainDiagram = loadNodeDiagram(zip, typeName);
+			DomainModule domainDiagram = loadNodeDiagram(zip, typeName);
 			zip.setDomainDiagram(domainDiagram);
 			cache.put(PathUtil.truncExtension(typeName), zip);
 			
@@ -88,17 +88,17 @@ public class ResourceCache {
 		}
 	}
 	
-	private DomainNodeDiagram loadNodeDiagram(ArroZipFile zip, String typeName) {
+	private DomainModule loadNodeDiagram(ArroZipFile zip, String typeName) {
 		String fileName = zip.getName();
 
 		
-		DomainNodeDiagram n = null;
+		DomainModule n = null;
 		
 	    try {
 	    	
 	    	Logger.out.trace(Logger.STD, "Loading for " + zip.getName());
 		    
-    		n = new DomainNodeDiagram();
+    		n = new DomainModule();
     		// FIXME compare name in file with name passed as parameter.
     		n.setType(typeName);
 
@@ -138,13 +138,13 @@ public class ResourceCache {
 	 * @param zip
 	 */
 	public void storeDomainDiagram(ArroZipFile zip) {
-		DomainNodeDiagram dnd = (DomainNodeDiagram)zip.getDomainDiagram();
+		DomainModule dnd = (DomainModule)zip.getDomainDiagram();
 		
 		storeNodeDiagram(dnd, zip, zip.getName());
 	}
 	
 	
-	private void storeNodeDiagram(DomainNodeDiagram domainNodeDiagram, ArroZipFile zip, String fileName) {
+	private void storeNodeDiagram(DomainModule domainModule, ArroZipFile zip, String fileName) {
 		DocumentBuilder builder = null;
 		
 		try {
@@ -156,7 +156,7 @@ public class ResourceCache {
 			Element elt = doc.createElement("nodedefinition");
 			doc.appendChild(elt);
 			
-			domainNodeDiagram.xmlWrite(doc, elt);
+			domainModule.xmlWrite(doc, elt);
 	 
 			// write the content into xml file
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();

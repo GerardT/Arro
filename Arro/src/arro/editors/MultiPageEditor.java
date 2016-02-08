@@ -39,7 +39,7 @@ import util.Logger;
 import util.PathUtil;
 import util.ArroZipFile;
 import arro.Constants;
-import arro.domain.DomainNodeDiagram;
+import arro.domain.DomainModule;
 import arro.domain.ResourceCache;
 
 /**
@@ -232,7 +232,11 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         getEditor(0).doSave(monitor);
         if(documentType == Constants.CodeBlockPython) {
             getEditor(1).doSave(monitor);
+        } else if(documentType == Constants.FunctionBlock) {
+            getEditor(1).doSave(monitor);
         }
+        
+		ResourceCache.getInstance().storeDomainDiagram(zip);
         
         // then zip the whole thing again
         FileEditorInput fei = (FileEditorInput) getEditorInput();

@@ -31,7 +31,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import util.Logger;
 import arro.Constants;
 import arro.domain.ArroNode;
-import arro.domain.DomainNodeDiagram;
+import arro.domain.DomainModule;
 import arro.editors.FunctionDiagramEditor;
 
 
@@ -65,7 +65,7 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
         	Logger.out.trace(Logger.EDITOR, "not an editor");
         	return null;
         }
-        DomainNodeDiagram domainNodeDiagram =  ((FunctionDiagramEditor)dc).getDomainNodeDiagram();
+        DomainModule domainModule =  ((FunctionDiagramEditor)dc).getDomainModule();
         
 
         int docType = ((FunctionDiagramEditor)dc).getDocumentType();
@@ -99,7 +99,7 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
             
             newClass.setType(className);
             instanceName = "a" + className;
-            while(domainNodeDiagram.getSubNodeByName(instanceName) != null) {
+            while(domainModule.getSubNodeByName(instanceName) != null) {
             	instanceName += "1";
             }
             obj = newClass;
@@ -172,10 +172,10 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
         }
         
 		
-        context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainNodeDiagram.cloneNodeList());
-        context.putProperty(Constants.PROP_DOMAIN_NODE_KEY, domainNodeDiagram);
+        context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
+        context.putProperty(Constants.PROP_DOMAIN_MODULE_KEY, domainModule);
 
-        domainNodeDiagram.addSubNode(addedDomainObject);
+        domainModule.addSubNode(addedDomainObject);
         
 	    // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
 		link(containerShape, addedDomainObject);
@@ -201,12 +201,12 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
 
 	@Override
 	public void undo(IContext context) {
-		DomainNodeDiagram domainNodeDiagram = (DomainNodeDiagram) context.getProperty(Constants.PROP_DOMAIN_NODE_KEY);
+		DomainModule domainModule = (DomainModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "undo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
-        context.putProperty(Constants.PROP_REDO_NODE_KEY, domainNodeDiagram.cloneNodeList());
+        context.putProperty(Constants.PROP_REDO_NODE_KEY, domainModule.cloneNodeList());
 		Object undoList = context.getProperty(Constants.PROP_UNDO_NODE_KEY);
-		domainNodeDiagram.setNodeList(undoList);
+		domainModule.setNodeList(undoList);
 	}
 
 	@Override
@@ -216,12 +216,12 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
 
 	@Override
 	public void redo(IContext context) {
-		DomainNodeDiagram domainNodeDiagram = (DomainNodeDiagram) context.getProperty(Constants.PROP_DOMAIN_NODE_KEY);
+		DomainModule domainModule = (DomainModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "redo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
-        context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainNodeDiagram.cloneNodeList());
+        context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
 		Object redoList = context.getProperty(Constants.PROP_REDO_NODE_KEY);
-		domainNodeDiagram.setNodeList(redoList);
+		domainModule.setNodeList(redoList);
 	}
 }
 

@@ -1,5 +1,6 @@
 package arro.editors;
 
+import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
@@ -33,16 +34,16 @@ public class MultiPageEditorContributor extends MultiPageEditorActionBarContribu
 		//createActions();
 	}
 	/**
-	 * Returns the action registed with the given text editor.
+	 * Returns the action registered with the given editor.
 	 * @return IAction or null if editor is null.
 	 */
-	protected IAction getAction(FunctionDiagramEditor editor, String actionID) {
-		return (editor == null ? null : editor.getActionRegistry().getAction(actionID) /*  getAction(actionID)*/);
+	protected IAction getAction(DiagramEditor editor, String actionID) {
+		return (editor == null ? null : editor.getActionRegistry().getAction(actionID));
 	}
+	
 	/* (non-JavaDoc)
 	 * Method declared in AbstractMultiPageEditorActionBarContributor.
 	 */
-
 	public void setActivePage(IEditorPart part) {
 		if (activeEditorPart == part)
 			return;
@@ -52,8 +53,13 @@ public class MultiPageEditorContributor extends MultiPageEditorActionBarContribu
 		IActionBars actionBars = getActionBars();
 		if (actionBars != null) {
 
+			DiagramEditor editor;
 			//ITextEditor editor = (part instanceof ITextEditor) ? (ITextEditor) part : null;
-			FunctionDiagramEditor editor = (part instanceof FunctionDiagramEditor) ? (FunctionDiagramEditor) part : null;
+			if(part instanceof FunctionDiagramEditor || part instanceof StateDiagramEditor) {
+				editor = (DiagramEditor) part;
+			} else {
+				editor = null;
+			}
 
 			actionBars.setGlobalActionHandler(
 				ActionFactory.DELETE.getId(),

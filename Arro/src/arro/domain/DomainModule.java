@@ -19,14 +19,15 @@ import util.Logger;
  * TODO Device is called Process in Runtime.
  * 
  */
-public class DomainNodeDiagram extends NonEmfDomainObject  {
+public class DomainModule extends NonEmfDomainObject  {
 	private HashMap<String, ArroNode> nodes = new HashMap<String, ArroNode>();
 	private ArroDevice device = null; // Note: either device is specified or one or more nodes. Not both.
 	private HashMap<String, ArroPad> pads = new HashMap<String, ArroPad>();
 	private HashMap<String, ArroConnection> connections = new HashMap<String, ArroConnection>();
 	private String type;
+	private ArroStateDiagram stateDiagram;
 	
-	public DomainNodeDiagram() {
+	public DomainModule() {
 		super();
 	}
 	
@@ -163,7 +164,7 @@ public class DomainNodeDiagram extends NonEmfDomainObject  {
 	}
 	
 	/**
-	 * Write this DomainNodeDiagram into XML.
+	 * Write this DomainModule into XML.
 	 * 
 	 * @param doc
 	 * @param elt
@@ -194,6 +195,13 @@ public class DomainNodeDiagram extends NonEmfDomainObject  {
 			device.xmlWrite(doc, sub);
 		}
 		
+		if(stateDiagram != null) {
+			Element sub = doc.createElement("states");
+			elt.appendChild(sub);
+			
+			stateDiagram.xmlWrite(doc, sub);
+		}
+		
 		Collection<ArroPad> p = pads.values();
 		for(ArroPad ref: p) {
 			Element sub = doc.createElement("pad");
@@ -213,7 +221,7 @@ public class DomainNodeDiagram extends NonEmfDomainObject  {
 	}
 	
 	/**
-	 * Read this DomainNodeDiagram from XML.
+	 * Read this DomainModule from XML.
 	 * 
 	 * @param nNode
 	 */
@@ -238,6 +246,12 @@ public class DomainNodeDiagram extends NonEmfDomainObject  {
 		    		newNode.xmlRead(sub);
 		    		// let xmlRead first read the id so the right key is used in nodes.
 		    		addSubNode(newNode);
+	    		}
+	    		if(sub.getNodeName().equals("states")) {
+	    			// should only be one state diagram.
+	    			stateDiagram = new ArroStateDiagram();
+
+	    			stateDiagram.xmlRead(sub);
 	    		}
 	    		if(sub.getNodeName().equals("device")) {
 	    			ArroDevice newDevice = new ArroDevice();
@@ -351,4 +365,13 @@ public class DomainNodeDiagram extends NonEmfDomainObject  {
 	public String getType() {
 		return type;
 	}
+
+	public void setStateDiagram(ArroStateDiagram diag) {
+		stateDiagram = diag;
+	}
+	
+	public ArroStateDiagram getStateDiagram() {
+		return stateDiagram;
+	}
+
 }
