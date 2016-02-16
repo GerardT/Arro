@@ -58,6 +58,10 @@ public class ArroStateDiagram extends NonEmfDomainObject {
 			Element sub = doc.createElement("state");
 			elt.appendChild(sub);
 			
+			attr = doc.createAttribute("id");
+			attr.setValue(state.getId());
+			sub.setAttributeNode(attr);
+			
 			attr = doc.createAttribute("name");
 			attr.setValue(state.getName());
 			sub.setAttributeNode(attr);
@@ -77,8 +81,9 @@ public class ArroStateDiagram extends NonEmfDomainObject {
 	    		Element eSubElement = (Element) sub;
 	    		ArroState state = new ArroState();
 	    		
-	    		String name = eSubElement.getAttribute("name");
-	    		state.setName(name);
+	        	state.setId(eSubElement.getAttribute("id"));
+	    		state.setName(eSubElement.getAttribute("name"));
+	    		
 	    		addState(state);
 			}
     	}

@@ -38,8 +38,49 @@ public class ArroPadUpdateFeature  extends DefaultUpdateDiagramFeature {
         NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement, getFeatureProvider());
         if(bo instanceof ArroPad) {
         	ArroPad pad = (ArroPad) bo;
+        	String name = pad.getName();
+        	boolean input = pad.getInput();
         	
-        	updatePE(pictogramElement, pad.getName(), pad.getInput());
+            // Set name in pictogram
+            if (pictogramElement instanceof ContainerShape) {
+                ContainerShape cs = (ContainerShape) pictogramElement;
+                
+    	        Graphiti.getPeService().setPropertyValue(cs, Constants.PROP_PAD_INPUT_KEY,
+    	        										input?Constants.PROP_TRUE_VALUE : Constants.PROP_FALSE_VALUE);
+
+                
+                int i = 0;
+                for (Shape shape : cs.getChildren()) {
+                	GraphicsAlgorithm graphicsAlgorithm = shape.getGraphicsAlgorithm();
+
+                    if (graphicsAlgorithm instanceof org.eclipse.graphiti.mm.algorithms.Text && i == 0) {
+//                        Text text = (Text) shape.getGraphicsAlgorithm();
+//                        text.setValue(type + " :");
+                        i++;
+                	}
+                	else if(graphicsAlgorithm instanceof org.eclipse.graphiti.mm.algorithms.Text && i == 1) {
+                        org.eclipse.graphiti.mm.algorithms.Text text = (org.eclipse.graphiti.mm.algorithms.Text) shape.getGraphicsAlgorithm();
+                        text.setValue(name);
+     				}
+                }
+        		ContainerShape containerShape = (ContainerShape) pictogramElement;
+        		GraphicsAlgorithm graphicsAlgorithm = containerShape.getGraphicsAlgorithm();
+        
+        		if (graphicsAlgorithm instanceof RoundedRectangle) {
+        			RoundedRectangle rr = (RoundedRectangle) graphicsAlgorithm;
+        	        
+        	        if(input) {
+        	        	rr.setForeground(manageColor(Constants.PAD_FOREGROUND_INPUT));
+        	        	rr.setBackground(manageColor(Constants.PAD_BACKGROUND_INPUT));
+        	        } else {
+        	        	rr.setForeground(manageColor(Constants.PAD_FOREGROUND_OUTPUT));
+        	        	rr.setBackground(manageColor(Constants.PAD_BACKGROUND_OUTPUT));
+        	        }
+        		}
+
+                return true;
+            }
+            return false;
         }
 		
         return true;
@@ -48,48 +89,5 @@ public class ArroPadUpdateFeature  extends DefaultUpdateDiagramFeature {
 	@Override
 	public boolean hasDoneChanges() {
 		return true;
-	}
-	
-	public boolean updatePE(PictogramElement pictogramElement, String name, boolean input) {
-        // Set name in pictogram
-        if (pictogramElement instanceof ContainerShape) {
-            ContainerShape cs = (ContainerShape) pictogramElement;
-            
-	        Graphiti.getPeService().setPropertyValue(cs, Constants.PROP_PAD_INPUT_KEY,
-	        										input?Constants.PROP_TRUE_VALUE : Constants.PROP_FALSE_VALUE);
-
-            
-            int i = 0;
-            for (Shape shape : cs.getChildren()) {
-            	GraphicsAlgorithm graphicsAlgorithm = shape.getGraphicsAlgorithm();
-
-                if (graphicsAlgorithm instanceof org.eclipse.graphiti.mm.algorithms.Text && i == 0) {
-//                    Text text = (Text) shape.getGraphicsAlgorithm();
-//                    text.setValue(type + " :");
-                    i++;
-            	}
-            	else if(graphicsAlgorithm instanceof org.eclipse.graphiti.mm.algorithms.Text && i == 1) {
-                    org.eclipse.graphiti.mm.algorithms.Text text = (org.eclipse.graphiti.mm.algorithms.Text) shape.getGraphicsAlgorithm();
-                    text.setValue(name);
- 				}
-            }
-    		ContainerShape containerShape = (ContainerShape) pictogramElement;
-    		GraphicsAlgorithm graphicsAlgorithm = containerShape.getGraphicsAlgorithm();
-    
-    		if (graphicsAlgorithm instanceof RoundedRectangle) {
-    			RoundedRectangle rr = (RoundedRectangle) graphicsAlgorithm;
-    	        
-    	        if(input) {
-    	        	rr.setForeground(manageColor(Constants.PAD_FOREGROUND_INPUT));
-    	        	rr.setBackground(manageColor(Constants.PAD_BACKGROUND_INPUT));
-    	        } else {
-    	        	rr.setForeground(manageColor(Constants.PAD_FOREGROUND_OUTPUT));
-    	        	rr.setBackground(manageColor(Constants.PAD_BACKGROUND_OUTPUT));
-    	        }
-    		}
-
-            return true;
-        }
-        return false;
 	}
 }

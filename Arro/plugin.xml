@@ -67,10 +67,15 @@
              label="Main">
           </propertyTab>
           <propertyTab
-                afterTab="arro.main.tab"
-                category="Graphiti"
-                id="arro.param.tab"
-                label="Parameters">
+             category="Graphiti"
+             id="arro.state.tab"
+             label="Main">
+          </propertyTab>
+          <propertyTab
+             afterTab="arro.main.tab"
+             category="Graphiti"
+             id="arro.param.tab"
+             label="Parameters">
           </propertyTab>
       </propertyTabs>
     </extension>
@@ -110,6 +115,12 @@
               id="arro.pad.section"
               tab="arro.sub.tab">
           </propertySection>
+          <propertySection
+              class="property.ArroStateSection"
+              filter="property.ArroStateFilter"
+              id="arro.state.section"
+              tab="arro.state.tab">
+          </propertySection>
       </propertySections>
     </extension>
    
@@ -142,9 +153,9 @@
         id="arro.editors.MessageEditor.inView">
          <with
            variable="activePartId">
-        <equals
+           <equals
               value="arro.editors.MessageEditor">
-        </equals>
+           </equals>
          </with>
       </definition>
     </extension>
@@ -180,7 +191,7 @@
      <extension
        point="org.eclipse.ui.bindings">
        <key
-          commandId="Arro.commands.deleteItemCommand"
+          commandId="org.eclipse.ui.edit.delete"
           contextId="org.eclipse.ui.contexts.window"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+6">

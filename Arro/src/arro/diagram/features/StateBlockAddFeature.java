@@ -130,7 +130,7 @@ public class StateBlockAddFeature extends AbstractAddFeature implements IAddFeat
         domainModule.getStateDiagram().addState(addedDomainObject);
         
 	    // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
-		link(containerShape, addedDomainObject);		
+		link(containerShape, addedDomainObject);
 		
 		// After PE was linked to domain object..
 

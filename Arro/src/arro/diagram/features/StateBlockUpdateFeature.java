@@ -5,9 +5,13 @@ import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.impl.DefaultUpdateDiagramFeature;
 import org.eclipse.graphiti.features.impl.Reason;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.mm.pictograms.Shape;
 
+import arro.domain.ArroPad;
 import arro.domain.ArroState;
 import arro.domain.NonEmfDomainObject;
 import arro.domain.POJOIndependenceSolver;
@@ -60,7 +64,21 @@ public class StateBlockUpdateFeature  extends DefaultUpdateDiagramFeature {
         PictogramElement pictogramElement = context.getPictogramElement();
         NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement, getFeatureProvider());
         
-        return true;
+        if(bo instanceof ArroState) {
+        	ArroState state = (ArroState) bo;
+        	String name = state.getName();
+            ContainerShape cs = (ContainerShape) pictogramElement;
+            for (Shape shape : cs.getChildren()) {
+            	GraphicsAlgorithm graphicsAlgorithm = shape.getGraphicsAlgorithm();
+
+                if(graphicsAlgorithm instanceof Text) {
+                    Text text = (Text) graphicsAlgorithm;
+                    text.setValue(name);
+                    return true;
+ 				}
+            }
+        }
+        return false;
     }
     
 }

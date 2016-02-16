@@ -6,11 +6,9 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.transaction.util.TransactionUtil;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.eclipse.graphiti.features.ILayoutFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
-import org.eclipse.graphiti.features.context.impl.LayoutContext;
 import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -33,9 +31,7 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
-import property.ArroNodeSectionStandard.X;
 import util.Misc;
-import arro.domain.ArroNode;
 import arro.domain.ArroPad;
 
 public class ArroPadSection extends GFPropertySection implements ITabbedPropertyConstants {
@@ -62,7 +58,7 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
 	    bOut = factory.createButton(parent, "Output", SWT.RADIO);
 	    bRunCycle = factory.createButton(parent, "Trigger cycle", SWT.CHECK);
 	    
-	    handleProperty(parent, factory, composite, nameTextVal);
+	    handleProperty(parent, composite, nameTextVal);
 	}
 	
 	@Override
@@ -102,7 +98,7 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
 	 * @param composite
 	 * @param nameText
 	 */
-	private void handleProperty(Composite parent, TabbedPropertySheetWidgetFactory factory, Composite composite, final Text nameText) {
+	private void handleProperty(Composite parent, Composite composite, final Text nameText) {
 	    FormData data;
 	    
 	    // http://www.eclipse.org/forums/index.php/t/202738/

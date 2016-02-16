@@ -44,13 +44,15 @@ public class AddRowHandler extends AbstractHandler {
 	}
 	
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		Object object = event.getApplicationContext();
-		if (object instanceof ExpressionContext) {
-			ExpressionContext appContext = (ExpressionContext) object;
+		//IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
+		IEditorPart activeEditor = HandlerUtil.getActiveEditor(event);
+		ISelection selection = HandlerUtil.getCurrentSelection(event);
+		//Object object = event.getApplicationContext();
+		//if (object instanceof ExpressionContext) {
+			//ExpressionContext appContext = (ExpressionContext) object;
 			
-			IEditorPart activeEditor = (IEditorPart) appContext.getVariable(ISources.ACTIVE_EDITOR_NAME);
-			ISelection selection = (ISelection) appContext.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+			//IEditorPart activeEditor = (IEditorPart) appContext.getVariable(ISources.ACTIVE_EDITOR_NAME);
+			//ISelection selection = (ISelection) appContext.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
 			
 			Logger.out.trace(Logger.EDITOR, "activeEditor " + activeEditor.toString());
 			Logger.out.trace(Logger.EDITOR, "selection " + selection.toString());
@@ -61,7 +63,7 @@ public class AddRowHandler extends AbstractHandler {
 		    	operation.addContext(me.getUndoContext());
 	        	me.getOperationHistory().execute(operation, null, null);
 			}
-		}
+		//}
         return null;
 	}
 
