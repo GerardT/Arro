@@ -62,16 +62,6 @@
              label="Main">
           </propertyTab>
           <propertyTab
-             category="Graphiti"
-             id="arro.sub.tab"
-             label="Main">
-          </propertyTab>
-          <propertyTab
-             category="Graphiti"
-             id="arro.state.tab"
-             label="Main">
-          </propertyTab>
-          <propertyTab
              afterTab="arro.main.tab"
              category="Graphiti"
              id="arro.param.tab"
@@ -113,13 +103,13 @@
               class="property.ArroPadSection"
               filter="property.ArroPadFilter"
               id="arro.pad.section"
-              tab="arro.sub.tab">
+              tab="arro.main.tab">
           </propertySection>
           <propertySection
               class="property.ArroStateSection"
               filter="property.ArroStateFilter"
               id="arro.state.section"
-              tab="arro.state.tab">
+              tab="arro.main.tab">
           </propertySection>
       </propertySections>
     </extension>
