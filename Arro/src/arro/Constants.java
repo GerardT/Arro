@@ -11,6 +11,8 @@ public class Constants {
 	public final static String HIDDEN_RESOURCE = ".";
 	public final static String NODE_EXT = "anod";
 	public final static String MESSAGE_EXT = "amsg";
+	
+	// Diagram.getDiagramTypeId() will return:
 	public final static String FUNCTION_DIAGRAM_TYPE = "Arro"; // must match with plugin.xml
 	public final static String STATE_DIAGRAM_TYPE = "ArroStateDiagram"; // must match with plugin.xml
 	
@@ -19,7 +21,11 @@ public class Constants {
 	
 
 	public final static String PROP_PAD_INPUT_KEY = "pad_input";
+	
+	// Pictogram types - Key
 	public final static String PROP_PICT_KEY = "pictogram";
+	
+	// Pictogram types - Values
 	public final static String PROP_PICT_NODE = "node";
 	public final static String PROP_PICT_STATE = "state_block";
 	public final static String PROP_PICT_BOX = "box";

@@ -44,7 +44,7 @@ public class ArroStateSection extends GFPropertySection implements ITabbedProper
         valueLabel = factory.createCLabel(composite, "State name:");
         nameTextVal = factory.createText(composite, "");
 
-        addLayout(parent, composite);
+        addLayout(parent);
 
         nameTextVal.addModifyListener(new ModifyListener() {
 
@@ -91,11 +91,8 @@ public class ArroStateSection extends GFPropertySection implements ITabbedProper
      * Provide layout and listeners for the controls.
      * 
      * @param parent
-     * @param factory
-     * @param composite
-     * @param nameText
      */
-    private void addLayout(Composite parent, Composite composite) {
+    private void addLayout(Composite parent) {
         FormData data;
 
         // http://www.eclipse.org/forums/index.php/t/202738/

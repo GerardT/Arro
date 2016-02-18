@@ -67,6 +67,12 @@
              id="arro.param.tab"
              label="Parameters">
           </propertyTab>
+          <propertyTab
+             afterTab="arro.param.tab"
+             category="Graphiti"
+             id="arro.modedef.tab"
+             label="Defined Modes">
+          </propertyTab>
       </propertyTabs>
     </extension>
      
@@ -98,7 +104,6 @@
               id="arro.param.section.device"
               tab="arro.param.tab">
           </propertySection>
-
           <propertySection
               class="property.ArroPadSection"
               filter="property.ArroPadFilter"
@@ -110,6 +115,12 @@
               filter="property.ArroStateFilter"
               id="arro.state.section"
               tab="arro.main.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroModeDefSection"
+              filter="property.ArroModeDefFilter"
+              id="arro.modedef.section"
+              tab="arro.modedef.tab">
           </propertySection>
       </propertySections>
     </extension>
