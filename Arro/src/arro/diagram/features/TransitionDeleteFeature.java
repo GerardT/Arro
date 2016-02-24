@@ -10,12 +10,15 @@ import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 import util.Logger;
 import arro.Constants;
 import arro.domain.ArroNode;
+import arro.domain.ArroState;
+import arro.domain.ArroStateDiagram;
 import arro.domain.ArroModule;
 import arro.editors.FunctionDiagramEditor;
+import arro.editors.StateDiagramEditor;
 
-public class ArroNodeDeleteFeature extends DefaultDeleteFeature implements ICustomUndoableFeature {
+public class TransitionDeleteFeature extends DefaultDeleteFeature implements ICustomUndoableFeature {
 
-	public ArroNodeDeleteFeature(IFeatureProvider fp) {
+	public TransitionDeleteFeature(IFeatureProvider fp) {
 		super(fp);
 	}
 	
@@ -25,12 +28,12 @@ public class ArroNodeDeleteFeature extends DefaultDeleteFeature implements ICust
 	
 	public void delete(IDeleteContext context) {
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
-        if(!(dc instanceof FunctionDiagramEditor)) {
+        if(!(dc instanceof StateDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");
         } else {
-        	ArroModule domainModule =  ((FunctionDiagramEditor)dc).getDomainModule();
-	        context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
-	        context.putProperty(Constants.PROP_UNDO_CONNECTION_KEY, domainModule.cloneConnectionList());
+        	ArroModule domainModule =  ((StateDiagramEditor)dc).getDomainModule();
+	        context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.getStateDiagram().clone());
+	        //context.putProperty(Constants.PROP_UNDO_CONNECTION_KEY, domainModule.cloneConnectionList());
 	        context.putProperty(Constants.PROP_DOMAIN_MODULE_KEY, domainModule);
         }
 		super.delete(context);
@@ -45,12 +48,11 @@ public class ArroNodeDeleteFeature extends DefaultDeleteFeature implements ICust
 	@Override
 	protected void deleteBusinessObject(Object bo) {
 		if(bo instanceof ArroNode) {
-			ArroNode obj = (ArroNode)bo;
+			ArroState obj = (ArroState)bo;
 			
-			obj.getParent().removeNode(obj);
-			obj.getParent().purgeConnections();
+			obj.getParent().removeState(obj);
 			
-			//POJOIndependenceSolver.getInstance().removeBusinessObject(bo);
+//			obj.getParent().purgeConnections();
 		}
 	}
 
@@ -59,13 +61,13 @@ public class ArroNodeDeleteFeature extends DefaultDeleteFeature implements ICust
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "undo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
-        context.putProperty(Constants.PROP_REDO_NODE_KEY, domainModule.cloneNodeList());
-		Object undoList = context.getProperty(Constants.PROP_UNDO_NODE_KEY);
-		domainModule.setNodeList(undoList);
+        context.putProperty(Constants.PROP_REDO_NODE_KEY, domainModule.getStateDiagram().clone());
+		Object undo = context.getProperty(Constants.PROP_UNDO_NODE_KEY);
+		domainModule.setStateDiagram((ArroStateDiagram) undo);
 		
-        context.putProperty(Constants.PROP_REDO_CONNECTION_KEY, domainModule.cloneConnectionList());
-		undoList = context.getProperty(Constants.PROP_UNDO_CONNECTION_KEY);
-		domainModule.setConnectionList(undoList);
+//        context.putProperty(Constants.PROP_REDO_CONNECTION_KEY, domainModule.cloneConnectionList());
+//		undoList = context.getProperty(Constants.PROP_UNDO_CONNECTION_KEY);
+//		domainModule.setConnectionList(undoList);
 	}
 
 	@Override
@@ -78,12 +80,12 @@ public class ArroNodeDeleteFeature extends DefaultDeleteFeature implements ICust
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "redo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
-        context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
-		Object redoList = context.getProperty(Constants.PROP_REDO_NODE_KEY);
-		domainModule.setNodeList(redoList);
+        context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.getStateDiagram().clone());
+		Object redo = context.getProperty(Constants.PROP_REDO_NODE_KEY);
+		domainModule.setStateDiagram((ArroStateDiagram) redo);
 		
-        context.putProperty(Constants.PROP_UNDO_CONNECTION_KEY, domainModule.cloneConnectionList());
-		redoList = context.getProperty(Constants.PROP_REDO_CONNECTION_KEY);
-		domainModule.setConnectionList(redoList);
+//        context.putProperty(Constants.PROP_UNDO_CONNECTION_KEY, domainModule.cloneConnectionList());
+//		redoList = context.getProperty(Constants.PROP_REDO_CONNECTION_KEY);
+//		domainModule.setConnectionList(redoList);
 	}
 }

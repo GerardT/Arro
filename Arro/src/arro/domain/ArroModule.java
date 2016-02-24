@@ -19,7 +19,7 @@ import util.Logger;
  * TODO Device is called Process in Runtime.
  * 
  */
-public class DomainModule extends NonEmfDomainObject  {
+public class ArroModule extends NonEmfDomainObject  {
 	private HashMap<String, ArroNode> nodes = new HashMap<String, ArroNode>();
 	private ArroDevice device = null; // Note: either device is specified or one or more nodes. Not both.
 	private HashMap<String, ArroPad> pads = new HashMap<String, ArroPad>();
@@ -27,25 +27,27 @@ public class DomainModule extends NonEmfDomainObject  {
 	private String type;
 	private ArroStateDiagram stateDiagram;
 	
-	public DomainModule() {
+	public ArroModule() {
 		super();
+		// should only be one state diagram.
+		stateDiagram = new ArroStateDiagram();
 	}
 	
 	/*
-	 * SubNode functions: get / add / remove.
+	 * Node functions: get / add / remove.
 	 */
 	
-	public ArroNode getSubNode(String id) {
+	public ArroNode getNode(String id) {
 		return nodes.get(id);
 	}
 
 	/**
-	 * Search pad from its given name (not ID).
+	 * Search node by its given name (not ID).
 	 * 
 	 * @param name
 	 * @return
 	 */
-	public ArroNode getSubNodeByName(String name) {
+	public ArroNode getNodeByName(String name) {
 		Collection<ArroNode> n = nodes.values();
 		
 		for(ArroNode ref: n) {
@@ -56,12 +58,12 @@ public class DomainModule extends NonEmfDomainObject  {
 		return null;
 	}
 
-	public void addSubNode(ArroNode node) {
+	public void addNode(ArroNode node) {
 		nodes.put(node.getId(), node);
 		node.setParent(this);
 	}
 	
-	public void removeSubNode(ArroNode node) {
+	public void removeNode(ArroNode node) {
 		nodes.remove(node.getId());
 	}
 
@@ -74,7 +76,7 @@ public class DomainModule extends NonEmfDomainObject  {
 	}
 	
 	/**
-	 * Search pad from its given name (not ID).
+	 * Search pad by its given name (not ID).
 	 * 
 	 * @param name
 	 * @return
@@ -126,6 +128,41 @@ public class DomainModule extends NonEmfDomainObject  {
 	public void removeConnection(ArroConnection connection) {
 		connections.remove(connection.getId());
 	}
+	
+	/*
+	 * StateDiagram functions: get / set
+	 */
+	public ArroStateDiagram getStateDiagram() {
+		return stateDiagram;
+	}
+
+	public void setStateDiagram(ArroStateDiagram diag) {
+		stateDiagram = diag;
+		stateDiagram.setParent(this);
+	}
+	
+	/**
+	 * 
+	 * Get a map with an entry for each node in this module containing
+	 * an array with possible (external) state names for this node.
+	 */
+	public HashMap<String, ArrayList<String>> getStateCombinations() {
+		HashMap<String, ArrayList<String>> map = new HashMap<String, ArrayList<String>>();
+		
+		Collection<ArroNode> p = nodes.values();
+		
+		for(ArroNode ref: p) {
+			ArroStateDiagram sd = ref.getAssociatedModule().getStateDiagram();
+			
+			ArrayList<String> names = sd.getStateNames();
+			
+			map.put(ref.getName(), names);
+		}
+		return map;
+	}
+	
+
+
 	
 	/**
 	 * Collect all parameter definitions from ArroNode instances in this
@@ -245,13 +282,13 @@ public class DomainModule extends NonEmfDomainObject  {
 
 		    		newNode.xmlRead(sub);
 		    		// let xmlRead first read the id so the right key is used in nodes.
-		    		addSubNode(newNode);
+		    		addNode(newNode);
 	    		}
 	    		if(sub.getNodeName().equals("states")) {
-	    			// should only be one state diagram.
-	    			stateDiagram = new ArroStateDiagram();
 
 	    			stateDiagram.xmlRead(sub);
+	    			
+	    			setStateDiagram(stateDiagram);
 	    		}
 	    		if(sub.getNodeName().equals("device")) {
 	    			ArroDevice newDevice = new ArroDevice();
@@ -336,7 +373,7 @@ public class DomainModule extends NonEmfDomainObject  {
 
 		Collection<ArroNode> n = nodes.values();
 		for(ArroNode node: n) {
-			Collection<ArroPad> p = node.getPads();
+			Collection<ArroPad> p = node.getAssociatedModule().getPads();
 			for(ArroPad pad: p) {
 				allPadNames.add(node.getName() + "." + pad.getName());
 				Logger.out.trace(Logger.STD, "pad list " + node.getName() + "." + pad.getName());
@@ -364,14 +401,6 @@ public class DomainModule extends NonEmfDomainObject  {
 	
 	public String getType() {
 		return type;
-	}
-
-	public void setStateDiagram(ArroStateDiagram diag) {
-		stateDiagram = diag;
-	}
-	
-	public ArroStateDiagram getStateDiagram() {
-		return stateDiagram;
 	}
 
 }

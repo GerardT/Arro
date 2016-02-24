@@ -127,7 +127,7 @@ public class ArroNodeSectionStandard extends GFPropertySection implements ITabbe
 				ArroNode n = getNode(pe);
 
 				if (n != null) {
-					ArroNode m = n.getParent().getSubNodeByName(typedValue);
+					ArroNode m = n.getParent().getNodeByName(typedValue);
 					if(m == null || m == n) {
 						x.success = true;
 						n.setName(typedValue);

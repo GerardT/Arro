@@ -14,7 +14,7 @@ import org.eclipse.ui.PartInitException;
 
 import util.ArroZipFile;
 import util.PathUtil;
-import arro.domain.DomainModule;
+import arro.domain.ArroModule;
 import arro.domain.ResourceCache;
 
 /**
@@ -27,7 +27,7 @@ public class StateDiagramEditor extends DiagramEditor {
 	//public final static String ID = "org.activiti.designer.diagrameditor"; //$NON-NLS-1$
 	
 	private String diagramName;
-	private DomainModule domainModule;
+	private ArroModule domainModule;
 	private ArroZipFile zip;
 	
 
@@ -51,17 +51,17 @@ public class StateDiagramEditor extends DiagramEditor {
 		
 		diagramName = PathUtil.truncExtension(zip.getName());
 		
-		DomainModule domainObject = (DomainModule)zip.getDomainDiagram();
-		if(domainObject != null && domainObject instanceof DomainModule) {
-			domainModule = (DomainModule)domainObject;
+		ArroModule domainObject = (ArroModule)zip.getDomainDiagram();
+		if(domainObject != null && domainObject instanceof ArroModule) {
+			domainModule = (ArroModule)domainObject;
 		} else {
 	    	// Then it must be that a new diagram is created...
-	    	domainModule = new DomainModule();
+	    	domainModule = new ArroModule();
 	    	domainModule.setType(diagramName);
 		}
 	}
 	
-	public DomainModule getDomainModule() {
+	public ArroModule getDomainModule() {
 		return domainModule;
 	}
 	

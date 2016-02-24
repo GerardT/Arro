@@ -27,7 +27,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import util.Misc;
 import arro.domain.ArroState;
 
-public class ArroStateSection extends GFPropertySection implements ITabbedPropertyConstants {
+public class ArroStateSection extends ArroGenericSection {
 
     private Text nameTextVal;
     private CLabel valueLabel;
@@ -174,4 +174,10 @@ public class ArroStateSection extends GFPropertySection implements ITabbedProper
         }
         return null;
     }
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -41,9 +41,14 @@ import arro.diagram.features.StateBlockCreateFeature;
 import arro.diagram.features.StateBlockLayoutFeature;
 import arro.diagram.features.StateBlockDeleteFeature;
 import arro.diagram.features.StateBlockUpdateFeature;
+import arro.diagram.features.TransitionAddFeature;
+import arro.diagram.features.TransitionCreateFeature;
+import arro.diagram.features.TransitionLayoutFeature;
+import arro.diagram.features.TransitionUpdateFeature;
 import arro.domain.ArroState;
 import arro.domain.ArroStateDiagram;
-import arro.domain.DomainModule;
+import arro.domain.ArroModule;
+import arro.domain.ArroTransition;
 import arro.domain.POJOIndependenceSolver;
 
 
@@ -61,7 +66,8 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
-		return new ICreateFeature[] {new StateBlockCreateFeature(this)};
+		return new ICreateFeature[] {new StateBlockCreateFeature(this),
+				                     new TransitionCreateFeature(this)};
 	}
 	
 	@Override
@@ -75,10 +81,12 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 		if (context instanceof IAddConnectionContext /* && context.getNewObject() instanceof <DomainObject> */) {
 			return new ArroConnectionAddFeature(this);
 		} else if (context instanceof IAddContext && 
-				(context.getNewObject() instanceof DomainModule || context.getNewObject() instanceof ArroStateDiagram)) {
+				(context.getNewObject() instanceof ArroModule || context.getNewObject() instanceof ArroStateDiagram)) {
 			return new ArroIDAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroState) {
 			return new StateBlockAddFeature(this);
+		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroTransition) {
+			return new TransitionAddFeature(this);
 		}
 
 		return super.getAddFeature(context);
@@ -136,6 +144,8 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_STATE)) {
 				return  new StateBlockLayoutFeature(this);				
+			} else if(pict != null && pict.equals(Constants.PROP_PICT_TRANSITION)) {
+				return  new TransitionLayoutFeature(this);				
 			}
 		}
 	
@@ -152,6 +162,8 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_STATE)) {
 				return  new StateBlockUpdateFeature(this);				
+			} else if(pict != null && pict.equals(Constants.PROP_PICT_TRANSITION)) {
+				return  new TransitionUpdateFeature(this);				
 			} else if(pict != null && pict.equals(Constants.PROP_PICT_PAD)) {
 				return  new ArroPadUpdateFeature(this);				
 			}

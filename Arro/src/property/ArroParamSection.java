@@ -95,12 +95,12 @@ public class ArroParamSection extends GFPropertySection/*AbstractPropertySection
 	
 	@SuppressWarnings("deprecation")
 	public void update() {
-		updateModelData(messageList);
+		updateDomainAndPE(messageList);
 
-	    IDiagramEditor editor = getDiagramEditor();
-	    if(editor instanceof FunctionDiagramEditor) {
-	    	((FunctionDiagramEditor)editor).updateDirtyState();
-	    }
+//	    IDiagramEditor editor = getDiagramEditor();
+//	    if(editor instanceof FunctionDiagramEditor) {
+//	    	((FunctionDiagramEditor)editor).updateDirtyState();
+//	    }
 	}
 
 	
@@ -266,7 +266,7 @@ public class ArroParamSection extends GFPropertySection/*AbstractPropertySection
 	 * 
 	 * @param parameterList contains the (updated) contents of the table.
 	 */
-	private void updateModelData(final ArrayList<ArroParameter> parameterList) {
+	private void updateDomainAndPE(final ArrayList<ArroParameter> parameterList) {
 		// make new clean list before storing.
 		final ArrayList<ArroParameter> newList = new ArrayList<ArroParameter>();
 		

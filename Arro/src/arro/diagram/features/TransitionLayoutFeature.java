@@ -35,10 +35,10 @@ import util.Logger;
 import util.WidgetUtil;
 
 
-public class ArroNodeLayoutFeature extends AbstractLayoutFeature implements
+public class TransitionLayoutFeature extends AbstractLayoutFeature implements
 		ILayoutFeature {
 
-	public ArroNodeLayoutFeature(IFeatureProvider fp) {
+	public TransitionLayoutFeature(IFeatureProvider fp) {
 		super(fp);
 	}
 
@@ -61,37 +61,6 @@ public class ArroNodeLayoutFeature extends AbstractLayoutFeature implements
 			
 			Rectangle invisibleRectangle = WidgetUtil.getInvisibleRectangle(cs);
 			
-			RoundedRectangle rect = WidgetUtil.getRoundedRectangle(cs);
-			Graphiti.getGaLayoutService().setLocationAndSize(rect, Constants.HALF_PAD_SIZE, 0,
-					invisibleRectangle.getWidth() - Constants.PAD_SIZE,
-					invisibleRectangle.getHeight());
-
-			Graphiti.getGaLayoutService().setLocationAndSize(WidgetUtil.getTextType(cs), 0, 0, rect.getWidth(), 20);
-			Graphiti.getGaLayoutService().setLocationAndSize(WidgetUtil.getTextName(cs), 0, 20, rect.getWidth(), 20);
-			
-			Polyline p = WidgetUtil.getSeparator(cs);
-			EList<Point> points = p.getPoints();
-			points.get(0).setX(Constants.HALF_PAD_SIZE);
-			points.get(1).setX(invisibleRectangle.getWidth() - Constants.HALF_PAD_SIZE);
-			
-            // Update anchors - first find out how many anchors and their name
-            NonEmfDomainObject domainObject = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(cs, getFeatureProvider());
-            if(domainObject instanceof ArroNode) {
-            	// Read the Node info using node-type
-            	Collection<ArroPad> pads = ((ArroNode)domainObject).getAssociatedModule().getPads();
-            	Logger.out.trace(Logger.EDITOR, "Found " + pads.size() + " pads");
-                
-        		HashMap<String, ContainerShape> anchors = WidgetUtil.getAnchors(cs);
-
-            	int i = 0;
-            	for(ArroPad pad: pads) {
-            		ContainerShape anchorContainer = anchors.get(pad.getName());
-            		GraphicsAlgorithm text = anchorContainer.getGraphicsAlgorithm();
-                    ArroNodeAnchorPosition pos = new ArroNodeAnchorPosition(rect, pad.getInput(), i);
-                    gaService.setLocationAndSize(text, pos.boxPosX(), pos.boxPosY(), pos.boxSizeX(), pos.boxSizeY());
-                    i++;
-            	}
-            }
 		}
 		return false;
 	}

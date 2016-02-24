@@ -48,7 +48,7 @@ import arro.diagram.features.ArroPadUpdateFeature;
 import arro.diagram.features.NullRemoveFeature;
 import arro.domain.ArroDevice;
 import arro.domain.ArroNode;
-import arro.domain.DomainModule;
+import arro.domain.ArroModule;
 import arro.domain.POJOIndependenceSolver;
 
 
@@ -89,7 +89,7 @@ public class FunctionDiagramFeatureProvider extends DefaultFeatureProvider {
 			return new ArroConnectionAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroNode) {
 			return new ArroNodeAddFeature(this);
-		} else if (context instanceof IAddContext && context.getNewObject() instanceof DomainModule) {
+		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroModule) {
 			return new ArroIDAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroDevice) {
 			return new ArroBoxAddFeature(this);

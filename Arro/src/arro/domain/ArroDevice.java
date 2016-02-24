@@ -1,7 +1,6 @@
 package arro.domain;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -17,7 +16,7 @@ import org.w3c.dom.NodeList;
 public class ArroDevice extends NonEmfDomainObject {
 		
 	private String url;
-	private DomainModule parent = null;
+	private ArroModule parent = null;
 	private ArrayList<ArroParameter> parameterList = new ArrayList<ArroParameter>();
 	
 	public ArroDevice() {
@@ -103,10 +102,10 @@ public class ArroDevice extends NonEmfDomainObject {
 	    parameterList = params;
 	}
 
-	public void setParent(DomainModule domainModule) {
+	public void setParent(ArroModule domainModule) {
 		this.parent = domainModule;
 	}
-	public DomainModule getParent() {
+	public ArroModule getParent() {
 		return parent;
 	}
 

@@ -39,7 +39,7 @@ import util.Logger;
 import util.PathUtil;
 import util.ArroZipFile;
 import arro.Constants;
-import arro.domain.DomainModule;
+import arro.domain.ArroModule;
 import arro.domain.ResourceCache;
 
 /**

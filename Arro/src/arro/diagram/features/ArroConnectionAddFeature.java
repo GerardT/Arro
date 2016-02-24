@@ -17,7 +17,7 @@ import org.eclipse.graphiti.util.IColorConstant;
 import util.Logger;
 import arro.Constants;
 import arro.domain.ArroConnection;
-import arro.domain.DomainModule;
+import arro.domain.ArroModule;
 import arro.editors.FunctionDiagramEditor;
 
 
@@ -38,7 +38,7 @@ public class ArroConnectionAddFeature extends AbstractAddFeature implements
         	Logger.out.trace(Logger.EDITOR, "not an editor");
         	return null;
         }
-        DomainModule domainModule =  ((FunctionDiagramEditor)dc).getDomainModule();
+        ArroModule domainModule =  ((FunctionDiagramEditor)dc).getDomainModule();
 
 		ArroConnection newConnection = new ArroConnection();
 		newConnection.setSource((String) context.getProperty(Constants.PROP_SOURCE_PAD_KEY));

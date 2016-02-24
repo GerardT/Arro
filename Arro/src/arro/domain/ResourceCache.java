@@ -80,7 +80,7 @@ public class ResourceCache {
 		        zip = new ArroZipFile(folder.getFile(typeName + "." + Constants.NODE_EXT));
 	        }
 
-			DomainModule domainDiagram = loadNodeDiagram(zip, typeName);
+			ArroModule domainDiagram = loadNodeDiagram(zip, typeName);
 			zip.setDomainDiagram(domainDiagram);
 			cache.put(PathUtil.truncExtension(typeName), zip);
 			
@@ -88,17 +88,17 @@ public class ResourceCache {
 		}
 	}
 	
-	private DomainModule loadNodeDiagram(ArroZipFile zip, String typeName) {
+	private ArroModule loadNodeDiagram(ArroZipFile zip, String typeName) {
 		String fileName = zip.getName();
 
 		
-		DomainModule n = null;
+		ArroModule n = null;
 		
 	    try {
 	    	
 	    	Logger.out.trace(Logger.STD, "Loading for " + zip.getName());
 		    
-    		n = new DomainModule();
+    		n = new ArroModule();
     		// FIXME compare name in file with name passed as parameter.
     		n.setType(typeName);
 
@@ -138,13 +138,13 @@ public class ResourceCache {
 	 * @param zip
 	 */
 	public void storeDomainDiagram(ArroZipFile zip) {
-		DomainModule dnd = (DomainModule)zip.getDomainDiagram();
+		ArroModule dnd = (ArroModule)zip.getDomainDiagram();
 		
 		storeNodeDiagram(dnd, zip, zip.getName());
 	}
 	
 	
-	private void storeNodeDiagram(DomainModule domainModule, ArroZipFile zip, String fileName) {
+	private void storeNodeDiagram(ArroModule domainModule, ArroZipFile zip, String fileName) {
 		DocumentBuilder builder = null;
 		
 		try {

@@ -10,7 +10,7 @@ import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 import util.Logger;
 import arro.Constants;
 import arro.domain.ArroConnection;
-import arro.domain.DomainModule;
+import arro.domain.ArroModule;
 import arro.editors.FunctionDiagramEditor;
 
 public class ArroConnectionDeleteFeature extends DefaultDeleteFeature implements ICustomUndoableFeature {
@@ -24,7 +24,7 @@ public class ArroConnectionDeleteFeature extends DefaultDeleteFeature implements
         if(!(dc instanceof FunctionDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");
         } else {
-        	DomainModule domainModule =  ((FunctionDiagramEditor)dc).getDomainModule();
+        	ArroModule domainModule =  ((FunctionDiagramEditor)dc).getDomainModule();
 	        context.putProperty(Constants.PROP_UNDO_CONNECTION_KEY, domainModule.cloneConnectionList());
 	        context.putProperty(Constants.PROP_DOMAIN_MODULE_KEY, domainModule);
         }
@@ -50,7 +50,7 @@ public class ArroConnectionDeleteFeature extends DefaultDeleteFeature implements
 
 	@Override
 	public void undo(IContext context) {
-		DomainModule domainModule = (DomainModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
+		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "undo " + context.getProperty(Constants.PROP_UNDO_CONNECTION_KEY));
         context.putProperty(Constants.PROP_REDO_CONNECTION_KEY, domainModule.cloneConnectionList());
@@ -65,7 +65,7 @@ public class ArroConnectionDeleteFeature extends DefaultDeleteFeature implements
 
 	@Override
 	public void redo(IContext context) {
-		DomainModule domainModule = (DomainModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
+		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "redo " + context.getProperty(Constants.PROP_UNDO_CONNECTION_KEY));
         context.putProperty(Constants.PROP_UNDO_CONNECTION_KEY, domainModule.cloneConnectionList());

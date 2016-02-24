@@ -76,7 +76,7 @@ public class ArroNodeUpdateFeature  extends DefaultUpdateDiagramFeature {
 	            }
             
             	// Read the Node info using node-type
-            	Collection<ArroPad> domainPads = ((ArroNode)domainObject).getPads();
+            	Collection<ArroPad> domainPads = ((ArroNode)domainObject).getAssociatedModule().getPads();
             	Logger.out.trace(Logger.EDITOR, "Found " + domainPads.size() + " pads");
                 
         		HashMap<String, ContainerShape> diagramPads = WidgetUtil.getAnchors(cs);
@@ -140,7 +140,7 @@ public class ArroNodeUpdateFeature  extends DefaultUpdateDiagramFeature {
             	boolean changed = false;
             	
             	// Read the Node info using node-type
-            	Collection<ArroPad> domainPads = ((ArroNode)domainObject).getPads();
+            	Collection<ArroPad> domainPads = ((ArroNode)domainObject).getAssociatedModule().getPads();
             	Logger.out.trace(Logger.EDITOR, "Found " + domainPads.size() + " pads");
                 
            		IPeCreateService peCreateService = Graphiti.getPeCreateService();

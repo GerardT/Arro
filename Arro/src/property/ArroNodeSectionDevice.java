@@ -32,7 +32,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 import arro.domain.ArroDevice;
 import arro.domain.ArroNode;
-import arro.domain.DomainModule;
+import arro.domain.ArroModule;
 import arro.domain.NonEmfDomainObject;
 
 public class ArroNodeSectionDevice extends GFPropertySection implements ITabbedPropertyConstants {

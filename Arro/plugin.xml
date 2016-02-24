@@ -71,7 +71,7 @@
              afterTab="arro.param.tab"
              category="Graphiti"
              id="arro.modedef.tab"
-             label="Defined Modes">
+             label="Conditions required">
           </propertyTab>
       </propertyTabs>
     </extension>
@@ -117,8 +117,8 @@
               tab="arro.main.tab">
           </propertySection>
           <propertySection
-              class="property.ArroModeDefSection"
-              filter="property.ArroModeDefFilter"
+              class="property.ArroConditionSection"
+              filter="property.ArroConditionFilter"
               id="arro.modedef.section"
               tab="arro.modedef.tab">
           </propertySection>
@@ -159,6 +159,15 @@
            </equals>
          </with>
       </definition>
+      <definition
+        id="arro.editors.MultiPageEditor.inView">
+         <with
+           variable="activePartId">
+           <equals
+              value="arro.editors.MultiPageEditor">
+           </equals>
+         </with>
+      </definition>
     </extension>
  
     
@@ -174,6 +183,16 @@
               id="Arro.addRemoveSampleNature"
               name="Add/RemoveSample Project Nature">
         </command>
+        <command
+              categoryId="Arro.sampleNature.category"
+              id="arro.append"
+              name="Add a row to the table.">
+        </command>
+        <command
+              categoryId="Arro.sampleNature.category"
+              id="org.eclipse.ui.edit.delete"
+              name="Delete a row from the table.">
+        </command>
     </extension>
     
     <extension
@@ -187,6 +206,19 @@
                 </reference>
             </activeWhen>
         </handler>
+        <handler
+            class="property.DelRowHandler"
+            commandId="org.eclipse.ui.edit.delete">
+            <activeWhen>
+                <reference
+                    definitionId="arro.editors.MultiPageEditor.inView">
+                </reference>
+            </activeWhen>
+        </handler>
+        <handler
+            class="property.AddRowHandler"
+            commandId="arro.append">
+        </handler>
      </extension>
      
      <extension
@@ -198,6 +230,7 @@
           sequence="M1+6">
       </key>
     </extension>
+    
     <extension
        point="org.eclipse.ui.menus">
        <menuContribution
@@ -209,6 +242,12 @@
                 icon="icons/sample.gif"
                 id="Arro.toolbars.deleteItemCommand"
                 tooltip="Remove selected item">
+             </command>
+             <command
+                commandId="arro.append"
+                icon="icons/sample.gif"
+                id="Arro.toolbars.append"
+                tooltip="Add new item">
              </command>
           </toolbar>
        </menuContribution>

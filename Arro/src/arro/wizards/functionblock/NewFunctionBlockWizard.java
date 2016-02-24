@@ -43,7 +43,7 @@ import org.eclipse.ui.ide.IDE;
 import arro.Constants;
 import arro.domain.ArroNode;
 import arro.domain.ArroStateDiagram;
-import arro.domain.DomainModule;
+import arro.domain.ArroModule;
 import arro.wizards.FileService;
 
 /**
@@ -60,7 +60,7 @@ import arro.wizards.FileService;
 public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 	private NewFunctionBlockWizardPage page;
 	private ISelection selection;
-	private DomainModule nodeDiagram;
+	private ArroModule nodeDiagram;
 	private ArroStateDiagram stateNode;
 
 
@@ -142,7 +142,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 			throwCoreException("Container \"" + containerName + "\" is not a project.");
 		}
 		
-		nodeDiagram = new DomainModule();
+		nodeDiagram = new ArroModule();
         stateNode = new ArroStateDiagram();
         nodeDiagram.setStateDiagram(stateNode);
 

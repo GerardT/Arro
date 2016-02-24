@@ -8,26 +8,16 @@ import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 
 import arro.Constants;
 
-public class ArroModeDefFilter extends AbstractPropertySectionFilter {
+public class ArroConditionFilter extends AbstractPropertySectionFilter {
 
     @Override
     protected boolean accept(PictogramElement pe) {
-		if(pe instanceof Diagram) {
-			Diagram cs = (Diagram)pe;
-			
-			if(cs.getDiagramTypeId().equals(Constants.FUNCTION_DIAGRAM_TYPE)) {
-			
-			//String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.FUNCTION_BLOCK);
-			
-			//if(pict != null && pict.equals(Constants.PROP_PICT_STATE)) {
-				return true;
-			}
-		} else if(pe instanceof ContainerShape) {
+		if(pe instanceof ContainerShape) {
 			ContainerShape cs = (ContainerShape)pe;
 			
 			String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
 			
-			if(pict != null && pict.equals(Constants.PROP_PICT_STATE)) {
+			if(pict != null && pict.equals(Constants.PROP_PICT_TRANSITION)) {
 				return true;
 			}
 		}

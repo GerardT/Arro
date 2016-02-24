@@ -33,7 +33,7 @@ import arro.Constants;
 import arro.domain.ArroNode;
 import arro.domain.ArroState;
 import arro.domain.ArroStateDiagram;
-import arro.domain.DomainModule;
+import arro.domain.ArroModule;
 import arro.editors.FunctionDiagramEditor;
 import arro.editors.StateDiagramEditor;
 
@@ -66,7 +66,7 @@ public class StateBlockAddFeature extends AbstractAddFeature implements IAddFeat
         	Logger.out.trace(Logger.EDITOR, "not an editor");
         	return null;
         }
-        DomainModule domainModule =  ((StateDiagramEditor)dc).getDomainModule();
+        ArroModule domainModule =  ((StateDiagramEditor)dc).getDomainModule();
         
   		Object obj = context.getNewObject();
 		
@@ -146,7 +146,7 @@ public class StateBlockAddFeature extends AbstractAddFeature implements IAddFeat
 
 	@Override
 	public void undo(IContext context) {
-		DomainModule domainModule = (DomainModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
+		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "undo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
         context.putProperty(Constants.PROP_REDO_NODE_KEY, domainModule.cloneNodeList());
@@ -161,7 +161,7 @@ public class StateBlockAddFeature extends AbstractAddFeature implements IAddFeat
 
 	@Override
 	public void redo(IContext context) {
-		DomainModule domainModule = (DomainModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
+		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "redo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
         context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
