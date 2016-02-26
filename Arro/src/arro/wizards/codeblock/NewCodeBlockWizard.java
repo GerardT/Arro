@@ -43,6 +43,7 @@ import org.eclipse.ui.ide.IDE;
 import arro.Constants;
 import arro.domain.ArroDevice;
 import arro.domain.ArroModule;
+import arro.domain.ArroStateDiagram;
 import arro.wizards.FileService;
 
 /**
@@ -61,6 +62,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 	private ISelection selection;
 	private ArroModule nodeDiagram;
 	private ArroDevice device;
+	private ArroStateDiagram stateNode;
 	
 
 
@@ -141,6 +143,9 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 		} else {
 			throwCoreException("Container \"" + containerName + "\" is not a project.");
 		}
+		nodeDiagram = new ArroModule();
+        stateNode = new ArroStateDiagram();
+        nodeDiagram.setStateDiagram(stateNode);
 
 		final IFile file = f.getFile(new Path(fileName));
 		try {
@@ -218,6 +223,24 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 	        	// close here in order to flush
 				stream.close();
 			}
+			{
+		        
+				// name the diagram file inside the zip file 
+		        out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + Constants.STATE_DIAGRAM_TYPE));
+		        
+		        // fill with initial data
+		        // Not very nice: we borrow the file for temporarily writing the diagram data into.
+		        // The file is actually used for storing the ZIP file
+				InputStream stream = openStateDiagramStream(file, nodeName);
+		        byte[] b = new byte[1024];
+		        int count;
+
+		        while ((count = stream.read(b)) > 0) {
+		            out.write(b, 0, count);
+		        }
+		        
+				stream.close();
+			}
         	out.close();
 			
 			// ZIP file finished. Continue working with the file
@@ -266,24 +289,20 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 		return new ByteArrayInputStream(contents.getBytes());
 	}
 
-	private InputStream openContentStream(IFile file, String diagramName) throws CoreException {
+	private InputStream openContentStream(IFile diagramFile, String diagramName) throws CoreException {
 		final String diagramTypeId = arro.Constants.FUNCTION_DIAGRAM_TYPE;
 		
+		// Create empty diagram.
 		Diagram diagram = Graphiti.getPeCreateService().createDiagram(diagramTypeId, diagramName, true);
-		
-		IFile diagramFile = file;
 		
 		URI uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
 		
-		// Create 'ID' in device diagram
-		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, "Arro.FunctionDiagramTypeProvider");
+		// Create 'ID' in device diagram, calling ArroIDAddFeature
 		AddContext context = new AddContext();
-		
-		nodeDiagram = new ArroModule();
-
 		context.setNewObject(nodeDiagram);
 		context.setTargetContainer(diagram);
 		
+		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, "Arro.FunctionDiagramTypeProvider");
 		IAddFeature f = dtp.getFeatureProvider().getAddFeature(context);
 		f.add(context);
 
@@ -299,11 +318,36 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 		return diagramFile.getContents();
 	}
 
+	// FIXME: code duplication with NewFunctionBlockWizard.java.
+	private InputStream openStateDiagramStream(IFile diagramFile, String diagramName) throws CoreException {
+		final String diagramTypeId = arro.Constants.STATE_DIAGRAM_TYPE;
+		
+		// Create empty diagram.
+		Diagram diagram = Graphiti.getPeCreateService().createDiagram(diagramTypeId, diagramName, true);
+		
+		URI uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
+		
+		// Create 'ID' in diagram, calling ArroIDAddFeature.
+		AddContext context = new AddContext();	
+		context.setNewObject(stateNode);
+		context.setTargetContainer(diagram);
+		
+		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, "Arro.StateDiagramTypeProvider");
+		IAddFeature f = dtp.getFeatureProvider().getAddFeature(context);
+		f.add(context);
+
+        // Serialize the diagram into XML.
+		FileService.createEmfFileForDiagram(uri, diagram);
+		
+		return diagramFile.getContents();
+	}
+
 	private InputStream openXmlStream(IFile file, String diagramName, String language) throws CoreException {
 		String contents = 	"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
 							"<diagram>\n" +
 							"    <nodedefinition id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
 							"        <device id=\"" + device.getId() + "\" url=\"" + language + ":" + diagramName + "\"/>\n" +
+						    "        <state id=\"" + stateNode.getId() + "\" name=\"_aState\" type=\"_State\"/>\n" +
 							"    </nodedefinition>\n" +
 							"</diagram>\n";
 		return new ByteArrayInputStream(contents.getBytes());

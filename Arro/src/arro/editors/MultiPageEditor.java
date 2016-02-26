@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -79,7 +80,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     }
     
     /**
-     * Creates page 0 of the multi-page editor, which contains a text editor.
+     * Creates page 0 of the multi-page editor, which contains the function diagram.
      */
     void createPage0(String fileName, ArroZipFile zip) {
 
@@ -102,7 +103,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     }
 
     /**
-     * Creates page 1 of the multi-page editor, which shows the sorted text.
+     * Creates page 1 of the multi-page editor, which shows the Python code.
      */
     void createPage1(String fileName, ArroZipFile zip) {
         IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + fileName + ".py");
@@ -126,7 +127,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     }
 
     /**
-     * Creates page 0 of the multi-page editor, which contains a text editor.
+     * Creates page 2 of the multi-page editor, which contains the state diagram.
      */
     void createPage2(String fileName, ArroZipFile zip) {
 
@@ -205,10 +206,10 @@ public class MultiPageEditor extends MultiPageEditorPart implements
 
         // Create page 0 containing Graphiti editor. File was just unzipped in ResourceCache.
         createPage0(fei.getName(), zip);
+        createPage2(fei.getName(), zip);
         if(documentType == Constants.CodeBlockPython) {
             createPage1(fei.getName(), zip);
         }
-        createPage2(fei.getName(), zip);
 
         //createPage2();
     }
@@ -230,10 +231,9 @@ public class MultiPageEditor extends MultiPageEditorPart implements
      */
     public void doSave(IProgressMonitor monitor) {
         getEditor(0).doSave(monitor);
+        getEditor(1).doSave(monitor);
         if(documentType == Constants.CodeBlockPython) {
-            getEditor(1).doSave(monitor);
-        } else if(documentType == Constants.FunctionBlock) {
-            getEditor(1).doSave(monitor);
+            getEditor(2).doSave(monitor);
         }
         
 		ResourceCache.getInstance().storeDomainDiagram(zip);
@@ -250,10 +250,12 @@ public class MultiPageEditor extends MultiPageEditorPart implements
      * correspond to the nested editor's.
      */
     public void doSaveAs() {
-        IEditorPart editor = getEditor(0);
-        editor.doSaveAs();
-        setPageText(0, editor.getTitle());
-        setInput(editor.getEditorInput());
+		MessageDialog.openInformation(null, "Arro", "SaveAs is not supported");
+    	
+//        IEditorPart editor = getEditor(0);
+//        editor.doSaveAs();
+//        setPageText(0, editor.getTitle());
+//        setInput(editor.getEditorInput());
     }
 
     /*

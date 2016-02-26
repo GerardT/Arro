@@ -289,7 +289,6 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 		IAddFeature f = dtp.getFeatureProvider().getAddFeature(context);
 		f.add(context);
 
-
 		FileService.createEmfFileForDiagram(uri, diagram);
 		
 		return diagramFile.getContents();

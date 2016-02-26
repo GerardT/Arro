@@ -12,14 +12,25 @@ public class Constants {
 	public final static String NODE_EXT = "anod";
 	public final static String MESSAGE_EXT = "amsg";
 	
-	// Diagram.getDiagramTypeId() will return:
+	// Editor types - Diagram.getDiagramTypeId() will return:
 	public final static String FUNCTION_DIAGRAM_TYPE = "Arro"; // must match with plugin.xml
 	public final static String STATE_DIAGRAM_TYPE = "ArroStateDiagram"; // must match with plugin.xml
 	
+	// Document types - defined in META file
 	public final static String FUNCTION_BLOCK = "Function";
 	public final static String CODE_BLOCK = "Code";
 	
+	// Document types - derived from META
+	public static final int FunctionBlock = 1;
+	public static final int CodeBlockPython = 2;
+	public static final int CodeBlockNative = 3;
+	
+	// Document types - messages
+	public static final int MessageDiagram = 4;
+	public static final int PrimitiveMessageDiagram = 5;
+	
 
+	// Properties
 	public final static String PROP_PAD_INPUT_KEY = "pad_input";
 	
 	// Pictogram types - Key
@@ -70,12 +81,6 @@ public class Constants {
      
 	public static final IColorConstant CLASS_BACKGROUND = new ColorConstant(255, 204, 153);
 
-	public static final int FunctionBlock = 1;
-	public static final int CodeBlockPython = 2;
-	public static final int CodeBlockNative = 3;
-	public static final int MessageDiagram = 4;
-	public static final int PrimitiveMessageDiagram = 5;
-	
 	public static final String PLUGIN_ID = "arro";
 
 	public static final String ATTR_LAUNCH_IP_ADDRESS = PLUGIN_ID + ".launch_ip_address";

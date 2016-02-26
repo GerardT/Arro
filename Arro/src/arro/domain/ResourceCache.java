@@ -89,6 +89,7 @@ public class ResourceCache {
 	}
 	
 	private ArroModule loadNodeDiagram(ArroZipFile zip, String typeName) {
+		// TODO: handle error if zip file removed.
 		String fileName = zip.getName();
 
 		
