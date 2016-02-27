@@ -1,5 +1,7 @@
 package property;
 
+import java.util.ArrayList;
+
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 
 /**
@@ -16,6 +18,15 @@ public class ColumnLabelStrategy extends ColumnLabelProvider {
 	 * @param element
 	 */
 	public void setText(String value, Object element) {
+	}
+	
+	/**
+	 * If this function returns non-null then the user is presented with a pull-down listbox to choose from.
+	 * 
+	 * @return
+	 */
+	public String[] getAcceptedValues(Object element) {
+		return null;
 	}
 
 }

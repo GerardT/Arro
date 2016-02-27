@@ -43,6 +43,7 @@ import arro.diagram.features.StateBlockDeleteFeature;
 import arro.diagram.features.StateBlockUpdateFeature;
 import arro.diagram.features.TransitionAddFeature;
 import arro.diagram.features.TransitionCreateFeature;
+import arro.diagram.features.TransitionDeleteFeature;
 import arro.diagram.features.TransitionLayoutFeature;
 import arro.diagram.features.TransitionUpdateFeature;
 import arro.domain.ArroState;
@@ -114,6 +115,8 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_STATE)) {
 				return  new StateBlockDeleteFeature(this);				
+			}else if(pict != null && pict.equals(Constants.PROP_PICT_TRANSITION)) {
+				return  new TransitionDeleteFeature(this);				
 			} else if(pict != null && pict.equals(Constants.PROP_PICT_CONNECTION)) {
 				// TODO is this ever used??
 				return  new ArroConnectionDeleteFeature(this);				

@@ -29,6 +29,9 @@ public class ArroConditionSection extends ArroGenericSection {
 	private ArrayList<ArroCondition> conditions = new ArrayList<ArroCondition>();
     private boolean listenerFlag = false;
 
+    /**
+     * Note: createControls is not called between selection PE of same type (e.g. transition).
+     */
     @Override
     public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
         super.createControls(parent, tabbedPropertySheetPage);
@@ -40,7 +43,7 @@ public class ArroConditionSection extends ArroGenericSection {
 		addLayout(parent, viewer.getControl());
 		
 		// first column is for the type
-		TableViewerColumn col1 = createTableViewerColumn("Mode", 100, 0);
+		TableViewerColumn col1 = createTableViewerColumn("Node", 100, 0);
 		ColumnLabelStrategy cls1 = new ColumnLabelStrategy() {
 			@Override
 			public String getText(Object element) {
@@ -49,12 +52,17 @@ public class ArroConditionSection extends ArroGenericSection {
 			@Override
 			public void setText(String value, Object element) {
 				((ArroCondition)element).setName(value);
-			};
+			}
+			@Override
+			public String[] getAcceptedValues(Object element) {
+				return getAcceptedNodeNames((ArroCondition)element);
+			}
+
 		};
 		col1.setLabelProvider(cls1);
-	    col1.setEditingSupport(new EditingSupportForString(viewer, this, cls1));
+	    col1.setEditingSupport(new EditingSupportForSelection(viewer, this, cls1));
 		
-		TableViewerColumn col2 = createTableViewerColumn("Description", 100, 1);
+		TableViewerColumn col2 = createTableViewerColumn("State", 100, 1);
 		ColumnLabelStrategy cls2 = new ColumnLabelStrategy() {
 			@Override
 			public String getText(Object element) {
@@ -63,10 +71,15 @@ public class ArroConditionSection extends ArroGenericSection {
 			@Override
 			public void setText(String value, Object element) {
 				((ArroCondition)element).setState(value);
-			};
+			}
+			@Override
+			public String[] getAcceptedValues(Object element) {
+				return getAcceptedStateNames((ArroCondition)element);
+			}
+
 		};
 		col2.setLabelProvider(cls2);
-	    col2.setEditingSupport(new EditingSupportForString(viewer, this, cls2));
+	    col2.setEditingSupport(new EditingSupportForSelection(viewer, this, cls2));
 
 		
 		final Table table = viewer.getTable();
@@ -82,6 +95,18 @@ public class ArroConditionSection extends ArroGenericSection {
 		
 		// make the selection available to other views - but causes trouble!!
 		//getSite().setSelectionProvider(viewer);
+    }
+    
+    private String[] getAcceptedNodeNames(ArroCondition cond) {
+    	String[] ret = { "aap", "noot" };
+    	
+    	return ret;
+    }
+    
+    private String[] getAcceptedStateNames(ArroCondition cond) {
+    	String[] ret = { "huis", "tuin" };
+    	
+    	return ret;
     }
     
     /**
