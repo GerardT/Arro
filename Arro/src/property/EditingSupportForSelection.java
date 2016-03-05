@@ -1,7 +1,5 @@
 package property;
 
-import java.util.ArrayList;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.commands.operations.IUndoableOperation;
@@ -13,6 +11,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.swt.SWT;
 
 public class EditingSupportForSelection extends EditingSupport {
 
@@ -62,7 +61,7 @@ public class EditingSupportForSelection extends EditingSupport {
 		String[] empty = { " " };
 		this.viewer = viewer;
 		this.paramEditor = paramEditor;
-		this.editor = new ComboBoxCellEditor(viewer.getTable(), empty);
+		this.editor = new ComboBoxCellEditor(viewer.getTable(), empty, SWT.READ_ONLY);
 		this.gs = gs;
 	}
 

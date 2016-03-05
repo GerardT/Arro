@@ -47,7 +47,7 @@ public class ArroModule extends NonEmfDomainObject  {
 	 * @param name
 	 * @return
 	 */
-	public ArroNode getNodeByName(String name) {
+	public ArroNode getNodeByName(String name) throws RuntimeException {
 		Collection<ArroNode> n = nodes.values();
 		
 		for(ArroNode ref: n) {
@@ -55,7 +55,7 @@ public class ArroModule extends NonEmfDomainObject  {
 				return ref;
 			}
 		}
-		return null;
+		throw new RuntimeException("Node not found");
 	}
 
 	public void addNode(ArroNode node) {
@@ -66,6 +66,28 @@ public class ArroModule extends NonEmfDomainObject  {
 	public void removeNode(ArroNode node) {
 		nodes.remove(node.getId());
 	}
+
+	/**
+	 * 
+	 * Get a map with an entry for each node in this module containing
+	 * an array with possible (external) state names for this node.
+	 */
+	public ArrayList<String> getNodeNames() {
+		ArrayList<String> ret = new ArrayList<String>();
+		
+		Collection<ArroNode> p = nodes.values();
+		
+		for(ArroNode ref: p) {
+			ret.add(ref.getName());
+		}
+		return ret;
+	}
+	
+	public ArrayList<String> getStateNames() {
+		return stateDiagram.getStateNames();
+	}
+
+
 
 	/*
 	 * Pad functions: get / add / remove.
@@ -141,28 +163,6 @@ public class ArroModule extends NonEmfDomainObject  {
 		stateDiagram.setParent(this);
 	}
 	
-	/**
-	 * 
-	 * Get a map with an entry for each node in this module containing
-	 * an array with possible (external) state names for this node.
-	 */
-	public HashMap<String, ArrayList<String>> getStateCombinations() {
-		HashMap<String, ArrayList<String>> map = new HashMap<String, ArrayList<String>>();
-		
-		Collection<ArroNode> p = nodes.values();
-		
-		for(ArroNode ref: p) {
-			ArroStateDiagram sd = ref.getAssociatedModule().getStateDiagram();
-			
-			ArrayList<String> names = sd.getStateNames();
-			
-			map.put(ref.getName(), names);
-		}
-		return map;
-	}
-	
-
-
 	
 	/**
 	 * Collect all parameter definitions from ArroNode instances in this
@@ -402,5 +402,6 @@ public class ArroModule extends NonEmfDomainObject  {
 	public String getType() {
 		return type;
 	}
+
 
 }

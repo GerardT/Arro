@@ -27,7 +27,8 @@ public class ArroConditionSection extends ArroGenericSection {
 
 	private TableViewer viewer;
 	private ArrayList<ArroCondition> conditions = new ArrayList<ArroCondition>();
-    private boolean listenerFlag = false;
+    @SuppressWarnings("unused")
+	private boolean listenerFlag = false;  // unused since we don't have listeners on property.
 
     /**
      * Note: createControls is not called between selection PE of same type (e.g. transition).
@@ -43,7 +44,7 @@ public class ArroConditionSection extends ArroGenericSection {
 		addLayout(parent, viewer.getControl());
 		
 		// first column is for the type
-		TableViewerColumn col1 = createTableViewerColumn("Node", 100, 0);
+		TableViewerColumn col1 = createTableViewerColumn("Node", 200, 0);
 		ColumnLabelStrategy cls1 = new ColumnLabelStrategy() {
 			@Override
 			public String getText(Object element) {
@@ -62,7 +63,7 @@ public class ArroConditionSection extends ArroGenericSection {
 		col1.setLabelProvider(cls1);
 	    col1.setEditingSupport(new EditingSupportForSelection(viewer, this, cls1));
 		
-		TableViewerColumn col2 = createTableViewerColumn("State", 100, 1);
+		TableViewerColumn col2 = createTableViewerColumn("State", 200, 1);
 		ColumnLabelStrategy cls2 = new ColumnLabelStrategy() {
 			@Override
 			public String getText(Object element) {
@@ -98,13 +99,40 @@ public class ArroConditionSection extends ArroGenericSection {
     }
     
     private String[] getAcceptedNodeNames(ArroCondition cond) {
-    	String[] ret = { "aap", "noot" };
+       	String[] ret = { "_this" };
+	    PictogramElement pe = getSelectedPictogramElement();
+	    
+	    if (pe != null) {
+            ArroTransition n = getTransition(pe);
+            ArrayList<String> list = n.getParent().getParent().getNodeNames();
+            list.add(0, "_this");
+
+    		ret = list.toArray(new String[list.size()]);
+	    }
     	
     	return ret;
     }
     
     private String[] getAcceptedStateNames(ArroCondition cond) {
-    	String[] ret = { "huis", "tuin" };
+       	String[] ret = { "" };
+    	String name = cond.getName(); // node name
+    	
+    	if(name.equals("")) {
+    		return ret;
+    	}
+    	
+	    PictogramElement pe = getSelectedPictogramElement();
+	    
+	    if (pe != null) {
+            ArroTransition n = getTransition(pe);
+            try {
+				ArrayList<String> list = n.getParent().getParent().getNodeByName(name).getAssociatedModule().getStateNames();
+
+				ret = list.toArray(new String[list.size()]);
+			} catch (RuntimeException e) {
+				return ret;
+			}
+	    }
     	
     	return ret;
     }
@@ -129,8 +157,9 @@ public class ArroConditionSection extends ArroGenericSection {
 	}
 
 	/**
-	 * Refresh the contents of the control. Note this may trigger the update
-	 * listener(s) attached.
+	 * Refresh the contents of the control - sync properties with domain info.
+	 * Since this may trigger the listener(s) attached, we prevent that using
+	 * listenerFlag.
 	 */
     @Override
     public void refresh() {
@@ -152,7 +181,6 @@ public class ArroConditionSection extends ArroGenericSection {
 		    	listenerFlag = true;
 			}
 	    }
-//				HashMap<String, ArrayList<String>> combinations = transition.getParent().getParent().getStateCombinations();
 	    viewer.refresh();
 
     }
@@ -239,9 +267,7 @@ public class ArroConditionSection extends ArroGenericSection {
 
 	@Override
 	public void update() {
-		if(listenerFlag) {
-			updateDomainAndPE();
-		}
+		updateDomainAndPE();
 		refresh();
 	}
 }

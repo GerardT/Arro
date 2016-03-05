@@ -66,7 +66,7 @@ public class ResourceCache {
 	 * 
 	 * FIXME: must search all resources in the open project.
 	 */
-	public ArroZipFile getZip(String typeName) {
+	public ArroZipFile getZip(String typeName) throws RuntimeException {
 		ArroZipFile zip = null;
 
 		if(cache.containsKey(typeName)) {
@@ -78,6 +78,8 @@ public class ResourceCache {
 	        
 	        if(folder.getFile(typeName + "." + Constants.NODE_EXT).exists()) {
 		        zip = new ArroZipFile(folder.getFile(typeName + "." + Constants.NODE_EXT));
+	        } else {
+	    		throw new RuntimeException("No zip file with this name");
 	        }
 
 			ArroModule domainDiagram = loadNodeDiagram(zip, typeName);

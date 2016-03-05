@@ -12,7 +12,6 @@ import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -30,12 +29,11 @@ import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
-import util.Logger;
 import arro.domain.ArroDevice;
 import arro.domain.ArroNode;
 import arro.domain.ArroParameter;
 import arro.domain.NonEmfDomainObject;
-import arro.editors.FunctionDiagramEditor;
+import util.Logger;
 
 public class ArroParamSection extends GFPropertySection/*AbstractPropertySection*/ {
 
