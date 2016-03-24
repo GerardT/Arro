@@ -28,7 +28,6 @@ public class EditingSupportForString extends EditingSupport {
 			super("Name change");
 			this.selectedRow = element;
 			this.newName = name;
-			paramEditor.update();
 		}
 		public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
 			undoName = gs.getText(selectedRow);

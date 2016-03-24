@@ -2,19 +2,19 @@ package property;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.commands.operations.IOperationHistory;
-import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.core.commands.operations.ObjectUndoContext;
-import org.eclipse.core.commands.operations.OperationHistoryFactory;
+import org.eclipse.graphiti.features.IAddFeature;
+import org.eclipse.graphiti.features.ICustomUndoableFeature;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.IUpdateFeature;
+import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.context.impl.UpdateContext;
+import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -23,23 +23,21 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.ISources;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.operations.RedoActionHandler;
-import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
+import arro.Constants;
 import arro.domain.ArroDevice;
+import arro.domain.ArroModule;
 import arro.domain.ArroNode;
 import arro.domain.ArroParameter;
+import arro.domain.ArroState;
 import arro.domain.NonEmfDomainObject;
 import util.Logger;
 
-public class ArroParamSection extends GFPropertySection/*AbstractPropertySection*/ {
+public class ArroParamSection  extends ArroGenericSection {
 
-	private UndoActionHandler undoAction;
-	private RedoActionHandler redoAction;
-	private IUndoContext undoContext;
 	private boolean isCodeDiagram;
 	
 
@@ -47,12 +45,7 @@ public class ArroParamSection extends GFPropertySection/*AbstractPropertySection
 	private ArrayList<ArroParameter> messageList = new ArrayList<ArroParameter>();
 
 	public ArroParamSection(boolean b) {
-		
 		isCodeDiagram = b;
-	    undoContext = new ObjectUndoContext(this);
-	    IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
-	    undoAction = new UndoActionHandler(part.getSite(), undoContext);
-	    redoAction = new RedoActionHandler(part.getSite(), undoContext);
 	    
 	}
 	
@@ -91,16 +84,6 @@ public class ArroParamSection extends GFPropertySection/*AbstractPropertySection
 
 	}
 	
-	@SuppressWarnings("deprecation")
-	public void update() {
-		updateDomainAndPE(messageList);
-
-//	    IDiagramEditor editor = getDiagramEditor();
-//	    if(editor instanceof FunctionDiagramEditor) {
-//	    	((FunctionDiagramEditor)editor).updateDirtyState();
-//	    }
-	}
-
 	
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
@@ -111,64 +94,106 @@ public class ArroParamSection extends GFPropertySection/*AbstractPropertySection
 		
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
-		
-		
-		String[] titlesStandard = { "Key", "Value", "External Name" };
-		String[] titlesDevice   = { "External Name", "Value",  };
-		String[] titles;
-		if(isCodeDiagram) {
-			titles = titlesDevice;
-		}else {
-			titles = titlesStandard;
-		}
-		int[] bounds = { 100, 100, 100, 100 };
 
 	    if(isCodeDiagram) {
-			// first column is for the type
-			TableViewerColumn col1 = createTableViewerColumn(titles[0], bounds[0], 0);
-			col1.setLabelProvider(new ColumnLabelProvider() {
+			TableViewerColumn col1 = createTableViewerColumn("External Name", 200, 0);
+			ColumnLabelStrategy cls1 = new ColumnLabelStrategy() {
 				@Override
 				public String getText(Object element) {
 					return ((ArroParameter)element).getFormalKey();
 				}
-			});
-		    col1.setEditingSupport(new EditingSupportForSubst(viewer, this));
+				@Override
+				public void setText(String value, Object element) {
+					((ArroParameter)element).setSubstitute(value);
+					if(isDevice()) {
+						((ArroParameter)element).setKey(value);
+					}
+				}
+				@Override
+				public String[] getAcceptedValues(Object element) {
+					return null;
+				}
+			};
+			col1.setLabelProvider(cls1);
+		    col1.setEditingSupport(new EditingSupportForString(viewer, this, cls1));
 			
-			TableViewerColumn col2 = createTableViewerColumn(titles[1], bounds[1], 1);
-			col2.setLabelProvider(new ColumnLabelProvider() {
+			
+			
+			TableViewerColumn col2 = createTableViewerColumn("Value", 200, 1);
+			ColumnLabelStrategy cls2 = new ColumnLabelStrategy() {
 				@Override
 				public String getText(Object element) {
 					return ((ArroParameter)element).getValue();
 				}
-			});
-		    col2.setEditingSupport(new EditingSupportForValue(viewer, this));
+				@Override
+				public void setText(String value, Object element) {
+					((ArroParameter)element).setValue(value);;
+				}
+				@Override
+				public String[] getAcceptedValues(Object element) {
+					return null;
+				}
+			};
+			col2.setLabelProvider(cls2);
+		    col2.setEditingSupport(new EditingSupportForString(viewer, this, cls2));
 	    } else {
-			// first column is for the type
-			TableViewerColumn col1 = createTableViewerColumn(titles[0], bounds[0], 0);
-			col1.setLabelProvider(new ColumnLabelProvider() {
+			TableViewerColumn col1 = createTableViewerColumn("Key", 200, 0);
+			ColumnLabelStrategy cls1 = new ColumnLabelStrategy() {
 				@Override
 				public String getText(Object element) {
 					return ((ArroParameter)element).getFormalKey();
 				}
-			});
+				@Override
+				public void setText(String value, Object element) {
+					((ArroParameter)element).setKey(value);
+				}
+				@Override
+				public String[] getAcceptedValues(Object element) {
+					return null;
+				}
+			};
+			col1.setLabelProvider(cls1);
+		    col1.setEditingSupport(new EditingSupportForString(viewer, this, cls1));
 			
-			TableViewerColumn col2 = createTableViewerColumn(titles[1], bounds[1], 1);
-			col2.setLabelProvider(new ColumnLabelProvider() {
+			TableViewerColumn col2 = createTableViewerColumn("Value", 200, 1);
+			ColumnLabelStrategy cls2 = new ColumnLabelStrategy() {
 				@Override
 				public String getText(Object element) {
 					return ((ArroParameter)element).getValue();
 				}
-			});
-		    col2.setEditingSupport(new EditingSupportForValue(viewer, this));
-
-			TableViewerColumn col3 = createTableViewerColumn(titles[2], bounds[2], 2);
-			col3.setLabelProvider(new ColumnLabelProvider() {
+				@Override
+				public void setText(String value, Object element) {
+					((ArroParameter)element).setValue(value);
+				}
+				@Override
+				public String[] getAcceptedValues(Object element) {
+					return null;
+				}
+			};
+			col2.setLabelProvider(cls2);
+		    col2.setEditingSupport(new EditingSupportForString(viewer, this, cls2));
+			
+			TableViewerColumn col3 = createTableViewerColumn("External Name", 200, 2);
+			ColumnLabelStrategy cls3 = new ColumnLabelStrategy() {
 				@Override
 				public String getText(Object element) {
 					return ((ArroParameter)element).getSubstitute();
 				}
-			});
-		    col3.setEditingSupport(new EditingSupportForSubst(viewer, this));
+				@Override
+				public void setText(String value, Object element) {
+					((ArroParameter)element).setSubstitute(value);
+					if(isDevice()) {
+						((ArroParameter)element).setKey(value);
+					}
+				}
+				@Override
+				public String[] getAcceptedValues(Object element) {
+					return null;
+				}
+			};
+			col3.setLabelProvider(cls3);
+		    col3.setEditingSupport(new EditingSupportForString(viewer, this, cls3));
+			
 	    }
 
 		
@@ -215,49 +240,10 @@ public class ArroParamSection extends GFPropertySection/*AbstractPropertySection
 		return viewerColumn;
 	}
 
-	public IOperationHistory getOperationHistory() {
-
-	  // The workbench provides its own undo/redo manager
-	  //return PlatformUI.getWorkbench()
-	  //   .getOperationSupport().getOperationHistory();
-
-	  // which, in this case, is the same as the default undo manager
-	  return OperationHistoryFactory.getOperationHistory();
-	}
-
-	public IUndoContext getUndoContext() {
-
-	  // For workbench-wide operations, we should return
-	  //return PlatformUI.getWorkbench()
-	  //   .getOperationSupport().getUndoContext();
-
-	  // but our operations are all local, so return our own content
-	  return undoContext;
-	}
-
-//		private void setUndoRedoActionHandlers() {
-//
-//		    final IActionBars actionBars = getEditorSite().getActionBars();
-//		    actionBars.setGlobalActionHandler(ActionFactory.UNDO.getId(), undoAction);
-//		    actionBars.setGlobalActionHandler(ActionFactory.REDO.getId(), redoAction);
-//		    actionBars.updateActionBars();
-//		}
-
-	public NonEmfDomainObject getNode(PictogramElement pe) {
-	    if (pe != null) {
-	       	IFeatureProvider fp = getDiagramTypeProvider().getFeatureProvider();
-
-	        Object[] eObject = fp.getAllBusinessObjectsForPictogramElement(pe);
-
-	        if (eObject.length != 0 && eObject[0] instanceof NonEmfDomainObject) {
-	        	return (NonEmfDomainObject)(eObject[0]);
-	        }
-	    }
-	    return null;
-	}
 	public boolean isDevice() {
 		return isCodeDiagram;
 	}
+
 
 	/**
 	 * Update the domain data according to new input in table.
@@ -269,18 +255,26 @@ public class ArroParamSection extends GFPropertySection/*AbstractPropertySection
 		final ArrayList<ArroParameter> newList = new ArrayList<ArroParameter>();
 		
 		for(ArroParameter parm: parameterList) {
-			if(!(parm.getFormalKey().equals("") || parm.getValue().equals(""))) {
+			if(!(parm.getFormalKey().equals(""))) {
+				// Show default value if none entered
+				if(parm.getValue().equals("")) { parm.setValue("0");
+				
+				}
 				// do not include not fully specified entries
 				System.out.println("newList.add " + parm);
 				newList.add(parm);
 			}
 		}
-		IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
-				
-			public boolean canExecute(IContext context) {
-				return true;
-			}
-			public void execute(IContext context) {
+		
+        CustomContext context = new CustomContext();
+        execute(new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+            
+        	@Override
+            public boolean canExecute(IContext context) {
+                return true;
+            }
+            @Override
+            public void execute(IContext context) {
 				final PictogramElement pe = getSelectedPictogramElement();
 				NonEmfDomainObject n = getNode(pe);
 
@@ -297,21 +291,29 @@ public class ArroParamSection extends GFPropertySection/*AbstractPropertySection
 						((ArroDevice)n).setParameterList(newList);
 					}
 				}
-				
-//				TransactionalEditingDomain domain = TransactionUtil.getEditingDomain(getDiagram());
-//				domain.getCommandStack().execute(new RecordingCommand(domain) {
-//				    public void doExecute() {
-//
-//		    			// update UI with new model data
-//				    	UpdateContext updateContext = new UpdateContext(pe);
-//				    	IUpdateFeature updateFeature = getFeatureProvider().getUpdateFeature(updateContext);
-//				    	updateFeature.update(updateContext);
-//				    }
-//				});
-			}
-		};
-		CustomContext context = new CustomContext();
-		execute(feature, context);
+
+            }
+        }, context);
+	}
+
+	public NonEmfDomainObject getNode(PictogramElement pe) {
+	    if (pe != null) {
+	       	IFeatureProvider fp = getDiagramTypeProvider().getFeatureProvider();
+
+	        Object[] eObject = fp.getAllBusinessObjectsForPictogramElement(pe);
+
+	        if (eObject.length != 0 && eObject[0] instanceof NonEmfDomainObject) {
+	        	return (NonEmfDomainObject)(eObject[0]);
+	        }
+	    }
+	    return null;
+	}
+	
+	
+	@Override
+	public void update() {
+		updateDomainAndPE(messageList);
+		refresh();
 	}
 
 }
