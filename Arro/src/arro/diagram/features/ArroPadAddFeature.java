@@ -2,7 +2,7 @@ package arro.diagram.features;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.graphiti.features.IAddFeature;
-import org.eclipse.graphiti.features.ICustomUndoableFeature;
+import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -30,7 +30,7 @@ import arro.domain.ArroModule;
 import arro.editors.FunctionDiagramEditor;
 
 
-public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature, ICustomUndoableFeature {
+public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature, ICustomUndoRedoFeature {
 
 	public ArroPadAddFeature(IFeatureProvider fp) {
 		super(fp);
@@ -206,7 +206,7 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 	}
 
 	@Override
-	public void undo(IContext context) {
+	public void preUndo(IContext context) {
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "undo " + context.getProperty(Constants.PROP_UNDO_PAD_KEY));
@@ -222,13 +222,25 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 	}
 
 	@Override
-	public void redo(IContext context) {
+	public void preRedo(IContext context) {
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "redo " + context.getProperty(Constants.PROP_UNDO_PAD_KEY));
         context.putProperty(Constants.PROP_UNDO_PAD_KEY, domainModule.clonePadList());
 		Object redoList = context.getProperty(Constants.PROP_REDO_PAD_KEY);
 		domainModule.setPadList(redoList);
+	}
+
+	@Override
+	public void postUndo(IContext context) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void postRedo(IContext context) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

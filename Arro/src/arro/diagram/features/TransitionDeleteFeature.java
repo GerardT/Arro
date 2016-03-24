@@ -1,22 +1,21 @@
 package arro.diagram.features;
 
-import org.eclipse.graphiti.features.ICustomUndoableFeature;
+import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 
-import util.Logger;
 import arro.Constants;
+import arro.domain.ArroModule;
 import arro.domain.ArroNode;
 import arro.domain.ArroState;
 import arro.domain.ArroStateDiagram;
-import arro.domain.ArroModule;
-import arro.editors.FunctionDiagramEditor;
 import arro.editors.StateDiagramEditor;
+import util.Logger;
 
-public class TransitionDeleteFeature extends DefaultDeleteFeature implements ICustomUndoableFeature {
+public class TransitionDeleteFeature extends DefaultDeleteFeature implements ICustomUndoRedoFeature {
 
 	public TransitionDeleteFeature(IFeatureProvider fp) {
 		super(fp);
@@ -57,7 +56,7 @@ public class TransitionDeleteFeature extends DefaultDeleteFeature implements ICu
 	}
 
 	@Override
-	public void undo(IContext context) {
+	public void preUndo(IContext context) {
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "undo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
@@ -76,7 +75,7 @@ public class TransitionDeleteFeature extends DefaultDeleteFeature implements ICu
 	}
 
 	@Override
-	public void redo(IContext context) {
+	public void preRedo(IContext context) {
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "redo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
@@ -87,5 +86,17 @@ public class TransitionDeleteFeature extends DefaultDeleteFeature implements ICu
 //        context.putProperty(Constants.PROP_UNDO_CONNECTION_KEY, domainModule.cloneConnectionList());
 //		redoList = context.getProperty(Constants.PROP_REDO_CONNECTION_KEY);
 //		domainModule.setConnectionList(redoList);
+	}
+
+	@Override
+	public void postUndo(IContext context) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void postRedo(IContext context) {
+		// TODO Auto-generated method stub
+		
 	}
 }

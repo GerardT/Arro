@@ -4,7 +4,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.graphiti.features.IAddFeature;
-import org.eclipse.graphiti.features.ICustomUndoableFeature;
+import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
@@ -35,7 +35,7 @@ import arro.domain.ArroModule;
 import arro.editors.FunctionDiagramEditor;
 
 
-public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeature, ICustomUndoableFeature {
+public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeature, ICustomUndoRedoFeature {
 	
 	public ArroNodeAddFeature(IFeatureProvider fp) {
 		super(fp);
@@ -200,7 +200,7 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
 	}
 
 	@Override
-	public void undo(IContext context) {
+	public void preUndo(IContext context) {
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "undo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
@@ -215,13 +215,25 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
 	}
 
 	@Override
-	public void redo(IContext context) {
+	public void preRedo(IContext context) {
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "redo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
         context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
 		Object redoList = context.getProperty(Constants.PROP_REDO_NODE_KEY);
 		domainModule.setNodeList(redoList);
+	}
+
+	@Override
+	public void postUndo(IContext context) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void postRedo(IContext context) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

@@ -1,6 +1,6 @@
 package arro.diagram.features;
 
-import org.eclipse.graphiti.features.ICustomUndoableFeature;
+import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
@@ -13,7 +13,7 @@ import arro.domain.ArroConnection;
 import arro.domain.ArroModule;
 import arro.editors.FunctionDiagramEditor;
 
-public class ArroConnectionDeleteFeature extends DefaultDeleteFeature implements ICustomUndoableFeature {
+public class ArroConnectionDeleteFeature extends DefaultDeleteFeature implements ICustomUndoRedoFeature {
 
 	public ArroConnectionDeleteFeature(IFeatureProvider fp) {
 		super(fp);
@@ -49,7 +49,12 @@ public class ArroConnectionDeleteFeature extends DefaultDeleteFeature implements
 	}
 
 	@Override
-	public void undo(IContext context) {
+	public boolean canRedo(IContext context) {
+		return true;
+	}
+
+	@Override
+	public void preUndo(IContext context) {
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "undo " + context.getProperty(Constants.PROP_UNDO_CONNECTION_KEY));
@@ -59,17 +64,24 @@ public class ArroConnectionDeleteFeature extends DefaultDeleteFeature implements
 	}
 
 	@Override
-	public boolean canRedo(IContext context) {
-		return true;
+	public void postUndo(IContext context) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
-	public void redo(IContext context) {
+	public void preRedo(IContext context) {
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "redo " + context.getProperty(Constants.PROP_UNDO_CONNECTION_KEY));
         context.putProperty(Constants.PROP_UNDO_CONNECTION_KEY, domainModule.cloneConnectionList());
 		Object redoList = context.getProperty(Constants.PROP_REDO_CONNECTION_KEY);
 		domainModule.setConnectionList(redoList);
+	}
+
+	@Override
+	public void postRedo(IContext context) {
+		// TODO Auto-generated method stub
+		
 	}
 }

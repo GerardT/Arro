@@ -1,44 +1,28 @@
 package arro.diagram.features;
 
 
-import java.util.Collection;
-import java.util.HashMap;
-
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
 import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.impl.AbstractLayoutFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
-import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
-import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
-import org.eclipse.graphiti.mm.algorithms.styles.Point;
-import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
-import org.eclipse.graphiti.mm.pictograms.FixPointAnchor;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
-import org.eclipse.graphiti.services.IPeCreateService;
-import org.eclipse.graphiti.services.IPeService;
 
 import arro.Constants;
-import arro.domain.ArroNode;
-import arro.domain.ArroPad;
-import arro.domain.NonEmfDomainObject;
-import arro.domain.POJOIndependenceSolver;
-import util.Logger;
 import util.WidgetUtil;
 
 
-public class StateBlockLayoutFeature extends AbstractLayoutFeature implements
+public class StepLayoutFeature extends AbstractLayoutFeature implements
 		ILayoutFeature {
 
-	public StateBlockLayoutFeature(IFeatureProvider fp) {
+	public StepLayoutFeature(IFeatureProvider fp) {
 		super(fp);
 	}
 

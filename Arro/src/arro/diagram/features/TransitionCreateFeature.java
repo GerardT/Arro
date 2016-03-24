@@ -6,9 +6,6 @@ import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
-import arro.domain.ArroNode;
-import arro.domain.ArroStateDiagram;
-import arro.domain.ArroState;
 import arro.domain.ArroTransition;
 
 public class TransitionCreateFeature extends AbstractCreateFeature implements

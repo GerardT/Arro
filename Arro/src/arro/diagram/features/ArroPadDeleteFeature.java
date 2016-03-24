@@ -1,6 +1,6 @@
 package arro.diagram.features;
 
-import org.eclipse.graphiti.features.ICustomUndoableFeature;
+import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
@@ -13,7 +13,7 @@ import arro.domain.ArroPad;
 import arro.domain.ArroModule;
 import arro.editors.FunctionDiagramEditor;
 
-public class ArroPadDeleteFeature extends DefaultDeleteFeature implements ICustomUndoableFeature {
+public class ArroPadDeleteFeature extends DefaultDeleteFeature implements ICustomUndoRedoFeature {
 
 	public ArroPadDeleteFeature(IFeatureProvider fp) {
 		super(fp);
@@ -55,7 +55,7 @@ public class ArroPadDeleteFeature extends DefaultDeleteFeature implements ICusto
 	}
 
 	@Override
-	public void undo(IContext context) {
+	public void preUndo(IContext context) {
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "undo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
@@ -74,7 +74,7 @@ public class ArroPadDeleteFeature extends DefaultDeleteFeature implements ICusto
 	}
 
 	@Override
-	public void redo(IContext context) {
+	public void preRedo(IContext context) {
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "redo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
@@ -85,5 +85,17 @@ public class ArroPadDeleteFeature extends DefaultDeleteFeature implements ICusto
         context.putProperty(Constants.PROP_UNDO_CONNECTION_KEY, domainModule.cloneConnectionList());
 		redoList = context.getProperty(Constants.PROP_REDO_CONNECTION_KEY);
 		domainModule.setConnectionList(redoList);
+	}
+
+	@Override
+	public void postUndo(IContext context) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void postRedo(IContext context) {
+		// TODO Auto-generated method stub
+		
 	}
 }

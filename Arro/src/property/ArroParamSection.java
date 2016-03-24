@@ -3,7 +3,7 @@ package property;
 import java.util.ArrayList;
 
 import org.eclipse.graphiti.features.IAddFeature;
-import org.eclipse.graphiti.features.ICustomUndoableFeature;
+import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IUpdateFeature;

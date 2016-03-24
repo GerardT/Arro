@@ -6,14 +6,12 @@ import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
-import arro.domain.ArroNode;
-import arro.domain.ArroStateDiagram;
 import arro.domain.ArroState;
 
-public class StateBlockCreateFeature extends AbstractCreateFeature implements
+public class StepCreateFeature extends AbstractCreateFeature implements
 		ICreateFeature {
 
-	public StateBlockCreateFeature(IFeatureProvider fp) {
+	public StepCreateFeature(IFeatureProvider fp) {
 		super(fp, "State", "Creates a new State");
 	}
 

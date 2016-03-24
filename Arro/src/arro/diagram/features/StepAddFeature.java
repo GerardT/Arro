@@ -1,19 +1,13 @@
 package arro.diagram.features;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.graphiti.features.IAddFeature;
-import org.eclipse.graphiti.features.ICustomUndoableFeature;
+import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
-import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.impl.LayoutContext;
-import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
-import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
@@ -26,21 +20,17 @@ import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
-import org.eclipse.jface.dialogs.ErrorDialog;
 
-import util.Logger;
 import arro.Constants;
-import arro.domain.ArroNode;
-import arro.domain.ArroState;
-import arro.domain.ArroStateDiagram;
 import arro.domain.ArroModule;
-import arro.editors.FunctionDiagramEditor;
+import arro.domain.ArroState;
 import arro.editors.StateDiagramEditor;
+import util.Logger;
 
 
-public class StateBlockAddFeature extends AbstractAddFeature implements IAddFeature, ICustomUndoableFeature {
+public class StepAddFeature extends AbstractAddFeature implements IAddFeature, ICustomUndoRedoFeature {
 	
-	public StateBlockAddFeature(IFeatureProvider fp) {
+	public StepAddFeature(IFeatureProvider fp) {
 		super(fp);
 
 	}
@@ -145,7 +135,12 @@ public class StateBlockAddFeature extends AbstractAddFeature implements IAddFeat
 	}
 
 	@Override
-	public void undo(IContext context) {
+	public boolean canRedo(IContext context) {
+		return true;
+	}
+
+	@Override
+	public void preUndo(IContext context) {
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "undo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
@@ -155,18 +150,25 @@ public class StateBlockAddFeature extends AbstractAddFeature implements IAddFeat
 	}
 
 	@Override
-	public boolean canRedo(IContext context) {
-		return true;
+	public void postUndo(IContext context) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
-	public void redo(IContext context) {
+	public void preRedo(IContext context) {
 		ArroModule domainModule = (ArroModule) context.getProperty(Constants.PROP_DOMAIN_MODULE_KEY);
 		
 		Logger.out.trace(Logger.EDITOR, "redo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
         context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
 		Object redoList = context.getProperty(Constants.PROP_REDO_NODE_KEY);
 		domainModule.setNodeList(redoList);
+	}
+
+	@Override
+	public void postRedo(IContext context) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

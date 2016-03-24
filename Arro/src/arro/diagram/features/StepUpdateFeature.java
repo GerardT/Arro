@@ -11,7 +11,6 @@ import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 
-import arro.domain.ArroPad;
 import arro.domain.ArroState;
 import arro.domain.NonEmfDomainObject;
 import arro.domain.POJOIndependenceSolver;
@@ -22,9 +21,9 @@ import arro.domain.POJOIndependenceSolver;
  * direct-editing or the property-sheet, then this text should be changed in the diagram immediately.
  * 
  */
-public class StateBlockUpdateFeature  extends DefaultUpdateDiagramFeature {
+public class StepUpdateFeature  extends DefaultUpdateDiagramFeature {
 
-	public StateBlockUpdateFeature(IFeatureProvider fp) {
+	public StepUpdateFeature(IFeatureProvider fp) {
 		super(fp);
 	}
 	

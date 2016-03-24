@@ -36,11 +36,11 @@ import arro.diagram.features.ArroConnectionDeleteFeature;
 import arro.diagram.features.ArroIDAddFeature;
 import arro.diagram.features.ArroPadUpdateFeature;
 import arro.diagram.features.NullRemoveFeature;
-import arro.diagram.features.StateBlockAddFeature;
-import arro.diagram.features.StateBlockCreateFeature;
-import arro.diagram.features.StateBlockLayoutFeature;
-import arro.diagram.features.StateBlockDeleteFeature;
-import arro.diagram.features.StateBlockUpdateFeature;
+import arro.diagram.features.StepAddFeature;
+import arro.diagram.features.StepCreateFeature;
+import arro.diagram.features.StepLayoutFeature;
+import arro.diagram.features.StepDeleteFeature;
+import arro.diagram.features.StepUpdateFeature;
 import arro.diagram.features.TransitionAddFeature;
 import arro.diagram.features.TransitionCreateFeature;
 import arro.diagram.features.TransitionDeleteFeature;
@@ -67,7 +67,7 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
-		return new ICreateFeature[] {new StateBlockCreateFeature(this),
+		return new ICreateFeature[] {new StepCreateFeature(this),
 				                     new TransitionCreateFeature(this)};
 	}
 	
@@ -85,7 +85,7 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 				(context.getNewObject() instanceof ArroModule || context.getNewObject() instanceof ArroStateDiagram)) {
 			return new ArroIDAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroState) {
-			return new StateBlockAddFeature(this);
+			return new StepAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroTransition) {
 			return new TransitionAddFeature(this);
 		}
@@ -114,7 +114,7 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 			String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_STATE)) {
-				return  new StateBlockDeleteFeature(this);				
+				return  new StepDeleteFeature(this);				
 			}else if(pict != null && pict.equals(Constants.PROP_PICT_TRANSITION)) {
 				return  new TransitionDeleteFeature(this);				
 			} else if(pict != null && pict.equals(Constants.PROP_PICT_CONNECTION)) {
@@ -146,7 +146,7 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 			String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_STATE)) {
-				return  new StateBlockLayoutFeature(this);				
+				return  new StepLayoutFeature(this);				
 			} else if(pict != null && pict.equals(Constants.PROP_PICT_TRANSITION)) {
 				return  new TransitionLayoutFeature(this);				
 			}
@@ -164,7 +164,7 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 			String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_STATE)) {
-				return  new StateBlockUpdateFeature(this);				
+				return  new StepUpdateFeature(this);				
 			} else if(pict != null && pict.equals(Constants.PROP_PICT_TRANSITION)) {
 				return  new TransitionUpdateFeature(this);				
 			} else if(pict != null && pict.equals(Constants.PROP_PICT_PAD)) {
