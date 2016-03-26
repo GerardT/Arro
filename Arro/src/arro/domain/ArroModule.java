@@ -48,6 +48,20 @@ public class ArroModule extends NonEmfDomainObject  {
 	 * @return
 	 */
 	public ArroNode getNodeByName(String name) throws RuntimeException {
+		ArroNode ret = findNodeByName(name);
+		if(ret == null) {
+			throw new RuntimeException("Node not found");
+		}
+		return ret;
+	}
+
+	/**
+	 * Search node by its given name (not ID).
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public ArroNode findNodeByName(String name) throws RuntimeException {
 		Collection<ArroNode> n = nodes.values();
 		
 		for(ArroNode ref: n) {
@@ -55,7 +69,7 @@ public class ArroModule extends NonEmfDomainObject  {
 				return ref;
 			}
 		}
-		throw new RuntimeException("Node not found");
+		return null;
 	}
 
 	public void addNode(ArroNode node) {

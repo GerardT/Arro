@@ -99,7 +99,7 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
             
             newClass.setType(className);
             instanceName = "a" + className;
-            while(domainModule.getNodeByName(instanceName) != null) {
+            while(domainModule.findNodeByName(instanceName) != null) {
             	instanceName += "1";
             }
             obj = newClass;
