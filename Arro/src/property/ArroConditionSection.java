@@ -63,7 +63,7 @@ public class ArroConditionSection extends ArroGenericSection {
 		col1.setLabelProvider(cls1);
 	    col1.setEditingSupport(new EditingSupportForSelection(viewer, this, cls1));
 		
-		TableViewerColumn col2 = createTableViewerColumn("State", 200, 1);
+		TableViewerColumn col2 = createTableViewerColumn("Step", 200, 1);
 		ColumnLabelStrategy cls2 = new ColumnLabelStrategy() {
 			@Override
 			public String getText(Object element) {

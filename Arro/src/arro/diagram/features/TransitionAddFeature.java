@@ -8,15 +8,10 @@ import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.impl.LayoutContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
-import org.eclipse.graphiti.mm.algorithms.Polyline;
-import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IDiagramContainer;
-import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.services.IGaService;
-import org.eclipse.graphiti.services.IPeCreateService;
 
 import arro.Constants;
 import arro.domain.ArroModule;
@@ -41,12 +36,6 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
 	 * Called when a State is added to the diagram.
 	 */
 	public PictogramElement add(IAddContext context) {
-		
-		// Can't make it a object attribute since this code is called from different
-		// contexts (so different object instances)!
-        int width = 200;
-        int height = 20;
-        
         
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
         if(!(dc instanceof StateDiagramEditor)) {
@@ -63,39 +52,13 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
         
         ArroTransition addedDomainObject = (ArroTransition)obj;
         
-        String instanceName = "a" + "State";
+        String instanceName = "a" + "Transition";
         while(domainModule.getStateDiagram().getStateByName(instanceName) != null) {
         	instanceName += "1";
         }
         addedDomainObject.setName(instanceName);
 
-		Diagram targetDiagram = (Diagram) context.getTargetContainer();
-		IPeCreateService peCreateService = Graphiti.getPeCreateService();
-		IGaService gaService = Graphiti.getGaService();
-		
-
-		/////// CONTAINER ///////
-		ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
-		
-        Graphiti.getPeService().setPropertyValue(containerShape, Constants.PROP_PICT_KEY, Constants.PROP_PICT_TRANSITION);
-
-        // create invisible outer rectangle expanded by
-        // the width needed for the anchor
-        Rectangle invisibleRectangle = gaService.createInvisibleRectangle(containerShape);
-        {
-            gaService.setLocationAndSize(invisibleRectangle, context.getX(), context.getY(),
-            												 width, height);
-     
-        }
-
-		/////// horizontal divider line ///////
-		{
-	        // create and set graphics algorithm
-	        Polyline polyline =
-	            gaService.createPolyline(invisibleRectangle, new int[] { 0, height / 2, width, height / 2 });
-	        polyline.setForeground(manageColor(Constants.CLASS_FOREGROUND));
-	        polyline.setLineWidth(2);
-		}
+		ContainerShape containerShape = new TransitionHelper().create(context, addedDomainObject, manageColor(Constants.CLASS_FOREGROUND), manageColor(Constants.CLASS_BACKGROUND));
 
 		context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
         context.putProperty(Constants.PROP_DOMAIN_MODULE_KEY, domainModule);

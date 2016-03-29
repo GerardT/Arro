@@ -11,6 +11,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 
+import arro.Constants;
 import util.WidgetUtil;
 
 
@@ -34,13 +35,22 @@ public class TransitionLayoutFeature extends AbstractLayoutFeature implements
 	 */
 	public boolean layout(ILayoutContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
-		IGaService gaService = Graphiti.getGaService();
 		if (pictogramElement instanceof ContainerShape) {
 			ContainerShape cs = (ContainerShape) pictogramElement;
 			
-			Rectangle invisibleRectangle = WidgetUtil.getInvisibleRectangle(cs);
-			
+			new TransitionHelper().read(context, cs, manageColor(Constants.CLASS_FOREGROUND), manageColor(Constants.CLASS_BACKGROUND));
+			return true;
 		}
 		return false;
 	}
+//		PictogramElement pictogramElement = context.getPictogramElement();
+//		IGaService gaService = Graphiti.getGaService();
+//		if (pictogramElement instanceof ContainerShape) {
+//			ContainerShape cs = (ContainerShape) pictogramElement;
+//			
+//			Rectangle invisibleRectangle = WidgetUtil.getInvisibleRectangle(cs);
+//			
+//		}
+//		return false;
+//	}
 }

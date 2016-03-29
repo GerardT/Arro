@@ -8,7 +8,7 @@ import arro.Constants;
 // +--+----------------+
 // |  |                |
 // +--+----------------+
-//  <                 >   Box (width is 80)
+//  <                 >   Box (width is ANCHOR_BOX_WIDTH)
 //  <>                    Anchor
 //     <              >   Text
 
@@ -17,17 +17,21 @@ public class ArroNodeAnchorPosition {
 	int index;
 	GraphicsAlgorithm rect;
 	
+	// This is the size of the small (invisible) rectangle surrounding anchor + anchor text.
+	private static final int ANCHOR_BOX_WIDTH = 80;
+	
 	ArroNodeAnchorPosition(GraphicsAlgorithm rect, boolean isLeft, int index) {
 		this.isLeft = isLeft;
 		this.index = index;
 		this.rect = rect;
+
 	}
 	
 	int boxPosX() {
 		if(isLeft) {
 			return rect.getX() - Constants.HALF_PAD_SIZE;
 		} else {
-			return rect.getX() + rect.getWidth() - 80 + Constants.HALF_PAD_SIZE;
+			return rect.getX() + rect.getWidth() - ANCHOR_BOX_WIDTH + Constants.HALF_PAD_SIZE;
 		}
 	}
 	
@@ -36,7 +40,7 @@ public class ArroNodeAnchorPosition {
 	}
 	
 	int boxSizeX() {
-		return 80;
+		return ANCHOR_BOX_WIDTH;
 	}
 	
 	int boxSizeY() {
@@ -56,7 +60,7 @@ public class ArroNodeAnchorPosition {
 	}
 
 	int textSizeX() {
-		return 80 - Constants.PAD_SIZE;
+		return ANCHOR_BOX_WIDTH - Constants.PAD_SIZE;
 	}
 
 	int textSizeY() {
@@ -67,7 +71,7 @@ public class ArroNodeAnchorPosition {
 		if(isLeft) {
 			return 0;
 		} else {
-			return 80 - Constants.PAD_SIZE;
+			return ANCHOR_BOX_WIDTH - Constants.PAD_SIZE;
 		}
 	}
 

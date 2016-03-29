@@ -54,7 +54,7 @@ public class ArroCondition extends NonEmfDomainObject {
 		attr.setValue(getName());
 		elt.setAttributeNode(attr);
 		
-		attr = doc.createAttribute("state");
+		attr = doc.createAttribute("step");
 		attr.setValue(getName());
 		elt.setAttributeNode(attr);
 	}
@@ -62,7 +62,7 @@ public class ArroCondition extends NonEmfDomainObject {
 		Element eElement = (Element) nNode;
     	setId(eElement.getAttribute("id"));
     	setName(eElement.getAttribute("name"));
-    	setState(eElement.getAttribute("state"));
+    	setState(eElement.getAttribute("step"));
 	}
 
 	public void setParent(ArroTransition ts) {

@@ -12,7 +12,7 @@ public class StepCreateFeature extends AbstractCreateFeature implements
 		ICreateFeature {
 
 	public StepCreateFeature(IFeatureProvider fp) {
-		super(fp, "State", "Creates a new State");
+		super(fp, "Step", "Creates a new Step");
 	}
 
 	public boolean canCreate(ICreateContext context) {

@@ -39,28 +39,30 @@ public class StepLayoutFeature extends AbstractLayoutFeature implements
 	 */
 	public boolean layout(ILayoutContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
-		IGaService gaService = Graphiti.getGaService();
 		if (pictogramElement instanceof ContainerShape) {
 			ContainerShape cs = (ContainerShape) pictogramElement;
 			
-			Rectangle invisibleRectangle = WidgetUtil.getInvisibleRectangle(cs);
+			new StepHelper().read(context, cs, manageColor(Constants.CLASS_FOREGROUND), manageColor(Constants.CLASS_BACKGROUND));
+			return true;
 			
-			RoundedRectangle rect = WidgetUtil.getRoundedRectangle(cs);
-			Graphiti.getGaLayoutService().setLocationAndSize(rect, Constants.HALF_PAD_SIZE, 0,
-					invisibleRectangle.getWidth() - Constants.PAD_SIZE,
-					invisibleRectangle.getHeight());
-			
-		    for (Shape shape : cs.getChildren()) {
-		    	if(!(shape instanceof ContainerShape)) {
-			    	GraphicsAlgorithm graphicsAlgorithm = shape.getGraphicsAlgorithm();
-
-			        if (graphicsAlgorithm instanceof Text) {
-			            Text text = (Text) shape.getGraphicsAlgorithm();
-			            
-						Graphiti.getGaLayoutService().setLocationAndSize(text, 0, 20, rect.getWidth(), 20);
-			    	}
-		    	}
-		    }
+//			Rectangle invisibleRectangle = WidgetUtil.getInvisibleRectangle(cs);
+//			
+//			RoundedRectangle rect = WidgetUtil.getRoundedRectangle(cs);
+//			Graphiti.getGaLayoutService().setLocationAndSize(rect, Constants.HALF_PAD_SIZE, 0,
+//					invisibleRectangle.getWidth() - Constants.PAD_SIZE,
+//					invisibleRectangle.getHeight());
+//			
+//		    for (Shape shape : cs.getChildren()) {
+//		    	if(!(shape instanceof ContainerShape)) {
+//			    	GraphicsAlgorithm graphicsAlgorithm = shape.getGraphicsAlgorithm();
+//
+//			        if (graphicsAlgorithm instanceof Text) {
+//			            Text text = (Text) shape.getGraphicsAlgorithm();
+//			            
+//						Graphiti.getGaLayoutService().setLocationAndSize(text, 0, 20, rect.getWidth(), 20);
+//			    	}
+//		    	}
+//		    }
 		}
 		return false;
 	}

@@ -63,7 +63,7 @@ public class ArroStateDiagram extends NonEmfDomainObject {
 		Collection<ArroState> st = states.values();
 		for(ArroState state: st) {
 			
-			Element sub = doc.createElement("state");
+			Element sub = doc.createElement("step");
 			elt.appendChild(sub);
 			
 			state.xmlWrite(doc, sub);
@@ -87,7 +87,7 @@ public class ArroStateDiagram extends NonEmfDomainObject {
     	for (int temp = 0; temp < nList.getLength(); temp++) {
     		Node sub = nList.item(temp);
     		
-			if(sub.getNodeName().equals("state")) {
+			if(sub.getNodeName().equals("step")) {
 	    		Element eSubElement = (Element) sub;
 	    		ArroState state = new ArroState();
 	    		

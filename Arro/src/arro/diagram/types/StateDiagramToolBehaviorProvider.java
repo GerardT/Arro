@@ -41,7 +41,7 @@ public class StateDiagramToolBehaviorProvider extends DefaultToolBehaviorProvide
         IPaletteCompartmentEntry[] superCompartments = super.getPalette();
         for (int i = 0; i < superCompartments.length; i++) {
         	IPaletteCompartmentEntry comp = superCompartments[i];
-        	if(true /*comp.getLabel().equals("State")*/) {
+        	if(true /*comp.getLabel().equals("Step")*/) {
                 ret.add(superCompartments[i]);
         	}
         }
