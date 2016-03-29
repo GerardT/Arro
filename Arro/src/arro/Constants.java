@@ -38,8 +38,10 @@ public class Constants {
 	
 	// Pictogram types - Values
 	public final static String PROP_PICT_NODE = "node";
-	public final static String PROP_PICT_STATE = "state_block";
+	public final static String PROP_PICT_STEP = "state_block";
 	public final static String PROP_PICT_TRANSITION = "transition";
+	public final static String PROP_PICT_SYNCHRONIZATION_IN = "synchronization_in";
+	public final static String PROP_PICT_SYNCHRONIZATION_OUT = "synchronization_out";
 	public final static String PROP_PICT_BOX = "box";
 	public final static String PROP_PICT_PAD = "pad";
 	public final static String PROP_PICT_CONNECTION = "connection";

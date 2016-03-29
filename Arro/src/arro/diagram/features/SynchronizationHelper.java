@@ -7,6 +7,7 @@ import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.styles.Color;
+import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.algorithms.styles.Point;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
@@ -18,22 +19,22 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
 import arro.Constants;
-import arro.domain.ArroTransition;
+import arro.domain.ArroSynchronization;
 import util.Logger;
 import util.WidgetUtil;
 
-public class TransitionHelper {
+public class SynchronizationHelper {
 	
 	private ContainerShape containerShape;  // this will be the PictogramElement: (ContainerShape) pictogramElement
 	private Rectangle invisibleRectangle;
-	private Polyline polyline;
+	private Polyline polyline1, polyline2;
 	private GraphicsAlgorithm anch1, anch2;
 	
 	
 	// Can't make it a object attribute since this code is called from different
 	// contexts (so different object instances)!
 	
-	public ContainerShape create(IAddContext context, ArroTransition addedDomainObject, Color fg, Color bg) {
+	public ContainerShape create(IAddContext context, ArroSynchronization addedDomainObject, Color fg, Color bg) {
 	    final int width = 200;
 	    final int height = 50;
 
@@ -44,7 +45,11 @@ public class TransitionHelper {
 		/////// CONTAINER ///////
 		containerShape = peCreateService.createContainerShape(targetDiagram, true);
 		
-        Graphiti.getPeService().setPropertyValue(containerShape, Constants.PROP_PICT_KEY, Constants.PROP_PICT_TRANSITION);
+		if(addedDomainObject.getIn()) {
+	        Graphiti.getPeService().setPropertyValue(containerShape, Constants.PROP_PICT_KEY, Constants.PROP_PICT_SYNCHRONIZATION_IN);
+		} else {
+	        Graphiti.getPeService().setPropertyValue(containerShape, Constants.PROP_PICT_KEY, Constants.PROP_PICT_SYNCHRONIZATION_OUT);
+		}
 
         // create invisible outer rectangle expanded by
         // the width needed for the anchor
@@ -54,13 +59,21 @@ public class TransitionHelper {
      
         }
 
-		/////// horizontal line ///////
+		/////// horizontal line1 ///////
 		{
 	        // create and set graphics algorithm
-	        polyline =
-	            gaService.createPolyline(invisibleRectangle, new int[] { 0, height / 2, width, height / 2 });
-	        polyline.setForeground(fg);
-	        polyline.setLineWidth(2);
+	        polyline1 =
+	            gaService.createPolyline(invisibleRectangle, new int[] { 0, Constants.PAD_SIZE, width, Constants.PAD_SIZE });
+	        polyline1.setForeground(fg);
+	        polyline1.setLineWidth(2);
+		}
+		/////// horizontal line2 ///////
+		{
+	        // create and set graphics algorithm
+	        polyline2 =
+	            gaService.createPolyline(invisibleRectangle, new int[] { 0, Constants.PAD_SIZE + 5, width, Constants.PAD_SIZE + 5 });
+	        polyline2.setForeground(fg);
+	        polyline2.setLineWidth(2);
 		}
         {
      		final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);                 		
@@ -79,20 +92,30 @@ public class TransitionHelper {
             anch2 = gaService.createRoundedRectangle(boxAnchor, 50, 50);
         }
         
-        layout(fg, bg);
+        layout(addedDomainObject.getIn(), fg, bg);
         
         return containerShape;
        
 	}
 	public void read(ILayoutContext context, ContainerShape cs, Color fg, Color bg) {
+		boolean in;
 		containerShape = cs;
 		invisibleRectangle = WidgetUtil.getInvisibleRectangle(containerShape);
+		
+		String val = Graphiti.getPeService().getPropertyValue(containerShape, Constants.PROP_PICT_KEY);
+		if(val.equals(Constants.PROP_PICT_SYNCHRONIZATION_IN)) {
+			in = true;
+		} else {
+			in = false;
+		}
 
 		EList<GraphicsAlgorithm> list = invisibleRectangle.getGraphicsAlgorithmChildren();
 		
 		for(GraphicsAlgorithm innerGa: list) {
-			if (innerGa instanceof Polyline) {
-				polyline = (Polyline) innerGa;
+			if (innerGa instanceof Polyline && polyline1 == null) {
+				polyline1 = (Polyline) innerGa;
+			} else if (innerGa instanceof Polyline && polyline2 == null) {
+				polyline2 = (Polyline) innerGa;
 			}
 		}
 
@@ -108,18 +131,30 @@ public class TransitionHelper {
 				anch2 = ((BoxRelativeAnchor)anchor).getGraphicsAlgorithm();
 			}
 		}
-        layout(fg, bg);
+        layout(in, fg, bg);
 	    
 	}
-	private void layout(Color fg, Color bg) {
+	private void layout(boolean in, Color fg, Color bg) {
 	    final int width = invisibleRectangle.getWidth();
 		IGaService gaService = Graphiti.getGaService();
 		
-		EList<Point> points = polyline.getPoints();
+		EList<Point> points = polyline1.getPoints();
 		points.get(0).setX(0);
 		points.get(0).setY(Constants.PAD_SIZE);
 		points.get(1).setX(width);
 		points.get(1).setY(Constants.PAD_SIZE);
+        
+		points = polyline2.getPoints();
+		points.get(0).setX(0);
+		points.get(0).setY(Constants.PAD_SIZE + 5);
+		points.get(1).setX(width);
+		points.get(1).setY(Constants.PAD_SIZE + 5);
+		
+		if(in) {
+			polyline2.setLineStyle(LineStyle.DASH);
+		} else {
+			polyline1.setLineStyle(LineStyle.DASH);
+		}
         
         anch1.setFilled(true);
         anch1.setForeground(fg);
@@ -132,7 +167,7 @@ public class TransitionHelper {
         anch2.setForeground(fg);
         anch2.setBackground(bg);
         anch2.setLineWidth(2);
-        gaService.setLocationAndSize(anch2, (width / 2) - Constants.HALF_PAD_SIZE, Constants.PAD_SIZE,
+        gaService.setLocationAndSize(anch2, (width / 2) - Constants.HALF_PAD_SIZE, Constants.PAD_SIZE + 5,
         		                            Constants.PAD_SIZE, Constants.PAD_SIZE);
 	}
 }

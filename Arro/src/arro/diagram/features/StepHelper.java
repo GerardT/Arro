@@ -48,7 +48,7 @@ public class StepHelper {
 		/////// CONTAINER ///////
 		containerShape = peCreateService.createContainerShape(targetDiagram, true);
 		
-        Graphiti.getPeService().setPropertyValue(containerShape, Constants.PROP_PICT_KEY, Constants.PROP_PICT_STATE);
+        Graphiti.getPeService().setPropertyValue(containerShape, Constants.PROP_PICT_KEY, Constants.PROP_PICT_STEP);
 
         // create invisible outer rectangle expanded by
         // the width needed for the anchor

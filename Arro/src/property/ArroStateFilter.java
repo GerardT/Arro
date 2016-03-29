@@ -16,7 +16,7 @@ public class ArroStateFilter extends AbstractPropertySectionFilter {
 			
 			String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
 			
-			if(pict != null && pict.equals(Constants.PROP_PICT_STATE)) {
+			if(pict != null && pict.equals(Constants.PROP_PICT_STEP)) {
 				return true;
 			}
 		}
