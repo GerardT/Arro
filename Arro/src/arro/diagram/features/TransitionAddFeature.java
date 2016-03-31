@@ -3,15 +3,13 @@ package arro.diagram.features;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.eclipse.graphiti.features.ILayoutFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.IContext;
-import org.eclipse.graphiti.features.context.impl.LayoutContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
-import org.eclipse.graphiti.mm.pictograms.ContainerShape;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IDiagramContainer;
+import org.eclipse.graphiti.util.IColorConstant;
 
 import arro.Constants;
 import arro.domain.ArroModule;
@@ -29,7 +27,7 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
 
 	public boolean canAdd(IAddContext context) {
 		// TODO: check for right domain object instance below
-		return (context.getNewObject() instanceof ArroTransition && context.getTargetContainer() instanceof Diagram);
+		return (context.getNewObject() instanceof ArroTransition);
 	}
 
 	/**
@@ -58,7 +56,7 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
         }
         addedDomainObject.setName(instanceName);
 
-		ContainerShape containerShape = new TransitionHelper().create(context, addedDomainObject, manageColor(Constants.CLASS_FOREGROUND), manageColor(Constants.CLASS_BACKGROUND));
+		Connection connection = new TransitionHelper().create(context, addedDomainObject, manageColor(IColorConstant.BLACK), manageColor(Constants.CLASS_BACKGROUND), getDiagram());
 
 		context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
         context.putProperty(Constants.PROP_DOMAIN_MODULE_KEY, domainModule);
@@ -66,18 +64,18 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
         domainModule.getStateDiagram().addTransition(addedDomainObject);
         
 	    // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
-		link(containerShape, addedDomainObject);
+		link(connection, addedDomainObject);
 		
-		// After PE was linked to domain object..
-
-        // To set location and size.
-	    LayoutContext layoutContext = new LayoutContext(containerShape);
-	    ILayoutFeature layoutFeature = getFeatureProvider().getLayoutFeature(layoutContext);
-	    layoutFeature.layout(layoutContext);
-
+//		// After PE was linked to domain object..
+//
+//        // To set location and size.
+//	    LayoutContext layoutContext = new LayoutContext(containerShape);
+//	    ILayoutFeature layoutFeature = getFeatureProvider().getLayoutFeature(layoutContext);
+//	    layoutFeature.layout(layoutContext);
+//
 
 		
-		return containerShape;
+		return connection;
 	}
 
 	@Override

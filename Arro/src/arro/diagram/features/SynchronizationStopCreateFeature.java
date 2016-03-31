@@ -9,11 +9,11 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import arro.domain.ArroSynchronization;
 import arro.domain.ArroTransition;
 
-public class SynchronizationInCreateFeature extends AbstractCreateFeature implements
+public class SynchronizationStopCreateFeature extends AbstractCreateFeature implements
 		ICreateFeature {
 
-	public SynchronizationInCreateFeature(IFeatureProvider fp) {
-		super(fp, "Start Synchronization", "Creates a new start-Synchronization Line");
+	public SynchronizationStopCreateFeature(IFeatureProvider fp) {
+		super(fp, "End Synchronization", "Creates a new end-Synchronization Line");
 	}
 
 	public boolean canCreate(ICreateContext context) {
@@ -26,7 +26,7 @@ public class SynchronizationInCreateFeature extends AbstractCreateFeature implem
 		// getDiagram().eResource().getContents().add(newDomainObject);
 		
 	    // create EClass
-		ArroSynchronization newClass = new ArroSynchronization(true);
+		ArroSynchronization newClass = new ArroSynchronization(false);
         // Add model element to resource.
         // We add the model element to the resource of the diagram for
         // simplicity's sake. Normally, a customer would use its own

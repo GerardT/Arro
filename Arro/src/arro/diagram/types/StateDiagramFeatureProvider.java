@@ -11,7 +11,6 @@ import org.eclipse.graphiti.features.IMoveShapeFeature;
 import org.eclipse.graphiti.features.IRemoveFeature;
 import org.eclipse.graphiti.features.IResizeShapeFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
-import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
@@ -28,36 +27,33 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
-import util.Logger;
 import arro.Constants;
-import arro.diagram.features.ArroConnectionAddFeature;
-import arro.diagram.features.ArroConnectionCreateFeature;
 import arro.diagram.features.ArroConnectionDeleteFeature;
 import arro.diagram.features.ArroIDAddFeature;
 import arro.diagram.features.ArroPadUpdateFeature;
 import arro.diagram.features.NullRemoveFeature;
 import arro.diagram.features.StepAddFeature;
 import arro.diagram.features.StepCreateFeature;
-import arro.diagram.features.StepLayoutFeature;
 import arro.diagram.features.StepDeleteFeature;
+import arro.diagram.features.StepLayoutFeature;
 import arro.diagram.features.StepUpdateFeature;
 import arro.diagram.features.SynchronizationAddFeature;
-import arro.diagram.features.SynchronizationInCreateFeature;
 import arro.diagram.features.SynchronizationDeleteFeature;
 import arro.diagram.features.SynchronizationLayoutFeature;
-import arro.diagram.features.SynchronizationOutCreateFeature;
+import arro.diagram.features.SynchronizationStartCreateFeature;
+import arro.diagram.features.SynchronizationStopCreateFeature;
 import arro.diagram.features.SynchronizationUpdateFeature;
 import arro.diagram.features.TransitionAddFeature;
 import arro.diagram.features.TransitionCreateFeature;
 import arro.diagram.features.TransitionDeleteFeature;
-import arro.diagram.features.TransitionLayoutFeature;
 import arro.diagram.features.TransitionUpdateFeature;
+import arro.domain.ArroModule;
 import arro.domain.ArroState;
 import arro.domain.ArroStateDiagram;
 import arro.domain.ArroSynchronization;
-import arro.domain.ArroModule;
 import arro.domain.ArroTransition;
 import arro.domain.POJOIndependenceSolver;
+import util.Logger;
 
 
 public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
@@ -75,22 +71,20 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
 		return new ICreateFeature[] {new StepCreateFeature(this),
-                new TransitionCreateFeature(this),
-                new SynchronizationInCreateFeature(this),
-                new SynchronizationOutCreateFeature(this)};
+                new SynchronizationStartCreateFeature(this),
+                new SynchronizationStopCreateFeature(this)};
 	}
 	
 	@Override
 	public ICreateConnectionFeature[] getCreateConnectionFeatures() {
-		return new ICreateConnectionFeature[] {new ArroConnectionCreateFeature(this)};
+		return new ICreateConnectionFeature[] {
+				new TransitionCreateFeature(this)};
 	}
 	
 	@Override
 	public IAddFeature getAddFeature(IAddContext context) {
 		Logger.out.trace(Logger.EDITOR, " ");
-		if (context instanceof IAddConnectionContext /* && context.getNewObject() instanceof <DomainObject> */) {
-			return new ArroConnectionAddFeature(this);
-		} else if (context instanceof IAddContext && 
+		if (context instanceof IAddContext && 
 				(context.getNewObject() instanceof ArroModule || context.getNewObject() instanceof ArroStateDiagram)) {
 			return new ArroIDAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroState) {
@@ -126,13 +120,10 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_STEP)) {
 				return  new StepDeleteFeature(this);				
-			} else if(pict != null && pict.equals(Constants.PROP_PICT_TRANSITION)) {
+			} else if(pict != null && (pict.equals(Constants.PROP_PICT_TRANSITION) || pict.equals(Constants.PROP_PICT_NULL_TRANSITION))) {
 				return  new TransitionDeleteFeature(this);				
 			} else if(pict != null && (pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_IN) || pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_OUT))) {
 				return  new SynchronizationDeleteFeature(this);				
-			} else if(pict != null && pict.equals(Constants.PROP_PICT_CONNECTION)) {
-				// TODO is this ever used??
-				return  new ArroConnectionDeleteFeature(this);				
 			} 
 		} else if(pictogramElement instanceof FreeFormConnection) {
 			FreeFormConnection ffc = (FreeFormConnection)pictogramElement;
@@ -148,10 +139,12 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 		
 		return super.getDeleteFeature(context);
 	}
-
 	
 	@Override
 	public ILayoutFeature getLayoutFeature(ILayoutContext context) {
+		
+		// Note Layout is not supported for connections (Transition).
+
 		if(context.getPictogramElement() instanceof ContainerShape) {
 			Logger.out.trace(Logger.EDITOR, " ");
 			ContainerShape cs = (ContainerShape)context.getPictogramElement();
@@ -160,8 +153,6 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_STEP)) {
 				return new StepLayoutFeature(this);				
-			} else if(pict != null && pict.equals(Constants.PROP_PICT_TRANSITION)) {
-				return new TransitionLayoutFeature(this);				
 			} else if(pict != null && (pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_IN) || pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_OUT))) {
 				return new SynchronizationLayoutFeature(this);				
 			}
@@ -180,7 +171,7 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_STEP)) {
 				return  new StepUpdateFeature(this);				
-			} else if(pict != null && pict.equals(Constants.PROP_PICT_TRANSITION)) {
+			} else if(pict != null && (pict.equals(Constants.PROP_PICT_TRANSITION) || pict.equals(Constants.PROP_PICT_NULL_TRANSITION))) {
 				return  new TransitionUpdateFeature(this);				
 			} else if(pict != null && (pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_IN) || pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_OUT))) {
 				return  new SynchronizationUpdateFeature(this);				

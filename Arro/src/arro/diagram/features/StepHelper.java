@@ -3,7 +3,6 @@ package arro.diagram.features;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
-import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
@@ -77,17 +76,18 @@ public class StepHelper {
     		boxAnchor.setRelativeWidth(0.0);
     		boxAnchor.setRelativeHeight(0.0/*0.38*/); // Use golden section
             
-            Graphiti.getPeService().setPropertyValue(containerShape, Constants.PROP_PAD_NAME_KEY, "name");
+            Graphiti.getPeService().setPropertyValue(boxAnchor, Constants.PROP_PAD_NAME_KEY, Constants.PROP_PAD_NAME_STEP_IN);
 
             anch1 = gaService.createRoundedRectangle(boxAnchor, 50, 50);
         }
+
         {
      		final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);                 		
 	
     		boxAnchor.setRelativeWidth(0.0);
     		boxAnchor.setRelativeHeight(0.0/*0.38*/); // Use golden section
             
-            Graphiti.getPeService().setPropertyValue(containerShape, Constants.PROP_PAD_NAME_KEY, "name");
+            Graphiti.getPeService().setPropertyValue(boxAnchor, Constants.PROP_PAD_NAME_KEY, Constants.PROP_PAD_NAME_STEP_OUT);
 
             anch2 = gaService.createRoundedRectangle(boxAnchor, 50, 50);
         }

@@ -1,14 +1,14 @@
 package arro.domain;
 
 public class ArroSynchronization extends NonEmfDomainObject {
-	private boolean in = false;
+	private boolean start = false;
 
-	public ArroSynchronization(boolean in) {
-		this.in = in;
+	public ArroSynchronization(boolean start) {
+		this.start = start;
 	}
 
-	public boolean getIn() {
-		return in;
+	public boolean getStart() {
+		return start;
 	}
 
 }

@@ -40,6 +40,7 @@ public class Constants {
 	public final static String PROP_PICT_NODE = "node";
 	public final static String PROP_PICT_STEP = "state_block";
 	public final static String PROP_PICT_TRANSITION = "transition";
+	public final static String PROP_PICT_NULL_TRANSITION = "null_transition";
 	public final static String PROP_PICT_SYNCHRONIZATION_IN = "synchronization_in";
 	public final static String PROP_PICT_SYNCHRONIZATION_OUT = "synchronization_out";
 	public final static String PROP_PICT_BOX = "box";
@@ -62,6 +63,14 @@ public class Constants {
 	public static final Object PROP_SOURCE_PAD_KEY = "source_pad";
 	public static final Object PROP_TARGET_PAD_KEY = "target_pad";
 	
+	// Pre-defined pad names used in SFCs
+	public static final String PROP_PAD_NAME_STEP_IN = "Step-in";
+	public static final String PROP_PAD_NAME_STEP_OUT = "Step-out";
+	public static final String PROP_PAD_NAME_SYNC_START_IN = "Sync-start-in";
+	public static final String PROP_PAD_NAME_SYNC_START_OUT = "Sync-start-out";
+	public static final String PROP_PAD_NAME_SYNC_STOP_IN = "Sync-stop-in";
+	public static final String PROP_PAD_NAME_SYNC_STOP_OUT = "Sync-stop-out";
+
 	
 	public static final IColorConstant PAD_TEXT_FOREGROUND = new ColorConstant(51, 51, 153);
          

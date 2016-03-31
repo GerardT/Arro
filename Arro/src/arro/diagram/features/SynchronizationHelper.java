@@ -41,11 +41,12 @@ public class SynchronizationHelper {
 	    Diagram targetDiagram = (Diagram) context.getTargetContainer();
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		IGaService gaService = Graphiti.getGaService();
+		BoxRelativeAnchor boxAnchor1, boxAnchor2;
 
 		/////// CONTAINER ///////
 		containerShape = peCreateService.createContainerShape(targetDiagram, true);
 		
-		if(addedDomainObject.getIn()) {
+		if(addedDomainObject.getStart()) {
 	        Graphiti.getPeService().setPropertyValue(containerShape, Constants.PROP_PICT_KEY, Constants.PROP_PICT_SYNCHRONIZATION_IN);
 		} else {
 	        Graphiti.getPeService().setPropertyValue(containerShape, Constants.PROP_PICT_KEY, Constants.PROP_PICT_SYNCHRONIZATION_OUT);
@@ -76,23 +77,30 @@ public class SynchronizationHelper {
 	        polyline2.setLineWidth(2);
 		}
         {
-     		final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);                 		
+     		boxAnchor1 = peCreateService.createBoxRelativeAnchor(containerShape);                 		
 	
-    		boxAnchor.setRelativeWidth(0.0);
-    		boxAnchor.setRelativeHeight(0.0/*0.38*/); // Use golden section
+    		boxAnchor1.setRelativeWidth(0.0);
+    		boxAnchor1.setRelativeHeight(0.0/*0.38*/); // Use golden section
             
-            anch1 = gaService.createRoundedRectangle(boxAnchor, 50, 50);
+            anch1 = gaService.createRoundedRectangle(boxAnchor1, 50, 50);
         }
         {
-     		final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);                 		
+     		boxAnchor2 = peCreateService.createBoxRelativeAnchor(containerShape);                 		
 	
-    		boxAnchor.setRelativeWidth(0.0);
-    		boxAnchor.setRelativeHeight(0.0/*0.38*/); // Use golden section
+    		boxAnchor2.setRelativeWidth(0.0);
+    		boxAnchor2.setRelativeHeight(0.0/*0.38*/); // Use golden section
             
-            anch2 = gaService.createRoundedRectangle(boxAnchor, 50, 50);
+            anch2 = gaService.createRoundedRectangle(boxAnchor2, 50, 50);
+        }
+        if(addedDomainObject.getStart()) {
+            Graphiti.getPeService().setPropertyValue(boxAnchor1, Constants.PROP_PAD_NAME_KEY, Constants.PROP_PAD_NAME_SYNC_START_IN);
+            Graphiti.getPeService().setPropertyValue(boxAnchor2, Constants.PROP_PAD_NAME_KEY, Constants.PROP_PAD_NAME_SYNC_START_OUT);
+        } else {
+            Graphiti.getPeService().setPropertyValue(boxAnchor1, Constants.PROP_PAD_NAME_KEY, Constants.PROP_PAD_NAME_SYNC_STOP_IN);
+            Graphiti.getPeService().setPropertyValue(boxAnchor2, Constants.PROP_PAD_NAME_KEY, Constants.PROP_PAD_NAME_SYNC_STOP_OUT);
         }
         
-        layout(addedDomainObject.getIn(), fg, bg);
+        layout(addedDomainObject.getStart(), fg, bg);
         
         return containerShape;
        
