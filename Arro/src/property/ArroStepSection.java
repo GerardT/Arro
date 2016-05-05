@@ -8,7 +8,6 @@ import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
@@ -20,14 +19,13 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
+import arro.domain.ArroStep;
 import util.Misc;
-import arro.domain.ArroState;
 
-public class ArroStateSection extends ArroGenericSection {
+public class ArroStepSection extends ArroGenericSection {
 
     private Text nameTextVal;
     private CLabel valueLabel;
@@ -69,7 +67,7 @@ public class ArroStateSection extends ArroGenericSection {
     public void refresh() {
         PictogramElement pe = getSelectedPictogramElement();
         if (pe != null) {
-            ArroState n = getState(pe);
+            ArroStep n = getState(pe);
 
             if (n != null) {
                 // Make sure to first read these variables from domain
@@ -141,7 +139,7 @@ public class ArroStateSection extends ArroGenericSection {
             }
             public void execute(IContext context) {
                 final PictogramElement pe = getSelectedPictogramElement();
-                ArroState n = getState(pe);
+                ArroStep n = getState(pe);
 
                 if (n != null) {
                     x.success = true;
@@ -162,14 +160,14 @@ public class ArroStateSection extends ArroGenericSection {
         return x.success;
     }
     
-    public ArroState getState(PictogramElement pe) {
+    public ArroStep getState(PictogramElement pe) {
         if (pe != null) {
                IFeatureProvider fp = getDiagramTypeProvider().getFeatureProvider();
 
             Object[] eObject = fp.getAllBusinessObjectsForPictogramElement(pe);
 
-            if (eObject.length != 0 && eObject[0] instanceof ArroState) {
-                return (ArroState)(eObject[0]);
+            if (eObject.length != 0 && eObject[0] instanceof ArroStep) {
+                return (ArroStep)(eObject[0]);
             }
         }
         return null;
@@ -177,7 +175,7 @@ public class ArroStateSection extends ArroGenericSection {
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
+		updateDomainAndPE();
 		
 	}
 }

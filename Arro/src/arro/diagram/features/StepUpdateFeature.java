@@ -11,7 +11,7 @@ import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 
-import arro.domain.ArroState;
+import arro.domain.ArroStep;
 import arro.domain.NonEmfDomainObject;
 import arro.domain.POJOIndependenceSolver;
 
@@ -39,7 +39,7 @@ public class StepUpdateFeature  extends DefaultUpdateDiagramFeature {
         PictogramElement pictogramElement = context.getPictogramElement();
         NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement, getFeatureProvider());;
 
-        if(bo instanceof ArroState) {
+        if(bo instanceof ArroStep) {
             //String type = ((ArroNode)bo).getType();
             String name = bo.getName();
             
@@ -63,8 +63,8 @@ public class StepUpdateFeature  extends DefaultUpdateDiagramFeature {
         PictogramElement pictogramElement = context.getPictogramElement();
         NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement, getFeatureProvider());
         
-        if(bo instanceof ArroState) {
-        	ArroState state = (ArroState) bo;
+        if(bo instanceof ArroStep) {
+        	ArroStep state = (ArroStep) bo;
         	String name = state.getName();
             ContainerShape cs = (ContainerShape) pictogramElement;
             for (Shape shape : cs.getChildren()) {

@@ -1,13 +1,10 @@
 package arro.editors;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -18,7 +15,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -36,12 +32,10 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
-import util.Logger;
-import util.PathUtil;
-import util.ArroZipFile;
 import arro.Constants;
-import arro.domain.ArroModule;
 import arro.domain.ResourceCache;
+import util.ArroZipFile;
+import util.PathUtil;
 
 /**
  * An example showing how to create a multi-page editor. This example has 3
@@ -127,7 +121,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     }
 
     /**
-     * Creates page 2 of the multi-page editor, which contains the state diagram.
+     * Creates page 2 of the multi-page editor, which contains the sequence diagram.
      */
     void createPage2(String fileName, ArroZipFile zip) {
 
@@ -142,7 +136,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
                 stateEditor = new StateDiagramEditor(zip);
                 
                 int index = addPage(stateEditor, fei2);
-                setPageText(index, "State Diagram");
+                setPageText(index, "Sequence Diagram");
             } catch (PartInitException e) {
                 ErrorDialog.openError(getSite().getShell(),
                         "Error creating nested state editor", null, e.getStatus());
@@ -239,7 +233,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
 		ResourceCache.getInstance().storeDomainDiagram(zip);
         
         // then zip the whole thing again
-        FileEditorInput fei = (FileEditorInput) getEditorInput();
+        //FileEditorInput fei = (FileEditorInput) getEditorInput();
 		
         zip.save();
     }

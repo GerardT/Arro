@@ -6,7 +6,7 @@ import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
-import arro.domain.ArroState;
+import arro.domain.ArroStep;
 
 public class StepCreateFeature extends AbstractCreateFeature implements
 		ICreateFeature {
@@ -25,7 +25,7 @@ public class StepCreateFeature extends AbstractCreateFeature implements
 		// getDiagram().eResource().getContents().add(newDomainObject);
 		
 	    // create EClass
-		ArroState newClass = new ArroState();
+		ArroStep newClass = new ArroStep();
         // Add model element to resource.
         // We add the model element to the resource of the diagram for
         // simplicity's sake. Normally, a customer would use its own

@@ -43,7 +43,7 @@ import org.eclipse.ui.ide.IDE;
 import arro.Constants;
 import arro.domain.ArroDevice;
 import arro.domain.ArroModule;
-import arro.domain.ArroStateDiagram;
+import arro.domain.ArroSequenceChart;
 import arro.wizards.FileService;
 
 /**
@@ -62,7 +62,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 	private ISelection selection;
 	private ArroModule nodeDiagram;
 	private ArroDevice device;
-	private ArroStateDiagram stateNode;
+	private ArroSequenceChart stateNode;
 	
 
 
@@ -144,7 +144,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 			throwCoreException("Container \"" + containerName + "\" is not a project.");
 		}
 		nodeDiagram = new ArroModule();
-        stateNode = new ArroStateDiagram();
+        stateNode = new ArroSequenceChart();
         nodeDiagram.setStateDiagram(stateNode);
 
 		final IFile file = f.getFile(new Path(fileName));

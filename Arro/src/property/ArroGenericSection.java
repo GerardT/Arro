@@ -5,6 +5,7 @@ import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -23,6 +24,11 @@ public abstract class ArroGenericSection extends GFPropertySection implements IT
 	    IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
 	    undoAction = new UndoActionHandler(part.getSite(), undoContext);
 	    redoAction = new RedoActionHandler(part.getSite(), undoContext);
+	}
+	
+	void getEditingDomain() {
+	    // how do we do that?
+	    TransactionalEditingDomain domain = getDiagramTypeProvider().getDiagramBehavior().getEditingDomain();
 	}
 
 	public abstract void update();

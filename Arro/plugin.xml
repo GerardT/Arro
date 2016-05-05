@@ -71,7 +71,24 @@
              afterTab="arro.param.tab"
              category="Graphiti"
              id="arro.modedef.tab"
-             label="Conditions required">
+             label="Transition">
+          </propertyTab>
+          <propertyTab
+             category="Graphiti"
+             id="arro.step.tab"
+             label="Step">
+          </propertyTab>
+          <propertyTab
+             afterTab="arro.main.tab"
+             category="Graphiti"
+             id="arro.state-entry.tab"
+             label="Entry Actions">
+          </propertyTab>
+          <propertyTab
+             afterTab="arro.main.tab"
+             category="Graphiti"
+             id="arro.state-exit.tab"
+             label="Exit Actions">
           </propertyTab>
       </propertyTabs>
     </extension>
@@ -111,10 +128,16 @@
               tab="arro.main.tab">
           </propertySection>
           <propertySection
-              class="property.ArroStateSection"
-              filter="property.ArroStateFilter"
+              class="property.ArroStepSection"
+              filter="property.ArroStepFilter"
               id="arro.state.section"
-              tab="arro.main.tab">
+              tab="arro.step.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroStateEntrySection"
+              filter="property.ArroStepFilter"
+              id="arro.state-entry.section"
+              tab="arro.state-entry.tab">
           </propertySection>
           <propertySection
               class="property.ArroConditionSection"

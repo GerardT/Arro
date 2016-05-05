@@ -107,7 +107,10 @@ public class EditingSupportForSelection extends EditingSupport {
 		IUndoableOperation operation = new DeltaInfoOperation((element), acceptedValues[i]);
 		operation.addContext(paramEditor.getUndoContext());
 		try {
-			paramEditor.getOperationHistory().execute(operation, null, null);
+		    String tmp = gs.getText(element);
+		    if(!tmp.equals(acceptedValues[i])) {
+		        paramEditor.getOperationHistory().execute(operation, null, null);
+		    }
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

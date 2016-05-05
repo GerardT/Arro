@@ -10,8 +10,8 @@ import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 import arro.Constants;
 import arro.domain.ArroModule;
 import arro.domain.ArroNode;
-import arro.domain.ArroState;
-import arro.domain.ArroStateDiagram;
+import arro.domain.ArroStep;
+import arro.domain.ArroSequenceChart;
 import arro.editors.StateDiagramEditor;
 import util.Logger;
 
@@ -47,7 +47,7 @@ public class SynchronizationDeleteFeature extends DefaultDeleteFeature implement
 	@Override
 	protected void deleteBusinessObject(Object bo) {
 		if(bo instanceof ArroNode) {
-			ArroState obj = (ArroState)bo;
+			ArroStep obj = (ArroStep)bo;
 			
 			obj.getParent().removeState(obj);
 			
@@ -62,7 +62,7 @@ public class SynchronizationDeleteFeature extends DefaultDeleteFeature implement
 		Logger.out.trace(Logger.EDITOR, "undo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
         context.putProperty(Constants.PROP_REDO_NODE_KEY, domainModule.getStateDiagram().clone());
 		Object undo = context.getProperty(Constants.PROP_UNDO_NODE_KEY);
-		domainModule.setStateDiagram((ArroStateDiagram) undo);
+		domainModule.setStateDiagram((ArroSequenceChart) undo);
 		
 //        context.putProperty(Constants.PROP_REDO_CONNECTION_KEY, domainModule.cloneConnectionList());
 //		undoList = context.getProperty(Constants.PROP_UNDO_CONNECTION_KEY);
@@ -81,7 +81,7 @@ public class SynchronizationDeleteFeature extends DefaultDeleteFeature implement
 		Logger.out.trace(Logger.EDITOR, "redo " + context.getProperty(Constants.PROP_UNDO_NODE_KEY));
         context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.getStateDiagram().clone());
 		Object redo = context.getProperty(Constants.PROP_REDO_NODE_KEY);
-		domainModule.setStateDiagram((ArroStateDiagram) redo);
+		domainModule.setStateDiagram((ArroSequenceChart) redo);
 		
 //        context.putProperty(Constants.PROP_UNDO_CONNECTION_KEY, domainModule.cloneConnectionList());
 //		redoList = context.getProperty(Constants.PROP_REDO_CONNECTION_KEY);

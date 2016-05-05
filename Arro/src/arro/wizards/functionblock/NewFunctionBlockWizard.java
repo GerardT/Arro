@@ -41,9 +41,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
 import arro.Constants;
-import arro.domain.ArroNode;
-import arro.domain.ArroStateDiagram;
 import arro.domain.ArroModule;
+import arro.domain.ArroSequenceChart;
 import arro.wizards.FileService;
 
 /**
@@ -61,7 +60,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 	private NewFunctionBlockWizardPage page;
 	private ISelection selection;
 	private ArroModule nodeDiagram;
-	private ArroStateDiagram stateNode;
+	private ArroSequenceChart stateNode;
 
 
 
@@ -143,7 +142,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 		}
 		
 		nodeDiagram = new ArroModule();
-        stateNode = new ArroStateDiagram();
+        stateNode = new ArroSequenceChart();
         nodeDiagram.setStateDiagram(stateNode);
 
 		final IFile file = f.getFile(new Path(fileName));

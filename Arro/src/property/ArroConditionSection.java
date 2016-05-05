@@ -1,34 +1,33 @@
 package property;
 
-import java.util.ArrayList;
-
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
+import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
-import arro.domain.ArroCondition;
 import arro.domain.ArroTransition;
 
 public class ArroConditionSection extends ArroGenericSection {
 
-	private TableViewer viewer;
-	private ArrayList<ArroCondition> conditions = new ArrayList<ArroCondition>();
-    @SuppressWarnings("unused")
-	private boolean listenerFlag = false;  // unused since we don't have listeners on property.
+    private Text nameTextVal;
+    private CLabel valueLabel;
+    private String name = "";
+    private boolean listenerFlag = false;
 
     /**
      * Note: createControls is not called between selection PE of same type (e.g. transition).
@@ -37,125 +36,35 @@ public class ArroConditionSection extends ArroGenericSection {
     public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
         super.createControls(parent, tabbedPropertySheetPage);
 
-		
-		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
-				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
-		
-		addLayout(parent, viewer.getControl());
-		
-		// first column is for the type
-		TableViewerColumn col1 = createTableViewerColumn("Node", 200, 0);
-		ColumnLabelStrategy cls1 = new ColumnLabelStrategy() {
-			@Override
-			public String getText(Object element) {
-				return ((ArroCondition)element).getName();
-			}
-			@Override
-			public void setText(String value, Object element) {
-				((ArroCondition)element).setName(value);
-			}
-			@Override
-			public String[] getAcceptedValues(Object element) {
-				return getAcceptedNodeNames((ArroCondition)element);
-			}
+        TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
+        Composite composite = factory.createFlatFormComposite(parent);
 
-		};
-		col1.setLabelProvider(cls1);
-	    col1.setEditingSupport(new EditingSupportForSelection(viewer, this, cls1));
-		
-		TableViewerColumn col2 = createTableViewerColumn("Step", 200, 1);
-		ColumnLabelStrategy cls2 = new ColumnLabelStrategy() {
-			@Override
-			public String getText(Object element) {
-				return ((ArroCondition)element).getState();
-			}
-			@Override
-			public void setText(String value, Object element) {
-				((ArroCondition)element).setState(value);
-			}
-			@Override
-			public String[] getAcceptedValues(Object element) {
-				return getAcceptedStateNames((ArroCondition)element);
-			}
+        valueLabel = factory.createCLabel(composite, "Condition:");
+        nameTextVal = factory.createText(composite, "");
 
-		};
-		col2.setLabelProvider(cls2);
-	    col2.setEditingSupport(new EditingSupportForSelection(viewer, this, cls2));
+        addLayout(parent);
 
-		
-		final Table table = viewer.getTable();
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+        nameTextVal.addModifyListener(new ModifyListener() {
 
-		// ArrayContentProvider handles objects in arrays. For each element in the
-		// table ColumnsLabelProvider.getText is called to provide content.
-		viewer.setContentProvider(new ArrayContentProvider());
-		
-		// get the content for the viewer, setInput will call getElements in the contentProvider
-		viewer.setInput(conditions);
-		
-		// make the selection available to other views - but causes trouble!!
-		//getSite().setSelectionProvider(viewer);
+            public void modifyText(ModifyEvent e) {
+                //name = Misc.checkString(nameTextVal);
+                name = nameTextVal.getText();
+                
+                if(listenerFlag) {
+                    if(!name.equals("") && updateDomainAndPE()) {
+                        nameTextVal.setBackground(null);
+                    } else {
+                        // show error indication
+                        Display display = Display.getCurrent();
+                        Color color = display.getSystemColor(SWT.COLOR_RED);
+                        nameTextVal.setBackground(color);
+                    }
+                }
+            }
+        });
     }
     
-    private String[] getAcceptedNodeNames(ArroCondition cond) {
-       	String[] ret = { "_this" };
-	    PictogramElement pe = getSelectedPictogramElement();
-	    
-	    if (pe != null) {
-            ArroTransition n = getTransition(pe);
-            ArrayList<String> list = n.getParent().getParent().getNodeNames();
-            list.add(0, "_this");
-
-    		ret = list.toArray(new String[list.size()]);
-	    }
-    	
-    	return ret;
-    }
     
-    private String[] getAcceptedStateNames(ArroCondition cond) {
-       	String[] ret = { "" };
-    	String name = cond.getName(); // node name
-    	
-    	if(name.equals("")) {
-    		return ret;
-    	}
-    	
-	    PictogramElement pe = getSelectedPictogramElement();
-	    
-	    if (pe != null) {
-            ArroTransition n = getTransition(pe);
-            try {
-				ArrayList<String> list = n.getParent().getParent().getNodeByName(name).getAssociatedModule().getStateNames();
-
-				ret = list.toArray(new String[list.size()]);
-			} catch (RuntimeException e) {
-				return ret;
-			}
-	    }
-    	
-    	return ret;
-    }
-    
-    /**
-     * Create a column for the table viewer. Column is now associated with
-     * this viewer.
-     * 
-     * @param title
-     * @param bound
-     * @param colNumber
-     * @return
-     */
-	private TableViewerColumn createTableViewerColumn(String title, int bound, final int colNumber) {
-		final TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
-		final TableColumn column = viewerColumn.getColumn();
-		column.setText(title);
-		column.setWidth(bound);
-		column.setResizable(true);
-		column.setMoveable(true);
-		return viewerColumn;
-	}
-
 	/**
 	 * Refresh the contents of the control - sync properties with domain info.
 	 * Since this may trigger the listener(s) attached, we prevent that using
@@ -163,47 +72,53 @@ public class ArroConditionSection extends ArroGenericSection {
 	 */
     @Override
     public void refresh() {
-	    PictogramElement pe = getSelectedPictogramElement();
-	    
-	    if (pe != null) {
+        PictogramElement pe = getSelectedPictogramElement();
+        if (pe != null) {
             ArroTransition n = getTransition(pe);
-			
-			if (n != null) {
+
+            if (n != null) {
+                // Make sure to first read these variables from domain
+                name = n.getCondition() == null ? "" : n.getCondition();
+
                 // Temp disable listener; listener only needed if user does types new value.
                 listenerFlag = false;
 
-				conditions.clear();
-		    	conditions.addAll(n.getConditions());
-		    	if(!conditions.contains(new ArroCondition("", ""))) {
-					conditions.add(new ArroCondition("", ""));
-		    	}
-		    	
-		    	listenerFlag = true;
-			}
-	    }
-	    viewer.refresh();
-
+                if(!(name.equals(nameTextVal))) {
+                    nameTextVal.setText(name);
+                }
+                listenerFlag = true;
+            }
+        }
     }
+
     /**
      * Provide layout and listeners for the controls.
      * 
      * @param parent
      */
-    private void addLayout(Composite parent, Control control) {
-		GridLayout layout = new GridLayout(2, false);
-		parent.setLayout(layout);
+    private void addLayout(Composite parent) {
+        FormData data;
 
-		// define layout for the viewer
-		GridData gridData = new GridData();
-		gridData.verticalAlignment = GridData.FILL;
-		gridData.horizontalSpan = 2;
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.grabExcessVerticalSpace = true;
-		gridData.horizontalAlignment = GridData.FILL;
-		control.setLayoutData(gridData);
-		
+        // http://www.eclipse.org/forums/index.php/t/202738/
+        final FormLayout layout = new FormLayout();
+        layout.marginWidth = 4;
+        layout.marginHeight = 0;
+        layout.spacing = 10;//100;
+        parent.setLayout(layout);
+
+        data = new FormData();
+        data.left = new FormAttachment(0, 0);
+        data.top = new FormAttachment(nameTextVal, 0, SWT.CENTER);
+        valueLabel.setLayoutData(data);
+
+        data = new FormData();
+        data.left = new FormAttachment(valueLabel, 0);
+        //data.right = new FormAttachment(100, 0);
+        data.right = new FormAttachment(50, 0);
+        data.top = new FormAttachment(0, VSPACE);
+        data.width = SWT.BORDER;
+        nameTextVal.setLayoutData(data);
     }
-
 
     
     // Use a class so we can declare it as final and use as closure.
@@ -220,6 +135,7 @@ public class ArroConditionSection extends ArroGenericSection {
      * @return true if domain object (referenced by PE) was updated successfully.
      */
     private boolean updateDomainAndPE() {
+        final String currentName = name;
         final Args x = new Args();
         
         IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
@@ -235,14 +151,7 @@ public class ArroConditionSection extends ArroGenericSection {
                     x.success = true;
                     
                     // Update the domain object
-                    ArrayList<ArroCondition> current = n.getConditions();
-                    current.clear();
-                    current.addAll(conditions);
-                   
-//                    // Then sync PE with domain object
-//                    UpdateContext updateContext = new UpdateContext(pe);
-//                    IUpdateFeature updateFeature = getFeatureProvider().getUpdateFeature(updateContext);
-//                    updateFeature.update(updateContext);
+                    n.setCondition(currentName);
                 }
 
             }
@@ -267,7 +176,7 @@ public class ArroConditionSection extends ArroGenericSection {
 
 	@Override
 	public void update() {
-		updateDomainAndPE();
+//		updateDomainAndPE();
 		refresh();
 	}
 }

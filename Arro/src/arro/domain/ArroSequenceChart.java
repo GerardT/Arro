@@ -10,24 +10,24 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class ArroStateDiagram extends NonEmfDomainObject {
+public class ArroSequenceChart extends NonEmfDomainObject {
 
 	private String nodeType;
-	private HashMap<String, ArroState> states = new HashMap<String, ArroState>();
+	private HashMap<String, ArroStep> states = new HashMap<String, ArroStep>();
 	private HashMap<String, ArroTransition> transitions = new HashMap<String, ArroTransition>();
 	private ArroModule parent;
 	
 	@SuppressWarnings("unchecked")
-	public ArroStateDiagram clone() {
-		ArroStateDiagram diag = new ArroStateDiagram();
-		diag.states = (HashMap<String, ArroState>) states.clone();
+	public ArroSequenceChart clone() {
+		ArroSequenceChart diag = new ArroSequenceChart();
+		diag.states = (HashMap<String, ArroStep>) states.clone();
 		diag.transitions = (HashMap<String, ArroTransition>) transitions.clone();
 		diag.nodeType = nodeType;
 		diag.parent = parent;
 		return diag;		
 	}
 	
-	public void addState(ArroState newState) {
+	public void addState(ArroStep newState) {
 		states.put(newState.getName(), newState);
 		newState.setParent(this);
 	}
@@ -60,8 +60,8 @@ public class ArroStateDiagram extends NonEmfDomainObject {
 		attr.setValue(getType());
 		elt.setAttributeNode(attr);
 		
-		Collection<ArroState> st = states.values();
-		for(ArroState state: st) {
+		Collection<ArroStep> st = states.values();
+		for(ArroStep state: st) {
 			
 			Element sub = doc.createElement("step");
 			elt.appendChild(sub);
@@ -89,7 +89,7 @@ public class ArroStateDiagram extends NonEmfDomainObject {
     		
 			if(sub.getNodeName().equals("step")) {
 	    		Element eSubElement = (Element) sub;
-	    		ArroState state = new ArroState();
+	    		ArroStep state = new ArroStep();
 	    		
 	    		state.xmlRead(eSubElement);
 	    		
@@ -106,11 +106,11 @@ public class ArroStateDiagram extends NonEmfDomainObject {
     	}
    	}
 
-	public ArroState getStateByName(String instanceName) {
+	public ArroStep getStateByName(String instanceName) {
 		return states.get(instanceName);
 	}
 
-	public void removeState(ArroState obj) {
+	public void removeState(ArroStep obj) {
 		states.remove(obj.getName());
 	}
 
@@ -132,8 +132,8 @@ public class ArroStateDiagram extends NonEmfDomainObject {
 	public ArrayList<String> getStateNames() {
 		ArrayList<String> list = new ArrayList<String>();
 		
-		Collection<ArroState> values = states.values();
-		for(ArroState state: values){
+		Collection<ArroStep> values = states.values();
+		for(ArroStep state: values){
 			list.add(state.getName());
 		}
 		return list;

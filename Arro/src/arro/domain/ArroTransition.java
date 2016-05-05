@@ -1,27 +1,27 @@
 package arro.domain;
 
-import java.util.ArrayList;
-
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
 public class ArroTransition extends NonEmfDomainObject {
-	private ArroStateDiagram parent;
-	private ArrayList<ArroCondition> conditions = new ArrayList<ArroCondition>();
+	private ArroSequenceChart parent;
+	private String condition = new String();
 	
 	
-	public ArroStateDiagram getParent() {
+	public ArroSequenceChart getParent() {
 		return parent;
 	}
-	public void setParent(ArroStateDiagram parent) {
+	public void setParent(ArroSequenceChart parent) {
 		this.parent = parent;
 	}
-	public ArrayList<ArroCondition> getConditions() {
-		return conditions;
+	public String getCondition() {
+		return condition;
+	}
+	public void setCondition(String condition) {
+		this.condition = condition;
 	}
 	
 	public void xmlWrite(Document doc, Element elt) {
@@ -35,38 +35,18 @@ public class ArroTransition extends NonEmfDomainObject {
 		attr.setValue(getName());
 		elt.setAttributeNode(attr);
 		
-		for(ArroCondition condition: conditions) {
-			
-			Element sub = doc.createElement("condition");
-			elt.appendChild(sub);
-			
-			condition.xmlWrite(doc, sub);
-		}
+		attr = doc.createAttribute("condition");
+		attr.setValue(getCondition());
+		elt.setAttributeNode(attr);
 	}
+	
 	public void xmlRead(Node nNode) {
 		Element eElement = (Element) nNode;
     	setId(eElement.getAttribute("id"));
     	setName(eElement.getAttribute("name"));
-    	
-    	NodeList nList = nNode.getChildNodes();
-    	for (int temp = 0; temp < nList.getLength(); temp++) {
-    		Node sub = nList.item(temp);
-    		
-			if(sub.getNodeName().equals("condition")) {
-	    		Element eSubElement = (Element) sub;
-	    		ArroCondition condition = new ArroCondition();
-	    		
-	    		condition.xmlRead(eSubElement);
-	    		
-	    		addCondition(condition);
-			}
-    	}
+    	setCondition(eElement.getAttribute("condition"));
 	}
 	
-	private void addCondition(ArroCondition condition) {
-		conditions.add(condition);
-		condition.setParent(this);
-	}
 }
 
 

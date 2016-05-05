@@ -51,6 +51,9 @@ public class Constants {
 	public final static String PROP_TRUE_VALUE = "true";
 	public final static String PROP_FALSE_VALUE = "false";
 	
+	// Undo / redo property keys for domain module
+	public static final String PROP_DOMAIN_MODULE_KEY = "domain_node";  // domain diagram ID
+	
 	public static final String PROP_UNDO_NODE_KEY = "undo_node";
 	public static final String PROP_REDO_NODE_KEY = "redo_node";
 	public static final String PROP_UNDO_PAD_KEY = "undo_pad";
@@ -58,10 +61,17 @@ public class Constants {
 	public static final String PROP_UNDO_CONNECTION_KEY = "undo_connection";
 	public static final String PROP_REDO_CONNECTION_KEY = "redo_connection";
 	
-	public static final String PROP_DOMAIN_MODULE_KEY = "domain_node";  // domain diagram ID
 	public static final String PROP_PAD_NAME_KEY = "pad_name";
 	public static final Object PROP_SOURCE_PAD_KEY = "source_pad";
 	public static final Object PROP_TARGET_PAD_KEY = "target_pad";
+
+	// Undo / redo property keys for domain sfc
+	public static final String PROP_DOMAIN_SFC_KEY = "domain_sfc";  // domain diagram ID
+	
+	public static final String PROP_UNDO_SFC_KEY = "undo_sfc";
+	public static final String PROP_REDO_SFC_KEY = "redo_sfc";
+
+	
 	
 	// Pre-defined pad names used in SFCs
 	public static final String PROP_PAD_NAME_STEP_IN = "Step-in";

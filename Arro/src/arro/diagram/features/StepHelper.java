@@ -20,7 +20,7 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
 import arro.Constants;
-import arro.domain.ArroState;
+import arro.domain.ArroStep;
 import util.Logger;
 import util.WidgetUtil;
 
@@ -36,7 +36,7 @@ public class StepHelper {
 	// Can't make it a object attribute since this code is called from different
 	// contexts (so different object instances)!
 	
-	public ContainerShape create(IAddContext context, ArroState addedDomainObject, Color fg, Color bg) {
+	public ContainerShape create(IAddContext context, ArroStep addedDomainObject, Color fg, Color bg) {
 	    final int width = 200;
 	    final int height = 50;
 

@@ -7,7 +7,7 @@ import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 
 import arro.Constants;
 
-public class ArroStateFilter extends AbstractPropertySectionFilter {
+public class ArroStepFilter extends AbstractPropertySectionFilter {
 
     @Override
     protected boolean accept(PictogramElement pe) {

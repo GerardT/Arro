@@ -7,7 +7,7 @@ import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
-import arro.domain.ArroStateDiagram;
+import arro.domain.ArroSequenceChart;
 import arro.domain.ArroModule;
 
 /**
@@ -30,7 +30,7 @@ public class ArroIDAddFeature extends AbstractAddFeature implements IAddFeature 
 	public PictogramElement add(IAddContext context) {
 		Object d = context.getNewObject();
 		
-		if(d instanceof ArroModule || d instanceof ArroStateDiagram) {
+		if(d instanceof ArroModule || d instanceof ArroSequenceChart) {
 		    // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
 			link(getDiagram(), d);
 		}

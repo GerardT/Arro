@@ -48,8 +48,8 @@ import arro.diagram.features.TransitionCreateFeature;
 import arro.diagram.features.TransitionDeleteFeature;
 import arro.diagram.features.TransitionUpdateFeature;
 import arro.domain.ArroModule;
-import arro.domain.ArroState;
-import arro.domain.ArroStateDiagram;
+import arro.domain.ArroStep;
+import arro.domain.ArroSequenceChart;
 import arro.domain.ArroSynchronization;
 import arro.domain.ArroTransition;
 import arro.domain.POJOIndependenceSolver;
@@ -85,9 +85,9 @@ public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
 	public IAddFeature getAddFeature(IAddContext context) {
 		Logger.out.trace(Logger.EDITOR, " ");
 		if (context instanceof IAddContext && 
-				(context.getNewObject() instanceof ArroModule || context.getNewObject() instanceof ArroStateDiagram)) {
+				(context.getNewObject() instanceof ArroModule || context.getNewObject() instanceof ArroSequenceChart)) {
 			return new ArroIDAddFeature(this);
-		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroState) {
+		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep) {
 			return new StepAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroTransition) {
 			return new TransitionAddFeature(this);

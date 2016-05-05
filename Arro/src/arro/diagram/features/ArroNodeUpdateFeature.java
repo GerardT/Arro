@@ -13,29 +13,29 @@ import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
-import org.eclipse.graphiti.mm.algorithms.styles.AbstractStyle;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.services.IPeService;
 
-import util.Logger;
-import util.WidgetUtil;
 import arro.Constants;
 import arro.domain.ArroNode;
 import arro.domain.ArroPad;
 import arro.domain.NonEmfDomainObject;
 import arro.domain.POJOIndependenceSolver;
+import util.Logger;
+import util.WidgetUtil;
 
 /**
  * The behavior of the update is straight forward, when the user is changing the domain data
  * directly via the diagram. For example if the user changes a text in the diagram using
  * direct-editing or the property-sheet, then this text should be changed in the diagram immediately.
+ * 
+ * TODO: implement undo to keep model and diagram in sync!
  * 
  */
 public class ArroNodeUpdateFeature  extends DefaultUpdateDiagramFeature {

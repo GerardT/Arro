@@ -13,7 +13,7 @@ import org.eclipse.graphiti.platform.IDiagramContainer;
 
 import arro.Constants;
 import arro.domain.ArroModule;
-import arro.domain.ArroState;
+import arro.domain.ArroStep;
 import arro.editors.StateDiagramEditor;
 import util.Logger;
 
@@ -27,7 +27,7 @@ public class StepAddFeature extends AbstractAddFeature implements IAddFeature, I
 
 	public boolean canAdd(IAddContext context) {
 		// TODO: check for right domain object instance below
-		return (context.getNewObject() instanceof ArroState && context.getTargetContainer() instanceof Diagram);
+		return (context.getNewObject() instanceof ArroStep && context.getTargetContainer() instanceof Diagram);
 	}
 
 	/**
@@ -43,11 +43,11 @@ public class StepAddFeature extends AbstractAddFeature implements IAddFeature, I
         
   		Object obj = context.getNewObject();
 		
-        if(!(obj instanceof ArroState)) {
+        if(!(obj instanceof ArroStep)) {
         	return null;
         }
         
-        ArroState addedDomainObject = (ArroState)obj;
+        ArroStep addedDomainObject = (ArroStep)obj;
         
         String instanceName = "a" + "Step";
         while(domainModule.getStateDiagram().getStateByName(instanceName) != null) {

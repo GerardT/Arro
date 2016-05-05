@@ -25,12 +25,12 @@ public class ArroModule extends NonEmfDomainObject  {
 	private HashMap<String, ArroPad> pads = new HashMap<String, ArroPad>();
 	private HashMap<String, ArroConnection> connections = new HashMap<String, ArroConnection>();
 	private String type;
-	private ArroStateDiagram stateDiagram;
+	private ArroSequenceChart stateDiagram;
 	
 	public ArroModule() {
 		super();
 		// should only be one state diagram.
-		stateDiagram = new ArroStateDiagram();
+		stateDiagram = new ArroSequenceChart();
 	}
 	
 	/*
@@ -168,11 +168,11 @@ public class ArroModule extends NonEmfDomainObject  {
 	/*
 	 * StateDiagram functions: get / set
 	 */
-	public ArroStateDiagram getStateDiagram() {
+	public ArroSequenceChart getStateDiagram() {
 		return stateDiagram;
 	}
 
-	public void setStateDiagram(ArroStateDiagram diag) {
+	public void setStateDiagram(ArroSequenceChart diag) {
 		stateDiagram = diag;
 		stateDiagram.setParent(this);
 	}
