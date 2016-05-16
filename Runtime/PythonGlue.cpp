@@ -13,6 +13,7 @@ PythonGlue::PythonGlue():
     pDict(nullptr),
     pDictApi(nullptr)
 {
+	trace.println("Instantiating PythonGlue.");
     if(instance) {
         trace.fatal("Tried to instantiate PythonGlue more than once.");
     }
@@ -34,7 +35,7 @@ PythonGlue::PythonGlue():
     Py_DECREF(dot);
 
     if(loadModule() == nullptr) {
-
+        instance = nullptr;
         throw std::runtime_error("Failed to load");
     }
 
@@ -47,6 +48,8 @@ PythonGlue::PythonGlue():
 
 PythonGlue::~PythonGlue() {
     instance = nullptr;
+
+	trace.println("Deleting PythonGlue.");
 
     /*
      * Cleanup for Python -> C.

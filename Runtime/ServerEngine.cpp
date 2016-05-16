@@ -58,12 +58,14 @@ static int readln(int sockfd, char* buffer, size_t n/*size*/) {
                 continue;
             else {
                 // Make losing socket to terminate process.
+            	trace.println("ServerEngine losing socket, terminated!");
                 strcpy(buffer, "terminate");
                 return strlen("terminate");
             }
 
         } else if (numRead == 0) {      /* EOF */
             if (totRead == 0) {         /* No bytes read */
+            	trace.println("ServerEngine terminated!\n");
                 strcpy(buffer, "terminate");
                 return strlen("terminate");
             }
@@ -90,8 +92,10 @@ static int readln(int sockfd, char* buffer, size_t n/*size*/) {
  */
 static void cleanup()
 {
+	trace.println("Cleanup");
 	if(nodeDb) {
         /* 1: stop message flow */
+		trace.println("-- nodeDb");
         nodeDb->stop();
 
         /* 2: delete node database */
@@ -101,12 +105,14 @@ static void cleanup()
 
     /* 3: stop python */
     if(pg) {
+		trace.println("-- PythonGlue");
         delete pg;
         pg = nullptr;
     }
 
     /* 4: close socket - probably already closed by Eclipse client */
     if(newsockfd != -1) {
+		trace.println("-- socket");
         close(newsockfd);
         newsockfd = -1;
     }
@@ -243,6 +249,7 @@ static void server()
                         nodeDb->start();
                         ServerEngine::console("run successful");
                     } catch ( const std::runtime_error& e ) {
+                    	trace.println("Instantiating PythonGlue failed");
                     	cleanup();
 
                         ServerEngine::console("run failed");

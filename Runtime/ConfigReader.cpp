@@ -22,14 +22,16 @@ ConfigReader::ConfigReader(const string& filename, NodeDb& db):
 
     TiXmlDocument doc(filename);
     if (!doc.LoadFile()) {
-        trace.fatal("Cannot read file " + filename);
+        trace.println("Cannot read file " + filename);
+        throw std::runtime_error("Cannot read file " + filename);
         return;
     }
 
     TiXmlElement* node = doc.FirstChildElement("diagrams");
 
     if(!node) {
-        trace.fatal("node 'diagrams' missing");
+        trace.println("node 'diagrams' missing");
+        throw std::runtime_error("node 'diagrams' missing");
     }
 
     // Collect all nodedefinition blocks and store them in map 'definitions'.
@@ -38,7 +40,6 @@ ConfigReader::ConfigReader(const string& filename, NodeDb& db):
         storeDefinition(elt);
         elt = elt->NextSiblingElement("nodedefinition");
     }
-    trace.println("");
 
     // Recursively process all nodedefinitions, starting with "Main"
     makeNodeInstance("Main", "main", "", *params);
@@ -57,7 +58,8 @@ ConfigReader::storeDefinition(TiXmlElement* node) {
         trace.println(string("Added definition ") + attr);
     }
     else {
-        trace.fatal("No type found? ");
+        trace.println("No type found? ");
+        throw std::runtime_error("No type definition for " + string(attr));
     }
 }
 
@@ -83,7 +85,8 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
             }
         }
         else {
-            trace.fatal("faulty parameter block");
+            trace.println("faulty parameter block");
+            throw std::runtime_error("faulty parameter block");
         }
         trace.println("updated parameter: key " + *keyAttr + ", value " + params[*keyAttr]);
         elt = elt->NextSiblingElement("param");
@@ -98,8 +101,9 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
     if(def == nullptr)
     {
-        trace.fatal("Element not found: " + typeName);
-        return;
+        ServerEngine::console("Element not found: " + typeName);
+        trace.println("Element not found: " + typeName);
+        throw std::runtime_error("Element not found: " + typeName);
     }
     string instance = instancePrefix + ARRO_NAME_SEPARATOR + instanceName;
 
