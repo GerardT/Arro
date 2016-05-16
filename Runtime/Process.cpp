@@ -24,7 +24,7 @@ Process::Process(NodeDb& db, const string& url, string& instance, ConfigReader::
     nodeDb(db),
     doRunCycle(false) {
 
-    trace.println("Creating instance of " + url + " parameters: ");
+    trace.println("Creating instance of " + url);
 
 
     getPrimitive(url, instance, params);
@@ -32,7 +32,7 @@ Process::Process(NodeDb& db, const string& url, string& instance, ConfigReader::
     std::map<std::string, std::string>::iterator iter;
 
     for (iter = params.begin(); iter != params.end(); ++iter) {
-        trace.println("    " + iter->first + " " + iter->second);
+        trace.println("    parameter " + iter->first + " " + iter->second);
 
         auto kv = new arro::KeyValuePair();
         kv->set_key(iter->first.c_str());
@@ -99,6 +99,8 @@ Process::getOutput(const string& name) {
 
 void
 Process::getPrimitive(const string& url, string& instance, ConfigReader::StringMap& params) {
+	device = nullptr;
+
     if(url.find("python:") == 0) {
         trace.println("new NodePython(" + instance + ")");
         try {

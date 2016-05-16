@@ -187,12 +187,15 @@ NodeDb::runCycle(NodeDb* nm) {
     } catch (std::runtime_error& e) {
     	// If exception, for instance Python (syntax) error, then thread exits here.
     	// User can stop NodeDb after that.
+        nm->trace.println("Execution failed, stopped");
     }
 }
 
 void
 NodeDb::start() {
     running = true;
+
+    trace.println("Starting ...");
 
     thrd = new thread(&NodeDb::runCycle, this);
 
@@ -202,6 +205,8 @@ NodeDb::start() {
 void
 NodeDb::stop() {
     if(running) {
+        trace.println("Stopping ...");
+
         running = false;
 
         condition.notify_one();
