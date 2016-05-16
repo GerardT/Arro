@@ -41,7 +41,7 @@ public class ArroMainTab  extends AbstractLaunchConfigurationTab {
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setContainer(null);
 	    configuration.setAttribute(Constants.ATTR_LAUNCH_IP_ADDRESS, "localhost");
-	    configuration.setAttribute(Constants.ATTR_LAUNCH_PROJECT, "");
+	    configuration.setAttribute(Constants.ATTR_LAUNCH_PROJECT, "<your project name>");
 	}
 
 	@Override

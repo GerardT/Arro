@@ -105,7 +105,7 @@ public class NewCodeBlockWizardPage extends WizardPage {
 		label.setText("&Code:");
 
 		language = new Combo(container, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
-		String items[] = {"Python", "Native"};
+		String items[] = {Constants.NODE_PYTHON, Constants.NODE_NATIVE};
 		language.setItems(items);
 		language.select(0);
 		language.addModifyListener(new ModifyListener() {

@@ -191,9 +191,9 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         if(zip.getMETA("type").equals(Constants.FUNCTION_BLOCK)) {
 			documentType = Constants.FunctionBlock;
 		} else if(zip.getMETA("type").equals(Constants.CODE_BLOCK)){
-	        if(zip.getMETA("language").equals("Python")) {
+	        if(zip.getMETA("language").equals(Constants.NODE_PYTHON)) {
 	        	documentType = Constants.CodeBlockPython;
-	        } else if(zip.getMETA("language").equals("Native")) {
+	        } else if(zip.getMETA("language").equals(Constants.NODE_NATIVE)) {
 		        documentType = Constants.CodeBlockNative;
 	        }
         }

@@ -206,6 +206,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
 	        	// close here in order to flush
 				stream.close();
 			}
+			if(language.equals(Constants.NODE_PYTHON))
 			{
 				// name the python file inside the zip file 
 		        out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName + ".py"));
