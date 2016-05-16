@@ -48,7 +48,6 @@ Process::Process(NodeDb& db, const string& url, string& instance, ConfigReader::
 }
 
 Process::~Process() {
-	printf("Deleting Process\n");
     delete device;
 }
 
@@ -100,6 +99,8 @@ Process::getOutput(const string& name) {
 
 void
 Process::getPrimitive(const string& url, string& instance, ConfigReader::StringMap& params) {
+	device = nullptr;
+
     if(url.find("python:") == 0) {
         trace.println("new NodePython(" + instance + ")");
         try {
