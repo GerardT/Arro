@@ -101,16 +101,16 @@ void
 Process::getPrimitive(const string& url, string& instance, ConfigReader::StringMap& params) {
 	device = nullptr;
 
-    if(url.find("python:") == 0) {
+    if(url.find("Python:") == 0) {
         trace.println("new NodePython(" + instance + ")");
         try {
             string className = url.substr(7);
             device = new NodePython(this, className, params);
         } catch(out_of_range &) {
-
+            throw std::runtime_error("Invalid URL " + url);
         }
     }
-    else if(url.find("native:") == 0) {
+    else if(url.find("Native:") == 0) {
         try {
             string className = url.substr(7);
 
@@ -147,6 +147,10 @@ Process::getPrimitive(const string& url, string& instance, ConfigReader::StringM
         } catch(out_of_range &) {
             trace.println("native node not found");
         }
+    }
+    if(device == nullptr) {
+        trace.println("Node module not found " + url);
+        throw std::runtime_error("Node module not found " + url);
     }
 }
 

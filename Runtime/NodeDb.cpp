@@ -175,7 +175,11 @@ NodeDb::runCycle(NodeDb* nm) {
         	} // make sure mutex is unlocked here
 
             /* Then trigger all runCycle methods on nodes */
-            for_each(nm->allNodes.begin(), nm->allNodes.end(), [&](pair<string, AbstractNode*> n) { n.second->runCycle(); });
+			try {
+				for_each(nm->allNodes.begin(), nm->allNodes.end(), [&](pair<string, AbstractNode*> n) { n.second->runCycle(); });
+			} catch (std::runtime_error& e) {
+		        nm->trace.println("Error "+ string(e.what()));
+			}
 
             {
                 std::unique_lock<std::mutex> lock(nm->mutex);
@@ -187,7 +191,7 @@ NodeDb::runCycle(NodeDb* nm) {
     } catch (std::runtime_error& e) {
     	// If exception, for instance Python (syntax) error, then thread exits here.
     	// User can stop NodeDb after that.
-        nm->trace.println("Execution failed, stopped");
+        nm->trace.println("Execution stopped, error " + string(e.what()));
     }
 }
 
