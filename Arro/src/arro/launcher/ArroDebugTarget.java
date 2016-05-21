@@ -1,5 +1,6 @@
 package arro.launcher;
 
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -33,6 +34,7 @@ public class ArroDebugTarget implements IDebugTarget {
 			try {
 				IResource[] members = build.members();
 				
+				// FTP all the stuff in Build directory
 				for(IResource r: members) {
 					IFile file;
 					
@@ -42,41 +44,22 @@ public class ArroDebugTarget implements IDebugTarget {
 					
 					engine.filterReply("put");
             	}
-			} catch (CoreException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-//			IFile file;
-//			
-//			file = build.getFile("arro.proto");
-//			
-//			engine.sendFile(file);
-//			
-//			engine.filterReply("put");
-//			
-//			file = build.getFile("arro_pgm.py");
-//			
-//			engine.sendFile(file);
-//			
-//			engine.filterReply("put");
-//			
-//			file = build.getFile("arro.xml");
-//		
-//			engine.sendFile(file);
-//			
-//			engine.filterReply("put");
-//			
-			engine.remoteCmd("protobuf");
+    			engine.remoteCmd("protobuf");
 			 
-			engine.filterReply("protobuf");
+                engine.filterReply("protobuf");
 
-			engine.remoteCmd("run");
-			 
-			engine.filterReply("run");
-			
-			engine.startSocketReader();
-
-			terminated = false;
+    			engine.remoteCmd("run");
+    			 
+    			engine.filterReply("run");
+    			
+    			engine.startSocketReader();
+    
+    			terminated = false;
+            } catch (ExecutionException e) {
+                Logger.writeToConsole("Lost socket: could not download");
+            } catch (CoreException e) {
+                Logger.writeToConsole("Error: could not download");
+            }
 		}
 	}
 	

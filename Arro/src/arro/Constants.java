@@ -112,6 +112,9 @@ public class Constants {
 	public static String FOLDER_DIAGRAMS = "diagrams";
 	public static String FOLDER_MESSAGES = "messages";
 
+	
+    public static String NODE_PYTHON = "Python";
+    public static String NODE_NATIVE = "Native";
 
 
 

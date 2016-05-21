@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -145,18 +146,23 @@ class TCPClient
 	}
 
 		
-	public void filterReply(String filterString) {
+	public void filterReply(String filterString) throws ExecutionException {
 		while(true) {
 			String s;
 			try {
 				s = readln();
+				if(s == null) {
+				    Logger.writeToConsole("Lost socket");
+                    throw new ExecutionException("Lost socket", null);
+				}
 				Logger.writeToConsole(s);
 				if(s.contains(filterString)) {
 					return;
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Logger.writeToConsole("Did not receive expected string: " + filterString);
+                throw new ExecutionException("Lost socket", null);
 			}
 		}
 	}
