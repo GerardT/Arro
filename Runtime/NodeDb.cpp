@@ -175,11 +175,7 @@ NodeDb::runCycle(NodeDb* nm) {
         	} // make sure mutex is unlocked here
 
             /* Then trigger all runCycle methods on nodes */
-			try {
-				for_each(nm->allNodes.begin(), nm->allNodes.end(), [&](pair<string, AbstractNode*> n) { n.second->runCycle(); });
-			} catch (std::runtime_error& e) {
-		        nm->trace.println("Error "+ string(e.what()));
-			}
+			for_each(nm->allNodes.begin(), nm->allNodes.end(), [&](pair<string, AbstractNode*> n) { n.second->runCycle(); });
 
             {
                 std::unique_lock<std::mutex> lock(nm->mutex);
