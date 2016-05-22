@@ -46,6 +46,7 @@ class TCPClient
 			return new Result(true);
 		} catch (IOException e) {
 			Logger.out.trace(Logger.ERROR, "Failed to connect");
+			close();
 			return new Result(false);
 		}
 	}
@@ -55,7 +56,10 @@ class TCPClient
 	 */
 	public void close() {
 		try {
-			clientSocket.close();
+            if(clientSocket != null) {
+                clientSocket.close();
+                clientSocket = null;
+            }
 		} catch (IOException e) {
 		    Logger.out.trace(Logger.ERROR, "Could not close socket");
 		}

@@ -58,342 +58,344 @@ import arro.wizards.FileService;
  */
 
 public class NewCodeBlockWizard extends Wizard implements INewWizard {
-	private NewCodeBlockWizardPage page;
-	private ISelection selection;
-	private ArroModule nodeDiagram;
-	private ArroDevice device;
-	private ArroSequenceChart stateNode;
-	
+    private NewCodeBlockWizardPage page;
+    private ISelection selection;
+    private ArroModule nodeDiagram;
+    private ArroDevice device;
+    private ArroSequenceChart stateNode;
+    
 
 
-	/**
-	 * Constructor for SampleNewWizard.
-	 */
-	public NewCodeBlockWizard() {
-		super();
-		setNeedsProgressMonitor(true);
-	}
-	
-	/**
-	 * Adding the page to the wizard.
-	 */
+    /**
+     * Constructor for SampleNewWizard.
+     */
+    public NewCodeBlockWizard() {
+        super();
+        setNeedsProgressMonitor(true);
+    }
+    
+    /**
+     * Adding the page to the wizard.
+     */
 
-	public void addPages() {
-		page = new NewCodeBlockWizardPage(selection);
-		addPage(page);
-	}
+    public void addPages() {
+        page = new NewCodeBlockWizardPage(selection);
+        addPage(page);
+    }
 
-	/**
-	 * This method is called when 'Finish' button is pressed in
-	 * the wizard. We will create an operation and run it
-	 * using wizard as execution context.
-	 */
-	public boolean performFinish() {
-		final String containerName = page.getContainerName();
-		final String fileName = page.getFileName();
-		final String language = page.getLanguage();
+    /**
+     * This method is called when 'Finish' button is pressed in
+     * the wizard. We will create an operation and run it
+     * using wizard as execution context.
+     */
+    public boolean performFinish() {
+        final String containerName = page.getContainerName();
+        final String fileName = page.getFileName();
+        final String language = page.getLanguage();
 
-		IRunnableWithProgress op = new IRunnableWithProgress() {
-			public void run(IProgressMonitor monitor) throws InvocationTargetException {
-				try {
-					doFinish(containerName, fileName, language, monitor);
-				} catch (CoreException e) {
-					throw new InvocationTargetException(e);
-				} finally {
-					monitor.done();
-				}
-			}
-		};
-		try {
-			getContainer().run(true, false, op);
-		} catch (InterruptedException e) {
-			return false;
-		} catch (InvocationTargetException e) {
-			Throwable realException = e.getTargetException();
-			MessageDialog.openError(getShell(), "Error", realException.getMessage());
-			return false;
-		}
-		return true;
-	}
-	
-	/**
-	 * The worker method. It will find the container, create the
-	 * file if missing or just replace its contents, and open
-	 * the editor on the newly created file.
-	 */
+        IRunnableWithProgress op = new IRunnableWithProgress() {
+            public void run(IProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    doFinish(containerName, fileName, language, monitor);
+                } catch (CoreException e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        try {
+            getContainer().run(true, false, op);
+        } catch (InterruptedException e) {
+            return false;
+        } catch (InvocationTargetException e) {
+            Throwable realException = e.getTargetException();
+            MessageDialog.openError(getShell(), "Error", realException.getMessage());
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * The worker method. It will find the container, create the
+     * file if missing or just replace its contents, and open
+     * the editor on the newly created file.
+     */
 
-	private void doFinish(String containerName,	String nodeName, String language, IProgressMonitor monitor) throws CoreException {
-		// create a sample file
-		monitor.beginTask("Creating " + nodeName, 2);
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IResource resource = root.findMember(new Path(containerName));
-		if (!resource.exists() || !(resource instanceof IContainer)) {
-			throwCoreException("Container \"" + containerName + "\" does not exist.");
-		}
-		String fileName = nodeName + "." + arro.Constants.NODE_EXT;
-		
-		IFolder f = null;
-		if(resource instanceof IProject) {
-			f = ((IProject)resource).getFolder(Constants.FOLDER_DEVICES);
-			try {
-				f.create(false, true, null);
-			} catch (CoreException e) {
-				// Ignore if already exists..
-			}
-		} else {
-			throwCoreException("Container \"" + containerName + "\" is not a project.");
-		}
-		nodeDiagram = new ArroModule();
+    private void doFinish(String containerName,    String nodeName, String language, IProgressMonitor monitor) throws CoreException {
+        // create a sample file
+        monitor.beginTask("Creating " + nodeName, 2);
+        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IResource resource = root.findMember(new Path(containerName));
+        if (!resource.exists() || !(resource instanceof IContainer)) {
+            throwCoreException("Container \"" + containerName + "\" does not exist.");
+        }
+        String fileName = nodeName + "." + arro.Constants.NODE_EXT;
+        
+        IFolder f = null;
+        if(resource instanceof IProject) {
+            f = ((IProject)resource).getFolder(Constants.FOLDER_DEVICES);
+            try {
+                f.create(false, true, null);
+            } catch (CoreException e) {
+                // Ignore if already exists..
+            }
+        } else {
+            throwCoreException("Container \"" + containerName + "\" is not a project.");
+        }
+        nodeDiagram = new ArroModule();
         stateNode = new ArroSequenceChart();
         nodeDiagram.setStateDiagram(stateNode);
 
-		final IFile file = f.getFile(new Path(fileName));
-		try {
-			// Create a zip file...
-			
-			ByteArrayOutputStream bao = new ByteArrayOutputStream();
-					
-			// works like a filter, writing to ZipOutputStream writes to Zip file (after selecting an entry).
-			ZipOutputStream out = new ZipOutputStream(bao);
-			{
+        final IFile file = f.getFile(new Path(fileName));
+        try {
+            // Create a zip file...
+            
+            ByteArrayOutputStream bao = new ByteArrayOutputStream();
+                    
+            // works like a filter, writing to ZipOutputStream writes to Zip file (after selecting an entry).
+            ZipOutputStream out = new ZipOutputStream(bao);
+            {
 
-		        // name the META file inside the zip file 
-		        out.putNextEntry(new ZipEntry("META"));
-		        
-		        // fill with initial data
-		        // Not very nice: we borrow the file for temporarily writing the diagram data into.
-		        // The file is actually used for storing the ZIP file
-				InputStream stream = openMETAStream(file, nodeName, language);
-		        byte[] b = new byte[1024];
-		        int count;
-	
-		        while ((count = stream.read(b)) > 0) {
-		            out.write(b, 0, count);
-		        }	        
-				stream.close();
-			}
-			{
+                // name the META file inside the zip file 
+                out.putNextEntry(new ZipEntry("META"));
+                
+                // fill with initial data
+                // Not very nice: we borrow the file for temporarily writing the diagram data into.
+                // The file is actually used for storing the ZIP file
+                InputStream stream = openMETAStream(file, nodeName, language);
+                byte[] b = new byte[1024];
+                int count;
+    
+                while ((count = stream.read(b)) > 0) {
+                    out.write(b, 0, count);
+                }            
+                stream.close();
+            }
+            {
 
-		        // name the file inside the zip file 
-		        out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName));
-		        
-		        // fill with initial data
-		        // Not very nice: we borrow the file for temporarily writing the diagram data into.
-		        // The file is actually used for storing the ZIP file
-				InputStream stream = openContentStream(file, nodeName);
-		        byte[] b = new byte[1024];
-		        int count;
-	
-		        while ((count = stream.read(b)) > 0) {
-		            out.write(b, 0, count);
-		        }	        
-				stream.close();
-			}
-			{
-				// name the xml file inside the zip file 
-		        out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName + ".xml"));
-		        
-		        // fill with initial data
-		        // Not very nice: we borrow the file for temporarily writing the diagram data into.
-		        // The file is actually used for storing the ZIP file
-				InputStream stream = openXmlStream(file, nodeName, language);
-		        byte[] b = new byte[1024];
-		        int count;
+                // name the file inside the zip file 
+                out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName));
+                
+                // fill with initial data
+                // Not very nice: we borrow the file for temporarily writing the diagram data into.
+                // The file is actually used for storing the ZIP file
+                InputStream stream = openContentStream(file, nodeName);
+                byte[] b = new byte[1024];
+                int count;
+    
+                while ((count = stream.read(b)) > 0) {
+                    out.write(b, 0, count);
+                }            
+                stream.close();
+            }
+            {
+                // name the xml file inside the zip file 
+                out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName + ".xml"));
+                
+                // fill with initial data
+                // Not very nice: we borrow the file for temporarily writing the diagram data into.
+                // The file is actually used for storing the ZIP file
+                InputStream stream = openXmlStream(file, nodeName, language);
+                byte[] b = new byte[1024];
+                int count;
 
-		        while ((count = stream.read(b)) > 0) {
-		            out.write(b, 0, count);
-		        }
-	        	// close here in order to flush
-				stream.close();
-			}
-			if(language.equals(Constants.NODE_PYTHON))
-			{
-				// name the python file inside the zip file 
-		        out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName + ".py"));
-		        
-		        // fill with initial data
-		        // Not very nice: we borrow the file for temporarily writing the diagram data into.
-		        // The file is actually used for storing the ZIP file
-				InputStream stream = openPythonStream(file, nodeName);
-		        byte[] b = new byte[1024];
-		        int count;
+                while ((count = stream.read(b)) > 0) {
+                    out.write(b, 0, count);
+                }
+                // close here in order to flush
+                stream.close();
+            }
+            if(language.equals(Constants.NODE_PYTHON))
+            {
+                // name the python file inside the zip file 
+                out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName + ".py"));
+                
+                // fill with initial data
+                // Not very nice: we borrow the file for temporarily writing the diagram data into.
+                // The file is actually used for storing the ZIP file
+                InputStream stream = openPythonStream(file, nodeName);
+                byte[] b = new byte[1024];
+                int count;
 
-		        while ((count = stream.read(b)) > 0) {
-		            out.write(b, 0, count);
-		        }
-	        	// close here in order to flush
-				stream.close();
-			}
-			{
-		        
-				// name the diagram file inside the zip file 
-		        out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + Constants.STATE_DIAGRAM_TYPE));
-		        
-		        // fill with initial data
-		        // Not very nice: we borrow the file for temporarily writing the diagram data into.
-		        // The file is actually used for storing the ZIP file
-				InputStream stream = openStateDiagramStream(file, nodeName);
-		        byte[] b = new byte[1024];
-		        int count;
+                while ((count = stream.read(b)) > 0) {
+                    out.write(b, 0, count);
+                }
+                // close here in order to flush
+                stream.close();
+            }
+            {
+                
+                // name the diagram file inside the zip file 
+                out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + Constants.STATE_DIAGRAM_TYPE));
+                
+                // fill with initial data
+                // Not very nice: we borrow the file for temporarily writing the diagram data into.
+                // The file is actually used for storing the ZIP file
+                InputStream stream = openStateDiagramStream(file, nodeName);
+                byte[] b = new byte[1024];
+                int count;
 
-		        while ((count = stream.read(b)) > 0) {
-		            out.write(b, 0, count);
-		        }
-		        
-				stream.close();
-			}
-        	out.close();
-			
-			// ZIP file finished. Continue working with the file
-			if (file.exists()) {
-				file.setContents(new ByteArrayInputStream(bao.toByteArray()), true, true, monitor);
-			} else {
-				file.create(new ByteArrayInputStream(bao.toByteArray()), true, monitor);
-			}
-			
-			bao.close();
+                while ((count = stream.read(b)) > 0) {
+                    out.write(b, 0, count);
+                }
+                
+                stream.close();
+            }
+            out.close();
+            
+            // ZIP file finished. Continue working with the file
+            if (file.exists()) {
+                file.setContents(new ByteArrayInputStream(bao.toByteArray()), true, true, monitor);
+            } else {
+                file.create(new ByteArrayInputStream(bao.toByteArray()), true, monitor);
+            }
+            
+            bao.close();
 
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		monitor.worked(1);
-		monitor.setTaskName("Opening file for editing...");
-		getShell().getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				IWorkbenchPage page =
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-				try {
-					IDE.openEditor(page, file, true);
-				} catch (PartInitException e) {
-				}
-			}
-		});
-		monitor.worked(1);
-	}
-	
-	/**
-	 * We will initialize file contents with a sample text.
-	 * @param file 
-	 * @throws CoreException 
-	 */
+            
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        monitor.worked(1);
+        monitor.setTaskName("Opening file for editing...");
+        getShell().getDisplay().asyncExec(new Runnable() {
+            public void run() {
+                IWorkbenchPage page =
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+                try {
+                    IDE.openEditor(page, file, true);
+                } catch (PartInitException e) {
+                }
+            }
+        });
+        monitor.worked(1);
+    }
+    
+    /**
+     * We will initialize file contents with a sample text.
+     * @param file 
+     * @throws CoreException 
+     */
 
-	private InputStream openMETAStream(IFile file, String diagramName, String language) throws CoreException {
-		String contents = 	"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-							"<metadata>\n" +
-							"	<entry key=\"name\" value=\"" + diagramName + "\"/>\n" +
-							"	<entry key=\"type\" value=\"" + Constants.CODE_BLOCK + "\"/>\n" +
-							"	<entry key=\"language\" value=\"" + language + "\"/>\n" +
-							"	<entry key=\"version\" value=\"0.90\"/>\n" +
-							"</metadata>\n";
-		return new ByteArrayInputStream(contents.getBytes());
-	}
+    private InputStream openMETAStream(IFile file, String diagramName, String language) throws CoreException {
+        String contents =     "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                            "<metadata>\n" +
+                            "    <entry key=\"name\" value=\"" + diagramName + "\"/>\n" +
+                            "    <entry key=\"type\" value=\"" + Constants.CODE_BLOCK + "\"/>\n" +
+                            "    <entry key=\"language\" value=\"" + language + "\"/>\n" +
+                            "    <entry key=\"version\" value=\"0.90\"/>\n" +
+                            "</metadata>\n";
+        return new ByteArrayInputStream(contents.getBytes());
+    }
 
-	private InputStream openContentStream(IFile diagramFile, String diagramName) throws CoreException {
-		final String diagramTypeId = arro.Constants.FUNCTION_DIAGRAM_TYPE;
-		
-		// Create empty diagram.
-		Diagram diagram = Graphiti.getPeCreateService().createDiagram(diagramTypeId, diagramName, true);
-		
-		URI uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
-		
-		// Create 'ID' in device diagram, calling ArroIDAddFeature
-		AddContext context = new AddContext();
-		context.setNewObject(nodeDiagram);
-		context.setTargetContainer(diagram);
-		
-		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, "Arro.FunctionDiagramTypeProvider");
-		IAddFeature f = dtp.getFeatureProvider().getAddFeature(context);
-		f.add(context);
+    private InputStream openContentStream(IFile diagramFile, String diagramName) throws CoreException {
+        final String diagramTypeId = arro.Constants.FUNCTION_DIAGRAM_TYPE;
+        
+        // Create empty diagram.
+        Diagram diagram = Graphiti.getPeCreateService().createDiagram(diagramTypeId, diagramName, true);
+        
+        URI uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
+        
+        // Create 'ID' in device diagram, calling ArroIDAddFeature
+        AddContext context = new AddContext();
+        context.setNewObject(nodeDiagram);
+        context.setTargetContainer(diagram);
+        
+        IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, "Arro.FunctionDiagramTypeProvider");
+        IAddFeature f = dtp.getFeatureProvider().getAddFeature(context);
+        f.add(context);
 
-		// Create 'BOX' in device diagram
-		device = new ArroDevice();
-		context.setNewObject(device);
+        // Create 'BOX' in device diagram
+        device = new ArroDevice();
+        context.setNewObject(device);
 
-		f = dtp.getFeatureProvider().getAddFeature(context);
-		f.add(context);
+        f = dtp.getFeatureProvider().getAddFeature(context);
+        f.add(context);
 
-		FileService.createEmfFileForDiagram(uri, diagram);
-		
-		return diagramFile.getContents();
-	}
+        FileService.createEmfFileForDiagram(uri, diagram);
+        
+        return diagramFile.getContents();
+    }
 
-	// FIXME: code duplication with NewFunctionBlockWizard.java.
-	private InputStream openStateDiagramStream(IFile diagramFile, String diagramName) throws CoreException {
-		final String diagramTypeId = arro.Constants.STATE_DIAGRAM_TYPE;
-		
-		// Create empty diagram.
-		Diagram diagram = Graphiti.getPeCreateService().createDiagram(diagramTypeId, diagramName, true);
-		
-		URI uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
-		
-		// Create 'ID' in diagram, calling ArroIDAddFeature.
-		AddContext context = new AddContext();	
-		context.setNewObject(stateNode);
-		context.setTargetContainer(diagram);
-		
-		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, "Arro.StateDiagramTypeProvider");
-		IAddFeature f = dtp.getFeatureProvider().getAddFeature(context);
-		f.add(context);
+    // FIXME: code duplication with NewFunctionBlockWizard.java.
+    private InputStream openStateDiagramStream(IFile diagramFile, String diagramName) throws CoreException {
+        final String diagramTypeId = arro.Constants.STATE_DIAGRAM_TYPE;
+        
+        // Create empty diagram.
+        Diagram diagram = Graphiti.getPeCreateService().createDiagram(diagramTypeId, diagramName, true);
+        
+        URI uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
+        
+        // Create 'ID' in diagram, calling ArroIDAddFeature.
+        AddContext context = new AddContext();    
+        context.setNewObject(stateNode);
+        context.setTargetContainer(diagram);
+        
+        IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, "Arro.StateDiagramTypeProvider");
+        IAddFeature f = dtp.getFeatureProvider().getAddFeature(context);
+        f.add(context);
 
         // Serialize the diagram into XML.
-		FileService.createEmfFileForDiagram(uri, diagram);
-		
-		return diagramFile.getContents();
-	}
+        FileService.createEmfFileForDiagram(uri, diagram);
+        
+        return diagramFile.getContents();
+    }
 
-	private InputStream openXmlStream(IFile file, String diagramName, String language) throws CoreException {
-		String contents = 	"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-							"<diagram>\n" +
-							"    <nodedefinition id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
-							"        <device id=\"" + device.getId() + "\" url=\"" + language + ":" + diagramName + "\"/>\n" +
-						    "        <state id=\"" + stateNode.getId() + "\" name=\"_aState\" type=\"_State\"/>\n" +
-							"    </nodedefinition>\n" +
-							"</diagram>\n";
-		return new ByteArrayInputStream(contents.getBytes());
-	}
+    private InputStream openXmlStream(IFile file, String diagramName, String language) throws CoreException {
+        String contents =   "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                            "<diagram>\n" +
+                            "    <nodedefinition id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
+                            "        <device id=\"" + device.getId() + "\" url=\"" + language + ":" + diagramName + "\"/>\n" +
+                            "        <state id=\"" + stateNode.getId() + "\" name=\"_aState\" type=\"_State\"/>\n" +
+                            "    </nodedefinition>\n" +
+                            "</diagram>\n";
+        return new ByteArrayInputStream(contents.getBytes());
+    }
 
-	private InputStream openPythonStream(IFile file, String diagramName) throws CoreException {
-		String contents = 	"class " + diagramName + ":\n" +
-					        "   b1 = 20\n" +
-					        "\n" +
-					        "   def __init__(self, usefonts=0):\n" +
-					        "       self.b2 = 30\n" +
-					        "\n" +
-					        "   def runCycle(self):\n" +
-					        "       while True:\n" +
-					        "           status = getMessage(self)\n" +
-					        "           print \"one loop\"\n" +
-					        "               break\n" +
-					        "               \n" +
-					        "           print status\n" +
-					        "           if status[0] == \"aTick\":\n" +
-					        "               message = arro_pb2.Tick()\n" +
-					        "               message.ParseFromString(status[1])\n" +
-					        "               print message.ms\n" +
-					        "               \n" +
-					        "               output = arro_pb2.Value()\n" +
-					        "               output.value = 17\n" +
-					        "               ser = output.SerializeToString()\n" +
-					        "               sendMessage(self, \"output\", ser)\n";
+    private InputStream openPythonStream(IFile file, String diagramName) throws CoreException {
+        String contents =   "import arro_api\nimport arro_pb2\n" +
+                            "class " + diagramName + ":\n" +
+                            "   b1 = 20\n" +
+                            "\n" +
+                            "   def __init__(self, usefonts=0):\n" +
+                            "       self.b2 = 30\n" +
+                            "\n" +
+                            "   def runCycle(self):\n" +
+                            "       while True:\n" +
+                            "           status = arro_api.getMessage(self)\n" +
+                            "           print \"one loop\"\n" +
+                            "           if status == None:\n" +
+                            "               break\n" +
+                            "\n" +
+                            "           print status\n" +
+                            "           if status[0] == \"aTick\":\n" +
+                            "               message = arro_pb2.Tick()\n" +
+                            "               message.ParseFromString(status[1])\n" +
+                            "               print message.ms_elapsed\n" +
+                            "\n" +
+                            "               output = arro_pb2.Value()\n" +
+                            "               output.value = 17\n" +
+                            "               ser = output.SerializeToString()\n" +
+                            "               arro_api.sendMessage(self, \"output\", ser)\n";
 
-		return new ByteArrayInputStream(contents.getBytes());
-	}
+        return new ByteArrayInputStream(contents.getBytes());
+    }
 
 
-	private void throwCoreException(String message) throws CoreException {
-		IStatus status =
-			new Status(IStatus.ERROR, "Arro", IStatus.OK, message, null);
-		throw new CoreException(status);
-	}
+    private void throwCoreException(String message) throws CoreException {
+        IStatus status =
+            new Status(IStatus.ERROR, "Arro", IStatus.OK, message, null);
+        throw new CoreException(status);
+    }
 
-	/**
-	 * We will accept the selection in the workbench to see if
-	 * we can initialize from it.
-	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
-	 */
-	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		this.selection = selection;
-	}
+    /**
+     * We will accept the selection in the workbench to see if
+     * we can initialize from it.
+     * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
+     */
+    public void init(IWorkbench workbench, IStructuredSelection selection) {
+        this.selection = selection;
+    }
 }

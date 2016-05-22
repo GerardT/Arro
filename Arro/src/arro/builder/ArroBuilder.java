@@ -223,6 +223,7 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 		// First collect all types
 		// Then do full or incremental build, which checks that referenced types are indeed defined.
 	    try {
+	        // Write prolog for arro.proto
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			baos.write(("syntax = \"proto3\";\n" +
 						"package arro;\n").getBytes());
@@ -236,6 +237,7 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			}
 			baos.close();
 			
+            // Write prolog for arro.xml
 			baos = new ByteArrayOutputStream();
 			baos.write(("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n" +
 						"<diagrams>\n").getBytes());
@@ -249,10 +251,10 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			}
 			baos.close();
 
+            // Write prolog for arro_pgm.py
 			baos = new ByteArrayOutputStream();
 			baos.write(("import sys\n" +
-						"sys.path.append('.')\n" +
-						"import arro_pb2\n\n").getBytes());
+                        "sys.path.append('.')\n\n").getBytes());
 	    	
 			IFile resultPython = folder.getFile("arro_pgm.py");
 
@@ -264,6 +266,7 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			baos.close();
 
 			
+            // Write content for arro.proto, arro.xml, arro_pgm.py
 			BuildInfo buildInfo = new BuildInfo(folder, resultFileMessages, resultFileNodes, resultPython);
 			fullCollect(buildInfo, monitor);
 			// for now we always do a full build...
@@ -278,6 +281,7 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 				}
 			}
 			
+            // Write epilog for arro.xml
 			resultFileNodes.appendContents(new ByteArrayInputStream("</diagrams>\n".getBytes()), true, true, null);
 
 	    } catch (Exception e) {
