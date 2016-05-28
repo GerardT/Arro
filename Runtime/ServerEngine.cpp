@@ -119,6 +119,22 @@ static void cleanup()
 }
 
 /**
+ * Wrapper to system function to get rid of compiler warning.
+ *
+ * @param command Command string to execute.
+ * @return
+ */
+int syswrap(const string& command)
+{
+	int ret = system(command.c_str());
+	if(ret != 0) {
+	    trace.fatal("system command failed");
+	}
+	return ret;
+}
+
+
+/**
  * Server thread for Eclipse client.
  * Should keep running forever and serve multiple client 'debugging' sessions.
  * For duration of each 'debugging' session from client the server will keep
@@ -194,7 +210,7 @@ static void server()
             }
             else if(!strcmp(command, "ls"))
             {
-                system("ls >temps.txt");
+                syswrap("ls >temps.txt");
                 i = 0;
                 stat("temps.txt",&obj);
                 size = obj.st_size;
@@ -228,7 +244,7 @@ static void server()
             }
             else if(!strcmp(command, "protobuf"))
             {
-                system("protoc --python_out=. arro.proto");
+                syswrap("protoc --python_out=. arro.proto");
                 ServerEngine::console("protobuf successful");
             }
             else if(!strcmp(command, "run"))
@@ -263,7 +279,7 @@ static void server()
             }
             else if(!strcmp(command, "pwd"))
             {
-                system("pwd>temp.txt");
+                syswrap("pwd>temp.txt");
                 i = 0;
                 FILE*f = fopen("temp.txt","r");
                 while(!feof(f) && i < ARRO_BUFFER_SIZE)

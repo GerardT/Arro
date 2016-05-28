@@ -46,7 +46,7 @@ namespace Arro {
     private:
         class Servo {
         public:
-            Servo(int address = 0x40, char* filename = "/dev/i2c-1");
+            Servo(int address = 0x40, const char* filename = "/dev/i2c-1");
             virtual ~Servo() {};
             void start(int ch, int val);
 

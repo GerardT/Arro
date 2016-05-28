@@ -546,6 +546,7 @@ inline ::std::string* Mode::mutable_mode() {
   return mode_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* Mode::release_mode() {
+  // @@protoc_insertion_point(field_release:arro.Mode.mode)
   
   return mode_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -593,6 +594,7 @@ inline ::std::string* KeyValuePair::mutable_key() {
   return key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* KeyValuePair::release_key() {
+  // @@protoc_insertion_point(field_release:arro.KeyValuePair.key)
   
   return key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -636,6 +638,7 @@ inline ::std::string* KeyValuePair::mutable_value() {
   return value_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* KeyValuePair::release_value() {
+  // @@protoc_insertion_point(field_release:arro.KeyValuePair.value)
   
   return value_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }

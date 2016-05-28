@@ -101,7 +101,7 @@ NodeServo::Servo::setPWMFreq(double freq) {
     i2c_write8(__MODE1, oldmode | 0x80);
 }
 
-NodeServo::Servo::Servo(int address, char* filename):
+NodeServo::Servo::Servo(int address, const char* filename):
     trace("Servo", true),
     prescaleval(0),
 	addr(address){

@@ -16,6 +16,11 @@
 #include "NodePython.h"
 
 
+inline PyObject* PyObject_CallMethod_wrap(PyObject *o, const char *method, const char *format, ...) {
+    return PyObject_CallMethod(o, (char*) method, (char*)format);  // Return value: New reference.
+}
+
+
 namespace Arro {
 
     /**

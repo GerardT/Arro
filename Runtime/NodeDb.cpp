@@ -6,6 +6,7 @@
 #include <queue>
 #include <algorithm>
 
+#include "ServerEngine.h"
 #include "NodeDb.h"
 #include "NodeTimer.h"
 
@@ -188,6 +189,7 @@ NodeDb::runCycle(NodeDb* nm) {
     	// If exception, for instance Python (syntax) error, then thread exits here.
     	// User can stop NodeDb after that.
         nm->trace.println("Execution stopped, error " + string(e.what()));
+        ServerEngine::console(string(e.what()));
     }
 }
 

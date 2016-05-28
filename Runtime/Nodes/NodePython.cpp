@@ -59,7 +59,7 @@ NodePython::handleMessage(MessageBuf* msg, const string& padName) {
  */
 void
 NodePython::runCycle() {
-    pValue = PyObject_CallMethod(pInstance, "runCycle", nullptr); // no parameters, Return value: New reference.
+    pValue = PyObject_CallMethod_wrap(pInstance, "runCycle", nullptr); // no parameters, Return value: New reference.
     if (pValue != nullptr)
     {
         Py_DECREF(pValue);

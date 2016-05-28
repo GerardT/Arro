@@ -92,7 +92,7 @@ Process::getOutput(const string& name) {
         return out;
     } else {
         trace.println("no such output registered: " + name);
-        throw std::runtime_error("Unknown name");
+        throw std::runtime_error("No such output registered: " + name);
     }
 }
 
