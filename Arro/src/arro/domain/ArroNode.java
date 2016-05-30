@@ -119,7 +119,7 @@ public class ArroNode extends NonEmfDomainObject {
 	 * @return
 	 */
 	public ArroModule getAssociatedModule() {
-		return (ArroModule)ResourceCache.getInstance().getZip(getType()).getDomainDiagram();		
+        return (ArroModule)ResourceCache.getInstance().getZip(getType()).getDomainDiagram();
 	}
 	
 	/**

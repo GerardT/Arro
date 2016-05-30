@@ -98,12 +98,9 @@ public class ArroZipFile {
                 	entry = in.getNextEntry();        			
                 }
             } catch (CoreException e) {
-                // TODO Auto-generated catch block
-    			// never mind, if temp file existed then just overwrite.
-                e.printStackTrace();
+                throw new RuntimeException(e.getMessage());
             } catch (IOException e) {
-    			// TODO Auto-generated catch block
-            	e.printStackTrace();
+                throw new RuntimeException(e.getMessage());
     		}
             readMETA();
     	}
@@ -379,11 +376,9 @@ public class ArroZipFile {
             	entry = in.getNextEntry();        			
             }
         } catch (CoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            retval = false;
         } catch (IOException e) {
-			// TODO Auto-generated catch block
-        	e.printStackTrace();
+			retval = false;
 		}
         return retval;
 	}

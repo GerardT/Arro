@@ -78,19 +78,24 @@ public class ArroNodeLayoutFeature extends AbstractLayoutFeature implements
             NonEmfDomainObject domainObject = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(cs, getFeatureProvider());
             if(domainObject instanceof ArroNode) {
             	// Read the Node info using node-type
-            	Collection<ArroPad> pads = ((ArroNode)domainObject).getAssociatedModule().getPads();
-            	Logger.out.trace(Logger.EDITOR, "Found " + pads.size() + " pads");
-                
-        		HashMap<String, ContainerShape> anchors = WidgetUtil.getAnchors(cs);
+            	try {
+                    Collection<ArroPad> pads = ((ArroNode)domainObject).getAssociatedModule().getPads();
+                    Logger.out.trace(Logger.EDITOR, "Found " + pads.size() + " pads");
+                    
+                    HashMap<String, ContainerShape> anchors = WidgetUtil.getAnchors(cs);
 
-            	int i = 0;
-            	for(ArroPad pad: pads) {
-            		ContainerShape anchorContainer = anchors.get(pad.getName());
-            		GraphicsAlgorithm text = anchorContainer.getGraphicsAlgorithm();
-                    ArroNodeAnchorPosition pos = new ArroNodeAnchorPosition(rect, pad.getInput(), i);
-                    gaService.setLocationAndSize(text, pos.boxPosX(), pos.boxPosY(), pos.boxSizeX(), pos.boxSizeY());
-                    i++;
-            	}
+                    int i = 0;
+                    for(ArroPad pad: pads) {
+                    	ContainerShape anchorContainer = anchors.get(pad.getName());
+                    	GraphicsAlgorithm text = anchorContainer.getGraphicsAlgorithm();
+                        ArroNodeAnchorPosition pos = new ArroNodeAnchorPosition(rect, pad.getInput(), i);
+                        gaService.setLocationAndSize(text, pos.boxPosX(), pos.boxPosY(), pos.boxSizeX(), pos.boxSizeY());
+                        i++;
+                    }
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
 		}
 		return false;

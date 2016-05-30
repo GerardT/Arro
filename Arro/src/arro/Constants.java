@@ -96,7 +96,9 @@ public class Constants {
 
 	public static final IColorConstant ANCHOR_BG = new ColorConstant(200, 200, 200);
 
-	public static final IColorConstant CLASS_TEXT_FOREGROUND = new ColorConstant(51, 51, 153);
+    public static final IColorConstant MODULE_GONE = new ColorConstant(200, 0, 0);
+
+    public static final IColorConstant CLASS_TEXT_FOREGROUND = new ColorConstant(51, 51, 153);
          
 	public static final IColorConstant CLASS_FOREGROUND = new ColorConstant(255, 102, 0);
      
