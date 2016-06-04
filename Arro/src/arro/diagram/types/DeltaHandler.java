@@ -12,9 +12,9 @@ class DeltaHandler implements IResourceDeltaVisitor {
         IResource res = delta.getResource();
         switch (delta.getKind()) {
             case IResourceDelta.ADDED:
-//	            Logger.out.trace(Logger.EDITOR, "Resource ");
-//	            Logger.out.trace(Logger.EDITOR, res.getFullPath());
-//	            Logger.out.trace(Logger.EDITOR, " was added.");
+	            Logger.out.trace(Logger.EDITOR, "Resource ");
+	            Logger.out.trace(Logger.EDITOR, res.getFullPath().toPortableString());
+	            Logger.out.trace(Logger.EDITOR, " was added.");
 	            break;
 	        case IResourceDelta.REMOVED:
 //	            Logger.out.trace(Logger.EDITOR, "Resource ");

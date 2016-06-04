@@ -35,7 +35,7 @@ public class POJOIndependenceSolver implements IIndependenceSolver {
 	DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 	
 	//private ArroNodeInternal intern;
-	private HashMap<String, NonEmfDomainObject> node;
+	private HashMap<String, NonEmfDomainObject> domainObjects;
 	
 	// Build a very simple cache. Increase usage count on every access.
 	// A garbage collector cleans entries with count != 0 and resets all counts to 0.
@@ -43,7 +43,7 @@ public class POJOIndependenceSolver implements IIndependenceSolver {
 	
 	
 	public POJOIndependenceSolver() {
-		node = new HashMap<String, NonEmfDomainObject>();
+		domainObjects = new HashMap<String, NonEmfDomainObject>();
 	}
 	
 	public static POJOIndependenceSolver getInstance() {
@@ -76,7 +76,7 @@ public class POJOIndependenceSolver implements IIndependenceSolver {
 	 * @see org.eclipse.graphiti.features.impl.IIndependenceSolver#getBusinessObjectForKey(java.lang.String)
 	 */
 	public Object getBusinessObjectForKey(String key) {
-		return node.get(key);
+		return domainObjects.get(key);
 	}
 	
 	/**
@@ -88,26 +88,33 @@ public class POJOIndependenceSolver implements IIndependenceSolver {
 	public void removeBusinessObject(Object bo) {
 	}
 
-	public void RemovePOJOObjects(String name) {
+	public void RemovePOJOObjects(String fullName) {
 		// TODO Auto-generated method stub
+        String name = fullName.  substring(0, fullName.indexOf('.'));
 		Logger.out.trace(Logger.STD, "Remove POJO file " + name);
+		
+		ResourceCache.getInstance().removeFromCache(name);
 		
 	}
 
 	public void RegisterPOJOObject(NonEmfDomainObject nonEmfDomainObject) {
-		Collection<NonEmfDomainObject> list = node.values();
+	    if(nonEmfDomainObject.getId().equals("")) {
+	        // some objects such as _mode are not shown in diagram hence have no id.
+	        return;
+	    }
+		Collection<NonEmfDomainObject> list = domainObjects.values();
 		for(NonEmfDomainObject obj: list) {
 			if(obj == nonEmfDomainObject) {
 				// remove it
-				node.remove(obj.getId());
+				domainObjects.remove(obj.getId());
 				break;
 			}
 		}
-		node.put(nonEmfDomainObject.getId(), nonEmfDomainObject);
+		domainObjects.put(nonEmfDomainObject.getId(), nonEmfDomainObject);
 	}
 	
     public NonEmfDomainObject findPOJOObjectByName(String name, Class<?> class1) {
-	    Iterator<Entry<String, NonEmfDomainObject>> it = node.entrySet().iterator();
+	    Iterator<Entry<String, NonEmfDomainObject>> it = domainObjects.entrySet().iterator();
 	    
 	    NonEmfDomainObject found = null;
 	    

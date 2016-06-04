@@ -17,9 +17,9 @@ public class MyResourceChangeReporter implements IResourceChangeListener {
 //            Logger.out.trace(Logger.EDITOR, " is about to close.");
             break;
          case IResourceChangeEvent.PRE_DELETE:
-//            Logger.out.trace(Logger.EDITOR, "Project ");
-//            Logger.out.trace(Logger.EDITOR, res.getFullPath());
-//            Logger.out.trace(Logger.EDITOR, " is about to be deleted.");
+            Logger.out.trace(Logger.EDITOR, "Project ");
+            Logger.out.trace(Logger.EDITOR, res.getFullPath().toString());
+            Logger.out.trace(Logger.EDITOR, " is about to be deleted.");
             break;
          case IResourceChangeEvent.POST_CHANGE:
 //            Logger.out.trace(Logger.EDITOR, "Resources have changed.");

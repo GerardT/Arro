@@ -217,6 +217,23 @@ public class ResourceCache {
 		return myCache;
 	}
 
+	   /**
+     * Open domain file <typeName> by unzipping it:
+     * - <typeName>.anod into .<typeName>.anod and .<typeName>.anod.xml
+     * Zip file also contains other stuff, but we only need module here.
+     * 
+     * Then read the domain file (.<typeName>.anod) into a DomainModule
+     * instance and register this instance in the cache.
+     * 
+     * FIXME: must search all resources in the open project.
+     */
+    public void removeFromCache(String typeName) throws RuntimeException {
+
+        if(cache.containsKey(typeName)) {
+            cache.remove(typeName);
+        }
+    }
+
 
 	/**
 	 * First call for opening a resource will allow this function

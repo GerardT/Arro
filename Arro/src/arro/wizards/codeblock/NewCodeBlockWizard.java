@@ -344,11 +344,13 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
     }
 
     private InputStream openXmlStream(IFile file, String diagramName, String language) throws CoreException {
+        // note that Pad _mode is never shown in diagram hence need no ID.
         String contents =   "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
                             "<diagram>\n" +
                             "    <nodedefinition id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
                             "        <device id=\"" + device.getId() + "\" url=\"" + language + ":" + diagramName + "\"/>\n" +
                             "        <state id=\"" + stateNode.getId() + "\" name=\"_aState\" type=\"_State\"/>\n" +
+                            "        <pad id=\"\" input=\"false\" name=\"_mode\" run=\"true\" type=\"Mode\"/>\n" +
                             "    </nodedefinition>\n" +
                             "</diagram>\n";
         return new ByteArrayInputStream(contents.getBytes());
