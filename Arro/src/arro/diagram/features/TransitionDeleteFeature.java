@@ -49,7 +49,7 @@ public class TransitionDeleteFeature extends DefaultDeleteFeature implements ICu
 		if(bo instanceof ArroNode) {
 			ArroStep obj = (ArroStep)bo;
 			
-			obj.getParent().removeState(obj);
+			obj.getParent().removeStep(obj);
 			
 //			obj.getParent().purgeConnections();
 		}

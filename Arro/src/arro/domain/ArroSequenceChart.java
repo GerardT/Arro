@@ -13,14 +13,14 @@ import org.w3c.dom.NodeList;
 public class ArroSequenceChart extends NonEmfDomainObject {
 
 	private String nodeType;
-	private HashMap<String, ArroStep> states = new HashMap<String, ArroStep>();
+	private HashMap<String, ArroStep> steps = new HashMap<String, ArroStep>();
 	private HashMap<String, ArroTransition> transitions = new HashMap<String, ArroTransition>();
 	private ArroModule parent;
 	
 	@SuppressWarnings("unchecked")
 	public ArroSequenceChart clone() {
 		ArroSequenceChart diag = new ArroSequenceChart();
-		diag.states = (HashMap<String, ArroStep>) states.clone();
+		diag.steps = (HashMap<String, ArroStep>) steps.clone();
 		diag.transitions = (HashMap<String, ArroTransition>) transitions.clone();
 		diag.nodeType = nodeType;
 		diag.parent = parent;
@@ -28,7 +28,7 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 	}
 	
 	public void addState(ArroStep newState) {
-		states.put(newState.getName(), newState);
+		steps.put(newState.getName(), newState);
 		newState.setParent(this);
 	}
 	
@@ -60,7 +60,7 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 		attr.setValue(getType());
 		elt.setAttributeNode(attr);
 		
-		Collection<ArroStep> st = states.values();
+		Collection<ArroStep> st = steps.values();
 		for(ArroStep state: st) {
 			
 			Element sub = doc.createElement("step");
@@ -106,12 +106,12 @@ public class ArroSequenceChart extends NonEmfDomainObject {
     	}
    	}
 
-	public ArroStep getStateByName(String instanceName) {
-		return states.get(instanceName);
+	public ArroStep getStepByName(String instanceName) {
+		return steps.get(instanceName);
 	}
 
-	public void removeState(ArroStep obj) {
-		states.remove(obj.getName());
+	public void removeStep(ArroStep obj) {
+		steps.remove(obj.getName());
 	}
 
 	public ArroTransition getTransitionByName(String instanceName) {
@@ -132,7 +132,7 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 	public ArrayList<String> getStateNames() {
 		ArrayList<String> list = new ArrayList<String>();
 		
-		Collection<ArroStep> values = states.values();
+		Collection<ArroStep> values = steps.values();
 		for(ArroStep state: values){
 			list.add(state.getName());
 		}

@@ -50,7 +50,7 @@ public class StepAddFeature extends AbstractAddFeature implements IAddFeature, I
         ArroStep addedDomainObject = (ArroStep)obj;
         
         String instanceName = "a" + "Step";
-        while(domainModule.getStateDiagram().getStateByName(instanceName) != null) {
+        while(domainModule.getStateDiagram().getStepByName(instanceName) != null) {
         	instanceName += "1";
         }
         addedDomainObject.setName(instanceName);

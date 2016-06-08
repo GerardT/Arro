@@ -91,7 +91,17 @@ public class EditingSupportForSelection extends EditingSupport {
 			}
 		}
 		if(index == acceptedValues.length) {
-			index = 0; // what else can we do?
+            // no choice than to add to obsolete string in the pull down menu.
+		    int i = 0;
+		    String[] newValues = new String[acceptedValues.length + 1];
+		    for(String s: acceptedValues) {
+		        newValues[i++] = s;
+		    }
+            newValues[i] = gs.obsolete(element);
+		    acceptedValues = newValues;
+		    
+		    
+            ((ComboBoxCellEditor) this.editor).setItems(acceptedValues);
 		}
 		return new Integer(index);
 	}
