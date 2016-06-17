@@ -16,6 +16,10 @@ message Mode {
     string mode = 1;
 }
 
+message Action {
+    string action = 1;
+}
+
 message KeyValuePair {
     string key = 1;
     string value = 2;
