@@ -58,6 +58,10 @@ public class ArroStateEntrySection extends ArroGenericSection {
 			public String[] getAcceptedValues(Object element) {
 				return getAcceptedNodeNames((ArroAction)element);
 			}
+            @Override
+            public String obsolete(Object element) {
+                return ((ArroAction)element).getName();
+            }
 
 		};
 		col1.setLabelProvider(cls1);
@@ -78,6 +82,11 @@ public class ArroStateEntrySection extends ArroGenericSection {
 			public String[] getAcceptedValues(Object element) {
 				return getAcceptedStateNames((ArroAction)element);
 			}
+            @Override
+            public String obsolete(Object element) {
+                return ((ArroAction)element).getState();
+            }
+
 
 		};
 		col2.setLabelProvider(cls2);

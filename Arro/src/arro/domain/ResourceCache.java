@@ -58,8 +58,9 @@ public class ResourceCache {
 
 
 	/**
-	 * Open Function Diagram file <typeName> by unzipping it:
+	 * Open domain file <typeName> by unzipping it:
 	 * - <typeName>.anod into .<typeName>.anod and .<typeName>.anod.xml
+	 * Zip file also contains other stuff, but we only need module here.
 	 * 
 	 * Then read the domain file (.<typeName>.anod) into a DomainModule
 	 * instance and register this instance in the cache.
@@ -68,29 +69,33 @@ public class ResourceCache {
 	 */
 	public ArroZipFile getZip(String typeName) throws RuntimeException {
 		ArroZipFile zip = null;
+        IFolder folder = getDiagramFolder(null);
 
 		if(cache.containsKey(typeName)) {
-			// Already in cache
-			return cache.get(typeName);
-		} else {
-	        IFolder folder = getDiagramFolder(null);
+			// Already in cache, double check that file exists..
+	          if(folder.getFile(typeName + "." + Constants.NODE_EXT).exists()) {
+	              return cache.get(typeName);
+	          } else {
+	              cache.remove(typeName);
+	              return null;
+	          }
 
-	        
+		} else {
 	        if(folder.getFile(typeName + "." + Constants.NODE_EXT).exists()) {
 		        zip = new ArroZipFile(folder.getFile(typeName + "." + Constants.NODE_EXT));
 	        } else {
 	    		throw new RuntimeException("No zip file with this name");
 	        }
 
-			ArroModule domainDiagram = loadNodeDiagram(zip, typeName);
-			zip.setDomainDiagram(domainDiagram);
+			ArroModule module = loadModule(zip, typeName);
+			zip.setDomainDiagram(module);
 			cache.put(PathUtil.truncExtension(typeName), zip);
 			
 			return zip;
 		}
 	}
 	
-	private ArroModule loadNodeDiagram(ArroZipFile zip, String typeName) {
+	private ArroModule loadModule(ArroZipFile zip, String typeName) {
 		// TODO: handle error if zip file removed.
 		String fileName = zip.getName();
 
@@ -130,6 +135,7 @@ public class ResourceCache {
 	    	}
 	    } catch (Exception e) {
 	        /* no file */;
+            throw new RuntimeException("Module not found "  + typeName);
         }
 	    return n;
 	}
@@ -210,6 +216,23 @@ public class ResourceCache {
 		}
 		return myCache;
 	}
+
+	   /**
+     * Open domain file <typeName> by unzipping it:
+     * - <typeName>.anod into .<typeName>.anod and .<typeName>.anod.xml
+     * Zip file also contains other stuff, but we only need module here.
+     * 
+     * Then read the domain file (.<typeName>.anod) into a DomainModule
+     * instance and register this instance in the cache.
+     * 
+     * FIXME: must search all resources in the open project.
+     */
+    public void removeFromCache(String typeName) throws RuntimeException {
+
+        if(cache.containsKey(typeName)) {
+            cache.remove(typeName);
+        }
+    }
 
 
 	/**

@@ -3,6 +3,7 @@ package arro.diagram.features;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
 import org.eclipse.graphiti.features.IReason;
@@ -75,31 +76,36 @@ public class ArroNodeUpdateFeature  extends DefaultUpdateDiagramFeature {
 	    			return Reason.createTrueReason("Name changed");
 	            }
             
-            	// Read the Node info using node-type
-            	Collection<ArroPad> domainPads = ((ArroNode)domainObject).getAssociatedModule().getPads();
-            	Logger.out.trace(Logger.EDITOR, "Found " + domainPads.size() + " pads");
-                
-        		HashMap<String, ContainerShape> diagramPads = WidgetUtil.getAnchors(cs);
+            	try {
+                    // Read the Node info using node-type
+                    Collection<ArroPad> domainPads = ((ArroNode)domainObject).getAssociatedModule().getPads();
+                    Logger.out.trace(Logger.EDITOR, "Found " + domainPads.size() + " pads");
+                    
+                    HashMap<String, ContainerShape> diagramPads = WidgetUtil.getAnchors(cs);
 
-            	for(ArroPad pad: domainPads) {
-            		//Logger.out.trace(Logger.EDITOR, "Node has a Pad " + pad.toString());
-            		ContainerShape a = diagramPads.get(pad.getName());
-            		
-            		if(a != null) {
-            			// Domain anchor also found in diagram: remove from oldAnchors, do nothing.
-            			diagramPads.remove(pad.getName());
-            		} else {
-            			// Domain anchor not found in diagram
-            			((ArroNode)domainObject).setNeedsUpdate(true);
-            			return Reason.createTrueReason("Pad was added");
-            		}
+                    for(ArroPad pad: domainPads) {
+                    	//Logger.out.trace(Logger.EDITOR, "Node has a Pad " + pad.toString());
+                    	ContainerShape a = diagramPads.get(pad.getName());
+                    	
+                    	if(a != null) {
+                    		// Domain anchor also found in diagram: remove from oldAnchors, do nothing.
+                    		diagramPads.remove(pad.getName());
+                    	} else {
+                    		// Domain anchor not found in diagram
+                    		((ArroNode)domainObject).setNeedsUpdate(true);
+                    		return Reason.createTrueReason("Pad was added");
+                    	}
+                    }
+                    
+                    if(diagramPads.isEmpty() == false) {
+                    	// Apparently pads were added in the domain.
+                    	((ArroNode)domainObject).setNeedsUpdate(true);
+                    	return Reason.createTrueReason("Pad was removed or changed");
+                    }
+                } catch (RuntimeException e) {
+                    // TODO Auto-generated catch block
+                    // TODO e.printStackTrace();
                 }
-            	
-            	if(diagramPads.isEmpty() == false) {
-            		// Apparently pads were added in the domain.
-        			((ArroNode)domainObject).setNeedsUpdate(true);
-        			return Reason.createTrueReason("Pad was removed or changed");
-            	}
 
     			((ArroNode)domainObject).setNeedsUpdate(false);
                 return Reason.createFalseReason();
@@ -139,76 +145,86 @@ public class ArroNodeUpdateFeature  extends DefaultUpdateDiagramFeature {
             if(domainObject instanceof ArroNode) {
             	boolean changed = false;
             	
-            	// Read the Node info using node-type
-            	Collection<ArroPad> domainPads = ((ArroNode)domainObject).getAssociatedModule().getPads();
-            	Logger.out.trace(Logger.EDITOR, "Found " + domainPads.size() + " pads");
+            	IGaService gaService;
+                IPeService peService;
+                HashMap<String, ContainerShape> diagramPads;
+                int i;
                 
-           		IPeCreateService peCreateService = Graphiti.getPeCreateService();
-        		IGaService gaService = Graphiti.getGaService();
-        		
-           		IPeService peService = Graphiti.getPeService();
-        		HashMap<String, ContainerShape> diagramPads = WidgetUtil.getAnchors(cs);
+                try {
+                    // Read the Node info using node-type
+                    Collection<ArroPad> domainPads = ((ArroNode)domainObject).getAssociatedModule().getPads();
+                    Logger.out.trace(Logger.EDITOR, "Found " + domainPads.size() + " pads");
+                    
+                    IPeCreateService peCreateService = Graphiti.getPeCreateService();
+                    gaService = Graphiti.getGaService();
+                    
+                    peService = Graphiti.getPeService();
+                    diagramPads = WidgetUtil.getAnchors(cs);
 
-            	int i = 0;
-            	for(ArroPad pad: domainPads) {
-            		//Logger.out.trace(Logger.EDITOR, "Node has a Pad " + pad.toString());
-            		ContainerShape a = diagramPads.get(pad.getName());
-            		
-            		if(a != null) {
-            			// Domain anchor also found in diagram: remove from oldAnchors, do nothing.
-            			diagramPads.remove(pad.getName());
-            		} else {
-            			// Domain anchor not found in diagram: create new anchor
-            			changed = true;
-            			
-            			// Create container for Anchor, Text and Rectangle
-            			// NOTE: the container must be an active shape: http://www.eclipse.org/forums/index.php/t/174858/
-            			// So we need to disallow moving, removing, deleting it.
-            			// GA for this shape is the Text below.
-        	    		ContainerShape shape = peCreateService.createContainerShape(cs, true);
-                        final Rectangle invs = gaService.createInvisibleRectangle(shape);
-                        ArroNodeAnchorPosition pos = new ArroNodeAnchorPosition(rect, pad.getInput(), i);
-                        gaService.setLocationAndSize(invs, pos.boxPosX(), pos.boxPosY(), pos.boxSizeX(), pos.boxSizeY());
-                      
-                        Graphiti.getPeService().setPropertyValue(shape, Constants.PROP_PICT_KEY, Constants.PROP_PICT_PASSIVE);
+                    i = 0;
+                    for(ArroPad pad: domainPads) {
+                    	//Logger.out.trace(Logger.EDITOR, "Node has a Pad " + pad.toString());
+                    	ContainerShape a = diagramPads.get(pad.getName());
+                    	
+                    	if(a != null) {
+                    		// Domain anchor also found in diagram: remove from oldAnchors, do nothing.
+                    		diagramPads.remove(pad.getName());
+                    	} else {
+                    		// Domain anchor not found in diagram: create new anchor
+                    		changed = true;
+                    		
+                    		// Create container for Anchor, Text and Rectangle
+                    		// NOTE: the container must be an active shape: http://www.eclipse.org/forums/index.php/t/174858/
+                    		// So we need to disallow moving, removing, deleting it.
+                    		// GA for this shape is the Text below.
+                    		ContainerShape shape = peCreateService.createContainerShape(cs, true);
+                            final Rectangle invs = gaService.createInvisibleRectangle(shape);
+                            ArroNodeAnchorPosition pos = new ArroNodeAnchorPosition(rect, pad.getInput(), i);
+                            gaService.setLocationAndSize(invs, pos.boxPosX(), pos.boxPosY(), pos.boxSizeX(), pos.boxSizeY());
+                          
+                            Graphiti.getPeService().setPropertyValue(shape, Constants.PROP_PICT_KEY, Constants.PROP_PICT_PASSIVE);
 
-            			createAnchor(shape, invs, pad.getInput(), pad.getName());
-            		}
-            		
-                    i++;
+                    		createAnchor(shape, invs, pad.getInput(), pad.getName());
+                    	}
+                    	
+                        i++;
+                    }
+                    // NOTE: Deleting anchors will remove connections.
+                    Collection<ContainerShape> toRemove = diagramPads.values();
+                    for(ContainerShape anchor: toRemove) {
+                        peService.deletePictogramElement(anchor);
+                        
+                        changed = true;
+                    }
+
+                    // NOTE: this code would resize invisibleRectangle back to default size even if it
+                    // was increased by user (see Layout). So we only set back to default if pads
+                    // are added or removed.
+                    if(changed) {
+                        Rectangle invisibleRectangle = WidgetUtil.getInvisibleRectangle(cs);
+                        
+                        int x = invisibleRectangle.getX();
+                        int y = invisibleRectangle.getY();
+                        int width = invisibleRectangle.getWidth();
+                        int height = 50 + (15 * i);
+                        gaService.setLocationAndSize(invisibleRectangle, x, y, width, height);
+                        
+                        Graphiti.getGaLayoutService().setLocationAndSize(rect, Constants.HALF_PAD_SIZE, 0, invisibleRectangle.getWidth() - Constants.PAD_SIZE, invisibleRectangle.getHeight());
+                        
+                        Logger.out.trace(Logger.EDITOR, "locsize (" + x + "," + y + ") (" + width+ "," + height + ")");
+                        
+                        // To set location and size.
+                        LayoutContext layoutContext = new LayoutContext(cs);
+                        ILayoutFeature layoutFeature = getFeatureProvider().getLayoutFeature(layoutContext);
+                        layoutFeature.layout(layoutContext);
+
+                    }
+                    ((ArroNode)domainObject).setNeedsUpdate(false);
+                } catch (Exception e) {
+                    rect.setBackground(manageColor(Constants.MODULE_GONE));
+                    rect.setForeground(manageColor(Constants.MODULE_GONE));
                 }
             	
-        		// NOTE: Deleting anchors will remove connections.
-            	Collection<ContainerShape> toRemove = diagramPads.values();
-        		for(ContainerShape anchor: toRemove) {
-        			peService.deletePictogramElement(anchor);
-        			
-        			changed = true;
-        		}
-
-            	// NOTE: this code would resize invisibleRectangle back to default size even if it
-            	// was increased by user (see Layout). So we only set back to default if pads
-        		// are added or removed.
-            	if(changed) {
-        			Rectangle invisibleRectangle = WidgetUtil.getInvisibleRectangle(cs);
-        			
-                    int x = invisibleRectangle.getX();
-                    int y = invisibleRectangle.getY();
-                    int width = invisibleRectangle.getWidth();
-                    int height = 50 + (15 * i);
-        			gaService.setLocationAndSize(invisibleRectangle, x, y, width, height);
-        			
-        			Graphiti.getGaLayoutService().setLocationAndSize(rect, Constants.HALF_PAD_SIZE, 0, invisibleRectangle.getWidth() - Constants.PAD_SIZE, invisibleRectangle.getHeight());
-        			
-        			Logger.out.trace(Logger.EDITOR, "locsize (" + x + "," + y + ") (" + width+ "," + height + ")");
-        			
-        	        // To set location and size.
-        		    LayoutContext layoutContext = new LayoutContext(cs);
-        		    ILayoutFeature layoutFeature = getFeatureProvider().getLayoutFeature(layoutContext);
-        		    layoutFeature.layout(layoutContext);
-
-            	}
-    			((ArroNode)domainObject).setNeedsUpdate(false);
             }
             return true;
         }

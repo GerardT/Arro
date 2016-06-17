@@ -396,11 +396,9 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 					buildInfo.resultPython.appendContents(new ByteArrayInputStream(baos.toByteArray()), true, true, null);
 					baos.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Logger.out.trace(Logger.BUILDER, e.getMessage());
 				} catch (CoreException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+                    Logger.out.trace(Logger.BUILDER, e.getMessage());
 				}
 			}
 		}

@@ -46,10 +46,10 @@ public class StepDeleteFeature extends DefaultDeleteFeature implements ICustomUn
 
 	@Override
 	protected void deleteBusinessObject(Object bo) {
-		if(bo instanceof ArroNode) {
+		if(bo instanceof ArroStep) {
 			ArroStep obj = (ArroStep)bo;
 			
-			obj.getParent().removeState(obj);
+			obj.getParent().removeStep(obj);
 			
 //			obj.getParent().purgeConnections();
 		}

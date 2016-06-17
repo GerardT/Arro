@@ -53,7 +53,7 @@ public class SynchronizationAddFeature extends AbstractAddFeature implements IAd
         ArroSynchronization addedDomainObject = (ArroSynchronization)obj;
         
         String instanceName = "a" + "Sync";
-        while(domainModule.getStateDiagram().getStateByName(instanceName) != null) {
+        while(domainModule.getStateDiagram().getStepByName(instanceName) != null) {
         	instanceName += "1";
         }
         addedDomainObject.setName(instanceName);

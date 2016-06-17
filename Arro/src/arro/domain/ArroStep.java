@@ -69,6 +69,16 @@ public class ArroStep extends NonEmfDomainObject{
  	}
 
 	public ArrayList<ArroAction> getEntryActions() {
+	    // Make sure there is a least one empty action ("", "")
+	    int i = 0;
+        for(ArroAction entry : entryActions) {
+            if(entry.getName().equals("") && entry.getState().equals("")) {
+                i++;
+            }
+        }
+        if(i == 0) {
+            entryActions.add(new ArroAction("", ""));
+        }
 		return entryActions;
 	}
 	
@@ -91,9 +101,5 @@ public class ArroStep extends NonEmfDomainObject{
         for(ArroAction entry : removals) {
             entryActions.remove(entry);
         }
-        
-        entryActions.add(new ArroAction("", ""));
-
 	}
-
 }
