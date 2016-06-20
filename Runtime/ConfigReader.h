@@ -9,6 +9,7 @@
 #include "Trace.h"
 
 #define ARRO_NAME_SEPARATOR "."
+#define ARRO_SFC_INSTANCE   "._Sfc"
 
 
 namespace Arro

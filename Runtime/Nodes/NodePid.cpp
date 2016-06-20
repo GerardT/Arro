@@ -7,7 +7,7 @@ using namespace Arro;
 using namespace arro;
 
 
-NodePid::NodePid(Process* d, string& /*name*/, ConfigReader::StringMap& params):
+NodePid::NodePid(Process* d, const string& /*name*/, ConfigReader::StringMap& params):
     trace("NodePid", true),
     device(d) {
 

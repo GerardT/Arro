@@ -31,6 +31,7 @@ SRCS         := main.cpp \
 		Pad.cpp \
 		Process.cpp \
 		PythonGlue.cpp \
+		Nodes/NodeSfc.cpp \
 		Nodes/NodePid.cpp \
 		Nodes/NodePython.cpp \
 		Nodes/NodeTimer.cpp \

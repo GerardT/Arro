@@ -4,6 +4,7 @@
 
 #include "Trace.h"
 #include "ServerEngine.h"
+#include "NodeSfc.h"
 #include "NodePid.h"
 #include "NodePython.h"
 #include "NodePass.h"
@@ -18,16 +19,30 @@ using namespace Arro;
 using namespace std;
 
 
-Process::Process(NodeDb& db, const string& url, string& instance, ConfigReader::StringMap params):
+Process::Process(NodeDb& db, const string& instance):
     AbstractNode(instance),
     trace("Process", true),
     nodeDb(db),
+    device(nullptr),
+    doRunCycle(false) {
+
+    trace.println("Creating sfc " + instance + "._sfc");
+
+    db.registerNode(this, instance + "._sfc");
+
+}
+
+Process::Process(NodeDb& db, const string& url, const string& instance, ConfigReader::StringMap params, TiXmlElement* elt):
+    AbstractNode(instance),
+    trace("Process", true),
+    nodeDb(db),
+    device(nullptr),
     doRunCycle(false) {
 
     trace.println("Creating instance of " + url);
 
 
-    getPrimitive(url, instance, params);
+    getPrimitive(url, instance, params, elt);
 
     std::map<std::string, std::string>::iterator iter;
 
@@ -48,7 +63,7 @@ Process::Process(NodeDb& db, const string& url, string& instance, ConfigReader::
 }
 
 Process::~Process() {
-    delete device;
+    if(device) delete device;
 }
 
 void
@@ -98,7 +113,7 @@ Process::getOutput(const string& name) {
 
 
 void
-Process::getPrimitive(const string& url, string& instance, ConfigReader::StringMap& params) {
+Process::getPrimitive(const string& url, const string& instance, ConfigReader::StringMap& params, TiXmlElement* elt) {
 	device = nullptr;
 
     if(url.find("Python:") == 0) {
@@ -106,6 +121,14 @@ Process::getPrimitive(const string& url, string& instance, ConfigReader::StringM
         try {
             string className = url.substr(7);
             device = new NodePython(this, className, params);
+        } catch(out_of_range &) {
+            throw std::runtime_error("Invalid URL " + url);
+        }
+    } else if(url.find("Sfc:") == 0) {
+        trace.println("new NodeSfc(" + instance + ")");
+        try {
+            //string className = url.substr(7);
+            device = new NodeSfc(this, elt);
         } catch(out_of_range &) {
             throw std::runtime_error("Invalid URL " + url);
         }

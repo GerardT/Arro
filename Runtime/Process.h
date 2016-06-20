@@ -35,7 +35,8 @@ namespace Arro
          * \param instance Name of this instance.
          * \param params List of parameters to pass to node.
          */
-        Process(NodeDb& nodeDb, const std::string& url, std::string& instance, ConfigReader::StringMap params);
+        Process(NodeDb& nodeDb, const std::string& url, const std::string& instance, ConfigReader::StringMap params, TiXmlElement* elt = nullptr);
+        Process(NodeDb& nodeDb, const std::string& instance);
         ~Process();
 
         // Copy and assignment is not supported.
@@ -49,14 +50,14 @@ namespace Arro
          * \param interfaceName Name of the interface to register.
          * \param enableRunCycle Set runCycle to true every time a message is received on this interface.
          */
-        void registerInput(const std::string& interfaceName, bool enableRunCycle);
+        virtual void registerInput(const std::string& interfaceName, bool enableRunCycle);
 
         /**
          * Called from ConfigReader in order to register an output Pad as output.
          *
          * \param interfaceName Name of the interface to register.
          */
-        void registerOutput(const std::string& interfaceName);
+        virtual void registerOutput(const std::string& interfaceName);
 
         /**
          * Lookup an output by its name, which is concatenated: "procesname.name".
@@ -70,7 +71,7 @@ namespace Arro
          * cycle if at least one input configured to trigger a cycle received a
          * message.
          */
-        void runCycle();
+        virtual void runCycle();
 
         /**
          * Instantiate a node of the given primitive type.
@@ -79,7 +80,7 @@ namespace Arro
          * \param instance Node instance.
          * \param params Parameter list to pass to the node.
          */
-        void getPrimitive(const std::string& url, std::string& instance, ConfigReader::StringMap& params);
+        void getPrimitive(const std::string& url, const std::string& instance, ConfigReader::StringMap& params, TiXmlElement* elt = nullptr);
 
     private:
         Trace trace;

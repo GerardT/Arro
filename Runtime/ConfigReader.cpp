@@ -97,7 +97,8 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
 void
 ConfigReader::makeNodeInstance(const string& typeName, const string& instanceName, const string& instancePrefix, StringMap& import_params) {
     Definition* def = definitions[typeName];
-    Process* processNode = nullptr;
+    Process* processNode = nullptr;  // Note: if there is a process node (=device) there will be only one in module.
+    Process* sfcNode = nullptr;
 
     if(def == nullptr)
     {
@@ -107,6 +108,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
     }
     string instance = instancePrefix + ARRO_NAME_SEPARATOR + instanceName;
 
+    trace.newln();
     trace.println("makeNodeInstance for " + typeName + ", " + instance);
     TiXmlElement* elt;
 
@@ -124,11 +126,41 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             // create Process object; inputs & outputs to be added later.
             processNode = new Process(nodeDb, *typeURL, instance, *params);
 
+            // EXTRA
+            processNode->registerInput("_action", true);
+
+
             delete params;
         }
         elt = elt->NextSiblingElement("device");
     }
+    // Read devices (the leaves in the tree) There should be only one sfc node.
+    elt = def->node->FirstChildElement("sfc");
+    while(elt) {
+        StringMap* params = new StringMap();
 
+        // EXTRA Simulate adding a new module
+        {
+            /*
+            <nodedefinition id="12...34" type="_Sfc">
+                <device id="12...34" url="Sfc:"/>
+                <pad id="12...34" input="true" name="_action" run="true" type="Action"/>
+                <pad id="12...34" input="false" name="_action_nodeX" run="true" type="Action"/>
+                <pad id="12...34" input="false" name="_action_nodeY" run="true" type="Action"/>
+            </nodedefinition>
+
+            Pads for nodeX and nodeY are added when parsing those nodes.
+            */
+
+            string instanceSfc = instance + ARRO_SFC_INSTANCE;
+
+            sfcNode = new Process(nodeDb, "Sfc:", instanceSfc, *params, elt);
+
+            sfcNode->registerInput("_action", true);
+        }
+
+        elt = elt->NextSiblingElement("sfc");
+    }
     // Read nodes (the branches in the tree)
     elt = def->node->FirstChildElement("node");
     while(elt) {
@@ -142,8 +174,24 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
             makeNodeInstance(*typeAttr,  *idAttr,  instance, *params);
 
+            {
+                // EXTRA Register _action output for each node with Sfc Node
+                sfcNode->registerOutput("_action_" + *idAttr);
+
+                // EXTRA Create an _action input pad in every module
+                new Pad(nodeDb, "Action", instance + ARRO_NAME_SEPARATOR + "_action");
+
+                // Connect to just created node (in makeNodeInstance).
+                string from = instance + ARRO_SFC_INSTANCE + ARRO_NAME_SEPARATOR + "_action_" + *idAttr;
+
+                string to = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_NAME_SEPARATOR + "_action";
+
+                trace.println("nodeDb.connect(" + from + ", " + to + ")");
+                nodeDb.connect(from, to);
+            }
             delete params;
         }
+
         elt = elt->NextSiblingElement("node");
     }
 
@@ -175,6 +223,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
         }
         elt = elt->NextSiblingElement("pad");
     }
+
 
     // Read connections
     elt = def->node->FirstChildElement("connection");

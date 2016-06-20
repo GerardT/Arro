@@ -129,7 +129,7 @@ NodeServo::Servo::start(int ch, int val) {
 NodeServo::Servo* NodeServo::pServo = nullptr;
 
 
-NodeServo::NodeServo(Process* d, string& /*name*/, ConfigReader::StringMap& params):
+NodeServo::NodeServo(Process* d, const string& /*name*/, ConfigReader::StringMap& params):
     trace("NodeServo", true),
     device(d),
     previous_position(0),

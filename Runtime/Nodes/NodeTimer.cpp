@@ -17,7 +17,7 @@ using namespace arro;
 static list<NodeTimer*> timers;
 static bool running = false;
 
-NodeTimer::NodeTimer(Process* d, string& /*name*/, ConfigReader::StringMap& params):
+NodeTimer::NodeTimer(Process* d, const string& /*name*/, ConfigReader::StringMap& params):
     trace("NodePid", true),
     device(d) {
 

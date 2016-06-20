@@ -16,7 +16,7 @@ namespace Arro
     	 * \param name Name of this node.
     	 * \param params List of parameters passed to this node.
     	 */
-        NodeTimer(Process* d, std::string& name, ConfigReader::StringMap& params);
+        NodeTimer(Process* d, const std::string& name, ConfigReader::StringMap& params);
         virtual ~NodeTimer();
 
         // Copy and assignment is not supported.

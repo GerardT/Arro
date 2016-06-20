@@ -49,6 +49,12 @@ namespace Arro {
             }
         }
 
+        void newln() const {
+            if(out == true) {
+                std::cout << "" << std::endl;
+            }
+        }
+
         /**
          * Fatal error - string is printed and sw exits.
          *

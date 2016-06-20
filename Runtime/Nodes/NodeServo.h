@@ -23,7 +23,7 @@ namespace Arro {
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodeServo(Arro::Process* d, std::string& name, Arro::ConfigReader::StringMap& params);
+        NodeServo(Arro::Process* d, const std::string& name, Arro::ConfigReader::StringMap& params);
         virtual ~NodeServo() {};
 
         // Copy and assignment is not supported.
