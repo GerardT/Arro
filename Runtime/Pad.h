@@ -15,13 +15,13 @@ namespace Arro
     class Pad: public AbstractNode {
     public:
 
-    	/**
-    	 * Constructor.
-    	 *
-    	 * \param nodeDb Node database.
-    	 * \param datatype Datatype of messages that this pad should pass.
-    	 * \param name Name of the pad.
-    	 */
+        /**
+         * Constructor.
+         *
+         * \param nodeDb Node database.
+         * \param datatype Datatype of messages that this pad should pass.
+         * \param name Name of the pad.
+         */
         Pad(NodeDb& nodeDb, const std::string& datatype, const std::string& name);
         virtual ~Pad() {};
 

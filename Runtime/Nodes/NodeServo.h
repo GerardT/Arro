@@ -97,7 +97,7 @@ namespace Arro {
         int Ch;
         ConfigReader::StringMap params;
 
-    	static Servo* pServo;
+        static Servo* pServo;
     };
 }
 

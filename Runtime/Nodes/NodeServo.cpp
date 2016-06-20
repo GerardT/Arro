@@ -85,7 +85,7 @@ NodeServo::Servo::setPWMFreq(double freq) {
     prescaleval -= 1.0;
 
     trace.println("Setting PWM frequency to %d Hz", freq);
-	trace.println("Estimated pre-scale: %d", prescaleval);
+    trace.println("Estimated pre-scale: %d", prescaleval);
 
     int prescale = (int)(prescaleval + 0.5);
     trace.println("Final pre-scale", prescale);
@@ -104,7 +104,7 @@ NodeServo::Servo::setPWMFreq(double freq) {
 NodeServo::Servo::Servo(int address, const char* filename):
     trace("Servo", true),
     prescaleval(0),
-	addr(address){
+    addr(address){
 
     if ((file = open(filename,O_RDWR)) < 0) {
         trace.fatal("Failed to open the bus errno", errno);

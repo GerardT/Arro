@@ -58,14 +58,14 @@ static int readln(int sockfd, char* buffer, size_t n/*size*/) {
                 continue;
             else {
                 // Make losing socket to terminate process.
-            	trace.println("ServerEngine losing socket, terminated!");
+                trace.println("ServerEngine losing socket, terminated!");
                 strcpy(buffer, "terminate");
                 return strlen("terminate");
             }
 
         } else if (numRead == 0) {      /* EOF */
             if (totRead == 0) {         /* No bytes read */
-            	trace.println("ServerEngine terminated!\n");
+                trace.println("ServerEngine terminated!\n");
                 strcpy(buffer, "terminate");
                 return strlen("terminate");
             }
@@ -92,27 +92,27 @@ static int readln(int sockfd, char* buffer, size_t n/*size*/) {
  */
 static void cleanup()
 {
-	trace.println("Cleanup");
-	if(nodeDb) {
+    trace.println("Cleanup");
+    if(nodeDb) {
         /* 1: stop message flow */
-		trace.println("-- nodeDb");
+        trace.println("-- nodeDb");
         nodeDb->stop();
 
         /* 2: delete node database */
         delete nodeDb; // will automatically stop timers etc.
         nodeDb = nullptr;
-	}
+    }
 
     /* 3: stop python */
     if(pg) {
-		trace.println("-- PythonGlue");
+        trace.println("-- PythonGlue");
         delete pg;
         pg = nullptr;
     }
 
     /* 4: close socket - probably already closed by Eclipse client */
     if(newsockfd != -1) {
-		trace.println("-- socket");
+        trace.println("-- socket");
         close(newsockfd);
         newsockfd = -1;
     }
@@ -126,11 +126,11 @@ static void cleanup()
  */
 int syswrap(const string& command)
 {
-	int ret = system(command.c_str());
-	if(ret != 0) {
-	    trace.fatal("system command failed");
-	}
-	return ret;
+    int ret = system(command.c_str());
+    if(ret != 0) {
+        trace.fatal("system command failed");
+    }
+    return ret;
 }
 
 
@@ -265,8 +265,8 @@ static void server()
                         nodeDb->start();
                         ServerEngine::console("run successful");
                     } catch ( const std::runtime_error& e ) {
-                    	trace.println("Instantiating PythonGlue failed");
-                    	cleanup();
+                        trace.println("Instantiating PythonGlue failed");
+                        cleanup();
 
                         ServerEngine::console("run failed");
                     }
@@ -274,7 +274,7 @@ static void server()
             }
             else if(!strcmp(command, "terminate"))
             {
-            	cleanup();
+                cleanup();
                 break;
             }
             else if(!strcmp(command, "pwd"))

@@ -92,11 +92,11 @@ namespace Arro
          */
         class NodeMultiOutput {
         public:
-        	/**
-        	 * Constructor for NodeMultiOutput.
-        	 *
-        	 * \param db Node database.
-        	 */
+            /**
+             * Constructor for NodeMultiOutput.
+             *
+             * \param db Node database.
+             */
             NodeMultiOutput(NodeDb* db);
             virtual ~NodeMultiOutput() {};
 
@@ -139,12 +139,12 @@ namespace Arro
 
         class FullMsg {
         public:
-        	/**
-        	 * Constructor for (addressable) message container.
-        	 *
-        	 * \param o NodeMultiOutput instance where to send this message to.
-        	 * \param s Message buffer to send.
-        	 */
+            /**
+             * Constructor for (addressable) message container.
+             *
+             * \param o NodeMultiOutput instance where to send this message to.
+             * \param s Message buffer to send.
+             */
             FullMsg(NodeMultiOutput* o, MessageBuf* s);
             virtual ~FullMsg() {};
 

@@ -9,13 +9,13 @@
 namespace Arro {
     class NodeSfc: public IDevice {
     public:
-    	/**
-    	 * Constructor
-    	 *
-    	 * \param device The Process node instance.
-    	 * \param name Name of this node.
-    	 * \param params List of parameters passed to this node.
-    	 */
+        /**
+         * Constructor
+         *
+         * \param device The Process node instance.
+         * \param name Name of this node.
+         * \param params List of parameters passed to this node.
+         */
         NodeSfc(Process* device, TiXmlElement* elt);
         virtual ~NodeSfc() {};
 

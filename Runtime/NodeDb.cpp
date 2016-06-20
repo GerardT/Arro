@@ -22,7 +22,7 @@ NodeDb::NodeDb():
     inQueue(),
     pInQueue(&inQueue),
     running(false),
-	thrd(nullptr) {
+    thrd(nullptr) {
 }
 
 NodeDb::~NodeDb() {
@@ -159,7 +159,7 @@ NodeDb::runCycle(NodeDb* nm) {
         while(nm->running)
         {
             // Deliver all messages to the right nodes until empty
-        	{
+            {
                 std::unique_lock<std::mutex> lock(nm->mutex);
 
                 while(!(nm->pInQueue->empty())) {
@@ -173,10 +173,10 @@ NodeDb::runCycle(NodeDb* nm) {
                         delete fm;
                     }
                 }
-        	} // make sure mutex is unlocked here
+            } // make sure mutex is unlocked here
 
             /* Then trigger all runCycle methods on nodes */
-			for_each(nm->allNodes.begin(), nm->allNodes.end(), [&](pair<string, AbstractNode*> n) { n.second->runCycle(); });
+            for_each(nm->allNodes.begin(), nm->allNodes.end(), [&](pair<string, AbstractNode*> n) { n.second->runCycle(); });
 
             {
                 std::unique_lock<std::mutex> lock(nm->mutex);
@@ -186,8 +186,8 @@ NodeDb::runCycle(NodeDb* nm) {
             } // make sure mutex is unlocked here
         }
     } catch (std::runtime_error& e) {
-    	// If exception, for instance Python (syntax) error, then thread exits here.
-    	// User can stop NodeDb after that.
+        // If exception, for instance Python (syntax) error, then thread exits here.
+        // User can stop NodeDb after that.
         nm->trace.println("Execution stopped, error " + string(e.what()));
         ServerEngine::console(string(e.what()));
     }

@@ -114,7 +114,7 @@ Process::getOutput(const string& name) {
 
 void
 Process::getPrimitive(const string& url, const string& instance, ConfigReader::StringMap& params, TiXmlElement* elt) {
-	device = nullptr;
+    device = nullptr;
 
     if(url.find("Python:") == 0) {
         trace.println("new NodePython(" + instance + ")");

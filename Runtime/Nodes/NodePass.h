@@ -6,12 +6,12 @@
 namespace Arro {
     class NodePass: public IDevice {
     public:
-    	/**
-    	 * Constructor
-    	 *
-    	 * \param datatype Data type that this node will pass.
-    	 * \param name Name of this node.
-    	 */
+        /**
+         * Constructor
+         *
+         * \param datatype Data type that this node will pass.
+         * \param name Name of this node.
+         */
         NodePass(std::string& datatype, std::string& name);
         virtual ~NodePass() {};
 

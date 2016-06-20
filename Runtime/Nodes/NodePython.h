@@ -13,13 +13,13 @@
 namespace Arro {
     class NodePython: public IDevice {
     public:
-    	/**
-    	 * Constructor
-    	 *
-    	 * \param device The Process node instance.
-    	 * \param className Name of this node.
-    	 * \param params List of parameters passed to this node.
-    	 */
+        /**
+         * Constructor
+         *
+         * \param device The Process node instance.
+         * \param className Name of this node.
+         * \param params List of parameters passed to this node.
+         */
         NodePython(Process* device, std::string& className, ConfigReader::StringMap& params);
         virtual ~NodePython();
 

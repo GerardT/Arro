@@ -9,13 +9,13 @@
 namespace Arro {
     class NodePid: public IDevice {
     public:
-    	/**
-    	 * Constructor
-    	 *
-    	 * \param device The Process node instance.
-    	 * \param name Name of this node.
-    	 * \param params List of parameters passed to this node.
-    	 */
+        /**
+         * Constructor
+         *
+         * \param device The Process node instance.
+         * \param name Name of this node.
+         * \param params List of parameters passed to this node.
+         */
         NodePid(Process* device, const std::string& name, ConfigReader::StringMap& params);
         virtual ~NodePid() {};
 
