@@ -125,7 +125,7 @@ public class ResourceCache {
 	     
 	    	Logger.out.trace(Logger.STD, "Root element :" + doc.getDocumentElement().getNodeName());
 	    	
-	    	NodeList nList = doc.getElementsByTagName("nodedefinition");
+	    	NodeList nList = doc.getElementsByTagName("module");
 	    	for (int temp = 0; temp < nList.getLength(); temp++) {
 	     
 	    		Node nNode = nList.item(temp);
@@ -162,7 +162,7 @@ public class ResourceCache {
 			// root elements
 			Document doc = builder.newDocument();
 
-			Element elt = doc.createElement("nodedefinition");
+			Element elt = doc.createElement("module");
 			doc.appendChild(elt);
 			
 			domainModule.xmlWrite(doc, elt);

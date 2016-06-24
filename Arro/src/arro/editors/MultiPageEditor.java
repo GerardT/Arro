@@ -200,7 +200,9 @@ public class MultiPageEditor extends MultiPageEditorPart implements
 
         // Create page 0 containing Graphiti editor. File was just unzipped in ResourceCache.
         createPage0(fei.getName(), zip);
-        createPage2(fei.getName(), zip);
+        if(documentType == Constants.FunctionBlock) {
+            createPage2(fei.getName(), zip);
+        }
         if(documentType == Constants.CodeBlockPython) {
             createPage1(fei.getName(), zip);
         }
@@ -224,10 +226,13 @@ public class MultiPageEditor extends MultiPageEditorPart implements
      * Saves the multi-page editor's document.
      */
     public void doSave(IProgressMonitor monitor) {
-        getEditor(0).doSave(monitor);
-        getEditor(1).doSave(monitor);
+        int i = 0;
+        getEditor(i++).doSave(monitor);
+        if(documentType == Constants.FunctionBlock) {
+            getEditor(i++).doSave(monitor);
+        }
         if(documentType == Constants.CodeBlockPython) {
-            getEditor(2).doSave(monitor);
+            getEditor(i++).doSave(monitor);
         }
         
 		ResourceCache.getInstance().storeDomainDiagram(zip);

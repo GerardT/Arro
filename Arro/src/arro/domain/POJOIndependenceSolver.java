@@ -98,10 +98,6 @@ public class POJOIndependenceSolver implements IIndependenceSolver {
 	}
 
 	public void RegisterPOJOObject(NonEmfDomainObject nonEmfDomainObject) {
-	    if(nonEmfDomainObject.getId().equals("")) {
-	        // some objects such as _mode are not shown in diagram hence have no id.
-	        return;
-	    }
 		Collection<NonEmfDomainObject> list = domainObjects.values();
 		for(NonEmfDomainObject obj: list) {
 			if(obj == nonEmfDomainObject) {

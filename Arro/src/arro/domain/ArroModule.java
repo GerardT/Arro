@@ -30,7 +30,7 @@ public class ArroModule extends NonEmfDomainObject  {
 	public ArroModule() {
 		super();
 		// should only be one state diagram.
-		stateDiagram = new ArroSequenceChart();
+		stateDiagram = null;
 	}
 	
 	/*
@@ -98,7 +98,11 @@ public class ArroModule extends NonEmfDomainObject  {
 	}
 	
 	public ArrayList<String> getStateNames() {
-		return stateDiagram.getStateNames();
+	    if(stateDiagram == null) {
+	        return new ArrayList<String>(); // empty
+	    } else {
+    		return stateDiagram.getStateNames(); 
+	    }
 	}
 
 
@@ -247,7 +251,7 @@ public class ArroModule extends NonEmfDomainObject  {
 		}
 		
 		if(stateDiagram != null) {
-			Element sub = doc.createElement("states");
+			Element sub = doc.createElement("sfc");
 			elt.appendChild(sub);
 			
 			stateDiagram.xmlWrite(doc, sub);
@@ -298,7 +302,8 @@ public class ArroModule extends NonEmfDomainObject  {
 		    		// let xmlRead first read the id so the right key is used in nodes.
 		    		addNode(newNode);
 	    		}
-	    		if(sub.getNodeName().equals("states")) {
+	    		if(sub.getNodeName().equals("sfc")) {
+	    		    stateDiagram = new ArroSequenceChart();
 
 	    			stateDiagram.xmlRead(sub);
 	    			

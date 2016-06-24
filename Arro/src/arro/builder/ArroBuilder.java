@@ -240,7 +240,7 @@ public class ArroBuilder extends IncrementalProjectBuilder {
             // Write prolog for arro.xml
 			baos = new ByteArrayOutputStream();
 			baos.write(("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n" +
-						"<diagrams>\n").getBytes());
+						"<modules>\n").getBytes());
 	    	
 			IFile resultFileNodes = folder.getFile("arro.xml");
 
@@ -282,7 +282,7 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			}
 			
             // Write epilog for arro.xml
-			resultFileNodes.appendContents(new ByteArrayInputStream("</diagrams>\n".getBytes()), true, true, null);
+			resultFileNodes.appendContents(new ByteArrayInputStream("</modules>\n".getBytes()), true, true, null);
 
 	    } catch (Exception e) {
 	    	e.printStackTrace();

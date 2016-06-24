@@ -32,18 +32,18 @@ public class ArroAction {
 	public void xmlWrite(Document doc, Element elt) {
 		Attr attr = null;
 		
-		attr = doc.createAttribute("name");
+		attr = doc.createAttribute("node");
 		attr.setValue(name);
 		elt.setAttributeNode(attr);
 		
-		attr = doc.createAttribute("state");
+		attr = doc.createAttribute("action");
 		attr.setValue(state);
 		elt.setAttributeNode(attr);
 	}
 	public void xmlRead(Node nNode) {
 		Element eElement = (Element) nNode;
-    	name = (eElement.getAttribute("name"));
-    	state = (eElement.getAttribute("state"));
+    	name = (eElement.getAttribute("node"));
+    	state = (eElement.getAttribute("action"));
 	}
 
 }
