@@ -50,8 +50,8 @@ NodeSfc::NodeSfc(Process* d, TiXmlElement* elt):
 
         TiXmlElement* eltAction = eltStep->FirstChildElement("entry-action");
         while(eltAction) {
-            const string* actionNameAttr = eltStep->Attribute(string("name"));
-            const string* actionActionAttr = eltStep->Attribute(string("state"));
+            const string* actionNameAttr = eltStep->Attribute(string("node"));
+            const string* actionActionAttr = eltStep->Attribute(string("action"));
             if(actionNameAttr && actionActionAttr) {
                 step->AddEntryAction(*actionNameAttr, *actionActionAttr);
             }

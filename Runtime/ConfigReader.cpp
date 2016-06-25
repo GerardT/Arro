@@ -27,21 +27,21 @@ ConfigReader::ConfigReader(const string& filename, NodeDb& db):
         return;
     }
 
-    TiXmlElement* node = doc.FirstChildElement("diagrams");
+    TiXmlElement* node = doc.FirstChildElement("modules");
 
     if(!node) {
-        trace.println("node 'diagrams' missing");
-        throw std::runtime_error("node 'diagrams' missing");
+        trace.println("node 'modules' missing");
+        throw std::runtime_error("node 'modules' missing");
     }
 
-    // Collect all nodedefinition blocks and store them in map 'definitions'.
-    TiXmlElement* elt = node->FirstChildElement("nodedefinition");
+    // Collect all module blocks and store them in map 'definitions'.
+    TiXmlElement* elt = node->FirstChildElement("module");
     while (elt) {
         storeDefinition(elt);
-        elt = elt->NextSiblingElement("nodedefinition");
+        elt = elt->NextSiblingElement("module");
     }
 
-    // Recursively process all nodedefinitions, starting with "Main"
+    // Recursively process all modules, starting with "Main"
     makeNodeInstance("Main", "main", "", *params);
 }
 
@@ -142,12 +142,12 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
         // EXTRA Simulate adding a new module
         {
             /*
-            <nodedefinition id="12...34" type="_Sfc">
+            <module id="12...34" type="_Sfc">
                 <device id="12...34" url="Sfc:"/>
                 <pad id="12...34" input="true" name="_action" run="true" type="Action"/>
                 <pad id="12...34" input="false" name="_action_nodeX" run="true" type="Action"/>
                 <pad id="12...34" input="false" name="_action_nodeY" run="true" type="Action"/>
-            </nodedefinition>
+            </module>
 
             Pads for nodeX and nodeY are added when parsing those nodes.
             */
