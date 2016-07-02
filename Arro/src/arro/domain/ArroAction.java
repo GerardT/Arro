@@ -8,14 +8,14 @@ import org.w3c.dom.Node;
 public class ArroAction {
 	String name;
 	String state;
-	ArroStep parent;
+	ArroTransition parent;
 	
 	public ArroAction(String name, String state) {
 		this.name = name;
 		this.state = state;
 	}
-	public ArroAction(ArroStep parent) {
-		this.parent = parent;
+	public ArroAction(ArroTransition arroTransition) {
+		this.parent = arroTransition;
 	}
 	public String getName() {
 		return name;

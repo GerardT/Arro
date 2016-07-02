@@ -101,14 +101,8 @@
           <propertyTab
              afterTab="arro.main.tab"
              category="Graphiti"
-             id="arro.state-entry.tab"
-             label="Entry Actions">
-          </propertyTab>
-          <propertyTab
-             afterTab="arro.main.tab"
-             category="Graphiti"
-             id="arro.state-exit.tab"
-             label="Exit Actions">
+             id="arro.set-actions.tab"
+             label="Set Actions">
           </propertyTab>
       </propertyTabs>
     </extension>
@@ -154,10 +148,10 @@
               tab="arro.step.tab">
           </propertySection>
           <propertySection
-              class="property.ArroStateEntrySection"
-              filter="property.ArroStepFilter"
-              id="arro.state-entry.section"
-              tab="arro.state-entry.tab">
+              class="property.ArroSetActionsSection"
+              filter="property.ArroSetActionsFilter"
+              id="arro.set-actions.section"
+              tab="arro.set-actions.tab">
           </propertySection>
           <propertySection
               class="property.ArroConditionSection"
