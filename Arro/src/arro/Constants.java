@@ -12,9 +12,17 @@ public class Constants {
 	public final static String NODE_EXT = "anod";
 	public final static String MESSAGE_EXT = "amsg";
 	
+	// temp file name after unzip
+	public final static String SFC_FILE_NAME = Constants.HIDDEN_RESOURCE + Constants.STATE_NODE_DIAGRAM_TYPE;
+	
 	// Editor types - Diagram.getDiagramTypeId() will return:
 	public final static String FUNCTION_DIAGRAM_TYPE = "Arro"; // must match with plugin.xml
-	public final static String STATE_DIAGRAM_TYPE = "ArroStateDiagram"; // must match with plugin.xml
+	
+    public final static String STATE_NODE_DIAGRAM_TYPE = "ArroStateDiagram"; // must match with plugin.xml
+    public final static String STATE_NODE_DIAGRAM_TYPE_PROVIDER = "Arro.StateDiagramTypeProvider"; // must match with plugin.xml
+    public final static String STATE_LEAF_DIAGRAM_TYPE = "ArroSfcLeafDiagram"; // must match with plugin.xml
+    public final static String STATE_LEAF_DIAGRAM_TYPE_PROVIDER = "Arro.SfcLeafTypeProvider"; // must match with plugin.xml
+    // Provider = Handler object that handles e.g. doc type.
 	
 	// Document types - defined in META file
 	public final static String FUNCTION_BLOCK = "Function";

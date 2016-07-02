@@ -1,6 +1,5 @@
 package arro.editors;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.LayerConstants;
@@ -8,18 +7,14 @@ import org.eclipse.gef.editparts.LayerManager;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
-import util.ArroZipFile;
-import util.PathUtil;
 import arro.Constants;
 import arro.domain.ArroModule;
-import arro.domain.POJOIndependenceSolver;
-import arro.domain.ResourceCache;
+import util.ArroZipFile;
+import util.PathUtil;
 
 /**
  * Subclass of DiagramEditor (Graphiti diagram editor), allows override some
@@ -31,7 +26,6 @@ public class FunctionDiagramEditor extends DiagramEditor {
 	//public final static String ID = "org.activiti.designer.diagrameditor"; //$NON-NLS-1$
 	private int documentType = Constants.FunctionBlock;
 	
-	private String pojoFilePath;
 	private String diagramName;
 	private ArroModule domainModule;
 	private ArroZipFile zip;

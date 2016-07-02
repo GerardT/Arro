@@ -15,6 +15,7 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 	private String nodeType;
 	private HashMap<String, ArroStep> steps = new HashMap<String, ArroStep>();
 	private HashMap<String, ArroTransition> transitions = new HashMap<String, ArroTransition>();
+    private ArrayList<String> publishedActions = new ArrayList<String>();;
 	private ArroModule parent;
 	
 	@SuppressWarnings("unchecked")
@@ -44,7 +45,19 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 	public void setType(String name) {
 		this.nodeType = name;
 	}
-	
+
+    public void updatePublishedActions(String action, String newValue) {
+        int index = publishedActions.indexOf(action);
+        if(index != -1) {
+            publishedActions.set(index, newValue);
+        }
+    }
+
+    public ArrayList<String> getPublishedActions() {
+        publishedActions.add("");
+        return publishedActions;
+    }
+    
 	public void xmlWrite(Document doc, Element elt) {
 		Attr attr = null;
 		
@@ -76,6 +89,15 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 			
 			transition.xmlWrite(doc, sub);
 		}
+        for(String action: publishedActions) {
+            
+            Element sub = doc.createElement("published-action");
+            elt.appendChild(sub);
+            
+            attr = doc.createAttribute("action");
+            attr.setValue(action);
+            sub.setAttributeNode(attr);
+        }
 	}
 	public void xmlRead(Node nNode) {
 		Element eElement = (Element) nNode;
@@ -95,14 +117,19 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 	    		
 	    		addState(state);
 			}
-			if(sub.getNodeName().equals("transition")) {
-	    		Element eSubElement = (Element) sub;
-	    		ArroTransition transition = new ArroTransition();
-	    		
-	    		transition.xmlRead(eSubElement);
-	    		
-	    		addTransition(transition);
-			}
+            if(sub.getNodeName().equals("transition")) {
+                Element eSubElement = (Element) sub;
+                ArroTransition transition = new ArroTransition();
+                
+                transition.xmlRead(eSubElement);
+                
+                addTransition(transition);
+            }
+            if(sub.getNodeName().equals("published-actions")) {
+                Element eSubElement = (Element) sub;
+                String action = eSubElement.getAttribute("action");
+                publishedActions.add(action);
+            }
     	}
    	}
 

@@ -14,16 +14,30 @@
             type="ArroStateDiagram"
             id="Arro.StateDiagramType">
          </diagramType>
+         <diagramType
+            name="Arro State Diagram Type"
+            type="ArroSfcLeafDiagram"
+            id="Arro.ArroSfcLeafDiagramType">
+         </diagramType>
     </extension>
     <extension
          point="org.eclipse.graphiti.ui.diagramTypeProviders">
        <diagramTypeProvider
-            class="arro.diagram.types.StateDiagramTypeProvider"
+            class="arro.diagram.types.SfcNodeTypeProvider"
             context="org.eclipse.graphiti.ui.diagramEditor"
             id="Arro.StateDiagramTypeProvider"
-            name="Arro State Diagram Type Provider">
+            name="Arro SFC Diagram Type Provider">
             <diagramType
                id="Arro.StateDiagramType">
+            </diagramType>
+       </diagramTypeProvider>
+       <diagramTypeProvider
+            class="arro.diagram.types.SfcLeafTypeProvider"
+            context="org.eclipse.graphiti.ui.diagramEditor"
+            id="Arro.SfcLeafTypeProvider"
+            name="Arro State Diagram Type Provider">
+            <diagramType
+               id="Arro.ArroSfcLeafDiagramType">
             </diagramType>
        </diagramTypeProvider>
        <diagramTypeProvider
@@ -72,6 +86,12 @@
              category="Graphiti"
              id="arro.modedef.tab"
              label="Transition">
+          </propertyTab>
+          <propertyTab
+             afterTab="arro.param.tab"
+             category="Graphiti"
+             id="arro.published-actions.tab"
+             label="Published Actions">
           </propertyTab>
           <propertyTab
              category="Graphiti"
@@ -144,6 +164,12 @@
               filter="property.ArroConditionFilter"
               id="arro.modedef.section"
               tab="arro.modedef.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroPublishedActionsSection"
+              filter="property.ArroPublishedActionsFilter"
+              id="arro.published-actions.section"
+              tab="arro.published-actions.tab">
           </propertySection>
       </propertySections>
     </extension>
