@@ -8,11 +8,8 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.graphiti.dt.AbstractDiagramTypeProvider;
-import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IDiagramBehavior;
-import org.eclipse.graphiti.tb.IDecorator;
 import org.eclipse.graphiti.tb.IToolBehaviorProvider;
 
 import util.Logger;
@@ -21,12 +18,12 @@ import util.Logger;
  * Even for same diagram type there will be one instance of this class.
  *
  */
-public class FunctionDiagramTypeProvider extends AbstractDiagramTypeProvider {
+public class FunctionNodeDiagramTypeProvider extends AbstractDiagramTypeProvider {
 	
-	private static HashMap<Diagram, FunctionDiagramTypeProvider> diagrams = new HashMap<Diagram, FunctionDiagramTypeProvider>();
-	public FunctionDiagramTypeProvider() {
+	private static HashMap<Diagram, FunctionNodeDiagramTypeProvider> diagrams = new HashMap<Diagram, FunctionNodeDiagramTypeProvider>();
+	public FunctionNodeDiagramTypeProvider() {
 		super();
-		setFeatureProvider(new FunctionDiagramFeatureProvider(this));
+		setFeatureProvider(new FunctionNodeDiagramFeatureProvider(this));
 	    IResourceChangeListener listener = new MyResourceChangeReporter();
 	    ResourcesPlugin.getWorkspace().addResourceChangeListener(
 	      listener, IResourceChangeEvent.POST_CHANGE);

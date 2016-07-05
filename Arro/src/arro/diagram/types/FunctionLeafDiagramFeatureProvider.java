@@ -29,15 +29,12 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
-import util.Logger;
 import arro.Constants;
 import arro.diagram.features.ArroBoxAddFeature;
 import arro.diagram.features.ArroConnectionAddFeature;
-import arro.diagram.features.ArroConnectionCreateFeature;
 import arro.diagram.features.ArroConnectionDeleteFeature;
 import arro.diagram.features.ArroIDAddFeature;
 import arro.diagram.features.ArroNodeAddFeature;
-import arro.diagram.features.ArroNodeCreateFeature;
 import arro.diagram.features.ArroNodeDeleteFeature;
 import arro.diagram.features.ArroNodeLayoutFeature;
 import arro.diagram.features.ArroNodeUpdateFeature;
@@ -47,14 +44,15 @@ import arro.diagram.features.ArroPadLayoutFeature;
 import arro.diagram.features.ArroPadUpdateFeature;
 import arro.diagram.features.NullRemoveFeature;
 import arro.domain.ArroDevice;
-import arro.domain.ArroNode;
 import arro.domain.ArroModule;
+import arro.domain.ArroNode;
 import arro.domain.POJOIndependenceSolver;
+import util.Logger;
 
 
-public class FunctionDiagramFeatureProvider extends DefaultFeatureProvider {
+public class FunctionLeafDiagramFeatureProvider extends DefaultFeatureProvider {
 	
-	public FunctionDiagramFeatureProvider(IDiagramTypeProvider dtp) {
+	public FunctionLeafDiagramFeatureProvider(IDiagramTypeProvider dtp) {
 		super(dtp);
 		
 		setIndependenceSolver(POJOIndependenceSolver.getInstance());
@@ -69,17 +67,16 @@ public class FunctionDiagramFeatureProvider extends DefaultFeatureProvider {
 		/* original
 		return new ICreateFeature[] {new ArroNodeCreateFeature(this)};
 		*/
-		ICreateFeature[] features = new ICreateFeature[1];
+		ICreateFeature[] features = new ICreateFeature[0];
 		
 		// Add 1 Create...features 1 right side of screen.
 		// FIXME: remove this
-		features[0] = new ArroNodeCreateFeature(this);
 		return features;
 	}
 	
 	@Override
 	public ICreateConnectionFeature[] getCreateConnectionFeatures() {
-		return new ICreateConnectionFeature[] {new ArroConnectionCreateFeature(this)};
+		return new ICreateConnectionFeature[] {};
 	}
 	
 	@Override
@@ -112,9 +109,9 @@ public class FunctionDiagramFeatureProvider extends DefaultFeatureProvider {
 		PictogramElement pictogramElement = context.getPictogramElement();
 		if (pictogramElement instanceof ContainerShape) {
 			Logger.out.trace(Logger.EDITOR, " ");
-			ContainerShape cs = (ContainerShape)pictogramElement;
+			//ContainerShape cs = (ContainerShape)pictogramElement;
 			
-			String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
+			//String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
 			return new NullRemoveFeature(this);				
 		} else if(pictogramElement instanceof BoxRelativeAnchor) {
 			return null;

@@ -272,7 +272,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 	}
 
 	private InputStream openFunctionDiagramStream(IFile diagramFile, String diagramName) throws CoreException {
-		final String diagramTypeId = arro.Constants.FUNCTION_DIAGRAM_TYPE;
+		final String diagramTypeId = arro.Constants.FUNCTION_NODE_DIAGRAM_TYPE;
 		
 		// Create empty diagram.
 		Diagram diagram = Graphiti.getPeCreateService().createDiagram(diagramTypeId, diagramName, true);
@@ -284,7 +284,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 		context.setNewObject(nodeDiagram);
 		context.setTargetContainer(diagram);
 		
-		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, "Arro.FunctionDiagramTypeProvider");
+		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, Constants.FUNCTION_NODE_DIAGRAM_TYPE_PROVIDER);
 		IAddFeature f = dtp.getFeatureProvider().getAddFeature(context);
 		f.add(context);
 

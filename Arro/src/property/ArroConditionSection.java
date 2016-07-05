@@ -1,5 +1,7 @@
 package property;
 
+import java.util.ArrayList;
+
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
@@ -7,6 +9,7 @@ import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -20,12 +23,15 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
+import arro.domain.ArroAction;
 import arro.domain.ArroTransition;
 
 public class ArroConditionSection extends ArroGenericSection {
 
     private Text nameTextVal;
     private CLabel valueLabel;
+    CCombo allowedModes;
+    
     private String name = "";
     private boolean listenerFlag = false;
 
@@ -41,6 +47,8 @@ public class ArroConditionSection extends ArroGenericSection {
 
         valueLabel = factory.createCLabel(composite, "Condition:");
         nameTextVal = factory.createText(composite, "");
+        
+        allowedModes = factory.createCCombo(composite);
 
         addLayout(parent);
 
@@ -74,7 +82,7 @@ public class ArroConditionSection extends ArroGenericSection {
     public void refresh() {
         PictogramElement pe = getSelectedPictogramElement();
         if (pe != null) {
-            ArroTransition n = getTransition(pe);
+            ArroTransition n = getTransition();
 
             if (n != null) {
                 // Make sure to first read these variables from domain
@@ -86,9 +94,24 @@ public class ArroConditionSection extends ArroGenericSection {
                 if(!(name.equals(nameTextVal))) {
                     nameTextVal.setText(name);
                 }
+                
                 listenerFlag = true;
             }
         }
+    }
+    
+    @SuppressWarnings("unused")
+    private String[] getAcceptedNodeNames(ArroAction cond) {
+        String[] ret;
+        
+        ArroTransition n = getTransition();
+        ArrayList<String> list = n.getParent().getParent().getNodeNames();
+        // Add empty option in order to remove the entry
+        list.add(0, "");
+
+        ret = list.toArray(new String[list.size()]);
+        
+        return ret;
     }
 
     /**
@@ -114,10 +137,20 @@ public class ArroConditionSection extends ArroGenericSection {
         data = new FormData();
         data.left = new FormAttachment(valueLabel, 0);
         //data.right = new FormAttachment(100, 0);
-        data.right = new FormAttachment(50, 0);
+        //data.right = new FormAttachment(50, 0);
+        data.width = 200;
         data.top = new FormAttachment(0, VSPACE);
-        data.width = SWT.BORDER;
+        //data.width = SWT.BORDER;
         nameTextVal.setLayoutData(data);
+
+        data = new FormData();
+        data.left = new FormAttachment(0, 0);
+        data.width = 200;
+        //data.right = new FormAttachment(100, 0);
+        //data.right = new FormAttachment(50, 0);
+        data.top = new FormAttachment(nameTextVal, VSPACE);
+        //data.width = SWT.BORDER;
+        allowedModes.setLayoutData(data);
     }
 
     
@@ -144,8 +177,7 @@ public class ArroConditionSection extends ArroGenericSection {
                 return true;
             }
             public void execute(IContext context) {
-                final PictogramElement pe = getSelectedPictogramElement();
-                ArroTransition n = getTransition(pe);
+                ArroTransition n = getTransition();
 
                 if (n != null) {
                     x.success = true;
@@ -161,7 +193,8 @@ public class ArroConditionSection extends ArroGenericSection {
         return x.success;
     }
     
-    public ArroTransition getTransition(PictogramElement pe) {
+    public ArroTransition getTransition() {
+        PictogramElement pe = getSelectedPictogramElement();
         if (pe != null) {
             IFeatureProvider fp = getDiagramTypeProvider().getFeatureProvider();
 

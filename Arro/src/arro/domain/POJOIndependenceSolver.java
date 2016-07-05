@@ -9,12 +9,10 @@ import java.util.Map.Entry;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.eclipse.graphiti.features.impl.AbstractFeatureProvider;
 import org.eclipse.graphiti.features.impl.IIndependenceSolver;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 import util.Logger;
-import arro.diagram.types.FunctionDiagramFeatureProvider;
 
 
 /**
