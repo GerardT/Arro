@@ -56,9 +56,9 @@ import arro.domain.POJOIndependenceSolver;
 import util.Logger;
 
 
-public class StateDiagramFeatureProvider extends DefaultFeatureProvider {
+public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 	
-	public StateDiagramFeatureProvider(IDiagramTypeProvider dtp) {
+	public SfcNodeFeatureProvider(IDiagramTypeProvider dtp) {
 		super(dtp);
 		
 		setIndependenceSolver(POJOIndependenceSolver.getInstance());

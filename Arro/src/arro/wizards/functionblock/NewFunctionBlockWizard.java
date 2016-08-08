@@ -191,7 +191,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 			{
 		        
 				// name the diagram file inside the zip file 
-		        out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + Constants.STATE_DIAGRAM_TYPE));
+		        out.putNextEntry(new ZipEntry(Constants.SFC_FILE_NAME));
 		        
 		        // fill with initial data
 		        // Not very nice: we borrow the file for temporarily writing the diagram data into.
@@ -272,7 +272,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 	}
 
 	private InputStream openFunctionDiagramStream(IFile diagramFile, String diagramName) throws CoreException {
-		final String diagramTypeId = arro.Constants.FUNCTION_DIAGRAM_TYPE;
+		final String diagramTypeId = arro.Constants.FUNCTION_NODE_DIAGRAM_TYPE;
 		
 		// Create empty diagram.
 		Diagram diagram = Graphiti.getPeCreateService().createDiagram(diagramTypeId, diagramName, true);
@@ -284,7 +284,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 		context.setNewObject(nodeDiagram);
 		context.setTargetContainer(diagram);
 		
-		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, "Arro.FunctionDiagramTypeProvider");
+		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, Constants.FUNCTION_NODE_DIAGRAM_TYPE_PROVIDER);
 		IAddFeature f = dtp.getFeatureProvider().getAddFeature(context);
 		f.add(context);
 
@@ -294,7 +294,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 	}
 	
 	private InputStream openStateDiagramStream(IFile diagramFile, String diagramName) throws CoreException {
-		final String diagramTypeId = arro.Constants.STATE_DIAGRAM_TYPE;
+		final String diagramTypeId = arro.Constants.STATE_NODE_DIAGRAM_TYPE;
 		
 		// Create empty diagram.
 		Diagram diagram = Graphiti.getPeCreateService().createDiagram(diagramTypeId, diagramName, true);
@@ -306,7 +306,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 		context.setNewObject(stateNode);
 		context.setTargetContainer(diagram);
 		
-		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, "Arro.StateDiagramTypeProvider");
+		IDiagramTypeProvider dtp=GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram, Constants.STATE_NODE_DIAGRAM_TYPE_PROVIDER);
 		IAddFeature f = dtp.getFeatureProvider().getAddFeature(context);
 		f.add(context);
 
@@ -318,11 +318,9 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 	
 	private InputStream openXmlStream(IFile file, String diagramName) throws CoreException {
 		String contents = 	"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-//							"<diagram>\n" +
 							"<module id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
 						    "    <sfc id=\"" + stateNode.getId() + "\" name=\"_sfc\" type=\"_Sfc\"/>\n" +
 							"</module>\n";
-//							+ "</diagram>\n";
 		return new ByteArrayInputStream(contents.getBytes());
 	}
 

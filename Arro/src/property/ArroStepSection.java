@@ -39,7 +39,7 @@ public class ArroStepSection extends ArroGenericSection {
         TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
         Composite composite = factory.createFlatFormComposite(parent);
 
-        valueLabel = factory.createCLabel(composite, "State name:");
+        valueLabel = factory.createCLabel(composite, "Step name:");
         nameTextVal = factory.createText(composite, "");
 
         addLayout(parent);

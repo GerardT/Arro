@@ -105,6 +105,9 @@ public class ArroModule extends NonEmfDomainObject  {
 	    }
 	}
 
+    public ArrayList<String> getPublishedActions() {
+        return stateDiagram.getPublishedActions();
+    }
 
 
 	/*
@@ -426,6 +429,5 @@ public class ArroModule extends NonEmfDomainObject  {
 	public String getType() {
 		return type;
 	}
-
 
 }

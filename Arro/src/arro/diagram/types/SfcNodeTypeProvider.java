@@ -4,12 +4,12 @@ import org.eclipse.graphiti.dt.AbstractDiagramTypeProvider;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.tb.IToolBehaviorProvider;
 
-public class StateDiagramTypeProvider extends AbstractDiagramTypeProvider
+public class SfcNodeTypeProvider extends AbstractDiagramTypeProvider
 		implements IDiagramTypeProvider {
 
-	public StateDiagramTypeProvider() {
+	public SfcNodeTypeProvider() {
 		super();
-		setFeatureProvider(new StateDiagramFeatureProvider(this));
+		setFeatureProvider(new SfcNodeFeatureProvider(this));
 	}
 
     private IToolBehaviorProvider[] toolBehaviorProviders;

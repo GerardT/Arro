@@ -13,8 +13,6 @@ import org.w3c.dom.NodeList;
 public class ArroStep extends NonEmfDomainObject{
 	private ArroSequenceChart parent;
 	private String description;
-	private ArrayList<ArroAction> entryActions = new ArrayList<ArroAction>();
-	private ArrayList<ArroAction> exitActions = new ArrayList<ArroAction>();
 	
 	public ArroSequenceChart getParent() {
 		return parent;
@@ -38,68 +36,12 @@ public class ArroStep extends NonEmfDomainObject{
 		attr = doc.createAttribute("name");
 		attr.setValue(getName());
 		elt.setAttributeNode(attr);
-		for(ArroAction action: entryActions) {
-			
-			Element sub = doc.createElement("entry-action");
-			elt.appendChild(sub);
-			
-			action.xmlWrite(doc, sub);
-		}
 
 	}
 	public void xmlRead(Node nNode) {
 		Element eElement = (Element) nNode;
     	setId(eElement.getAttribute("id"));
     	setName(eElement.getAttribute("name"));
-    	
-    	NodeList nList = nNode.getChildNodes();
-    	for (int temp = 0; temp < nList.getLength(); temp++) {
-    		Node sub = nList.item(temp);
-    		
-			if(sub.getNodeName().equals("entry-action")) {
-	    		Element eSubElement = (Element) sub;
-	    		ArroAction action = new ArroAction(this);
-	    		
-	    		action.xmlRead(eSubElement);
-	    		
-	    		entryActions.add(action);
-			}
-    	}
-
  	}
 
-	public ArrayList<ArroAction> getEntryActions() {
-	    // Make sure there is a least one empty action ("", "")
-	    int i = 0;
-        for(ArroAction entry : entryActions) {
-            if(entry.getName().equals("") && entry.getState().equals("")) {
-                i++;
-            }
-        }
-        if(i == 0) {
-            entryActions.add(new ArroAction("", ""));
-        }
-		return entryActions;
-	}
-	
-    // Allow client code to update individual elements, use address
-	// of object to find it.
-	public void updateEntry(ArroAction action, ArroAction newValue) {
-	    int index = entryActions.indexOf(action);
-	    if(index != -1) {
-            entryActions.get(index).name = newValue.name;
-            entryActions.get(index).state = newValue.state;
-	    }
-	    
-	    // Remove superfluous empty entries, add one empty entry at end.
-	    ArrayList<ArroAction> removals = new ArrayList<ArroAction>();
-        for(ArroAction entry : entryActions) {
-            if(entry.getName().equals("") && entry.getState().equals("")) {
-                removals.add(entry);
-            }
-        }
-        for(ArroAction entry : removals) {
-            entryActions.remove(entry);
-        }
-	}
 }

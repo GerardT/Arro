@@ -10,33 +10,59 @@
             id="Arro.ArroNodeDiagramType">
          </diagramType>
          <diagramType
+            name="Arro Node Diagram Type"
+            type="ArroFunctionLeafDiagram"
+            id="Arro.ArroFunctionLeafDiagram">
+         </diagramType>
+         <diagramType
             name="Arro State Diagram Type"
             type="ArroStateDiagram"
             id="Arro.StateDiagramType">
+         </diagramType>
+         <diagramType
+            name="Arro State Diagram Type"
+            type="ArroSfcLeafDiagram"
+            id="Arro.ArroSfcLeafDiagramType">
          </diagramType>
     </extension>
     <extension
          point="org.eclipse.graphiti.ui.diagramTypeProviders">
        <diagramTypeProvider
-            class="arro.diagram.types.StateDiagramTypeProvider"
+            class="arro.diagram.types.SfcNodeTypeProvider"
             context="org.eclipse.graphiti.ui.diagramEditor"
             id="Arro.StateDiagramTypeProvider"
-            name="Arro State Diagram Type Provider">
+            name="Arro SFC Diagram Type Provider">
             <diagramType
                id="Arro.StateDiagramType">
             </diagramType>
        </diagramTypeProvider>
        <diagramTypeProvider
+            class="arro.diagram.types.SfcLeafTypeProvider"
+            context="org.eclipse.graphiti.ui.diagramEditor"
+            id="Arro.SfcLeafTypeProvider"
+            name="Arro State Diagram Type Provider">
+            <diagramType
+               id="Arro.ArroSfcLeafDiagramType">
+            </diagramType>
+       </diagramTypeProvider>
+       <diagramTypeProvider
             name="Arro Node Diagram Type Provider"
-            class="arro.diagram.types.FunctionDiagramTypeProvider"
-            id="Arro.FunctionDiagramTypeProvider">
+            class="arro.diagram.types.FunctionNodeDiagramTypeProvider"
+            id="Arro.FunctionNodeDiagramTypeProvider">
             <diagramType
                id="Arro.ArroNodeDiagramType">
             </diagramType>
             <imageProvider
                id="Arro.imageProvider">
-            </imageProvider>
-            
+            </imageProvider>           
+       </diagramTypeProvider>
+       <diagramTypeProvider
+            name="Arro Node Diagram Type Provider"
+            class="arro.diagram.types.FunctionLeafDiagramTypeProvider"
+            id="Arro.FunctionLeafDiagramTypeProvider">
+            <diagramType
+               id="Arro.ArroFunctionLeafDiagram">
+            </diagramType>
        </diagramTypeProvider>
     </extension>
    
@@ -47,6 +73,10 @@
         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
         <!-- The contributorId is calculated from the diagram-type-id by the formula:  Diagram.getDiagramTypeId() + ".PropertyContributor".-->
         <propertyContributor contributorId="Arro.PropertyContributor"> 
+           <propertyCategory category="Graphiti"> 
+           </propertyCategory> 
+        </propertyContributor> 
+        <propertyContributor contributorId="ArroFunctionLeafDiagram.PropertyContributor"> 
            <propertyCategory category="Graphiti"> 
            </propertyCategory> 
         </propertyContributor> 
@@ -74,6 +104,12 @@
              label="Transition">
           </propertyTab>
           <propertyTab
+             afterTab="arro.param.tab"
+             category="Graphiti"
+             id="arro.published-actions.tab"
+             label="Published Actions">
+          </propertyTab>
+          <propertyTab
              category="Graphiti"
              id="arro.step.tab"
              label="Step">
@@ -81,14 +117,45 @@
           <propertyTab
              afterTab="arro.main.tab"
              category="Graphiti"
-             id="arro.state-entry.tab"
-             label="Entry Actions">
+             id="arro.set-actions.tab"
+             label="Set Actions">
+          </propertyTab>
+      </propertyTabs>
+      <propertyTabs
+          contributorId="ArroFunctionLeafDiagram.PropertyContributor">
+          <propertyTab
+             category="Graphiti"
+             id="arro.main.tab"
+             label="Main">
           </propertyTab>
           <propertyTab
              afterTab="arro.main.tab"
              category="Graphiti"
-             id="arro.state-exit.tab"
-             label="Exit Actions">
+             id="arro.param.tab"
+             label="Parameters">
+          </propertyTab>
+          <propertyTab
+             afterTab="arro.param.tab"
+             category="Graphiti"
+             id="arro.modedef.tab"
+             label="Transition">
+          </propertyTab>
+          <propertyTab
+             afterTab="arro.param.tab"
+             category="Graphiti"
+             id="arro.published-actions.tab"
+             label="Published Actions">
+          </propertyTab>
+          <propertyTab
+             category="Graphiti"
+             id="arro.step.tab"
+             label="Step">
+          </propertyTab>
+          <propertyTab
+             afterTab="arro.main.tab"
+             category="Graphiti"
+             id="arro.set-actions.tab"
+             label="Set Actions">
           </propertyTab>
       </propertyTabs>
     </extension>
@@ -134,16 +201,79 @@
               tab="arro.step.tab">
           </propertySection>
           <propertySection
-              class="property.ArroStateEntrySection"
-              filter="property.ArroStepFilter"
-              id="arro.state-entry.section"
-              tab="arro.state-entry.tab">
+              class="property.ArroSetActionsSection"
+              filter="property.ArroSetActionsFilter"
+              id="arro.set-actions.section"
+              tab="arro.set-actions.tab">
           </propertySection>
           <propertySection
               class="property.ArroConditionSection"
               filter="property.ArroConditionFilter"
               id="arro.modedef.section"
               tab="arro.modedef.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroPublishedActionsSection"
+              filter="property.ArroPublishedActionsFilter"
+              id="arro.published-actions.section"
+              tab="arro.published-actions.tab">
+          </propertySection>
+      </propertySections>
+      <propertySections
+          contributorId="ArroFunctionLeafDiagram.PropertyContributor">
+          <propertySection
+              class="property.ArroNodeSectionStandard"
+              filter="property.ArroNodeFilterStandard"
+              id="arro.node.section"
+              tab="arro.main.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroNodeSectionDevice"
+              filter="property.ArroNodeFilterDevice"
+              id="arro.node.section"
+              tab="arro.main.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroParamSectionStandard"
+              filter="property.ArroParamFilterStandard"
+              id="arro.param.section.standard"
+              tab="arro.param.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroParamSectionDevice"
+              filter="property.ArroParamFilterDevice"
+              id="arro.param.section.device"
+              tab="arro.param.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroPadSection"
+              filter="property.ArroPadFilter"
+              id="arro.pad.section"
+              tab="arro.main.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroStepSection"
+              filter="property.ArroStepFilter"
+              id="arro.state.section"
+              tab="arro.step.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroSetActionsSection"
+              filter="property.ArroSetActionsFilter"
+              id="arro.set-actions.section"
+              tab="arro.set-actions.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroConditionSection"
+              filter="property.ArroConditionFilter"
+              id="arro.modedef.section"
+              tab="arro.modedef.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroPublishedActionsSection"
+              filter="property.ArroPublishedActionsFilter"
+              id="arro.published-actions.section"
+              tab="arro.published-actions.tab">
           </propertySection>
       </propertySections>
     </extension>

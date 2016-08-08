@@ -126,7 +126,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     void createPage2(String fileName, ArroZipFile zip) {
 
         //IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + fileName);
-        IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + Constants.STATE_DIAGRAM_TYPE);
+        IFile file = zip.getFile(Constants.SFC_FILE_NAME);
         if(file != null) {
         	FileEditorInput fei2 = new FileEditorInput(file);
         	
@@ -200,9 +200,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
 
         // Create page 0 containing Graphiti editor. File was just unzipped in ResourceCache.
         createPage0(fei.getName(), zip);
-        if(documentType == Constants.FunctionBlock) {
-            createPage2(fei.getName(), zip);
-        }
+        createPage2(fei.getName(), zip);
         if(documentType == Constants.CodeBlockPython) {
             createPage1(fei.getName(), zip);
         }
@@ -228,9 +226,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     public void doSave(IProgressMonitor monitor) {
         int i = 0;
         getEditor(i++).doSave(monitor);
-        if(documentType == Constants.FunctionBlock) {
-            getEditor(i++).doSave(monitor);
-        }
+        getEditor(i++).doSave(monitor);
         if(documentType == Constants.CodeBlockPython) {
             getEditor(i++).doSave(monitor);
         }

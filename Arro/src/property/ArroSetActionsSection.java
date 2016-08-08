@@ -7,6 +7,7 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.impl.AbstractFeature;
+import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -21,9 +22,9 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 import arro.domain.ArroAction;
-import arro.domain.ArroStep;
+import arro.domain.ArroTransition;
 
-public class ArroStateEntrySection extends ArroGenericSection {
+public class ArroSetActionsSection extends ArroGenericSection {
 
 	private TableViewer viewer;
     @SuppressWarnings("unused")
@@ -80,7 +81,7 @@ public class ArroStateEntrySection extends ArroGenericSection {
 			}
 			@Override
 			public String[] getAcceptedValues(Object element) {
-				return getAcceptedStateNames((ArroAction)element);
+				return getAcceptedPublishedActions((ArroAction)element);
 			}
             @Override
             public String obsolete(Object element) {
@@ -106,19 +107,41 @@ public class ArroStateEntrySection extends ArroGenericSection {
 		//getSite().setSelectionProvider(viewer);
     }
     
+    
     private String[] getAcceptedNodeNames(ArroAction cond) {
-       	String[] ret;
-       	
-        ArroStep n = getStep();
+        String[] ret;
+        
+        ArroTransition n = getTransition();
         ArrayList<String> list = n.getParent().getParent().getNodeNames();
         // Add empty option in order to remove the entry
         list.add(0, "");
 
-		ret = list.toArray(new String[list.size()]);
-    	
-    	return ret;
+        ret = list.toArray(new String[list.size()]);
+        
+        return ret;
     }
     
+    private String[] getAcceptedPublishedActions(ArroAction cond) {
+        String[] ret = { "" };
+        String name = cond.getName(); // node name
+        
+        if(name.equals("")) {
+            return ret;
+        }
+        
+        ArroTransition n = getTransition();
+        try {
+            ArrayList<String> list = n.getParent().getParent().getNodeByName(name).getAssociatedModule().getPublishedActions();
+
+            ret = list.toArray(new String[list.size()]);
+        } catch (RuntimeException e) {
+            return ret;
+        }
+        
+        return ret;
+    }
+    
+    @SuppressWarnings("unused")
     private String[] getAcceptedStateNames(ArroAction cond) {
        	String[] ret = { "" };
     	String name = cond.getName(); // node name
@@ -127,7 +150,7 @@ public class ArroStateEntrySection extends ArroGenericSection {
     		return ret;
     	}
     	
-        ArroStep n = getStep();
+        ArroTransition n = getTransition();
         try {
 			ArrayList<String> list = n.getParent().getParent().getNodeByName(name).getAssociatedModule().getStateNames();
 
@@ -165,7 +188,7 @@ public class ArroStateEntrySection extends ArroGenericSection {
 	 */
     @Override
     public void refresh() {
-        ArroStep n = getStep();
+        ArroTransition n = getTransition();
 		
 		if (n != null) {
             // Temp disable listener; listener only needed if user does types new value.
@@ -225,7 +248,7 @@ public class ArroStateEntrySection extends ArroGenericSection {
             }
             @Override
             public void execute(IContext context) {
-                ArroStep n = getStep();
+                ArroTransition n = getTransition();
 
                 if (n != null) {
                     n.updateEntry((ArroAction)(context.getProperty("p1")), (ArroAction)(context.getProperty("p2")));
@@ -240,16 +263,16 @@ public class ArroStateEntrySection extends ArroGenericSection {
         return x.success;
     }
     
-    public ArroStep getStep() {
-	    PictogramElement pe = getSelectedPictogramElement();
+    public ArroTransition getTransition() {
+        PictogramElement pe = getSelectedPictogramElement();
+        if(pe != null && pe instanceof FreeFormConnection) {
 	    
-        if (pe != null) {
             IFeatureProvider fp = getDiagramTypeProvider().getFeatureProvider();
-
+            
             Object[] eObject = fp.getAllBusinessObjectsForPictogramElement(pe);
 
-            if (eObject.length != 0 && eObject[0] instanceof ArroStep) {
-                return (ArroStep)(eObject[0]);
+            if (eObject.length != 0 && eObject[0] instanceof ArroTransition) {
+                return (ArroTransition)(eObject[0]);
             }
         }
         return null;
@@ -257,7 +280,6 @@ public class ArroStateEntrySection extends ArroGenericSection {
 
 	@Override
 	public void update() {
-//		updateDomainAndPE();
 		refresh();
 	}
 }
