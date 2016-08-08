@@ -265,7 +265,7 @@ static void server()
                         nodeDb->start();
                         ServerEngine::console("run successful");
                     } catch ( const std::runtime_error& e ) {
-                        trace.println("Instantiating PythonGlue failed");
+                        trace.println(string("Runtime error ") + e.what());
                         cleanup();
 
                         ServerEngine::console("run failed");

@@ -42,7 +42,7 @@ ConfigReader::ConfigReader(const string& filename, NodeDb& db):
     }
 
     // Recursively process all modules, starting with "Main"
-    makeNodeInstance("Main", "main", "", *params);
+    makeNodeInstance("Main", "main", "", *params, nullptr);
 }
 
 ConfigReader::~ConfigReader() {
@@ -95,7 +95,7 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
 
 
 void
-ConfigReader::makeNodeInstance(const string& typeName, const string& instanceName, const string& instancePrefix, StringMap& import_params) {
+ConfigReader::makeNodeInstance(const string& typeName, const string& instanceName, const string& instancePrefix, StringMap& import_params, Process* parentSfc) {
     Definition* def = definitions[typeName];
     Process* processNode = nullptr;  // Note: if there is a process node (=device) there will be only one in module.
     Process* sfcNode = nullptr;
@@ -127,7 +127,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             processNode = new Process(nodeDb, *typeURL, instance, *params);
 
             // EXTRA
-            processNode->registerInput("_action", true);
+            //processNode->registerInput("_action", true);
 
 
             delete params;
@@ -157,6 +157,14 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             sfcNode = new Process(nodeDb, "Sfc:", instanceSfc, *params, elt);
 
             sfcNode->registerInput("_action", true);
+
+            // EXTRA Create an _action and _step pad in every module
+            new Pad(nodeDb, "Action", instance + ARRO_NAME_SEPARATOR + "_action");
+            new Pad(nodeDb, "Mode", instance + ARRO_NAME_SEPARATOR + "_step");
+
+            // Provide steps and actions to parentSfc so parent Sfc can check that its conditions and actions are legal.
+            // Maybe in future host system can do this check. Or we can use protobuf enum.
+            if(parentSfc) parentSfc->registerSfc(instance, sfcNode);
         }
 
         elt = elt->NextSiblingElement("sfc");
@@ -172,19 +180,27 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             StringMap* params = new StringMap();
             getParamsAndSubstitute(elt, import_params, *params);
 
-            makeNodeInstance(*typeAttr,  *idAttr,  instance, *params);
+            makeNodeInstance(*typeAttr,  *idAttr,  instance, *params, sfcNode);
 
             {
-                // EXTRA Register _action output for each node with Sfc Node
-                sfcNode->registerOutput("_action_" + *idAttr);
+                string from, to;
 
-                // EXTRA Create an _action input pad in every module
-                new Pad(nodeDb, "Action", instance + ARRO_NAME_SEPARATOR + "_action");
+                // EXTRA Register _action output and _step input for each node with Sfc Node
+                sfcNode->registerOutput("_action_" + *idAttr);
+                sfcNode->registerInput("_step_" + *idAttr, true);
+                // TODO let's also here register all steps and actions with the SFC.
 
                 // Connect to just created node (in makeNodeInstance).
-                string from = instance + ARRO_SFC_INSTANCE + ARRO_NAME_SEPARATOR + "_action_" + *idAttr;
+                from = instance + ARRO_SFC_INSTANCE + ARRO_NAME_SEPARATOR + "_action_" + *idAttr;
 
-                string to = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_NAME_SEPARATOR + "_action";
+                to = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_NAME_SEPARATOR + "_action";
+
+                trace.println("nodeDb.connect(" + from + ", " + to + ")");
+                nodeDb.connect(from, to);
+
+                from = instance + ARRO_SFC_INSTANCE + ARRO_NAME_SEPARATOR + "_step_" + *idAttr;
+
+                to = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_NAME_SEPARATOR + "_step";
 
                 trace.println("nodeDb.connect(" + from + ", " + to + ")");
                 nodeDb.connect(from, to);
@@ -240,6 +256,8 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
         }
         elt = elt->NextSiblingElement("connection");
     }
+
+    if(sfcNode) sfcNode->test();
 }
 
 

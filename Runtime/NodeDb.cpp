@@ -144,6 +144,12 @@ NodeDb::getOutput(const string& name) {
     return (NodeMultiOutput*)(allOutputs[name]);
 }
 
+NodeDb::NodeSingleInput*
+NodeDb::getInput(const std::string& name) {
+    return (NodeSingleInput*)(allInputs[name]);
+}
+
+
 NodeDb::FullMsg::FullMsg(NodeMultiOutput* o /*string s*/, MessageBuf* m) {
     //target = s;
     output = o;

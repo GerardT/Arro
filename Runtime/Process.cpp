@@ -28,6 +28,8 @@ Process::Process(NodeDb& db, const string& instance):
 
     trace.println("Creating sfc " + instance + "._sfc");
 
+    trace.println("---> Never used?? <--- ");
+
     db.registerNode(this, instance + "._sfc");
 
 }
@@ -100,17 +102,27 @@ Process::registerOutput(const string& interfaceName) {
     nodeDb.registerNodeOutput(this, interfaceName);
 }
 
+NodeDb::NodeSingleInput*
+Process::getInput(const string& name) {
+    auto in = nodeDb.getInput(getName() + "." + name);
+    if(in) {
+        return in;
+    } else {
+        trace.println("no such input registered: " + getName() + "." + name);
+        throw std::runtime_error("No such input registered: " + getName() + "." + name);
+    }
+}
+
 NodeDb::NodeMultiOutput*
 Process::getOutput(const string& name) {
     auto out = nodeDb.getOutput(getName() + "." + name);
     if(out) {
         return out;
     } else {
-        trace.println("no such output registered: " + name);
-        throw std::runtime_error("No such output registered: " + name);
+        trace.println("no such output registered: " + getName() + "." + name);
+        throw std::runtime_error("No such output registered: " + getName() + "." + name);
     }
 }
-
 
 void
 Process::getPrimitive(const string& url, const string& instance, ConfigReader::StringMap& params, TiXmlElement* elt) {
@@ -177,6 +189,14 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
     }
 }
 
+/**
+ * TODO this is not the happiest function, it is for SFC only. Should be something more elegant.
+ * @param sfc
+ */
+void
+Process::registerSfc(const std::string& name, Process* sfc) {
+    ((NodeSfc*)device)->registerSfc(name, (NodeSfc*)(sfc->device));
+}
 
 
 

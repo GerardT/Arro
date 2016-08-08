@@ -18,6 +18,8 @@ namespace Arro {
     public:
         virtual ~IDevice() {};
 
+        virtual void test() {};
+
         /**
          * Handle a message that is sent to this node.
          *

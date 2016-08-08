@@ -31,6 +31,8 @@ SRCS         := main.cpp \
 		Pad.cpp \
 		Process.cpp \
 		PythonGlue.cpp \
+		Parser.cpp \
+		Tokenizer.cpp \
 		Nodes/NodeSfc.cpp \
 		Nodes/NodePid.cpp \
 		Nodes/NodePython.cpp \

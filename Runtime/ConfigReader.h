@@ -15,6 +15,7 @@
 namespace Arro
 {
     class NodeDb;
+    class Process;
 
     /**
     * \brief Read config file arro.xml and build database of nodes.
@@ -108,7 +109,7 @@ namespace Arro
          * \param instancePrefix Prefix to use for this instance.
          * \param importParams list of parameters to be pass to instance.
          */
-        void makeNodeInstance(const std::string& className, const std::string& instanceName, const std::string& instancePrefix, StringMap& importParams);
+        void makeNodeInstance(const std::string& className, const std::string& instanceName, const std::string& instancePrefix, StringMap& importParams, Process* parentSfc);
 
     private:
         Trace trace;

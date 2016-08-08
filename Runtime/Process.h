@@ -7,6 +7,8 @@
 
 namespace Arro
 {
+    class NodeSfc;
+
     /**
      * \brief Process, like Pad, implements AbstractNode.
      *
@@ -43,6 +45,13 @@ namespace Arro
         Process(const Process&) = delete;
         Process& operator=(const Process& other) = delete;
 
+        void test() {
+            device->test();
+        }
+
+        bool hasStep(const std::string& name, const std::string& step);
+
+
         /**
          * Called from ConfigReader in order to register an input Pad as input. Basically
          * it installs a listener for this Pad that handles incoming messages.
@@ -58,6 +67,13 @@ namespace Arro
          * \param interfaceName Name of the interface to register.
          */
         virtual void registerOutput(const std::string& interfaceName);
+
+        /**
+         * Lookup an input by its name, which is concatenated: "procesname.name".
+         *
+         * \param name Name of input.
+         */
+        NodeDb::NodeSingleInput*  getInput(const std::string& name);
 
         /**
          * Lookup an output by its name, which is concatenated: "procesname.name".
@@ -81,6 +97,12 @@ namespace Arro
          * \param params Parameter list to pass to the node.
          */
         void getPrimitive(const std::string& url, const std::string& instance, ConfigReader::StringMap& params, TiXmlElement* elt = nullptr);
+
+        /**
+         * TODO this is not the happiest function, it is for SFC only. Should be something more elegant.
+         * @param sfc
+         */
+        void registerSfc(const std::string& name, Process* sfc);
 
     private:
         Trace trace;

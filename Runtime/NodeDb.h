@@ -240,6 +240,15 @@ namespace Arro
         AbstractNode* getNode(const std::string& name);
 
         /**
+         * Find an input from a name "node.subnode.subsub.input".
+         *
+         * \param name Name of input to lookup.
+         *
+         * \return Found input reference (makes this method non-const).
+         */
+        NodeSingleInput* getInput(const std::string& name);
+
+        /**
          * Find an output from a name "node.subnode.subsub.output".
          *
          * \param name Name of output to lookup.
