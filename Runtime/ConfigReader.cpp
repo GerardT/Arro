@@ -162,9 +162,6 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             new Pad(nodeDb, "Action", instance + ARRO_NAME_SEPARATOR + "_action");
             new Pad(nodeDb, "Mode", instance + ARRO_NAME_SEPARATOR + "_step");
 
-            // Provide steps and actions to parentSfc so parent Sfc can check that its conditions and actions are legal.
-            // Maybe in future host system can do this check. Or we can use protobuf enum.
-            if(parentSfc) parentSfc->registerSfc(instance, sfcNode);
         }
 
         elt = elt->NextSiblingElement("sfc");
@@ -188,9 +185,8 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
                 // EXTRA Register _action output and _step input for each node with Sfc Node
                 sfcNode->registerOutput("_action_" + *idAttr);
                 sfcNode->registerInput("_step_" + *idAttr, true);
-                // TODO let's also here register all steps and actions with the SFC.
 
-                // Connect to just created node (in makeNodeInstance).
+                // Connect from sfc to just created node (in makeNodeInstance).
                 from = instance + ARRO_SFC_INSTANCE + ARRO_NAME_SEPARATOR + "_action_" + *idAttr;
 
                 to = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_NAME_SEPARATOR + "_action";
@@ -198,9 +194,10 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
                 trace.println("nodeDb.connect(" + from + ", " + to + ")");
                 nodeDb.connect(from, to);
 
-                from = instance + ARRO_SFC_INSTANCE + ARRO_NAME_SEPARATOR + "_step_" + *idAttr;
+                // Connect from just created node (in makeNodeInstance) to sfc.
+                to = instance + ARRO_SFC_INSTANCE + ARRO_NAME_SEPARATOR + "_step_" + *idAttr;
 
-                to = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_NAME_SEPARATOR + "_step";
+                from = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_NAME_SEPARATOR + "_step";
 
                 trace.println("nodeDb.connect(" + from + ", " + to + ")");
                 nodeDb.connect(from, to);
@@ -257,6 +254,9 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
         elt = elt->NextSiblingElement("connection");
     }
 
+    // Provide steps and actions to parentSfc so parent Sfc can check that its conditions and actions are legal.
+    // Maybe in future host system can do this check. Or we can use protobuf enum.
+    if(parentSfc && sfcNode) parentSfc->registerSfc(instanceName, sfcNode);
     if(sfcNode) sfcNode->test();
 }
 

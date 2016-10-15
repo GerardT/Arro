@@ -59,19 +59,6 @@ namespace Arro {
             m_expression(condition),
             m_parser(CONDITION, DONE)
         {
-            /*
-            m_parser.addRule(CONDITION,     'd', IN);
-            m_parser.addRule(IN,            'i', STATE_LIST_B);
-            m_parser.addRule(STATE_LIST_B,  '(', SINGLE_STATE);
-            m_parser.addRule(SINGLE_STATE,  's', STATE_LIST_E);
-
-            m_parser.addRule(SINGLE_STATE,  's', SINGLE_STATE);  // another state
-
-            m_parser.addRule(STATE_LIST_E,  ')', DONE);
-
-            m_parser.addRule(DONE,          'a', CONDITION);
-            m_parser.addRule(DONE,          'o', CONDITION);
-            */
             m_parser.addRule(CONDITION,     'n', IN);
             m_parser.addRule(IN,            'i', STATE_LIST_B);
             m_parser.addRule(STATE_LIST_B,  '(', SINGLE_STATE);
@@ -91,6 +78,21 @@ namespace Arro {
             }
             else {
                 throw std::runtime_error("Parsing condition failed " + m_expression);
+            }
+        }
+
+        void runTransitions(std::set<std::string>& m_currentSteps) {
+            if(m_currentSteps.find(m_from) != m_currentSteps.end()) {
+                // check the condition
+                if(testRule0()) {
+                    // send all actions.
+
+                    //Value* value = new Value();
+
+                   // value->set_value(output);
+
+                    //m_process->getOutput("output")->submitMessage(value);
+                }
             }
         }
 
@@ -155,6 +157,8 @@ namespace Arro {
         std::map<std::string, std::string> m_actions;
         Parser m_parser;
         std::list<Instruction> m_instrList;
+        std::string m_from;
+        std::string m_to;
     };
 
 
@@ -199,12 +203,16 @@ namespace Arro {
          * @param sfc
          */
         void registerSfc(const std::string& name, NodeSfc* sfc) {
+            m_trace.println(std::string("Registering node ") + name);
             childSfc[name] = sfc;
         }
 
         bool hasStep(const std::string& name, const std::string& step) const {
-            if(childSfc.find(name) == childSfc.end()) {
-                m_trace.println("Node not found " + name);
+            std::string tmp = name;
+            m_trace.println("checking step " + tmp);
+            if(childSfc.find(tmp) == childSfc.end()) {
+                m_trace.println("Node in expression not found " + tmp);
+                throw std::runtime_error("Node in expression not found " + tmp);
                 return false;
             } else {
                 NodeSfc* sfc = childSfc.at(name);
@@ -215,6 +223,7 @@ namespace Arro {
                 }
             }
             m_trace.println("step not found " + step);
+            throw std::runtime_error("step not found " + step);
             return false;
         }
 
@@ -224,6 +233,7 @@ namespace Arro {
         std::list<std::unique_ptr<SfcStep> > m_steps;
         std::list<std::unique_ptr<SfcTransition> > m_transitions;
         std::map<std::string, NodeSfc*> childSfc;
+        std::set<std::string> m_currentSteps;
     };
 }
 

@@ -90,6 +90,9 @@ NodeSfc::NodeSfc(Process* d, TiXmlElement* elt):
         const string* nameAttr = eltStep->Attribute(string("name"));
         m_trace.println(std::string("New SfcStep ") + *nameAttr);
         m_steps.push_front(unique_ptr<SfcStep>(new SfcStep(*nameAttr, *this, init)));
+        if(init) {
+            m_currentSteps.insert(*nameAttr);
+        }
         init = false; // TODO this is temporary
 
         eltStep = eltStep->NextSiblingElement("step");
@@ -129,45 +132,9 @@ NodeSfc::test() {
 void
 NodeSfc::handleMessage(MessageBuf* m, const std::string& padName) {
 
+// see NodePython for how to collect messages.
 
 
-    //Interpreter interpret(instr);
-
-
-
-
-/*
-    if(padName == "actualValue") {
-        Value* msg = new Value();
-        msg->ParseFromString(m->c_str());
-
-        assert(msg->GetTypeName() == "arro.Value");
-        actual_position = ((Value*)msg)->value();
-    } else if(padName == "targetValue") {
-        Value* msg = new Value();
-        msg->ParseFromString(m->c_str());
-
-        assert(msg->GetTypeName() == "arro.Value");
-        setpoint = ((Value*)msg)->value();
-    } else if(padName == "aTick") {
-        Tick* msg = new Tick();
-        msg->ParseFromString(m->c_str());
-
-        trace.println(string(msg->GetTypeName()));
-        assert(msg->GetTypeName() == "arro.Tick");
-        Tick* tick = (Tick*)msg;
-        ms_elapsed = tick->ms();
-
-    } else if (padName == "mode") {
-        Mode* msg = new Mode();
-        msg->ParseFromString(m->c_str());
-
-        assert(msg->GetTypeName() == "arro.Mode");
-        actual_mode = ((Mode*)msg)->mode();
-    } else {
-        trace.println(string("Message received from ") + padName);
-    }
-    */
 }
 
 void
@@ -177,27 +144,27 @@ NodeSfc::runCycle() {
 
     if(true /*actual_mode == "Active"*/) {
         //trace.println(string("NodeSfc output = ") + to_string((long double)output));
-
-        Value* value = new Value();
-
-       // value->set_value(output);
-
-        //m_process->getOutput("output")->submitMessage(value);
+        for(auto it = m_transitions.begin(); it != m_transitions.end(); ++it) {
+            (*it)->runTransitions(m_currentSteps);
+        }
     }
 }
 
 bool
 SfcTransition::testRule3(std::list<Instruction>::iterator& it, const std::string& argument) {
     ++it;
+    bool ret = false;
 
     if(it!= m_instrList.end()) {
         // we now know that 'n' should be a step name
-        return m_parent.hasStep(argument, it->getArgument());
-        if(it->match(SINGLE_STATE, STATE_LIST_E)) {
-            testRule4(it);
+        ret = m_parent.hasStep(argument, it->getArgument());
+
+        if(ret && it->match(SINGLE_STATE, STATE_LIST_E)) {
+            ret = testRule4(it);
         } else {
             m_trace.println("Error in condition.");
         }
     }
+    return ret;
 }
 
