@@ -191,7 +191,7 @@ PythonGlue::captureError() {
         return;
     }
 
-    list= PyObject_CallMethod_wrap(mod, "format_exception", "OOO", type,    value, traceback);  // Return value: New reference.
+    list= PyObject_CallMethod(mod, (char*)"format_exception", (char*)"OOO", type,    value, traceback);  // Return value: New reference.
 
     Py_ssize_t size = PyList_Size(list);
 

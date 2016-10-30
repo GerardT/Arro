@@ -134,7 +134,7 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
             string className = url.substr(7);
             device = new NodePython(this, className, params);
         } catch(out_of_range &) {
-            throw std::runtime_error("Invalid URL " + url);
+            throw std::runtime_error("Invalid URL for Python node " + url);
         }
     } else if(url.find("Sfc:") == 0) {
         trace.println("new NodeSfc(" + instance + ")");
@@ -142,7 +142,7 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
             //string className = url.substr(7);
             device = new NodeSfc(this, elt);
         } catch(out_of_range &) {
-            throw std::runtime_error("Invalid URL " + url);
+            throw std::runtime_error("Invalid URL for SFC node " + url);
         }
     }
     else if(url.find("Native:") == 0) {

@@ -15,12 +15,14 @@
 
 using namespace std;
 
-Parser::Parser(int startState, int endState) {
+Parser::Parser(int startState, int endState):
+    m_parsedState(startState) {
     m_startState = startState;
     m_acceptingStates.insert(endState);
 }
-void Parser::addRule(int curState, char token, int newState) {
+void Parser::addRule(int curState, char token, int newState, tokenFunction func) {
     m_transitions.insert(std::make_pair(make_pair(curState, token), newState));
+    m_tokenFunctions.insert(std::make_pair(make_pair(curState, newState), func));
 }
 
 bool Parser::parse(Tokenizer& tokens, list<Instruction>& instructions) {
@@ -30,7 +32,7 @@ bool Parser::parse(Tokenizer& tokens, list<Instruction>& instructions) {
     string tokenString;
     char token;
     
-    while((token = tokens.getToken(tokenString)) != '\0') {
+    while((token = tokens.getToken(tokenString)) != '$') {
         list<State> nextStates;
         
         for(auto state = currStates.begin(); state != currStates.end(); ++state) {
@@ -65,8 +67,11 @@ bool Parser::parse(Tokenizer& tokens, list<Instruction>& instructions) {
         //}
     }
     
+
+    // Find State in currStates that is in m_acceptingStates
     for(list<State>::iterator itr = currStates.begin(); itr != currStates.end(); ++itr) {
         if(m_acceptingStates.count(itr->get())) {
+            m_parsedState = *itr;
             itr->collectInstructions(tokens, instructions);
             
             return true;
@@ -75,5 +80,29 @@ bool Parser::parse(Tokenizer& tokens, list<Instruction>& instructions) {
     
     return false;
 }
+
+void Parser::runCode(Tokenizer& tokens) {
+    tokens.reset();
+    bool stop = false;
+
+    auto history = m_parsedState.getHistory();
+
+    auto c = history.begin();
+    while(c != history.end() && !stop) {
+        auto c1 = c;
+        auto c2 = ++c;
+        if(c != history.end()) {
+            std::string tmp;
+            tokens.getToken(tmp);
+
+            tokenFunction func = m_tokenFunctions.at(make_pair(*c1, *c2));
+            stop = func(tmp);
+
+            std::cout << "Rule " << *c1 << " - " << tmp << " - " << *c2 << "\n";
+        }
+    }
+
+}
+
 
 

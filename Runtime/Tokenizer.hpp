@@ -53,7 +53,7 @@ public:
     
     // (key) words must be separated by whitespace.
     char getSubstring(std::string& token) {
-        char ret = '\0';
+        char ret = '$';
         token = "";
         
         // skip spaces

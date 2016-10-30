@@ -15,10 +15,15 @@
 #include "Process.h"
 #include "NodePython.h"
 
-
-inline PyObject* PyObject_CallMethod_wrap(PyObject *o, const char *method, const char *format, ...) {
-    return PyObject_CallMethod(o, (char*) method, (char*)format);  // Return value: New reference.
-}
+//inline PyObject* PyObject_CallMethod_wrap(PyObject *o, const char *method, const char *format, ...) {
+//    PyObject* ret;
+//    va_list argptr;
+//
+//    va_start(argptr, format);
+//    ret = PyObject_CallMethod(o, (char*) method, (char*)format, argptr);  // Return value: New reference.
+//    va_end(argptr);
+//    return ret;
+//}
 
 
 namespace Arro {

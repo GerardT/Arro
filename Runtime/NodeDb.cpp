@@ -101,7 +101,6 @@ NodeDb::getNode(const string& name) {
     }
 }
 
-
 AbstractNode*
 NodeDb::registerNode(AbstractNode* node, const string& name) {
      allNodes[name] = node;

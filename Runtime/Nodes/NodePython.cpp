@@ -59,7 +59,7 @@ NodePython::handleMessage(MessageBuf* msg, const string& padName) {
  */
 void
 NodePython::runCycle() {
-    pValue = PyObject_CallMethod_wrap(pInstance, "runCycle", nullptr); // no parameters, Return value: New reference.
+    pValue = PyObject_CallMethod(pInstance, (char*)"runCycle", nullptr); // no parameters, Return value: New reference.
     if (pValue != nullptr)
     {
         Py_DECREF(pValue);
@@ -102,6 +102,7 @@ NodePython::sendMessage(char* padName, char* message) {
         Py_INCREF(Py_None);
         return Py_None;
     }
+    trace.println(string("Unknown Pad ") + padName);
     return nullptr;
 }
 

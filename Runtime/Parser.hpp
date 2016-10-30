@@ -14,8 +14,18 @@
 #include <set>
 #include <list>
 #include <string>
+#include <functional>
 #include "Tokenizer.hpp"
 
+
+typedef std::function<bool (const std::string& token)> tokenFunction;
+
+
+/**
+ * Instructions will be stored in a (history) list when parsing the
+ * expression. Each instruction contains a parsing state and the token
+ * that led to the next parsing state (even if keyword or e.g. bracket).
+ */
 class Instruction {
 public:
     Instruction(int state1, std::string argument, int state2) {
@@ -26,6 +36,7 @@ public:
     std::string& getArgument() {
         return m_argument;
     }
+    // Return true if transition from s1 to s2
     bool match(int s1, int s2) {
         return s1 == m_state1 && s2 == m_state2;
     }
@@ -63,6 +74,9 @@ public:
             }
         }
     }
+    const std::list<int>& getHistory() {
+        return history;
+    }
     
     
 private:
@@ -76,11 +90,15 @@ private:
     std::multimap<std::pair<int, char>, int> m_transitions;
     std::set<int> m_acceptingStates;
     int m_startState;
+    std::map<std::pair<int, int>, tokenFunction> m_tokenFunctions;
+    State m_parsedState;
+
     
 public:
     Parser(int startState, int endState);
-    void addRule(int curState, char token, int newState);
+    void addRule(int curState, char token, int newState, tokenFunction func);
     bool parse(Tokenizer& tokens, std::list<Instruction>& instructions);
+    void runCode(Tokenizer& tokens);
 };
 
 
