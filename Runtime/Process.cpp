@@ -103,7 +103,7 @@ Process::registerOutput(const string& interfaceName) {
 }
 
 NodeDb::NodeSingleInput*
-Process::getInput(const string& name) {
+Process::getInput(const string& name) const {
     auto in = nodeDb.getInput(getName() + "." + name);
     if(in) {
         return in;
@@ -114,7 +114,7 @@ Process::getInput(const string& name) {
 }
 
 NodeDb::NodeMultiOutput*
-Process::getOutput(const string& name) {
+Process::getOutput(const string& name) const {
     auto out = nodeDb.getOutput(getName() + "." + name);
     if(out) {
         return out;

@@ -16,6 +16,7 @@
 #include <string>
 #include <functional>
 #include "Tokenizer.hpp"
+#include "Trace.h"
 
 
 typedef std::function<bool (const std::string& token)> tokenFunction;
@@ -85,6 +86,7 @@ private:
 
 class Parser {
 private:
+    Arro::Trace m_trace;
     // multimap allows multiple entries with same key value.
     // Below is a multimap of pair<state, token> --> newstate
     std::multimap<std::pair<int, char>, int> m_transitions;

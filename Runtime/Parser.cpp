@@ -16,6 +16,7 @@
 using namespace std;
 
 Parser::Parser(int startState, int endState):
+    m_trace("Parser", true),
     m_parsedState(startState) {
     m_startState = startState;
     m_acceptingStates.insert(endState);
@@ -32,7 +33,9 @@ bool Parser::parse(Tokenizer& tokens, list<Instruction>& instructions) {
     string tokenString;
     char token;
     
-    while((token = tokens.getToken(tokenString)) != '$') {
+    /*while((token = tokens.getToken(tokenString)) != '$')*/ do {
+        token = tokens.getToken(tokenString);
+
         list<State> nextStates;
         
         for(auto state = currStates.begin(); state != currStates.end(); ++state) {
@@ -65,7 +68,7 @@ bool Parser::parse(Tokenizer& tokens, list<Instruction>& instructions) {
         //for(list<State>::iterator itr = currStates.begin(); itr != currStates.end(); ++itr) {
         //    std::cout << "Current state " << itr->get() << "\n";
         //}
-    }
+    } while(token != '$');
     
 
     // Find State in currStates that is in m_acceptingStates
@@ -83,22 +86,29 @@ bool Parser::parse(Tokenizer& tokens, list<Instruction>& instructions) {
 
 void Parser::runCode(Tokenizer& tokens) {
     tokens.reset();
-    bool stop = false;
+    bool cont = true;
 
+    m_trace.println("Checking transitions ");
     auto history = m_parsedState.getHistory();
 
     auto c = history.begin();
-    while(c != history.end() && !stop) {
+    while(c != history.end() && cont) {
         auto c1 = c;
         auto c2 = ++c;
         if(c != history.end()) {
             std::string tmp;
             tokens.getToken(tmp);
 
-            tokenFunction func = m_tokenFunctions.at(make_pair(*c1, *c2));
-            stop = func(tmp);
+            try {
+                tokenFunction func = m_tokenFunctions.at(make_pair(*c1, *c2));
 
-            std::cout << "Rule " << *c1 << " - " << tmp << " - " << *c2 << "\n";
+                std::cout << "Rule " << *c1 << " - " << tmp << " - " << *c2 << "\n";
+
+                cont = func(tmp);
+            }
+            catch (std::out_of_range) {
+                throw std::runtime_error("Running instruction fails " + tmp);
+            }
         }
     }
 

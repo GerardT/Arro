@@ -43,7 +43,7 @@ namespace Arro {
 
     class SfcTransition {
     public:
-        SfcTransition(const std::string& condition, const NodeSfc& parent);
+        SfcTransition(const std::string& condition, const std::string& from, const std::string& to, const NodeSfc& parent);
 
         /**
          * Check if any of the transitions in this SFC can fire.
@@ -53,17 +53,7 @@ namespace Arro {
          */
         void runTransitions(std::set<std::string>& m_currentSteps);
 
-        /**
-         * Check if condition for this transition is true.
-         * Function testRule0 will call testRule1, which will call testRule2, etc.
-         *
-         * @return true if condition true
-         */
-        bool testRule_START();
-        bool testRule_IN(std::list<Instruction>::iterator& it, const std::string& argument);
-        bool testRule_LIST_BEGIN(std::list<Instruction>::iterator& it, const std::string& argument);
-        bool testRule_SINGLE_STATE(std::list<Instruction>::iterator& it, const std::string& argument);
-        bool testRule_LIST_END(std::list<Instruction>::iterator& it);
+        void sendActions();
 
         void AddAction(const std::string& nodeName, const std::string& actionString) {
             m_actions[nodeName] = actionString;
@@ -75,10 +65,10 @@ namespace Arro {
         const NodeSfc& m_parent;
         std::string m_expression;
         std::map<std::string, std::string> m_actions;
-        Parser m_parser;
         std::list<Instruction> m_instrList;
         std::string m_from;
         std::string m_to;
+        Parser m_parser;
 
         struct Context {
             std::string node;
@@ -163,14 +153,22 @@ namespace Arro {
         }
 
         bool nodeAtStep(const std::string& node, const std::string& step) const {
-            std::string nodeName = this->m_process->getName() + ARRO_NAME_SEPARATOR + "step_" + node;
+            std::string nodeName = /*this->m_process->getName() + ARRO_NAME_SEPARATOR +*/ "_step_" + node;
 
-            if(m_currentInputs.find(node) != m_currentInputs.end()) {
-                const std::string& value = m_currentInputs.at(node);
+            if(m_currentInputs.find(nodeName) != m_currentInputs.end()) {
+                const std::string& value = m_currentInputs.at(nodeName);
 
                 return value == step;
             }
+            // dump currentInputs
+            for(auto it = m_currentInputs.begin(); it != m_currentInputs.end(); ++it) {
+                m_trace.println("input: " + it->first + " value " + it->second);
+            }
             return false;
+        }
+
+        const Process* getProcess() const {
+            return m_process;
         }
 
 //        void inputHasValue(const std::string& input, const std::string& value) {

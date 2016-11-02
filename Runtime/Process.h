@@ -73,14 +73,14 @@ namespace Arro
          *
          * \param name Name of input.
          */
-        NodeDb::NodeSingleInput*  getInput(const std::string& name);
+        NodeDb::NodeSingleInput*  getInput(const std::string& name) const;
 
         /**
          * Lookup an output by its name, which is concatenated: "procesname.name".
          *
          * \param name Name of output.
          */
-        NodeDb::NodeMultiOutput* getOutput(const std::string& name);
+        NodeDb::NodeMultiOutput* getOutput(const std::string& name) const;
 
         /**
          * Let implementation of Process run one execution cycle. Only run a
