@@ -20,11 +20,11 @@ using namespace std;
 
 
 Process::Process(NodeDb& db, const string& instance):
-    AbstractNode(instance),
-    trace("Process", true),
-    nodeDb(db),
-    device(nullptr),
-    doRunCycle(false) {
+    AbstractNode{instance},
+    trace{"Process", true},
+    nodeDb{db},
+    device{nullptr},
+    doRunCycle{false} {
 
     trace.println("Creating sfc " + instance + "._sfc");
 
@@ -35,11 +35,11 @@ Process::Process(NodeDb& db, const string& instance):
 }
 
 Process::Process(NodeDb& db, const string& url, const string& instance, ConfigReader::StringMap params, TiXmlElement* elt):
-    AbstractNode(instance),
-    trace("Process", true),
-    nodeDb(db),
-    device(nullptr),
-    doRunCycle(false) {
+    AbstractNode{instance},
+    trace{"Process", true},
+    nodeDb{db},
+    device{nullptr},
+    doRunCycle{false} {
 
     trace.println("Creating instance of " + url);
 

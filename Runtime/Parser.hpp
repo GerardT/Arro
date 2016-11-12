@@ -91,9 +91,9 @@ private:
     // Below is a multimap of pair<state, token> --> newstate
     std::multimap<std::pair<int, char>, int> m_transitions;
     std::set<int> m_acceptingStates;
+    State m_parsedState;
     int m_startState;
     std::map<std::pair<int, int>, tokenFunction> m_tokenFunctions;
-    State m_parsedState;
 
     
 public:

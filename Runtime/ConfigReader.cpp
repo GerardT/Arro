@@ -15,8 +15,8 @@ using namespace std;
 using namespace Arro;
 
 ConfigReader::ConfigReader(const string& filename, NodeDb& db):
-     trace("ConfigReader", true),
-     nodeDb(db)
+     trace{"ConfigReader", true},
+     nodeDb{db}
 {
     auto params = new StringMap();
 
@@ -125,10 +125,6 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
             // create Process object; inputs & outputs to be added later.
             processNode = new Process(nodeDb, *typeURL, instance, *params);
-
-            // EXTRA
-            //processNode->registerInput("_action", true);
-
 
             delete params;
         }

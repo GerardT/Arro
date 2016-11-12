@@ -15,14 +15,14 @@ using namespace Arro;
 using namespace std;
 
 NodeDb::NodeDb():
-    trace("NodeDb", true),
-    allInputs(),
-    allOutputs(),
-    allNodes(),
-    inQueue(),
-    pInQueue(&inQueue),
-    running(false),
-    thrd(nullptr) {
+    trace{"NodeDb", true},
+    allInputs{},
+    allOutputs{},
+    allNodes{},
+    inQueue{},
+    pInQueue{&inQueue},
+    running{false},
+    thrd{nullptr} {
 }
 
 NodeDb::~NodeDb() {
@@ -30,18 +30,6 @@ NodeDb::~NodeDb() {
         auto fm = inQueue.front();
         inQueue.pop();
         delete fm;
-    }
-
-
-    for(auto it = allOutputs.begin(); it != allOutputs.end() ; ++it) {
-        delete it->second;
-    }
-    for(auto it = allInputs.begin(); it != allInputs.end() ; ++it) {
-        delete it->second;
-    }
-
-    for(auto it = allNodes.begin(); it != allNodes.end() ; ++it) {
-        delete it->second;
     }
 }
 
@@ -51,8 +39,8 @@ NodeDb::NodeSingleInput::handleMessage(MessageBuf* msg) {
 }
 
 NodeDb::NodeMultiOutput::NodeMultiOutput(NodeDb* n):
-    nm(n),
-    inputs() {
+    nm{n},
+    inputs{} {
 }
 
 void
@@ -92,7 +80,7 @@ NodeDb::NodeMultiOutput::submitMessageBuffer(const char* msg) {
 AbstractNode*
 NodeDb::getNode(const string& name) {
     try {
-        auto n = allNodes[name];
+        auto n = &(*(allNodes[name]));
         return n;
     }
     catch (const std::out_of_range& oor) {
@@ -103,7 +91,7 @@ NodeDb::getNode(const string& name) {
 
 AbstractNode*
 NodeDb::registerNode(AbstractNode* node, const string& name) {
-     allNodes[name] = node;
+     allNodes[name] = std::unique_ptr<AbstractNode>(node);
      return node;
 }
 
@@ -112,11 +100,11 @@ NodeDb::registerNodeInput(AbstractNode* node, const string& interfaceName, NodeD
     auto n = new NodeDb::NodeSingleInput(/*interfaceName, */listen, node);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
-        allInputs[node->getName()] = n;
+        allInputs [node->getName()] = unique_ptr<NodeSingleInput>(n);
         trace.println(string("registering input ") + node->getName());
         return (NodeDb::NodeSingleInput*)n;
     } else {
-        allInputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = n;
+        allInputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = unique_ptr<NodeSingleInput>(n);
         trace.println(("registering input ") + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
         return (NodeDb::NodeSingleInput*)n;
     }
@@ -128,11 +116,11 @@ NodeDb::registerNodeOutput(AbstractNode* node, const string& interfaceName) {
 
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
-        allOutputs[node->getName()] = n;
+        allOutputs[node->getName()] = unique_ptr<NodeMultiOutput>(n);
         trace.println("registering output " + node->getName());
         return (NodeMultiOutput*)n;
     } else {
-        allOutputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = n;
+        allOutputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = unique_ptr<NodeMultiOutput>(n);
         trace.println("registering output " + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
         return (NodeMultiOutput*)n;
     }
@@ -140,12 +128,12 @@ NodeDb::registerNodeOutput(AbstractNode* node, const string& interfaceName) {
 
 NodeDb::NodeMultiOutput*
 NodeDb::getOutput(const string& name) {
-    return (NodeMultiOutput*)(allOutputs[name]);
+    return (NodeMultiOutput*)&(*((allOutputs[name])));
 }
 
 NodeDb::NodeSingleInput*
 NodeDb::getInput(const std::string& name) {
-    return (NodeSingleInput*)(allInputs[name]);
+    return (NodeSingleInput*)&(*(allInputs[name]));  // Since using unique_ptr, we have to get pointer first (*)
 }
 
 
@@ -181,7 +169,9 @@ NodeDb::runCycle(NodeDb* nm) {
             } // make sure mutex is unlocked here
 
             /* Then trigger all runCycle methods on nodes */
-            for_each(nm->allNodes.begin(), nm->allNodes.end(), [&](pair<string, AbstractNode*> n) { n.second->runCycle(); });
+            for(auto it = nm->allNodes.begin(); it != nm->allNodes.end(); ++it) {
+                it->second->runCycle();
+            }
 
             {
                 std::unique_lock<std::mutex> lock(nm->mutex);
@@ -233,13 +223,13 @@ NodeDb::connect(string& output, string& input) {
     NodeSingleInput* in = nullptr;
 
     try {
-        out = allOutputs[output];
+        out = &(*(allOutputs[output]));
     }
     catch (std::out_of_range) {
         trace.println("### non-registered output " + output);
     }
     try {
-        in = allInputs[input];
+        in = &(*(allInputs[input]));
     }
     catch (std::out_of_range) {
         trace.println("### non-registered input " + input);

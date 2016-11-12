@@ -14,6 +14,7 @@
 #include <queue>
 #include <mutex>
 #include <condition_variable>
+#include <memory>
 
 #include "AbstractNode.h"
 #include "Trace.h"
@@ -259,9 +260,9 @@ namespace Arro
 
     private:
         Trace trace;
-        std::map<std::string, NodeSingleInput*> allInputs;
-        std::map<std::string, NodeMultiOutput*> allOutputs;
-        std::map<std::string, AbstractNode*> allNodes;
+        std::map<std::string, std::unique_ptr<NodeSingleInput> > allInputs;
+        std::map<std::string, std::unique_ptr<NodeMultiOutput> > allOutputs;
+        std::map<std::string, std::unique_ptr<AbstractNode> > allNodes;
         std::queue<FullMsg*> inQueue, *pInQueue;
         bool running;
         std::thread* thrd;

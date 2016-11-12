@@ -8,10 +8,10 @@ static PythonGlue* instance = nullptr;
 
 
 PythonGlue::PythonGlue():
-    trace("PythonGlue", true),
-    pModule(nullptr),
-    pDict(nullptr),
-    pDictApi(nullptr)
+    trace{"PythonGlue", true},
+    pModule{nullptr},
+    pDict{nullptr},
+    pDictApi{nullptr}
 {
     trace.println("Instantiating PythonGlue.");
     if(instance) {

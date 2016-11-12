@@ -16,9 +16,9 @@
 using namespace std;
 
 Parser::Parser(int startState, int endState):
-    m_trace("Parser", true),
-    m_parsedState(startState) {
-    m_startState = startState;
+    m_trace{"Parser", true},
+    m_parsedState{startState},
+    m_startState{startState} {
     m_acceptingStates.insert(endState);
 }
 void Parser::addRule(int curState, char token, int newState, tokenFunction func) {
