@@ -25,7 +25,7 @@ namespace Arro
          *
          * \param n Name of the node.
          */
-        AbstractNode(const std::string& n): name(n) {};
+        AbstractNode(const std::string& n): m_name(n) {};
         virtual ~AbstractNode() {};
 
         /**
@@ -33,7 +33,7 @@ namespace Arro
          *
          * \return name Name of the node.
          */
-        const std::string& getName() const { return name; };
+        const std::string& getName() const { return m_name; };
 
         /**
          * Make the node execute one cycle.
@@ -41,7 +41,7 @@ namespace Arro
         virtual void runCycle() = 0;
 
     private:
-        std::string name;
+        std::string m_name;
     };
 }
 

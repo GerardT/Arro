@@ -47,7 +47,7 @@ namespace Arro
              * \param l Listener
              * \param n Node to which this input is attached.
              */
-            NodeSingleInput(std::function<void (MessageBuf* msg)> l, AbstractNode* n): listen(l), node(n) {};
+            NodeSingleInput(std::function<void (MessageBuf* m_msg)> l, AbstractNode* n): m_callback(l), m_node(n) {};
             virtual ~NodeSingleInput() {};
 
             // Copy and assignment is not supported.
@@ -62,8 +62,8 @@ namespace Arro
             void handleMessage(MessageBuf* msg);
 
         private:
-            std::function<void (MessageBuf* msg)> listen;
-            AbstractNode* node;
+            std::function<void (MessageBuf* m_msg)> m_callback;
+            AbstractNode* m_node;
 
         };
 
@@ -117,8 +117,8 @@ namespace Arro
             void submitMessageBuffer(const char* msg);
 
         private:
-            NodeDb* nm;
-            std::vector<NodeSingleInput*> inputs;
+            NodeDb* m_nm;
+            std::vector<NodeSingleInput*> m_inputs;
         };
 
         class FullMsg {
@@ -137,8 +137,8 @@ namespace Arro
             FullMsg& operator=(const FullMsg& other) = delete;
 
         // FIXME Should be private
-            NodeMultiOutput* output;
-            std::string* msg;
+            NodeMultiOutput* m_output;
+            std::string* m_msg;
         };
 
     public:
@@ -177,7 +177,7 @@ namespace Arro
          * \param name Name of the interface as "node.node.interface".
          * \param n The instance of the node.
          */
-        NodeSingleInput* registerNodeInput(AbstractNode* node, const std::string& interfaceName, std::function<void (MessageBuf* msg)> listen);
+        NodeSingleInput* registerNodeInput(AbstractNode* node, const std::string& interfaceName, std::function<void (MessageBuf* m_msg)> listen);
 
         /**
          * Register an output with the node.
@@ -242,15 +242,15 @@ namespace Arro
         NodeMultiOutput* getOutput(const std::string& name);
 
     private:
-        Trace trace;
-        std::map<std::string, std::unique_ptr<NodeSingleInput> > allInputs;
-        std::map<std::string, std::unique_ptr<NodeMultiOutput> > allOutputs;
-        std::map<std::string, std::unique_ptr<AbstractNode> > allNodes;
-        std::queue<FullMsg*> inQueue, *pInQueue;
-        bool running;
-        std::thread* thrd;
-        std::mutex mutex;
-        std::condition_variable condition;
+        Trace m_trace;
+        std::map<std::string, std::unique_ptr<NodeSingleInput> > m_allInputs;
+        std::map<std::string, std::unique_ptr<NodeMultiOutput> > m_allOutputs;
+        std::map<std::string, std::unique_ptr<AbstractNode> > m_allNodes;
+        std::queue<FullMsg*> m_inQueue, *m_pInQueue;
+        bool m_running;
+        std::thread* m_thrd;
+        std::mutex m_mutex;
+        std::condition_variable m_condition;
     };
 }
 

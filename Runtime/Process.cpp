@@ -21,14 +21,14 @@ using namespace std;
 
 Process::Process(NodeDb& db, const string& instance):
     AbstractNode{instance},
-    trace{"Process", true},
-    nodeDb{db},
-    device{nullptr},
-    doRunCycle{false} {
+    m_trace{"Process", true},
+    m_nodeDb{db},
+    m_device{nullptr},
+    m_doRunCycle{false} {
 
-    trace.println("Creating sfc " + instance + "._sfc");
+    m_trace.println("Creating sfc " + instance + "._sfc");
 
-    trace.println("---> Never used?? <--- ");
+    m_trace.println("---> Never used?? <--- ");
 
     db.registerNode(this, instance + "._sfc");
 
@@ -36,13 +36,13 @@ Process::Process(NodeDb& db, const string& instance):
 
 Process::Process(NodeDb& db, const string& url, const string& instance, ConfigReader::StringMap params, TiXmlElement* elt):
     AbstractNode{instance},
-    trace{"Process", true},
-    nodeDb{db},
+    m_trace{"Process", true},
+    m_nodeDb{db},
     m_enableRunCycle{false},
-    device{nullptr},
-    doRunCycle{false} {
+    m_device{nullptr},
+    m_doRunCycle{false} {
 
-    trace.println("Creating instance of " + url);
+    m_trace.println("Creating instance of " + url);
 
 
     getPrimitive(url, instance, params, elt);
@@ -50,7 +50,7 @@ Process::Process(NodeDb& db, const string& url, const string& instance, ConfigRe
     std::map<std::string, std::string>::iterator iter;
 
     for (iter = params.begin(); iter != params.end(); ++iter) {
-        trace.println("    parameter " + iter->first + " " + iter->second);
+        m_trace.println("    parameter " + iter->first + " " + iter->second);
 
         auto kv = new arro::KeyValuePair();
         kv->set_key(iter->first.c_str());
@@ -58,7 +58,7 @@ Process::Process(NodeDb& db, const string& url, const string& instance, ConfigRe
         string s = kv->SerializeAsString();
         MessageBuf msg(s);
         free(kv);
-        device->handleMessage(&msg, "config");
+        m_device->handleMessage(&msg, "config");
     }
 
     db.registerNode(this, instance);
@@ -66,14 +66,14 @@ Process::Process(NodeDb& db, const string& url, const string& instance, ConfigRe
 }
 
 Process::~Process() {
-    if(device) delete device;
+    if(m_device) delete m_device;
 }
 
 void
 Process::runCycle() {
-    if(doRunCycle) {
-        device->runCycle();
-        doRunCycle = false;
+    if(m_doRunCycle) {
+        m_device->runCycle();
+        m_doRunCycle = false;
     }
 }
 
@@ -81,58 +81,58 @@ void
 Process::registerInput(const string& interfaceName, bool enableRunCycle) {
     m_interfaceName = interfaceName;
     m_enableRunCycle = enableRunCycle;
-    nodeDb.registerNodeInput(this, interfaceName, [this](MessageBuf* msg) {
+    m_nodeDb.registerNodeInput(this, interfaceName, [this](MessageBuf* msg) {
         if(m_enableRunCycle) {
-            doRunCycle = true;
+            m_doRunCycle = true;
         }
-        device->handleMessage(msg, m_interfaceName);
+        m_device->handleMessage(msg, m_interfaceName);
     });
 }
 
 void
 Process::registerOutput(const string& interfaceName) {
-    nodeDb.registerNodeOutput(this, interfaceName);
+    m_nodeDb.registerNodeOutput(this, interfaceName);
 }
 
 NodeDb::NodeSingleInput*
 Process::getInput(const string& name) const {
-    auto in = nodeDb.getInput(getName() + "." + name);
+    auto in = m_nodeDb.getInput(getName() + "." + name);
     if(in) {
         return in;
     } else {
-        trace.println("no such input registered: " + getName() + "." + name);
+        m_trace.println("no such input registered: " + getName() + "." + name);
         throw std::runtime_error("No such input registered: " + getName() + "." + name);
     }
 }
 
 NodeDb::NodeMultiOutput*
 Process::getOutput(const string& name) const {
-    auto out = nodeDb.getOutput(getName() + "." + name);
+    auto out = m_nodeDb.getOutput(getName() + "." + name);
     if(out) {
         return out;
     } else {
-        trace.println("no such output registered: " + getName() + "." + name);
+        m_trace.println("no such output registered: " + getName() + "." + name);
         throw std::runtime_error("No such output registered: " + getName() + "." + name);
     }
 }
 
 void
 Process::getPrimitive(const string& url, const string& instance, ConfigReader::StringMap& params, TiXmlElement* elt) {
-    device = nullptr;
+    m_device = nullptr;
 
     if(url.find("Python:") == 0) {
-        trace.println("new NodePython(" + instance + ")");
+        m_trace.println("new NodePython(" + instance + ")");
         try {
             string className = url.substr(7);
-            device = new NodePython(this, className, params);
+            m_device = new NodePython(this, className, params);
         } catch(out_of_range &) {
             throw std::runtime_error("Invalid URL for Python node " + url);
         }
     } else if(url.find("Sfc:") == 0) {
-        trace.println("new NodeSfc(" + instance + ")");
+        m_trace.println("new NodeSfc(" + instance + ")");
         try {
             //string className = url.substr(7);
-            device = new NodeSfc(this, elt);
+            m_device = new NodeSfc(this, elt);
         } catch(out_of_range &) {
             throw std::runtime_error("Invalid URL for SFC node " + url);
         }
@@ -142,11 +142,11 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
             string className = url.substr(7);
 
             if(className == "pid") {
-                trace.println("new NodePid(" + instance + ")");
-                device = new NodePid(this, instance, params);
+                m_trace.println("new NodePid(" + instance + ")");
+                m_device = new NodePid(this, instance, params);
             }
             else if(className == "Servo") {
-               trace.println("new NodeServo(" + instance + ")");
+               m_trace.println("new NodeServo(" + instance + ")");
                 new NodeServo(this, instance, params);
             }
 //            else if(className == "Linear") {
@@ -162,21 +162,21 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
 //                //device = new NodeTsSection(instance, params);
 //            }
             else if(className == "Timer") {
-                trace.println("new NodeTimer(" + instance + ")");
-                device = new NodeTimer(this, instance, params);
+                m_trace.println("new NodeTimer(" + instance + ")");
+                m_device = new NodeTimer(this, instance, params);
             }
             else if(className == "pass") {
             }
             else {
-                trace.println("unknown node" + instance );
+                m_trace.println("unknown node" + instance );
                 ServerEngine::console(string("unknown node ") + className);
             }
         } catch(out_of_range &) {
-            trace.println("native node not found");
+            m_trace.println("native node not found");
         }
     }
-    if(device == nullptr) {
-        trace.println("Node module not found " + url);
+    if(m_device == nullptr) {
+        m_trace.println("Node module not found " + url);
         throw std::runtime_error("Node module not found " + url);
     }
 }
@@ -187,7 +187,7 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
  */
 void
 Process::registerSfc(const std::string& name, Process* sfc) {
-    ((NodeSfc*)device)->registerSfc(name, (NodeSfc*)(sfc->device));
+    ((NodeSfc*)m_device)->registerSfc(name, (NodeSfc*)(sfc->m_device));
 }
 
 

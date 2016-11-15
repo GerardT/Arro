@@ -50,9 +50,9 @@ namespace Arro
          */
         class Definition {
         public:
-            TiXmlElement* node;
+            TiXmlElement* m_node;
             Definition(TiXmlElement* n):
-                node(n) {
+                m_node(n) {
             }
         };
 
@@ -112,9 +112,9 @@ namespace Arro
         void makeNodeInstance(const std::string& className, const std::string& instanceName, const std::string& instancePrefix, StringMap& importParams, Process* parentSfc);
 
     private:
-        Trace trace;
-        NodeDb& nodeDb;
-        DefinitionMap definitions;
+        Trace m_trace;
+        NodeDb& m_nodeDb;
+        DefinitionMap m_definitions;
     };
 }
 

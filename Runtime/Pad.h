@@ -36,9 +36,9 @@ namespace Arro
 
     private:
         Trace trace;
-        NodeDb::NodeMultiOutput* result;
-        NodeDb::NodeSingleInput* in;
-        NodeDb::NodeMultiOutput* out;
+        NodeDb::NodeMultiOutput* m_result;
+        NodeDb::NodeSingleInput* m_in;
+        NodeDb::NodeMultiOutput* m_out;
     };
 }
 

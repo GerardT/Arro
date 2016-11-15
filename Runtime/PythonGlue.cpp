@@ -8,14 +8,14 @@ static PythonGlue* instance = nullptr;
 
 
 PythonGlue::PythonGlue():
-    trace{"PythonGlue", true},
-    pModule{nullptr},
-    pDict{nullptr},
-    pDictApi{nullptr}
+    m_trace{"PythonGlue", true},
+    m_pModule{nullptr},
+    m_pDict{nullptr},
+    m_pDictApi{nullptr}
 {
-    trace.println("Instantiating PythonGlue.");
+    m_trace.println("Instantiating PythonGlue.");
     if(instance) {
-        trace.fatal("Tried to instantiate PythonGlue more than once.");
+        m_trace.fatal("Tried to instantiate PythonGlue more than once.");
     }
 
     instance = this;
@@ -49,7 +49,7 @@ PythonGlue::PythonGlue():
 PythonGlue::~PythonGlue() {
     instance = nullptr;
 
-    trace.println("Deleting PythonGlue.");
+    m_trace.println("Deleting PythonGlue.");
 
     /*
      * Cleanup for Python -> C.
@@ -59,7 +59,7 @@ PythonGlue::~PythonGlue() {
      * Cleanup for C -> Python.
      */
     // Don't Py_DECREF pDict, pDictApi.
-    Py_DECREF(pModule);
+    Py_DECREF(m_pModule);
 
     // Finish the Python Interpreter
     Py_Finalize();
@@ -74,7 +74,7 @@ PythonGlue::getMessage(PyObject * /*self*/, PyObject *args)
     if(!PyArg_ParseTuple(args, "O", &obj))  // Return value: int
         return nullptr;
 
-    NodePython* np = instance->instanceMap[obj];
+    NodePython* np = instance->m_instanceMap[obj];
     if(!np) {
         return nullptr; // FIXME: do i need to set an error?
     } else {
@@ -93,7 +93,7 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
         return nullptr;
     }
 
-    NodePython* np = instance->instanceMap[obj];
+    NodePython* np = instance->m_instanceMap[obj];
     if(!np) {
         return nullptr; // FIXME: do i need to set an error?
     } else {
@@ -118,11 +118,11 @@ PythonGlue::loadModule() {
     // Build the name object
     PyObject *pName = PyUnicode_FromString(ARRO_PROGRAM_FILE);  // Return value: New reference.
     // Load the arro module object
-    pModule = PyImport_Import(pName);  // Return value: New reference.
+    m_pModule = PyImport_Import(pName);  // Return value: New reference.
     Py_DECREF(pName);
 
-    if (pModule != nullptr) {
-        pDict = PyModule_GetDict(pModule);  // Return value: Borrowed reference.
+    if (m_pModule != nullptr) {
+        m_pDict = PyModule_GetDict(m_pModule);  // Return value: Borrowed reference.
     }
     else {
         captureError();
@@ -132,42 +132,42 @@ PythonGlue::loadModule() {
     // Build the name object
     PyObject *pNameApi = PyUnicode_FromString(ARRO_API_FILE);
     // Load the arro_api module object
-    pModuleApi = PyImport_Import(pNameApi);  // Return value: New reference.
+    m_pModuleApi = PyImport_Import(pNameApi);  // Return value: New reference.
     Py_DECREF(pNameApi);
 
-    if (pModuleApi != nullptr) {
-        pDictApi = PyModule_GetDict(pModuleApi);  // Return value: Borrowed reference.
+    if (m_pModuleApi != nullptr) {
+        m_pDictApi = PyModule_GetDict(m_pModuleApi);  // Return value: Borrowed reference.
     }
     else {
         captureError();
         return nullptr;
     }
 
-    return pDict;
+    return m_pDict;
 }
 
 void
 PythonGlue::insertFunctionToModule() {
     for(PyMethodDef* def = ArroMethods; def->ml_name != nullptr; def++) {
         PyObject *func = PyCFunction_New(def, nullptr);
-        PyDict_SetItemString(pDictApi, def->ml_name, func);
+        PyDict_SetItemString(m_pDictApi, def->ml_name, func);
         Py_DECREF(func);
     }
 }
 
 void
 PythonGlue::registerInstance(PyObject* obj, NodePython* node) {
-    instance->instanceMap[obj] = node;
+    instance->m_instanceMap[obj] = node;
 }
 
 PyObject*
 PythonGlue::getDict() {
-    return instance->pDict;
+    return instance->m_pDict;
 };
 
 PyObject*
 PythonGlue::getDictApi() {
-    return instance->pDictApi;
+    return instance->m_pDictApi;
 };
 
 void

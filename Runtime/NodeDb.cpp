@@ -15,47 +15,47 @@ using namespace Arro;
 using namespace std;
 
 NodeDb::NodeDb():
-    trace{"NodeDb", true},
-    allInputs{},
-    allOutputs{},
-    allNodes{},
-    inQueue{},
-    pInQueue{&inQueue},
-    running{false},
-    thrd{nullptr} {
+    m_trace{"NodeDb", true},
+    m_allInputs{},
+    m_allOutputs{},
+    m_allNodes{},
+    m_inQueue{},
+    m_pInQueue{&m_inQueue},
+    m_running{false},
+    m_thrd{nullptr} {
 }
 
 NodeDb::~NodeDb() {
-    while(inQueue.empty() != true) {
-        auto fm = inQueue.front();
-        inQueue.pop();
+    while(m_inQueue.empty() != true) {
+        auto fm = m_inQueue.front();
+        m_inQueue.pop();
         delete fm;
     }
 }
 
 void
 NodeDb::NodeSingleInput::handleMessage(MessageBuf* msg) {
-    listen(msg);
+    m_callback(msg);
 }
 
 NodeDb::NodeMultiOutput::NodeMultiOutput(NodeDb* n):
-    nm{n},
-    inputs{} {
+    m_nm{n},
+    m_inputs{} {
 }
 
 void
 NodeDb::NodeMultiOutput::connectInput(NodeSingleInput* i) {
     if(i) {
-        inputs.push_back((NodeSingleInput*)i);
+        m_inputs.push_back((NodeSingleInput*)i);
     }
     else {
-        nm->trace.println("### cannot connect ");
+        m_nm->m_trace.println("### cannot connect ");
     }
 }
 
 void
 NodeDb::NodeMultiOutput::forwardMessage(MessageBuf* msg) {
-    for_each(inputs.begin(), inputs.end(), [msg](NodeSingleInput* i) { i->handleMessage(msg); });
+    for_each(m_inputs.begin(), m_inputs.end(), [msg](NodeSingleInput* i) { i->handleMessage(msg); });
 }
 void
 NodeDb::NodeMultiOutput::submitMessage(google::protobuf::MessageLite* msg) {
@@ -68,10 +68,10 @@ NodeDb::NodeMultiOutput::submitMessageBuffer(const char* msg) {
     auto s = new MessageBuf(msg);
     auto fm = new FullMsg(this, s);
 
-    std::lock_guard<std::mutex> lock(nm->mutex);
-    nm->pInQueue->push(fm);
+    std::lock_guard<std::mutex> lock(m_nm->m_mutex);
+    m_nm->m_pInQueue->push(fm);
 
-    nm->condition.notify_one();
+    m_nm->m_condition.notify_one();
 
 }
 
@@ -80,18 +80,18 @@ NodeDb::NodeMultiOutput::submitMessageBuffer(const char* msg) {
 AbstractNode*
 NodeDb::getNode(const string& name) {
     try {
-        auto n = &(*(allNodes[name]));
+        auto n = &(*(m_allNodes[name]));
         return n;
     }
     catch (const std::out_of_range& oor) {
-        trace.fatal("### non-registered name " + name);
+        m_trace.fatal("### non-registered name " + name);
         return nullptr;
     }
 }
 
 AbstractNode*
 NodeDb::registerNode(AbstractNode* node, const string& name) {
-     allNodes[name] = std::unique_ptr<AbstractNode>(node);
+     m_allNodes[name] = std::unique_ptr<AbstractNode>(node);
      return node;
 }
 
@@ -101,12 +101,12 @@ NodeDb::registerNodeInput(AbstractNode* node, const string& interfaceName,
     auto n = new NodeDb::NodeSingleInput(/*interfaceName, */listen, node);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
-        allInputs [node->getName()] = unique_ptr<NodeSingleInput>(n);
-        trace.println(string("registering input ") + node->getName());
+        m_allInputs [node->getName()] = unique_ptr<NodeSingleInput>(n);
+        m_trace.println(string("registering input ") + node->getName());
         return (NodeDb::NodeSingleInput*)n;
     } else {
-        allInputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = unique_ptr<NodeSingleInput>(n);
-        trace.println(("registering input ") + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
+        m_allInputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = unique_ptr<NodeSingleInput>(n);
+        m_trace.println(("registering input ") + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
         return (NodeDb::NodeSingleInput*)n;
     }
 }
@@ -117,31 +117,31 @@ NodeDb::registerNodeOutput(AbstractNode* node, const string& interfaceName) {
 
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
-        allOutputs[node->getName()] = unique_ptr<NodeMultiOutput>(n);
-        trace.println("registering output " + node->getName());
+        m_allOutputs[node->getName()] = unique_ptr<NodeMultiOutput>(n);
+        m_trace.println("registering output " + node->getName());
         return (NodeMultiOutput*)n;
     } else {
-        allOutputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = unique_ptr<NodeMultiOutput>(n);
-        trace.println("registering output " + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
+        m_allOutputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = unique_ptr<NodeMultiOutput>(n);
+        m_trace.println("registering output " + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
         return (NodeMultiOutput*)n;
     }
 }
 
 NodeDb::NodeMultiOutput*
 NodeDb::getOutput(const string& name) {
-    return (NodeMultiOutput*)&(*((allOutputs[name])));
+    return (NodeMultiOutput*)&(*((m_allOutputs[name])));
 }
 
 NodeDb::NodeSingleInput*
 NodeDb::getInput(const std::string& name) {
-    return (NodeSingleInput*)&(*(allInputs[name]));  // Since using unique_ptr, we have to get pointer first (*)
+    return (NodeSingleInput*)&(*(m_allInputs[name]));  // Since using unique_ptr, we have to get pointer first (*)
 }
 
 
 NodeDb::FullMsg::FullMsg(NodeMultiOutput* o /*string s*/, MessageBuf* m) {
     //target = s;
-    output = o;
-    msg = m;
+    m_output = o;
+    m_msg = m;
 }
 
 
@@ -150,19 +150,19 @@ void
 NodeDb::runCycle(NodeDb* nm) {
 
     try {
-        while(nm->running)
+        while(nm->m_running)
         {
             // Deliver all messages to the right nodes until empty
             {
-                std::unique_lock<std::mutex> lock(nm->mutex);
+                std::unique_lock<std::mutex> lock(nm->m_mutex);
 
-                while(!(nm->pInQueue->empty())) {
-                    FullMsg* fm = nm->pInQueue->front();
-                    nm->trace.println("new msg");
-                    nm->pInQueue->pop();
+                while(!(nm->m_pInQueue->empty())) {
+                    FullMsg* fm = nm->m_pInQueue->front();
+                    nm->m_trace.println("new msg");
+                    nm->m_pInQueue->pop();
                     if(fm != nullptr) {
-                        MessageBuf* msg = fm->msg;
-                        fm->output->forwardMessage(msg);
+                        MessageBuf* msg = fm->m_msg;
+                        fm->m_output->forwardMessage(msg);
                         delete msg;
                         delete fm;
                     }
@@ -170,50 +170,50 @@ NodeDb::runCycle(NodeDb* nm) {
             } // make sure mutex is unlocked here
 
             /* Then trigger all runCycle methods on nodes */
-            for(auto it = nm->allNodes.begin(); it != nm->allNodes.end(); ++it) {
+            for(auto it = nm->m_allNodes.begin(); it != nm->m_allNodes.end(); ++it) {
                 it->second->runCycle();
             }
 
             {
-                std::unique_lock<std::mutex> lock(nm->mutex);
+                std::unique_lock<std::mutex> lock(nm->m_mutex);
 
                 // And wait until new message arrive in queue
-                nm->condition.wait(lock);  // keep waiting if queue empty
+                nm->m_condition.wait(lock);  // keep waiting if queue empty
             } // make sure mutex is unlocked here
         }
     } catch (std::runtime_error& e) {
         // If exception, for instance Python (syntax) error, then thread exits here.
         // User can stop NodeDb after that.
-        nm->trace.println("Execution stopped, error " + string(e.what()));
+        nm->m_trace.println("Execution stopped, error " + string(e.what()));
         ServerEngine::console(string(e.what()));
     }
 }
 
 void
 NodeDb::start() {
-    running = true;
+    m_running = true;
 
-    trace.println("Starting ...");
+    m_trace.println("Starting ...");
 
-    thrd = new thread(&NodeDb::runCycle, this);
+    m_thrd = new thread(&NodeDb::runCycle, this);
 
     NodeTimer::start();
 }
 
 void
 NodeDb::stop() {
-    if(running) {
-        trace.println("Stopping ...");
+    if(m_running) {
+        m_trace.println("Stopping ...");
 
-        running = false;
+        m_running = false;
 
-        condition.notify_one();
+        m_condition.notify_one();
 
         NodeTimer::stop();
 
-        thrd->join();
-        delete thrd;
-        thrd = nullptr;
+        m_thrd->join();
+        delete m_thrd;
+        m_thrd = nullptr;
     }
 }
 
@@ -224,24 +224,24 @@ NodeDb::connect(string& output, string& input) {
     NodeSingleInput* in = nullptr;
 
     try {
-        out = &(*(allOutputs[output]));
+        out = &(*(m_allOutputs[output]));
     }
     catch (std::out_of_range) {
-        trace.println("### non-registered output " + output);
+        m_trace.println("### non-registered output " + output);
     }
     try {
-        in = &(*(allInputs[input]));
+        in = &(*(m_allInputs[input]));
     }
     catch (std::out_of_range) {
-        trace.println("### non-registered input " + input);
+        m_trace.println("### non-registered input " + input);
     }
     if(in == 0)
     {
-        trace.println("### non-registered input " + input);
+        m_trace.println("### non-registered input " + input);
     }
     else if(out == 0)
     {
-        trace.println("### non-registered output " + output);
+        m_trace.println("### non-registered output " + output);
     }
     else
     {

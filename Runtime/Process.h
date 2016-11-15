@@ -19,17 +19,6 @@ namespace Arro
 
     public:
         /**
-         * \brief Interface that let implementer listen to updates on a Pad connected to Process.
-         * Listener for updates to NodeSingleInput objects, invoked by
-         * NodeSingleInput::handleMessage().
-         */
-        class IPadListener {
-        public:
-            virtual ~IPadListener() {};
-            virtual void handleMessage(MessageBuf* msg, std::string padName) = 0;
-        };
-
-        /**
          * Constructor.
          *
          * \param nodeDb Database that contains all nodes.
@@ -46,7 +35,7 @@ namespace Arro
         Process& operator=(const Process& other) = delete;
 
         void test() {
-            device->test();
+            m_device->test();
         }
 
         bool hasStep(const std::string& name, const std::string& step);
@@ -105,13 +94,12 @@ namespace Arro
         void registerSfc(const std::string& name, Process* sfc);
 
     private:
-        Trace trace;
-        NodeDb& nodeDb;
+        Trace m_trace;
+        NodeDb& m_nodeDb;
         std::string m_interfaceName;
         bool m_enableRunCycle;
-        IDevice* device;
-        IPadListener* listener;
-        bool doRunCycle;
+        IDevice* m_device;
+        bool m_doRunCycle;
     };
 }
 

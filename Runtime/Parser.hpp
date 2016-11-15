@@ -51,22 +51,22 @@ private:
 class State {
 public:
     State(int initialState) {
-        history.push_back(initialState);
+        m_history.push_back(initialState);
     }
     void add(int newState) {
-        history.push_back(newState);
+        m_history.push_back(newState);
     }
     int get() const {
-        return history.back();
+        return m_history.back();
     }
     void collectInstructions(Tokenizer& tokens, std::list<Instruction>& instructions) {
         tokens.reset();
         
-        auto c = history.begin();
-        while(c != history.end()) {
+        auto c = m_history.begin();
+        while(c != m_history.end()) {
             auto c1 = c;
             auto c2 = ++c;
-            if(c != history.end()) {
+            if(c != m_history.end()) {
                 std::string tmp;
                 tokens.getToken(tmp);
                 instructions.push_back(Instruction(*c1, tmp, *c2));
@@ -76,15 +76,22 @@ public:
         }
     }
     const std::list<int>& getHistory() {
-        return history;
+        return m_history;
     }
     
     
 private:
-    std::list<int> history;
+    std::list<int> m_history;
 };
 
 class Parser {
+
+public:
+    Parser(int startState, int endState);
+    void addRule(int curState, char token, int newState, tokenFunction func);
+    bool parse(Tokenizer& tokens, std::list<Instruction>& instructions);
+    void runCode(Tokenizer& tokens);
+
 private:
     Arro::Trace m_trace;
     // multimap allows multiple entries with same key value.
@@ -94,13 +101,6 @@ private:
     State m_parsedState;
     int m_startState;
     std::map<std::pair<int, int>, tokenFunction> m_tokenFunctions;
-
-    
-public:
-    Parser(int startState, int endState);
-    void addRule(int curState, char token, int newState, tokenFunction func);
-    bool parse(Tokenizer& tokens, std::list<Instruction>& instructions);
-    void runCode(Tokenizer& tokens);
 };
 
 

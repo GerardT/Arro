@@ -15,14 +15,14 @@ using namespace std;
 using namespace Arro;
 
 ConfigReader::ConfigReader(const string& filename, NodeDb& db):
-     trace{"ConfigReader", true},
-     nodeDb{db}
+     m_trace{"ConfigReader", true},
+     m_nodeDb{db}
 {
     auto params = new StringMap();
 
     TiXmlDocument doc(filename);
     if (!doc.LoadFile()) {
-        trace.println("Cannot read file " + filename);
+        m_trace.println("Cannot read file " + filename);
         throw std::runtime_error("Cannot read file " + filename);
         return;
     }
@@ -30,7 +30,7 @@ ConfigReader::ConfigReader(const string& filename, NodeDb& db):
     TiXmlElement* node = doc.FirstChildElement("modules");
 
     if(!node) {
-        trace.println("node 'modules' missing");
+        m_trace.println("node 'modules' missing");
         throw std::runtime_error("node 'modules' missing");
     }
 
@@ -54,11 +54,11 @@ ConfigReader::storeDefinition(TiXmlElement* node) {
     const char* attr = node->Attribute("type");
 
     if(attr != nullptr){
-        definitions[attr] = new Definition(node);
-        trace.println(string("Added definition ") + attr);
+        m_definitions[attr] = new Definition(node);
+        m_trace.println(string("Added definition ") + attr);
     }
     else {
-        trace.println("No type found? ");
+        m_trace.println("No type found? ");
         throw std::runtime_error("No type definition for " + string(attr));
     }
 }
@@ -73,7 +73,7 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
         const string* keyAttr = elt->Attribute(string("key"));
         const string* substAttr = elt->Attribute(string("subst"));
         const string* valueAttr = elt->Attribute(string("value"));
-        trace.println("found parameter  : key " + *keyAttr + ", subst " + *substAttr + ", value " + *valueAttr);
+        m_trace.println("found parameter  : key " + *keyAttr + ", subst " + *substAttr + ", value " + *valueAttr);
         if(keyAttr) {
            params[*keyAttr] = *valueAttr;
            if(substAttr && *substAttr != "") {
@@ -85,10 +85,10 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
             }
         }
         else {
-            trace.println("faulty parameter block");
+            m_trace.println("faulty parameter block");
             throw std::runtime_error("faulty parameter block");
         }
-        trace.println("updated parameter: key " + *keyAttr + ", value " + params[*keyAttr]);
+        m_trace.println("updated parameter: key " + *keyAttr + ", value " + params[*keyAttr]);
         elt = elt->NextSiblingElement("param");
     }
 }
@@ -96,25 +96,25 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
 
 void
 ConfigReader::makeNodeInstance(const string& typeName, const string& instanceName, const string& instancePrefix, StringMap& import_params, Process* parentSfc) {
-    Definition* def = definitions[typeName];
+    Definition* def = m_definitions[typeName];
     Process* processNode = nullptr;  // Note: if there is a process node (=device) there will be only one in module.
     Process* sfcNode = nullptr;
 
     if(def == nullptr)
     {
         ServerEngine::console("Element not found: " + typeName);
-        trace.println("Element not found: " + typeName);
+        m_trace.println("Element not found: " + typeName);
         throw std::runtime_error("Element not found: " + typeName);
     }
     string instance = instancePrefix + ARRO_NAME_SEPARATOR + instanceName;
 
-    trace.newln();
-    trace.println("makeNodeInstance for " + typeName + ", " + instance);
+    m_trace.newln();
+    m_trace.println("makeNodeInstance for " + typeName + ", " + instance);
     TiXmlElement* elt;
 
 
     // Read devices (the leaves in the tree)
-    elt = def->node->FirstChildElement("device");
+    elt = def->m_node->FirstChildElement("device");
     while(elt) {
         const string* typeURL = elt->Attribute(string("url"));
 
@@ -124,14 +124,14 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             getParamsAndSubstitute(elt, import_params, *params);
 
             // create Process object; inputs & outputs to be added later.
-            processNode = new Process(nodeDb, *typeURL, instance, *params);
+            processNode = new Process(m_nodeDb, *typeURL, instance, *params);
 
             delete params;
         }
         elt = elt->NextSiblingElement("device");
     }
     // Read devices (the leaves in the tree) There should be only one sfc node.
-    elt = def->node->FirstChildElement("sfc");
+    elt = def->m_node->FirstChildElement("sfc");
     while(elt) {
         StringMap* params = new StringMap();
 
@@ -150,20 +150,20 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
             string instanceSfc = instance + ARRO_SFC_INSTANCE;
 
-            sfcNode = new Process(nodeDb, "Sfc:", instanceSfc, *params, elt);
+            sfcNode = new Process(m_nodeDb, "Sfc:", instanceSfc, *params, elt);
 
             sfcNode->registerInput("_action", true);
 
             // EXTRA Create an _action and _step pad in every module
-            new Pad(nodeDb, "Action", instance + ARRO_NAME_SEPARATOR + "_action");
-            new Pad(nodeDb, "Mode", instance + ARRO_NAME_SEPARATOR + "_step");
+            new Pad(m_nodeDb, "Action", instance + ARRO_NAME_SEPARATOR + "_action");
+            new Pad(m_nodeDb, "Mode", instance + ARRO_NAME_SEPARATOR + "_step");
 
         }
 
         elt = elt->NextSiblingElement("sfc");
     }
     // Read nodes (the branches in the tree)
-    elt = def->node->FirstChildElement("node");
+    elt = def->m_node->FirstChildElement("node");
     while(elt) {
         const string* typeAttr = elt->Attribute(string("type"));
         const string* idAttr = elt->Attribute(string("name"));
@@ -187,16 +187,16 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
                 to = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_NAME_SEPARATOR + "_action";
 
-                trace.println("nodeDb.connect(" + from + ", " + to + ")");
-                nodeDb.connect(from, to);
+                m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
+                m_nodeDb.connect(from, to);
 
                 // Connect from just created node (in makeNodeInstance) to sfc.
                 to = instance + ARRO_SFC_INSTANCE + ARRO_NAME_SEPARATOR + "_step_" + *idAttr;
 
                 from = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_NAME_SEPARATOR + "_step";
 
-                trace.println("nodeDb.connect(" + from + ", " + to + ")");
-                nodeDb.connect(from, to);
+                m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
+                m_nodeDb.connect(from, to);
             }
             delete params;
         }
@@ -205,7 +205,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
     }
 
     // Read pads (other leaves in the tree)
-    elt = def->node->FirstChildElement("pad");
+    elt = def->m_node->FirstChildElement("pad");
     while(elt) {
         const string* datatypeAttr = elt->Attribute(string("type"));
         const string* idAttr = elt->Attribute(string("name"));
@@ -226,8 +226,8 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
                 }
             } else {
                 // create Pad object with input and output.
-                trace.println("new Pad(" + *datatypeAttr + ", " + inst + ")");
-                new Pad(nodeDb, *datatypeAttr, inst);
+                m_trace.println("new Pad(" + *datatypeAttr + ", " + inst + ")");
+                new Pad(m_nodeDb, *datatypeAttr, inst);
             }
         }
         elt = elt->NextSiblingElement("pad");
@@ -235,7 +235,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
 
     // Read connections
-    elt = def->node->FirstChildElement("connection");
+    elt = def->m_node->FirstChildElement("connection");
     while(elt) {
         const string* fromAttr = elt->Attribute(string("source"));
         const string* toAttr = elt->Attribute(string("target"));
@@ -244,8 +244,8 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
             string to = instance + ARRO_NAME_SEPARATOR + *toAttr;
 
-            trace.println("nodeDb.connect(" + from + ", " + to + ")");
-            nodeDb.connect(from, to);
+            m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
+            m_nodeDb.connect(from, to);
         }
         elt = elt->NextSiblingElement("connection");
     }

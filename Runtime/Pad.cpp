@@ -15,16 +15,16 @@ using namespace Arro;
 Pad::Pad(NodeDb& nodeDb, const string& /*datatype*/, const string& name):
     AbstractNode{name},
     trace{"Pad", false},
-    result{nullptr},
-    in{nullptr},
-    out{nullptr} {
+    m_result{nullptr},
+    m_in{nullptr},
+    m_out{nullptr} {
 
     nodeDb.registerNode(this, name);
 
-    in = nodeDb.registerNodeInput(this, "", [this](MessageBuf* msg) {
+    m_in = nodeDb.registerNodeInput(this, "", [this](MessageBuf* msg) {
         // do not put in queue but instead forward directly to target node.
         trace.println("Pad forward ");
-        out->forwardMessage(msg);
+        m_out->forwardMessage(msg);
     });
-    out = nodeDb.registerNodeOutput(this, "");
+    m_out = nodeDb.registerNodeOutput(this, "");
 }

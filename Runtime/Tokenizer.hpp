@@ -13,21 +13,16 @@
 #include <functional>
 
 class Tokenizer {
-private:
-    std::string input;
-    std::string::iterator it;
-    std::string::iterator itEnd;
-    
 public:
     Tokenizer(std::string i):
-        input(i) {
+        m_input(i) {
         
-        it = input.begin();
-        itEnd = input.end();
+        m_it = m_input.begin();
+        m_itEnd = m_input.end();
 
     }
     void reset() {
-        it = input.begin();
+        m_it = m_input.begin();
     }
     
     char getToken(std::string& token) {
@@ -57,31 +52,36 @@ public:
         token = "";
         
         // skip spaces
-        while(it != itEnd && (*it == ' ' || *it == '\t')) {
-            ++it;
+        while(m_it != m_itEnd && (*m_it == ' ' || *m_it == '\t')) {
+            ++m_it;
         }
         // first get tokens not necessarily separated by whitespace
-        if(it != itEnd && *it == '(') {
+        if(m_it != m_itEnd && *m_it == '(') {
             ret = '(';
             token = "(";
-            ++it;
+            ++m_it;
         }
-        else if(it != itEnd && *it == ')') {
+        else if(m_it != m_itEnd && *m_it == ')') {
             ret = ')';
             token = ")";
-            ++it;
+            ++m_it;
         }
         else {
             // otherwise get token separated by whitespace
-            while(it != itEnd && *it != ' ' && *it != '\t' && *it != '(' && *it != ')') {
+            while(m_it != m_itEnd && *m_it != ' ' && *m_it != '\t' && *m_it != '(' && *m_it != ')') {
                 ret = 'n'; // name
-                token += *it;
-                ++it;
+                token += *m_it;
+                ++m_it;
             }
         }
         
         return ret;
     }
+
+private:
+    std::string m_input;
+    std::string::iterator m_it;
+    std::string::iterator m_itEnd;
 
 };
 

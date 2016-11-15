@@ -23,8 +23,8 @@ namespace Arro {
          * \param on Switch if serial output is enabled for this instance.
          */
         Trace(const std::string& c, bool on) {
-            cl = c;
-            out = on;
+            m_cl = c;
+            m_out = on;
         }
 
         virtual ~Trace() {};
@@ -39,18 +39,18 @@ namespace Arro {
          * \param s String to be printed.
          */
         void println(const std::string& s, int err) const {
-            if(out == true) {
-                std::cout << cl << " ==> " << s << " ==> " << err  << std::endl;
+            if(m_out == true) {
+                std::cout << m_cl << " ==> " << s << " ==> " << err  << std::endl;
             }
         }
         void println(const std::string& s) const {
-            if(out == true) {
-                std::cout << cl << " ==> " << s << std::endl;
+            if(m_out == true) {
+                std::cout << m_cl << " ==> " << s << std::endl;
             }
         }
 
         void newln() const {
-            if(out == true) {
+            if(m_out == true) {
                 std::cout << "" << std::endl;
             }
         }
@@ -61,11 +61,11 @@ namespace Arro {
          * \param s String to be printed.
          */
         void fatal(const std::string& s, int err) const {
-            std::cout << cl << " ==> " << s << " ==> " << err << std::endl;
+            std::cout << m_cl << " ==> " << s << " ==> " << err << std::endl;
             exit(0);
         }
         void fatal(const std::string& s) const {
-            std::cout << cl << " ==> " << s << std::endl;
+            std::cout << m_cl << " ==> " << s << std::endl;
             exit(0);
         }
 
@@ -76,14 +76,14 @@ namespace Arro {
          * \param node XML node to be printed as well.
          */
         void println(const std::string& s, TiXmlElement* node) const {
-            if(out == true) {
-                std::cout << cl << " ==> " << s << node << std::endl;
+            if(m_out == true) {
+                std::cout << m_cl << " ==> " << s << node << std::endl;
             }
         }
 
     private:
-        bool out;
-        std::string cl;
+        bool m_out;
+        std::string m_cl;
     };
 }
 

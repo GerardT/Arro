@@ -15,17 +15,6 @@
 #include "Process.h"
 #include "NodePython.h"
 
-//inline PyObject* PyObject_CallMethod_wrap(PyObject *o, const char *method, const char *format, ...) {
-//    PyObject* ret;
-//    va_list argptr;
-//
-//    va_start(argptr, format);
-//    ret = PyObject_CallMethod(o, (char*) method, (char*)format, argptr);  // Return value: New reference.
-//    va_end(argptr);
-//    return ret;
-//}
-
-
 namespace Arro {
 
     /**
@@ -116,9 +105,9 @@ namespace Arro {
          */
         PyObject* loadModule();
 
-        Trace trace;
-        PyObject *pModule, *pModuleApi, *pDict, *pDictApi;
-        std::map<PyObject *, NodePython*> instanceMap;
+        Trace m_trace;
+        PyObject *m_pModule, *m_pModuleApi, *m_pDict, *m_pDictApi;
+        std::map<PyObject *, NodePython*> m_instanceMap;
     };
 }
 
