@@ -73,7 +73,7 @@ namespace Arro {
         struct Context {
             std::string node;
             bool expValue;
-        } context;
+        } m_context;
     };
 
 

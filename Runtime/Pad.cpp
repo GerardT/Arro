@@ -19,22 +19,12 @@ Pad::Pad(NodeDb& nodeDb, const string& /*datatype*/, const string& name):
     in{nullptr},
     out{nullptr} {
 
-    AbstractNode* n = nodeDb.registerNode(this, name);
+    nodeDb.registerNode(this, name);
 
-    /* Almost anonymous class (if 'Anon' removed), but needed constructor */
-    class Anon: public NodeDb::NodeSingleInput::IListener {
-        Pad* owner;
-    public:
-        Anon(Pad* n){owner = n;};
-
-        void handleMessage(MessageBuf* msg) {
-            // do not put in queue but instead forward directly to target node.
-            owner->trace.println("Pad forward ");
-            //owner->result->forwardMessage(msg);
-            owner->out->forwardMessage(msg);
-        }
-    };
-
-    in = nodeDb.registerNodeInput(n, "", new Anon(this));
-    out = nodeDb.registerNodeOutput(n, "");
+    in = nodeDb.registerNodeInput(this, "", [this](MessageBuf* msg) {
+        // do not put in queue but instead forward directly to target node.
+        trace.println("Pad forward ");
+        out->forwardMessage(msg);
+    });
+    out = nodeDb.registerNodeOutput(this, "");
 }

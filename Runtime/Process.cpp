@@ -38,6 +38,7 @@ Process::Process(NodeDb& db, const string& url, const string& instance, ConfigRe
     AbstractNode{instance},
     trace{"Process", true},
     nodeDb{db},
+    m_enableRunCycle{false},
     device{nullptr},
     doRunCycle{false} {
 
@@ -78,23 +79,14 @@ Process::runCycle() {
 
 void
 Process::registerInput(const string& interfaceName, bool enableRunCycle) {
-    // Almost anonymous class (if 'Anon' removed), but needed constructor.
-
-    class Anon: public NodeDb::NodeSingleInput::IListener {
-        Process* owner;
-        string name;
-        bool enableRunCycle;
-    public:
-        Anon(Process* n, string name, bool enableRunCycle){owner = n; this->name = name; this->enableRunCycle = enableRunCycle; };
-
-        void handleMessage(MessageBuf* msg) {
-            if(this->enableRunCycle) {
-                owner->doRunCycle = true;
-            }
-            owner->device->handleMessage(msg, name);
+    m_interfaceName = interfaceName;
+    m_enableRunCycle = enableRunCycle;
+    nodeDb.registerNodeInput(this, interfaceName, [this](MessageBuf* msg) {
+        if(m_enableRunCycle) {
+            doRunCycle = true;
         }
-    };
-    nodeDb.registerNodeInput(this, interfaceName, new Anon(this, interfaceName, enableRunCycle));
+        device->handleMessage(msg, m_interfaceName);
+    });
 }
 
 void

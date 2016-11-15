@@ -15,6 +15,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <memory>
+#include <functional>
 
 #include "AbstractNode.h"
 #include "Trace.h"
@@ -41,30 +42,12 @@ namespace Arro
         class NodeSingleInput {
         public:
             /**
-             * \brief Interface that allows implemeter to listen on node input.
-             *
-             * Listener for updates to NodeSingleInput objects, invoked by
-             * NodeSingleInput::handleMessage().
-             */
-            class IListener {
-            public:
-                virtual ~IListener() {};
-
-                /**
-                 * Implementer can handle incoming message on this input.
-                 *
-                 * \param msg Incoming message.
-                 */
-                virtual void handleMessage(MessageBuf* msg) = 0;
-            };
-
-            /**
              * Constructor for NodeSingleInput. Can set only one listener to node input.
              *
              * \param l Listener
              * \param n Node to which this input is attached.
              */
-            NodeSingleInput(NodeDb::NodeSingleInput::IListener* l, AbstractNode* n): listen(l), node(n) {};
+            NodeSingleInput(std::function<void (MessageBuf* msg)> l, AbstractNode* n): listen(l), node(n) {};
             virtual ~NodeSingleInput() {};
 
             // Copy and assignment is not supported.
@@ -79,7 +62,7 @@ namespace Arro
             void handleMessage(MessageBuf* msg);
 
         private:
-            NodeDb::NodeSingleInput::IListener* listen;
+            std::function<void (MessageBuf* msg)> listen;
             AbstractNode* node;
 
         };
@@ -194,7 +177,7 @@ namespace Arro
          * \param name Name of the interface as "node.node.interface".
          * \param n The instance of the node.
          */
-        NodeSingleInput* registerNodeInput(AbstractNode* node, const std::string& interfaceName, NodeDb::NodeSingleInput::IListener* listen);
+        NodeSingleInput* registerNodeInput(AbstractNode* node, const std::string& interfaceName, std::function<void (MessageBuf* msg)> listen);
 
         /**
          * Register an output with the node.

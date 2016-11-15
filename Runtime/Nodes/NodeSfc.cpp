@@ -125,23 +125,23 @@ SfcTransition::SfcTransition(const std::string& condition, const std::string& fr
     m_to{to},
     m_parser{START, END}
 {
-    m_parser.addRule(START,         'n', IN,           [this](const std::string& token){ this->context.node = token; return true; });
+    m_parser.addRule(START,         'n', IN,           [this](const std::string& token){ m_context.node = token; return true; });
     m_parser.addRule(IN,            'i', LIST_BEGIN,   [this](const std::string&      ){ return true; });
     m_parser.addRule(LIST_BEGIN,    '(', SINGLE_STATE, [this](const std::string&      ){ return true; });
     m_parser.addRule(SINGLE_STATE,  'n', LIST_END,     [this](const std::string& token){
-                                                                                         bool ret = m_parent.hasStep(this->context.node, token);
+                                                                                         bool ret = m_parent.hasStep(m_context.node, token);
                                                                                          if(ret) {
-                                                                                             ret = m_parent.nodeAtStep(this->context.node, token);
-                                                                                             this->m_trace.println("Node at step ", ret);
+                                                                                             ret = m_parent.nodeAtStep(m_context.node, token);
+                                                                                             m_trace.println("Node at step ", ret);
                                                                                          }
                                                                                          return ret; });
 
     m_parser.addRule(SINGLE_STATE,  'n', SINGLE_STATE, [this](const std::string& token){
-                                                                                         bool ret = m_parent.hasStep(this->context.node, token);
+                                                                                         bool ret = m_parent.hasStep(m_context.node, token);
                                                                                          if(ret) {
-                                                                                             ret = m_parent.nodeAtStep(this->context.node, token);
-                                                                                             this->m_trace.println("Node at step ", ret);
-                                                                                             this->context.expValue = ret;
+                                                                                             ret = m_parent.nodeAtStep(m_context.node, token);
+                                                                                             m_trace.println("Node at step ", ret);
+                                                                                             m_context.expValue = ret;
                                                                                          }
                                                                                          return true; });
 
@@ -149,8 +149,8 @@ SfcTransition::SfcTransition(const std::string& condition, const std::string& fr
 
     m_parser.addRule(DONE,          'a', START,        [this](const std::string&      ){ return true; });  // AND
     m_parser.addRule(DONE,          'o', START,        [this](const std::string&      ){ return true; });  // OR
-    m_parser.addRule(DONE,          '$', END,          [this](const std::string&      ){ if(this->context.expValue) {
-                                                                                             this->sendActions();
+    m_parser.addRule(DONE,          '$', END,          [this](const std::string&      ){ if(m_context.expValue) {
+                                                                                             sendActions();
                                                                                          }
                                                                                          return true; });
 

@@ -35,7 +35,7 @@ NodeDb::~NodeDb() {
 
 void
 NodeDb::NodeSingleInput::handleMessage(MessageBuf* msg) {
-    listen->handleMessage(msg);
+    listen(msg);
 }
 
 NodeDb::NodeMultiOutput::NodeMultiOutput(NodeDb* n):
@@ -96,7 +96,8 @@ NodeDb::registerNode(AbstractNode* node, const string& name) {
 }
 
 NodeDb::NodeSingleInput*
-NodeDb::registerNodeInput(AbstractNode* node, const string& interfaceName, NodeDb::NodeSingleInput::IListener* listen) {
+NodeDb::registerNodeInput(AbstractNode* node, const string& interfaceName,
+                          std::function<void (MessageBuf* msg)> listen) {
     auto n = new NodeDb::NodeSingleInput(/*interfaceName, */listen, node);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {

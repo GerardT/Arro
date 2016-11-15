@@ -107,6 +107,8 @@ namespace Arro
     private:
         Trace trace;
         NodeDb& nodeDb;
+        std::string m_interfaceName;
+        bool m_enableRunCycle;
         IDevice* device;
         IPadListener* listener;
         bool doRunCycle;
