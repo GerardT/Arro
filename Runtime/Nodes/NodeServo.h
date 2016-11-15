@@ -81,23 +81,23 @@ namespace Arro {
             void setPWMFreq(double freq);
 
         private:
-            Trace trace;
-            double prescaleval;
-            char filename[40];
-            int addr;           // The I2C address
-            int file;
+            Trace m_trace;
+            double m_prescaleval;
+            char m_filename[40];
+            int m_addr;           // The I2C address
+            int m_file;
         };
 
-        Trace trace;
-        Process* device;
-        double previous_position;
-        double actual_position;
-        int ms_elapsed;
-        std::string actual_mode;
-        int Ch;
-        ConfigReader::StringMap params;
+        Trace m_trace;
+        Process* m_device;
+        double m_previous_position;
+        double m_actual_position;
+        int m_ms_elapsed;
+        std::string m_actual_mode;
+        int m_Ch;
+        ConfigReader::StringMap m_params;
 
-        static Servo* pServo;
+        static Servo* m_pServo;
     };
 }
 

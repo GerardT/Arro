@@ -37,19 +37,19 @@ namespace Arro {
         void runCycle();
 
     private:
-        Trace trace;
-        double previous_error;
-        double integral;
-        double derivative;
-        double setpoint;
-        double actual_position;
-        std::string actual_mode;
-        int ms_elapsed;
-        double Kp;    // factor for "proportional" control
-        double Ki;    // factor for "integral" control
-        double Kd;    // factor for "derivative" control
-        ConfigReader::StringMap params;
-        Process* device;
+        Trace m_trace;
+        double m_previous_error;
+        double m_integral;
+        double m_derivative;
+        double m_setpoint;
+        double m_actual_position;
+        std::string m_actual_mode;
+        int m_ms_elapsed;
+        double m_Kp;    // factor for "proportional" control
+        double m_Ki;    // factor for "integral" control
+        double m_Kd;    // factor for "derivative" control
+        ConfigReader::StringMap m_params;
+        Process* m_device;
     };
 }
 

@@ -33,8 +33,8 @@ namespace Arro {
          */
         void runCycle();
     private:
-        Trace trace;
-        NodeDb::NodeMultiOutput* result;
+        Trace m_trace;
+        NodeDb::NodeMultiOutput* m_result;
     };
 }
 

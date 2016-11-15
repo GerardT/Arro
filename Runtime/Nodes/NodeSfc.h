@@ -119,7 +119,7 @@ namespace Arro {
          */
         void registerSfc(const std::string& name, NodeSfc* sfc) {
             m_trace.println(std::string("Registering node ") + name);
-            childSfc[name] = sfc;
+            m_childSfc[name] = sfc;
         }
 
         /**
@@ -134,7 +134,7 @@ namespace Arro {
             //std::string tmp = name;
             m_trace.println("checking step " + nodeName);
             try {
-                NodeSfc* sfc = childSfc.at(nodeName);
+                NodeSfc* sfc = m_childSfc.at(nodeName);
                 for(auto it = sfc->m_steps.begin(); it != sfc->m_steps.end(); ++it) {
                     if((*it)->getName() == stepName) {
                         m_trace.println("good " + nodeName);
@@ -184,7 +184,7 @@ namespace Arro {
         // List of transitions for this SFC
         std::list<std::unique_ptr<SfcTransition> > m_transitions;
         // Library of child SFCs
-        std::map<std::string, NodeSfc*> childSfc;
+        std::map<std::string, NodeSfc*> m_childSfc;
         // Steps currently active
         std::set<std::string> m_activeSteps;
 

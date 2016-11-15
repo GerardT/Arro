@@ -39,10 +39,10 @@ unsigned char
 NodeServo::Servo::i2c_readU8(unsigned char command) {
     // Using I2C Read, equivalent of i2c_smbus_read_byte(file)
     // if (read(file, buf, 1) != 1) {
-    __s32 ret  = i2c_smbus_read_byte_data(file, command);
-    trace.println("---- i2c_read returned ", ret);
+    __s32 ret  = i2c_smbus_read_byte_data(m_file, command);
+    m_trace.println("---- i2c_read returned ", ret);
     if (ret == -1) {
-        trace.fatal("Failed i2c_read errno", errno);
+        m_trace.fatal("Failed i2c_read errno", errno);
     } else {
         // buf[0] contains the read byte
     }
@@ -61,11 +61,11 @@ NodeServo::Servo::i2c_write8(unsigned char command, unsigned short value) {
     // buf[2] = value & 0x000000FF; // 0x65;
     // if (write(file, buf, 3) !=3) {
 
-    __s32 ret = i2c_smbus_write_byte_data(file, command, value);
-    trace.println("---- i2c_write8 Wrote", value);
-    trace.println("to ", (int)command);
+    __s32 ret = i2c_smbus_write_byte_data(m_file, command, value);
+    m_trace.println("---- i2c_write8 Wrote", value);
+    m_trace.println("to ", (int)command);
     if (ret == -1) {
-        trace.fatal("Failed i2c_write8 errno", errno);
+        m_trace.fatal("Failed i2c_write8 errno", errno);
     }
 }
 
@@ -79,16 +79,16 @@ NodeServo::Servo::setPWM(int channel, int on, int off) {
 
 void
 NodeServo::Servo::setPWMFreq(double freq) {
-    prescaleval = 25000000.0;   // 25MHz
-    prescaleval /= 4096.0;      // 12-bit
-    prescaleval /= float(freq);
-    prescaleval -= 1.0;
+    m_prescaleval = 25000000.0;   // 25MHz
+    m_prescaleval /= 4096.0;      // 12-bit
+    m_prescaleval /= float(freq);
+    m_prescaleval -= 1.0;
 
-    trace.println("Setting PWM frequency to %d Hz", freq);
-    trace.println("Estimated pre-scale: %d", prescaleval);
+    m_trace.println("Setting PWM frequency to %d Hz", freq);
+    m_trace.println("Estimated pre-scale: %d", m_prescaleval);
 
-    int prescale = (int)(prescaleval + 0.5);
-    trace.println("Final pre-scale", prescale);
+    int prescale = (int)(m_prescaleval + 0.5);
+    m_trace.println("Final pre-scale", prescale);
 
     int oldmode = i2c_readU8(__MODE1);
     int newmode = (oldmode & 0x7F) | 0x10;  // sleep
@@ -102,20 +102,20 @@ NodeServo::Servo::setPWMFreq(double freq) {
 }
 
 NodeServo::Servo::Servo(int address, const char* filename):
-    trace("Servo", true),
-    prescaleval(0),
-    addr(address){
+    m_trace("Servo", true),
+    m_prescaleval(0),
+    m_addr(address){
 
-    if ((file = open(filename,O_RDWR)) < 0) {
-        trace.fatal("Failed to open the bus errno", errno);
+    if ((m_file = open(filename,O_RDWR)) < 0) {
+        m_trace.fatal("Failed to open the bus errno", errno);
     }
 
-    if (ioctl(file,I2C_SLAVE,addr) < 0) {
-        trace.fatal("Failed to acquire bus access and/or talk to slave");
+    if (ioctl(m_file,I2C_SLAVE,m_addr) < 0) {
+        m_trace.fatal("Failed to acquire bus access and/or talk to slave");
     }
 
     /* Reseting PCA9685 */
-    i2c_smbus_write_byte_data(file, __MODE1, 0x00);
+    i2c_smbus_write_byte_data(m_file, __MODE1, 0x00);
 
     setPWMFreq(50.0);
 
@@ -126,27 +126,27 @@ NodeServo::Servo::start(int ch, int val) {
     setPWM(ch, 0, val);
 }
 
-NodeServo::Servo* NodeServo::pServo = nullptr;
+NodeServo::Servo* NodeServo::m_pServo = nullptr;
 
 
 NodeServo::NodeServo(Process* d, const string& /*name*/, ConfigReader::StringMap& params):
-    trace("NodeServo", true),
-    device(d),
-    previous_position(0),
-    actual_position(0),
-    ms_elapsed(0),
-    actual_mode("Idle"),
-    Ch(0) {
+    m_trace("NodeServo", true),
+    m_device(d),
+    m_previous_position(0),
+    m_actual_position(0),
+    m_ms_elapsed(0),
+    m_actual_mode("Idle"),
+    m_Ch(0) {
 
-    if(!pServo) {
-        pServo = new Servo();
+    if(!m_pServo) {
+        m_pServo = new Servo();
     }
 
     try {
-        Ch = stod(params.at("Channel"));
+        m_Ch = stod(params.at("Channel"));
     }
     catch (std::out_of_range) {
-        trace.println("### param not found Ch ");
+        m_trace.println("### param not found Ch ");
     }
 }
 
@@ -157,36 +157,36 @@ NodeServo::handleMessage(MessageBuf* m, const std::string& padName) {
         msg->ParseFromString(m->c_str());
 
         assert(msg->GetTypeName() == "arro.Value");
-        actual_position = ((Value*)msg)->value();
+        m_actual_position = ((Value*)msg)->value();
     } else if(padName == "timer") {
         auto msg = new Tick();
         msg->ParseFromString(m->c_str());
 
-        trace.println(string(msg->GetTypeName()));
+        m_trace.println(string(msg->GetTypeName()));
         assert(msg->GetTypeName() == "arro.Tick");
         auto tick = (Tick*)msg;
-        ms_elapsed = tick->ms();
+        m_ms_elapsed = tick->ms();
 
     } else if (padName == "mode") {
         auto msg = new Mode();
         msg->ParseFromString(m->c_str());
 
         assert(msg->GetTypeName() == "arro.Mode");
-        actual_mode = ((Mode*)msg)->mode();
+        m_actual_mode = ((Mode*)msg)->mode();
     } else {
-        trace.println(string("Message received from ") + padName);
+        m_trace.println(string("Message received from ") + padName);
     }
 }
 
 void
 NodeServo::runCycle() {
-    trace.println(string("NodeServo input = ") + to_string((long double)actual_position));
+    m_trace.println(string("NodeServo input = ") + to_string((long double)m_actual_position));
 
     if(true /*actual_mode == "Active"*/
-    && actual_position != previous_position
-    && actual_position > 0 && actual_position < 400) {
-        pServo->start(Ch, 200 + (actual_position * 2));
-        previous_position = actual_position;
-        ms_elapsed /= 1000;
+    && m_actual_position != m_previous_position
+    && m_actual_position > 0 && m_actual_position < 400) {
+        m_pServo->start(m_Ch, 200 + (m_actual_position * 2));
+        m_previous_position = m_actual_position;
+        m_ms_elapsed /= 1000;
     }
 }

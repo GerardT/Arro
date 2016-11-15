@@ -42,10 +42,10 @@ namespace Arro
         static void stop ();
 
     private:
-        Trace trace;
-        int ticks;
-        Process* device;
-        std::string actual_mode;
+        Trace m_trace;
+        int m_ticks;
+        Process* m_device;
+        std::string m_actual_mode;
     };
 }
 

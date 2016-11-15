@@ -18,14 +18,14 @@ static list<NodeTimer*> timers;
 static bool running = false;
 
 NodeTimer::NodeTimer(Process* d, const string& /*name*/, ConfigReader::StringMap& params):
-    trace("NodePid", true),
-    device(d) {
+    m_trace("NodePid", true),
+    m_device(d) {
 
     try {
-        ticks = stoi(params.at("ms"));
+        m_ticks = stoi(params.at("ms"));
     }
     catch (std::out_of_range) {
-        trace.println("### param not found ms ");
+        m_trace.println("### param not found ms ");
     }
 
     // Add this instance to array of timers.
@@ -42,7 +42,7 @@ void NodeTimer::handleMessage(MessageBuf* m, const std::string& padName) {
         msg->ParseFromString(m->c_str());
 
         assert(msg->GetTypeName() == "tutorial.Mode");
-        actual_mode = ((Mode*)msg)->mode();
+        m_actual_mode = ((Mode*)msg)->mode();
     }
 }
 
@@ -57,10 +57,10 @@ void NodeTimer::timer () {
     tick->set_ms(ARRO_TIMEOUT /* elapsed time in ms */);
 
     try {
-        device->getOutput("aTick")->submitMessage(tick);
+        m_device->getOutput("aTick")->submitMessage(tick);
     }
     catch(runtime_error&) {
-        trace.println("Timer failed to update");
+        m_trace.println("Timer failed to update");
     }
 }
 

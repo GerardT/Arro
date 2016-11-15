@@ -14,31 +14,31 @@ using namespace Arro;
  * will be used for the lifetime of the Process.
  */
 NodePython::NodePython(Process* d, string& className, ConfigReader::StringMap& /*params*/):
-    trace("NodePython", true),
-    device(d)
+    m_trace("NodePython", true),
+    m_device(d)
 {
     PyObject *pDict = PythonGlue::getDict();
 
     // Build the name of a callable class
-    pClass = PyDict_GetItemString(pDict, className.c_str());  // Return value: Borrowed reference
+    m_pClass = PyDict_GetItemString(pDict, className.c_str());  // Return value: Borrowed reference
 
     // Create an instance of the class
-    if (PyCallable_Check(pClass))  // Return value: int
+    if (PyCallable_Check(m_pClass))  // Return value: int
     {
-        pInstance = PyObject_CallObject(pClass, nullptr);  // Return value: New reference.
-        if(pInstance == nullptr) {
+        m_pInstance = PyObject_CallObject(m_pClass, nullptr);  // Return value: New reference.
+        if(m_pInstance == nullptr) {
             throw std::runtime_error("Failed to instantiate Python class");
         }
-        PythonGlue::registerInstance(pInstance, this);
+        PythonGlue::registerInstance(m_pInstance, this);
     }
 }
 
 NodePython::~NodePython() {
-    while(!messages.empty()) {
-        messages.pop();  // FIXME messages should be deleted properly
+    while(!m_messages.empty()) {
+        m_messages.pop();  // FIXME messages should be deleted properly
     }
 
-    Py_DECREF(pInstance);
+    Py_DECREF(m_pInstance);
 }
 
 /**
@@ -50,7 +50,7 @@ void
 NodePython::handleMessage(MessageBuf* msg, const string& padName) {
     PyObject* tuple = Py_BuildValue("s s", padName.c_str(), msg->c_str());  // Return value: New reference.
 
-    messages.push(tuple);
+    m_messages.push(tuple);
 }
 
 /**
@@ -59,10 +59,10 @@ NodePython::handleMessage(MessageBuf* msg, const string& padName) {
  */
 void
 NodePython::runCycle() {
-    pValue = PyObject_CallMethod(pInstance, (char*)"runCycle", nullptr); // no parameters, Return value: New reference.
-    if (pValue != nullptr)
+    m_pValue = PyObject_CallMethod(m_pInstance, (char*)"runCycle", nullptr); // no parameters, Return value: New reference.
+    if (m_pValue != nullptr)
     {
-        Py_DECREF(pValue);
+        Py_DECREF(m_pValue);
     }
     else
     {
@@ -77,10 +77,10 @@ NodePython::runCycle() {
  */
 PyObject*
 NodePython::getMessage() {
-    if(!messages.empty()) {
-        PyObject* tuple = messages.front();
-        trace.println("====================> new msg");
-        messages.pop();
+    if(!m_messages.empty()) {
+        PyObject* tuple = m_messages.front();
+        m_trace.println("====================> new msg");
+        m_messages.pop();
         return tuple;
     } else {
         // insert None object
@@ -94,7 +94,7 @@ NodePython::getMessage() {
  */
 PyObject*
 NodePython::sendMessage(char* padName, char* message) {
-    NodeDb::NodeMultiOutput* pad = device->getOutput(padName);
+    NodeDb::NodeMultiOutput* pad = m_device->getOutput(padName);
 
     if(pad) {
         pad->submitMessageBuffer(message);
@@ -102,7 +102,7 @@ NodePython::sendMessage(char* padName, char* message) {
         Py_INCREF(Py_None);
         return Py_None;
     }
-    trace.println(string("Unknown Pad ") + padName);
+    m_trace.println(string("Unknown Pad ") + padName);
     return nullptr;
 }
 

@@ -43,11 +43,11 @@ namespace Arro {
         PyObject* sendMessage(char* pad, char* message);
 
     private:
-        Trace trace;
-        ConfigReader::StringMap params;
-        Process* device;
-        PyObject *pFunc, *pValue, *pArgs, *pClass, *pInstance;
-        std::queue<PyObject*> messages;
+        Trace m_trace;
+        ConfigReader::StringMap m_params;
+        Process* m_device;
+        PyObject *m_pFunc, *m_pValue, *m_pArgs, *m_pClass, *m_pInstance;
+        std::queue<PyObject*> m_messages;
     };
 }
 
