@@ -25,6 +25,9 @@ static int newsockfd = -1;
 static NodeDb* nodeDb = nullptr;
 static PythonGlue* pg = nullptr;
 static Trace trace("ServerEngine", true);
+static std::map<std::string, ServerEngine::Factory > m_deviceRegister;
+
+
 
 /**
  * Blocking read from socket until '\n' received. If socket is closed
@@ -321,5 +324,16 @@ void ServerEngine::console(string s)
     }
 }
 
+void ServerEngine::registerFactory(const std::string& name, ServerEngine::Factory factory) {
+    m_deviceRegister[name] = factory;
+}
+
+bool ServerEngine::getFactory(const std::string& name, ServerEngine::Factory& factory) {
+    if(m_deviceRegister.find(name) != m_deviceRegister.end()) {
+        factory =  m_deviceRegister.at(name);
+        return true;
+    }
+    return false;
+}
 
 

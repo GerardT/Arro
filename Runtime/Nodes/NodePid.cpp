@@ -1,11 +1,13 @@
 #include "arro.pb.h"
 #include "NodeDb.h"
 #include "NodePid.h"
+#include "ServerEngine.h"
 
 using namespace std;
 using namespace Arro;
 using namespace arro;
 
+static RegisterMe<NodePid> registerMe("pid");
 
 NodePid::NodePid(Process* d, const string& /*name*/, ConfigReader::StringMap& params):
     m_trace("NodePid", true),

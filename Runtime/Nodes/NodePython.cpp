@@ -7,13 +7,14 @@
 using namespace std;
 using namespace Arro;
 
+static RegisterMe<NodePython> registerMe("Python");
 
 /**
  * Create Process instance that executes Python code.
  * Will instantiate an object of class className inside Python that
  * will be used for the lifetime of the Process.
  */
-NodePython::NodePython(Process* d, string& className, ConfigReader::StringMap& /*params*/):
+NodePython::NodePython(Process* d, const string& className, ConfigReader::StringMap& /*params*/):
     m_trace("NodePython", true),
     m_device(d)
 {

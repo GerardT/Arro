@@ -16,6 +16,7 @@ using namespace Arro;
 using namespace arro;
 
 
+//static RegisterMe<NodeSfc> registerMe;
 
 NodeSfc::NodeSfc(Process* d, TiXmlElement* elt):
     m_trace{"NodeSfc", true},

@@ -7,6 +7,7 @@
 
 #include "NodeDb.h"
 #include "NodeTimer.h"
+#include "ServerEngine.h"
 
 using namespace std;
 using namespace Arro;
@@ -16,6 +17,10 @@ using namespace arro;
 
 static list<NodeTimer*> timers;
 static bool running = false;
+
+static RegisterMe<NodeTimer> registerMe("Timer");
+
+
 
 NodeTimer::NodeTimer(Process* d, const string& /*name*/, ConfigReader::StringMap& params):
     m_trace("NodePid", true),

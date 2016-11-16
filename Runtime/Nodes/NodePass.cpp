@@ -1,6 +1,8 @@
 #include "NodePass.h"
 #include "NodeDb.h"
 
+static RegisterMe<NodePass> registerMe("Pass");
+
 
 NodePass::NodePass(string& datatype, string& name):
     trace("NodePass", false) {

@@ -2,6 +2,10 @@
 #define ARRO_SERVER_ENGINE_H
 
 #include <string>
+#include <map>
+#include <functional>
+
+//#include "Process.h"
 
 #define ARRO_PROGRAM_FILE    "arro_pgm"
 #define ARRO_API_FILE        "arro_api"
@@ -9,6 +13,12 @@
 
 
 namespace Arro {
+
+
+class Process;
+class IDevice;
+
+
 
     /**
      * \brief Wrapper class that encapsulates ServerEngine functions.
@@ -18,6 +28,7 @@ namespace Arro {
     class ServerEngine {
 
     public:
+        typedef std::function<IDevice* (Process* d, const std::string& instance, std::map<std::string, std::string>& params)> Factory;
         /**
          * This class is not for instantiation.
          */
@@ -42,7 +53,24 @@ namespace Arro {
          * \param s String to send to Eclipse console.
          */
         static void console(std::string s);
+
+        static void registerFactory(const std::string& name, Factory factory);
+
+        static bool getFactory(const std::string& name, Factory& factory);
+
     };
+
+    template<typename T>
+    class RegisterMe {
+    public:
+        RegisterMe(const std::string& name) {
+            ServerEngine::registerFactory(name, [](Process* d, const std::string& instance, std::map<std::string, std::string>& params) ->IDevice* {
+                return new T(d, instance, params);
+            });
+        };
+    };
+
+
 }
 
 #endif

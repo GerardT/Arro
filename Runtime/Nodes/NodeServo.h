@@ -11,6 +11,7 @@
 #include "ConfigReader.h"
 #include "Process.h"
 #include "NodeDb.h"
+#include "ServerEngine.h"
 
 namespace Arro {
     class NodeServo: public IDevice {

@@ -251,6 +251,7 @@ namespace Arro
         std::thread* m_thrd;
         std::mutex m_mutex;
         std::condition_variable m_condition;
+
     };
 }
 

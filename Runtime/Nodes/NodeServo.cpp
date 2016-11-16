@@ -35,6 +35,9 @@ using namespace arro;
 #define  __ALLLED_OFF_L        0xFC
 #define  __ALLLED_OFF_H        0xFD
 
+
+static RegisterMe<NodeServo> registerMe("Servo");
+
 unsigned char
 NodeServo::Servo::i2c_readU8(unsigned char command) {
     // Using I2C Read, equivalent of i2c_smbus_read_byte(file)

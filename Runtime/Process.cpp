@@ -23,6 +23,7 @@ Process::Process(NodeDb& db, const string& instance):
     AbstractNode{instance},
     m_trace{"Process", true},
     m_nodeDb{db},
+    m_enableRunCycle{false},
     m_device{nullptr},
     m_doRunCycle{false} {
 
@@ -140,9 +141,10 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
     else if(url.find("Native:") == 0) {
         try {
             string className = url.substr(7);
+            ServerEngine::Factory factory;
 
             if(className == "pid") {
-                m_trace.println("new NodePid(" + instance + ")");
+                m_trace.println("new Pid(" + instance + ")");
                 m_device = new NodePid(this, instance, params);
             }
             else if(className == "Servo") {
@@ -161,11 +163,11 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
 //                trace.println("new NodeTsSection(" + instance + ")");
 //                //device = new NodeTsSection(instance, params);
 //            }
-            else if(className == "Timer") {
-                m_trace.println("new NodeTimer(" + instance + ")");
-                m_device = new NodeTimer(this, instance, params);
-            }
             else if(className == "pass") {
+            }
+            else if(ServerEngine::getFactory(className, factory)) {
+                m_trace.println("new " + className + "(" + instance + ")");
+                m_device = factory(this, instance, params);
             }
             else {
                 m_trace.println("unknown node" + instance );
