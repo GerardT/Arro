@@ -1,16 +1,22 @@
-
-
+#
+# sudo apt-get install python2.7-dev to get python2.7-config
+# ./protobuf/python/
+# python setup.py build
+# python setup.py test
+# sudo python setup.py install
+#
+#
 CC            = gcc
 CXX           = g++
 DEFINES       = -DUNICODE 
-CFLAGS        = -pipe -Wall -Wextra $(DEFINES) `python-config --cflags`
-CXXFLAGS      = -pipe -std=c++0x -g -frtti -Wall -Wextra -fexceptions $(DEFINES) `python-config --cflags`
+CFLAGS        = -pipe -Wall -Wextra $(DEFINES) `python2.7-config --cflags`
+CXXFLAGS      = -pipe -std=c++0x -g -frtti -Wall -Wextra -fexceptions $(DEFINES) `python2.7-config --cflags`
 # INCPATH       = -I"." -I"../../protobuf-2.5.0/src"
 INCPATH       = -I"." -I"Nodes" -I"/usr/local/include"
 LINKER        = g++
 # LFLAGS        = -g -Wl,-subsystem		--> -Wl,-subsystem is MinGW stuff, results in no symbols.
 LFLAGS        = -g
-LIBS          = -L/usr/local/lib -lprotobuf `python-config --ldflags`
+LIBS          = -L/usr/local/lib -lprotobuf `python2.7-config --ldflags`
 DEL_FILE      = rm
 OBJDIR       := debug
 SRCDIR       := ../Runtime
@@ -50,7 +56,7 @@ SRCS         := $(addprefix $(SRCDIR)/,$(SRCS))
 
 .PHONY: all clean
 
-all: $(OBJS)
+all: $(OBJDIR)/arro.pb.o $(OBJS)
 	$(CXX) -o Arro $(LFLAGS) $(OBJS) $(LIBS) 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
