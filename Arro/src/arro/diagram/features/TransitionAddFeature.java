@@ -48,7 +48,11 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
         	return null;
         }
         
-        ArroTransition addedDomainObject = (ArroTransition)obj;
+      ArroTransition addedDomainObject = (ArroTransition)obj;
+//        ArroTransition addedDomainObject = new ArroTransition();
+        addedDomainObject.setSource((String) context.getProperty(Constants.PROP_SOURCE_PAD_KEY));
+        addedDomainObject.setTarget((String) context.getProperty(Constants.PROP_TARGET_PAD_KEY));
+
         
         String instanceName = "a" + "Transition";
         while(domainModule.getStateDiagram().getStepByName(instanceName) != null) {

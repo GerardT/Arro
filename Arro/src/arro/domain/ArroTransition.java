@@ -11,7 +11,9 @@ import org.w3c.dom.NodeList;
 
 public class ArroTransition extends NonEmfDomainObject {
 	private ArroSequenceChart parent;
-	private String condition = new String();
+    private String condition = new String();
+    private String from = new String();
+    private String to = new String();
     private ArrayList<ArroAction> entryActions = new ArrayList<ArroAction>();
 	
 	public ArroSequenceChart getParent() {
@@ -62,6 +64,20 @@ public class ArroTransition extends NonEmfDomainObject {
         }
     }
 
+    public String getTarget() {
+        return to;
+    }
+    public String getSource() {
+        return from;
+    }
+    public void setTarget(String attribute) {
+        to = attribute;   
+    }
+    
+    public void setSource(String attribute) {
+        from = attribute;
+    }
+
     public void xmlWrite(Document doc, Element elt) {
 		Attr attr = null;
 		
@@ -69,10 +85,18 @@ public class ArroTransition extends NonEmfDomainObject {
 		attr.setValue(getId());
 		elt.setAttributeNode(attr);
 		
-		attr = doc.createAttribute("name");
-		attr.setValue(getName());
-		elt.setAttributeNode(attr);
-		
+        attr = doc.createAttribute("name");
+        attr.setValue(getName());
+        elt.setAttributeNode(attr);
+        
+        attr = doc.createAttribute("source");
+        attr.setValue(getSource());
+        elt.setAttributeNode(attr);
+        
+        attr = doc.createAttribute("target");
+        attr.setValue(getTarget());
+        elt.setAttributeNode(attr);
+        
 		attr = doc.createAttribute("condition");
 		attr.setValue(getCondition());
 		elt.setAttributeNode(attr);
@@ -86,10 +110,12 @@ public class ArroTransition extends NonEmfDomainObject {
         }
 	}
 	
-	public void xmlRead(Node nNode) {
+    public void xmlRead(Node nNode) {
 		Element eElement = (Element) nNode;
     	setId(eElement.getAttribute("id"));
-    	setName(eElement.getAttribute("name"));
+        setName(eElement.getAttribute("name"));
+        setSource(eElement.getAttribute("source"));
+        setTarget(eElement.getAttribute("target"));
     	setCondition(eElement.getAttribute("condition"));
         
         NodeList nList = nNode.getChildNodes();

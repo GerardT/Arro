@@ -40,6 +40,13 @@ public class ArroConnectionCreateFeature extends AbstractCreateConnectionFeature
 		}
 	}
 
+	/**
+	 * From an anchor retrieve the name of the object that the anchor belongs to.
+	 * 
+	 * @param pictogramElement
+	 * @param ref
+	 * @return
+	 */
 	private ArroPad fetchPad(PictogramElement pictogramElement, StringParam ref) {
 		ArroPad pad = null;
 		if(pictogramElement instanceof BoxRelativeAnchor) {
@@ -77,28 +84,6 @@ public class ArroConnectionCreateFeature extends AbstractCreateConnectionFeature
 		StringParam ref = new StringParam();
 		fetchPad(pictogramElement, ref);
 		
-//		if(pictogramElement instanceof BoxRelativeAnchor) {
-//			BoxRelativeAnchor anchor = (BoxRelativeAnchor)pictogramElement;
-//			
-//			// Find UID from original pad and check if input or output.
-//			GraphicsAlgorithm rect = anchor.getReferencedGraphicsAlgorithm();
-//			
-//			ContainerShape cs = (ContainerShape)rect.eContainer();
-//			
-//	        NonEmfDomainObject domainObject = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(cs);
-//	        if(domainObject instanceof ArroNode) {
-//		        String name = Graphiti.getPeService().getPropertyValue(anchor, Constants.PROP_PAD_NAME_KEY);
-//		        ArroPad pad = ((ArroNode)domainObject).getPadByName(name);
-//		        if(pad != null) {
-//		        	ref = domainObject.getName() + "." + pad.getName();
-//		        }
-//	        } else if(domainObject instanceof ArroPad) {
-//	        	ArroPad pad = (ArroPad)domainObject;
-//		        if(pad != null) {
-//		        	ref = pad.getName();
-//		        }
-//	        }
-//		}
 	    return ref.s;
 	}
 
@@ -121,12 +106,12 @@ public class ArroConnectionCreateFeature extends AbstractCreateConnectionFeature
 	public Connection create(ICreateConnectionContext context) {
 		Connection newConnection = null;
 
-		Object newDomainObjectConnetion = null;
+		Object newDomainObjectConnection = null;
 
-		AddConnectionContext addContext = new AddConnectionContext(context.getSourceAnchor(), context.getTargetAnchor());
+        AddConnectionContext addContext = new AddConnectionContext(context.getSourceAnchor(), context.getTargetAnchor());
 		addContext.putProperty(Constants.PROP_SOURCE_PAD_KEY, getFullPadReference(context.getSourcePictogramElement()));
 		addContext.putProperty(Constants.PROP_TARGET_PAD_KEY, getFullPadReference(context.getTargetPictogramElement()));
-		addContext.setNewObject(newDomainObjectConnetion);
+		addContext.setNewObject(newDomainObjectConnection);
 		newConnection = (Connection) getFeatureProvider().addIfPossible(addContext);
 
 		return newConnection;
