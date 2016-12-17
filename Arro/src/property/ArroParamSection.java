@@ -197,8 +197,8 @@ public class ArroParamSection  extends ArroGenericSection {
 		// get the content for the viewer, setInput will call getElements in the contentProvider
 		viewer.setInput(messageList);
 		
-		// make the selection available to other views
-		PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart().getSite().setSelectionProvider(viewer);
+        // TODO make the selection available to other views - but causes trouble!!
+		//PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart().getSite().setSelectionProvider(viewer);
 		// set the sorter for the table
 
 		// define layout for the viewer
@@ -219,8 +219,7 @@ public class ArroParamSection  extends ArroGenericSection {
 	}
 
 	private TableViewerColumn createTableViewerColumn(String title, int bound, final int colNumber) {
-		final TableViewerColumn viewerColumn = new TableViewerColumn(viewer,
-				SWT.NONE);
+		final TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
 		final TableColumn column = viewerColumn.getColumn();
 		column.setText(title);
 		column.setWidth(bound);

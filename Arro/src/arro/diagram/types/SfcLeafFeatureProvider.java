@@ -33,7 +33,6 @@ import arro.diagram.features.StepCreateFeature;
 import arro.diagram.features.StepDeleteFeature;
 import arro.diagram.features.StepLayoutFeature;
 import arro.diagram.features.StepUpdateFeature;
-import arro.diagram.features.SynchronizationLayoutFeature;
 import arro.domain.ArroModule;
 import arro.domain.ArroSequenceChart;
 import arro.domain.ArroStep;
@@ -117,8 +116,6 @@ public class SfcLeafFeatureProvider extends DefaultFeatureProvider {
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_STEP)) {
 				return new StepLayoutFeature(this);				
-			} else if(pict != null && (pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_IN) || pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_OUT))) {
-				return new SynchronizationLayoutFeature(this);				
 			}
 		}
 	

@@ -1,7 +1,9 @@
 package property;
 
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 
 import arro.Constants;
@@ -19,6 +21,15 @@ public class ArroPublishedActionsFilter extends AbstractPropertySectionFilter {
 				return true;
 			}
 		}
+        if(pe instanceof FreeFormConnection) {
+            FreeFormConnection cs = (FreeFormConnection)pe;
+            
+            String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
+            
+            if(pict != null && pict.equals(Constants.PROP_PICT_TRANSITION)) {
+                return true;
+            }
+        }
 
         return false;
     }

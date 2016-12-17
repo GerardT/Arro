@@ -37,12 +37,6 @@ import arro.diagram.features.StepCreateFeature;
 import arro.diagram.features.StepDeleteFeature;
 import arro.diagram.features.StepLayoutFeature;
 import arro.diagram.features.StepUpdateFeature;
-import arro.diagram.features.SynchronizationAddFeature;
-import arro.diagram.features.SynchronizationDeleteFeature;
-import arro.diagram.features.SynchronizationLayoutFeature;
-import arro.diagram.features.SynchronizationStartCreateFeature;
-import arro.diagram.features.SynchronizationStopCreateFeature;
-import arro.diagram.features.SynchronizationUpdateFeature;
 import arro.diagram.features.TransitionAddFeature;
 import arro.diagram.features.TransitionCreateFeature;
 import arro.diagram.features.TransitionDeleteFeature;
@@ -70,9 +64,7 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
-		return new ICreateFeature[] {new StepCreateFeature(this),
-                new SynchronizationStartCreateFeature(this),
-                new SynchronizationStopCreateFeature(this)};
+		return new ICreateFeature[] {new StepCreateFeature(this)};
 	}
 	
 	@Override
@@ -91,8 +83,6 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 			return new StepAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroTransition) {
 			return new TransitionAddFeature(this);
-		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroSynchronization) {
-			return new SynchronizationAddFeature(this);
 		}
 
 		return super.getAddFeature(context);
@@ -120,10 +110,6 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_STEP)) {
 				return  new StepDeleteFeature(this);				
-			} else if(pict != null && (pict.equals(Constants.PROP_PICT_TRANSITION) || pict.equals(Constants.PROP_PICT_NULL_TRANSITION))) {
-				return  new TransitionDeleteFeature(this);				
-			} else if(pict != null && (pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_IN) || pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_OUT))) {
-				return  new SynchronizationDeleteFeature(this);				
 			} 
 		} else if(pictogramElement instanceof FreeFormConnection) {
 			FreeFormConnection ffc = (FreeFormConnection)pictogramElement;
@@ -132,7 +118,9 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_CONNECTION)) {
 				return  new ArroConnectionDeleteFeature(this);				
-			} 
+			} else if(pict != null && (pict.equals(Constants.PROP_PICT_TRANSITION) || pict.equals(Constants.PROP_PICT_NULL_TRANSITION))) {
+                return  new TransitionDeleteFeature(this);              
+            }
 		} else if(pictogramElement instanceof BoxRelativeAnchor) {
 			return null;
 		}
@@ -153,8 +141,6 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_STEP)) {
 				return new StepLayoutFeature(this);				
-			} else if(pict != null && (pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_IN) || pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_OUT))) {
-				return new SynchronizationLayoutFeature(this);				
 			}
 		}
 	
@@ -173,8 +159,6 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 				return  new StepUpdateFeature(this);				
 			} else if(pict != null && (pict.equals(Constants.PROP_PICT_TRANSITION) || pict.equals(Constants.PROP_PICT_NULL_TRANSITION))) {
 				return  new TransitionUpdateFeature(this);				
-			} else if(pict != null && (pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_IN) || pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_OUT))) {
-				return  new SynchronizationUpdateFeature(this);				
 			} else if(pict != null && pict.equals(Constants.PROP_PICT_PAD)) {
 				return  new ArroPadUpdateFeature(this);				
 			}

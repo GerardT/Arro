@@ -80,12 +80,7 @@ public class TransitionCreateFeature extends AbstractCreateConnectionFeature
         
 		// The following combinations are allowed:
         if((
-        		(sourceType.equals(Constants.PROP_PAD_NAME_STEP_OUT) && targetType.equals(Constants.PROP_PAD_NAME_STEP_IN)) ||
-        		(sourceType.equals(Constants.PROP_PAD_NAME_STEP_OUT) && targetType.equals(Constants.PROP_PAD_NAME_SYNC_START_IN)) ||
-        		(sourceType.equals(Constants.PROP_PAD_NAME_SYNC_START_OUT) && targetType.equals(Constants.PROP_PAD_NAME_STEP_IN)) ||
-        		(sourceType.equals(Constants.PROP_PAD_NAME_STEP_OUT) && targetType.equals(Constants.PROP_PAD_NAME_SYNC_STOP_IN)) ||
-        		(sourceType.equals(Constants.PROP_PAD_NAME_SYNC_STOP_OUT) && targetType.equals(Constants.PROP_PAD_NAME_STEP_IN)) ||
-        		(sourceType.equals(Constants.PROP_PAD_NAME_SYNC_STOP_OUT) && targetType.equals(Constants.PROP_PAD_NAME_SYNC_START_IN))
+        		(sourceType.equals(Constants.PROP_PAD_NAME_STEP_OUT) && targetType.equals(Constants.PROP_PAD_NAME_STEP_IN))
         		
         		)) {
         	return true;

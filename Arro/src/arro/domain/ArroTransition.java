@@ -30,39 +30,33 @@ public class ArroTransition extends NonEmfDomainObject {
 	}
 	
     public ArrayList<ArroAction> getEntryActions() {
-        // Make sure there is a least one empty action ("", "")
-        int i = 0;
-        for(ArroAction entry : entryActions) {
-            if(entry.getName().equals("") && entry.getState().equals("")) {
-                i++;
-            }
-        }
-        if(i == 0) {
-            entryActions.add(new ArroAction("", ""));
-        }
         return entryActions;
     }
     
-    // Allow client code to update individual elements, use address
-    // of object to find it.
-    public void updateEntry(ArroAction action, ArroAction newValue) {
-        int index = entryActions.indexOf(action);
-        if(index != -1) {
-            entryActions.get(index).name = newValue.name;
-            entryActions.get(index).state = newValue.state;
-        }
-        
-        // Remove superfluous empty entries, add one empty entry at end.
-        ArrayList<ArroAction> removals = new ArrayList<ArroAction>();
-        for(ArroAction entry : entryActions) {
-            if(entry.getName().equals("") && entry.getState().equals("")) {
-                removals.add(entry);
-            }
-        }
-        for(ArroAction entry : removals) {
-            entryActions.remove(entry);
-        }
+    public void setEntryActions(ArrayList<ArroAction> a) {
+        entryActions = a;
     }
+    
+//    // Allow client code to update individual elements, use address
+//    // of object to find it.
+//    public void updateEntry(ArroAction action, ArroAction newValue) {
+//        int index = entryActions.indexOf(action);
+//        if(index != -1) {
+//            entryActions.get(index).name = newValue.name;
+//            entryActions.get(index).state = newValue.state;
+//        }
+//        
+//        // Remove superfluous empty entries, add one empty entry at end.
+//        ArrayList<ArroAction> removals = new ArrayList<ArroAction>();
+//        for(ArroAction entry : entryActions) {
+//            if(entry.getName().equals("") && entry.getState().equals("")) {
+//                removals.add(entry);
+//            }
+//        }
+//        for(ArroAction entry : removals) {
+//            entryActions.remove(entry);
+//        }
+//    }
 
     public String getTarget() {
         return to;

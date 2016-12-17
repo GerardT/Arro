@@ -13,22 +13,21 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 import arro.domain.ArroAction;
+import arro.domain.ArroRequest;
 import arro.domain.ArroTransition;
 
 public class ArroSetActionsSection extends ArroGenericSection {
 
 	private TableViewer viewer;
-    @SuppressWarnings("unused")
-	private boolean listenerFlag = false;  // unused since we don't have listeners on property.
+	
+	// Do not re-create this array, just clear it and refill.
+	ArrayList<ArroAction> actions = new ArrayList<ArroAction>();
+    ArroTransition transition = null;
 
     /**
      * Note: createControls is not called between selection PE of same type (e.g. transition).
@@ -41,10 +40,10 @@ public class ArroSetActionsSection extends ArroGenericSection {
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		
-		addLayout(parent, viewer.getControl());
+		addLayout(parent, viewer.getControl(), 2);
 		
 		// first column is for the type
-		TableViewerColumn col1 = createTableViewerColumn("Node", 200, 0);
+		TableViewerColumn col1 = createTableViewerColumn(viewer, "Node", 200, 0);
 		ColumnLabelStrategy cls1 = new ColumnLabelStrategy() {
 			@Override
 			public String getText(Object element) {
@@ -52,8 +51,8 @@ public class ArroSetActionsSection extends ArroGenericSection {
 			}
 			@Override
 			public void setText(String value, Object element) {
-			    ArroAction act = new ArroAction(value, "");
-			    updateDomainAndPE((ArroAction) element, act);
+			    ((ArroAction)element).setName(value);
+			    storeTable();
 			}
 			@Override
 			public String[] getAcceptedValues(Object element) {
@@ -68,7 +67,7 @@ public class ArroSetActionsSection extends ArroGenericSection {
 		col1.setLabelProvider(cls1);
 	    col1.setEditingSupport(new EditingSupportForSelection(viewer, this, cls1));
 		
-		TableViewerColumn col2 = createTableViewerColumn("Action", 200, 1);
+		TableViewerColumn col2 = createTableViewerColumn(viewer, "Action", 200, 1);
 		ColumnLabelStrategy cls2 = new ColumnLabelStrategy() {
 			@Override
 			public String getText(Object element) {
@@ -76,8 +75,9 @@ public class ArroSetActionsSection extends ArroGenericSection {
 			}
 			@Override
 			public void setText(String value, Object element) {
-                ArroAction act = new ArroAction(((ArroAction)element).getName(), value);
-                updateDomainAndPE((ArroAction) element, act);
+	            ((ArroAction)element).setState(value);
+
+                storeTable();
 			}
 			@Override
 			public String[] getAcceptedValues(Object element) {
@@ -99,43 +99,53 @@ public class ArroSetActionsSection extends ArroGenericSection {
 		table.setLinesVisible(true);
 		table.setEnabled(true);
 
-		// ArrayContentProvider handles objects in arrays. For each element in the
-		// table ColumnsLabelProvider.getText is called to provide content.
-		viewer.setContentProvider(new ArrayContentProvider());
+        // ArrayContentProvider handles objects in arrays. Each element in the
+        // table, ColumnsLabelProvider.getText is called to provide content.
+        viewer.setContentProvider(new ArrayContentProvider());
+        
+        // get the content for the viewer, setInput will call getElements in the contentProvider
+        viewer.setInput(actions);
 		
-		// make the selection available to other views - but causes trouble!!
+		// TODO make the selection available to other views - but causes trouble!!
 		//getSite().setSelectionProvider(viewer);
+		
     }
     
     
     private String[] getAcceptedNodeNames(ArroAction cond) {
-        String[] ret;
+        String[] ret = {""};
         
-        ArroTransition n = getTransition();
-        ArrayList<String> list = n.getParent().getParent().getNodeNames();
-        // Add empty option in order to remove the entry
-        list.add(0, "");
+        if(transition != null) {
+            ArrayList<String> list = transition.getParent().getParent().getNodeNames();
+            // Add empty option in order to remove the entry
+            list.add(0, "");
 
-        ret = list.toArray(new String[list.size()]);
+            ret = list.toArray(new String[list.size()]);
+        } else {
+            System.out.println("getAcceptedNodeNames: no transition selected");
+        }
         
         return ret;
     }
     
     private String[] getAcceptedPublishedActions(ArroAction cond) {
-        String[] ret = { "" };
+        String[] ret = {""};
         String name = cond.getName(); // node name
         
         if(name.equals("")) {
             return ret;
         }
         
-        ArroTransition n = getTransition();
-        try {
-            ArrayList<String> list = n.getParent().getParent().getNodeByName(name).getAssociatedModule().getPublishedActions();
+        if(transition != null) {
+            try {
+                ArrayList<ArroRequest> list = transition.getParent().getParent().getNodeByName(name).getAssociatedModule().getPublishedActions();
 
-            ret = list.toArray(new String[list.size()]);
-        } catch (RuntimeException e) {
-            return ret;
+                ret = list.toArray(new String[list.size()]);
+            } catch (RuntimeException e) {
+                return ret;
+            }
+        } else {
+            System.out.println("getAcceptedPublishedActions: no transition selected");
         }
         
         return ret;
@@ -143,90 +153,57 @@ public class ArroSetActionsSection extends ArroGenericSection {
     
     @SuppressWarnings("unused")
     private String[] getAcceptedStateNames(ArroAction cond) {
-       	String[] ret = { "" };
+       	String[] ret = {""};
     	String name = cond.getName(); // node name
     	
     	if(name.equals("")) {
     		return ret;
     	}
     	
-        ArroTransition n = getTransition();
-        try {
-			ArrayList<String> list = n.getParent().getParent().getNodeByName(name).getAssociatedModule().getStateNames();
+        if(transition != null) {
+            try {
+                ArrayList<String> list = transition.getParent().getParent().getNodeByName(name).getAssociatedModule().getStateNames();
 
-			ret = list.toArray(new String[list.size()]);
-		} catch (RuntimeException e) {
-			return ret;
-		}
+                ret = list.toArray(new String[list.size()]);
+            } catch (RuntimeException e) {
+                return ret;
+            }
+        } else {
+            System.out.println("getAcceptedStateNames: no transition selected");
+        }
     	
     	return ret;
     }
     
-    /**
-     * Create a column for the table viewer. Column is now associated with
-     * this viewer.
-     * 
-     * @param title
-     * @param bound
-     * @param colNumber
-     * @return
-     */
-	private TableViewerColumn createTableViewerColumn(String title, int bound, final int colNumber) {
-		final TableViewerColumn viewerColumn = new TableViewerColumn(viewer, SWT.NONE);
-		final TableColumn column = viewerColumn.getColumn();
-		column.setText(title);
-		column.setWidth(bound);
-		column.setResizable(true);
-		column.setMoveable(true);
-		return viewerColumn;
-	}
-
 	/**
 	 * Refresh the contents of the control - sync properties with domain info.
-	 * Since this may trigger the listener(s) attached, we prevent that using
-	 * listenerFlag.
+	 * 
+	 * Called every time a PE is selected.
 	 */
     @Override
     public void refresh() {
-        ArroTransition n = getTransition();
-		
-		if (n != null) {
-            // Temp disable listener; listener only needed if user does types new value.
-            listenerFlag = false;
+        transition = getTransition();
+        
+        if(transition != null) {
+            loadTable(transition);
             
-            // get the content for the viewer, setInput will call getElements in the contentProvider
-            viewer.setInput(n.getEntryActions());
-            
-	    	listenerFlag = true;
+		} else {
+		    // when apparently nothing selected.
+		    actions.clear();
 		}
-	    viewer.refresh();
-
+        viewer.refresh();
     }
-    /**
-     * Provide layout and listeners for the controls.
-     * 
-     * @param parent
-     */
-    private void addLayout(Composite parent, Control control) {
-		GridLayout layout = new GridLayout(2, false);
-		parent.setLayout(layout);
-
-		// define layout for the viewer
-		GridData gridData = new GridData();
-		gridData.verticalAlignment = GridData.FILL;
-		gridData.horizontalSpan = 2;
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.grabExcessVerticalSpace = true;
-		gridData.horizontalAlignment = GridData.FILL;
-		control.setLayoutData(gridData);
-		
-    }
-
+    
 
     
-    // Use a class so we can declare it as final and use as closure.
-    class Args {
-        public boolean success = false;
+    private void loadTable(ArroTransition n) {
+        ArrayList<ArroAction> tmp = n.getEntryActions();
+        
+        actions.clear();
+        for(ArroAction entry : tmp) {
+            actions.add(new ArroAction(entry.getName(), entry.getState()));
+        }
+        actions.add(new ArroAction("", ""));
     }
 
     /**
@@ -237,9 +214,17 @@ public class ArroSetActionsSection extends ArroGenericSection {
      * 
      * @return true if domain object (referenced by PE) was updated successfully.
      */
-    private boolean updateDomainAndPE(ArroAction action, ArroAction newValue) {
-        final Args x = new Args();
+    private void storeTable() {
         
+        // make new clean list before storing.
+        final ArrayList<ArroAction> newList = new ArrayList<ArroAction>();
+        for(ArroAction entry : actions) {
+            if(!(entry.getName().equals("") /*|| entry.getState().equals("")*/)) {
+                System.out.println("Store actions " + entry.getName() + " " + entry.getState());
+                newList.add(new ArroAction(entry.getName(), entry.getState()));
+            }
+        }
+
         IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
                 
             @Override
@@ -250,17 +235,11 @@ public class ArroSetActionsSection extends ArroGenericSection {
             public void execute(IContext context) {
                 ArroTransition n = getTransition();
 
-                if (n != null) {
-                    n.updateEntry((ArroAction)(context.getProperty("p1")), (ArroAction)(context.getProperty("p2")));
-                    x.success = true;
-                }
+                n.setEntryActions(newList);
             }
         };
         CustomContext context = new CustomContext();
-        context.putProperty("p1", action);
-        context.putProperty("p2", newValue);
         execute(feature, context);
-        return x.success;
     }
     
     public ArroTransition getTransition() {
@@ -275,11 +254,12 @@ public class ArroSetActionsSection extends ArroGenericSection {
                 return (ArroTransition)(eObject[0]);
             }
         }
+        System.out.println("No ArroTransition found!");
         return null;
     }
 
 	@Override
 	public void update() {
-		refresh();
+		//refresh();
 	}
 }

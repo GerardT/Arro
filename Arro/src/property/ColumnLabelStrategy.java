@@ -1,7 +1,5 @@
 package property;
 
-import java.util.ArrayList;
-
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 
 /**

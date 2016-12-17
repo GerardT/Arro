@@ -1,5 +1,6 @@
 package arro.diagram.features;
 
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -55,7 +56,7 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
 
         
         String instanceName = "a" + "Transition";
-        while(domainModule.getStateDiagram().getStepByName(instanceName) != null) {
+        while(domainModule.getStateDiagram().getTransitionByName(instanceName) != null) {
         	instanceName += "1";
         }
         addedDomainObject.setName(instanceName);
@@ -65,7 +66,12 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
 		context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
         context.putProperty(Constants.PROP_DOMAIN_MODULE_KEY, domainModule);
 
-        domainModule.getStateDiagram().addTransition(addedDomainObject);
+        try {
+            domainModule.getStateDiagram().addTransition(addedDomainObject);
+        } catch (ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
 	    // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
 		link(connection, addedDomainObject);

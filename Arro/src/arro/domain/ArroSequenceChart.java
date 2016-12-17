@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.eclipse.core.commands.ExecutionException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -15,7 +16,7 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 	private String nodeType;
 	private HashMap<String, ArroStep> steps = new HashMap<String, ArroStep>();
 	private HashMap<String, ArroTransition> transitions = new HashMap<String, ArroTransition>();
-    private ArrayList<String> publishedActions = new ArrayList<String>();;
+    private ArrayList<ArroRequest> publishedActions = new ArrayList<ArroRequest>();;
 	private ArroModule parent;
 	
 	@SuppressWarnings("unchecked")
@@ -28,12 +29,18 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 		return diag;		
 	}
 	
-	public void addState(ArroStep newState) {
+	public void addState(ArroStep newState) throws ExecutionException {
+        if(steps.containsKey(newState.getName())) {
+            throw new ExecutionException("Non-unique step name", null);
+        }
 		steps.put(newState.getName(), newState);
 		newState.setParent(this);
 	}
 	
-	public void addTransition(ArroTransition newTransition) {
+	public void addTransition(ArroTransition newTransition) throws ExecutionException {
+	    if(transitions.containsKey(newTransition.getName())) {
+            throw new ExecutionException("Non-unique transition name", null);
+	    }
 		transitions.put(newTransition.getName(), newTransition);
 		newTransition.setParent(this);
 	}
@@ -46,15 +53,12 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 		this.nodeType = name;
 	}
 
-    public void updatePublishedActions(String action, String newValue) {
-        int index = publishedActions.indexOf(action);
-        if(index != -1) {
-            publishedActions.set(index, newValue);
-        }
+    public void setPublishedActions(ArrayList<ArroRequest> requests) {
+        publishedActions = requests;
     }
 
-    public ArrayList<String> getPublishedActions() {
-        publishedActions.add("");
+    public ArrayList<ArroRequest> getPublishedActions() {
+        publishedActions.add(new ArroRequest());
         return publishedActions;
     }
     
@@ -89,14 +93,10 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 			
 			transition.xmlWrite(doc, sub);
 		}
-        for(String action: publishedActions) {
+        for(ArroRequest action: publishedActions) {
             
             Element sub = doc.createElement("published-action");
             elt.appendChild(sub);
-            
-            attr = doc.createAttribute("action");
-            attr.setValue(action);
-            sub.setAttributeNode(attr);
         }
 	}
 	public void xmlRead(Node nNode) {
@@ -115,7 +115,12 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 	    		
 	    		state.xmlRead(eSubElement);
 	    		
-	    		addState(state);
+	    		try {
+                    addState(state);
+                } catch (ExecutionException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
 			}
             if(sub.getNodeName().equals("transition")) {
                 Element eSubElement = (Element) sub;
@@ -123,12 +128,20 @@ public class ArroSequenceChart extends NonEmfDomainObject {
                 
                 transition.xmlRead(eSubElement);
                 
-                addTransition(transition);
+                try {
+                    addTransition(transition);
+                } catch (ExecutionException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
             if(sub.getNodeName().equals("published-actions")) {
                 Element eSubElement = (Element) sub;
-                String action = eSubElement.getAttribute("action");
-                publishedActions.add(action);
+                ArroRequest req = new ArroRequest();
+                
+                req.xmlRead(eSubElement);
+                
+                publishedActions.add(req);
             }
     	}
    	}

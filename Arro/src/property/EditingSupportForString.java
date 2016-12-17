@@ -82,6 +82,9 @@ public class EditingSupportForString extends EditingSupport {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
+//    gs.setText(String.valueOf(userInputValue), element);
+//    paramEditor.update();
+
 
     viewer.update(element, null);
 

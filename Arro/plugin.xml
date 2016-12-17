@@ -104,10 +104,10 @@
              label="Transition">
           </propertyTab>
           <propertyTab
-             afterTab="arro.param.tab"
+             afterTab="arro.set-actions.tab"
              category="Graphiti"
              id="arro.published-actions.tab"
-             label="Published Actions">
+             label="Receive Requests">
           </propertyTab>
           <propertyTab
              category="Graphiti"
@@ -118,7 +118,7 @@
              afterTab="arro.main.tab"
              category="Graphiti"
              id="arro.set-actions.tab"
-             label="Set Actions">
+             label="Send Requests">
           </propertyTab>
       </propertyTabs>
       <propertyTabs
@@ -141,10 +141,10 @@
              label="Transition">
           </propertyTab>
           <propertyTab
-             afterTab="arro.param.tab"
+             afterTab="arro.set-actions.tab"
              category="Graphiti"
              id="arro.published-actions.tab"
-             label="Published Actions">
+             label="Receive Requests">
           </propertyTab>
           <propertyTab
              category="Graphiti"
@@ -155,7 +155,7 @@
              afterTab="arro.main.tab"
              category="Graphiti"
              id="arro.set-actions.tab"
-             label="Set Actions">
+             label="Send Requests">
           </propertyTab>
       </propertyTabs>
     </extension>
