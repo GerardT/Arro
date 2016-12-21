@@ -81,7 +81,8 @@ public class ArroSetActionsSection extends ArroGenericSection {
 			}
 			@Override
 			public String[] getAcceptedValues(Object element) {
-				return getAcceptedPublishedActions((ArroAction)element);
+				//return getAcceptedPublishedActions((ArroAction)element);
+			    return getAcceptedStateNames((ArroAction)element);
 			}
             @Override
             public String obsolete(Object element) {
@@ -128,6 +129,7 @@ public class ArroSetActionsSection extends ArroGenericSection {
         return ret;
     }
     
+    @SuppressWarnings("unused")
     private String[] getAcceptedPublishedActions(ArroAction cond) {
         String[] ret = {""};
         String name = cond.getName(); // node name
@@ -151,7 +153,6 @@ public class ArroSetActionsSection extends ArroGenericSection {
         return ret;
     }
     
-    @SuppressWarnings("unused")
     private String[] getAcceptedStateNames(ArroAction cond) {
        	String[] ret = {""};
     	String name = cond.getName(); // node name

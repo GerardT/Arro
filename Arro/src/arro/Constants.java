@@ -46,12 +46,18 @@ public class Constants {
 	// Properties
 	public final static String PROP_PAD_INPUT_KEY = "pad_input";
 	
-	// Pictogram types - Key
-	public final static String PROP_PICT_KEY = "pictogram";
-	
-	// Pictogram types - Values
-	public final static String PROP_PICT_NODE = "node";
-	public final static String PROP_PICT_STEP = "state_block";
+    // Context types - Key
+    public final static String PROP_CONTEXT_KEY = "context";
+    
+    // Pictogram types - Values
+    public final static String PROP_CONTEXT_READY_STEP = "_ready_step";
+    
+    // Pictogram types - Key
+    public final static String PROP_PICT_KEY = "pictogram";
+    
+    // Pictogram types - Values
+    public final static String PROP_PICT_NODE = "node";
+    public final static String PROP_PICT_STEP = "state_block";
 	public final static String PROP_PICT_TRANSITION = "transition";
 	public final static String PROP_PICT_NULL_TRANSITION = "null_transition";
 	public final static String PROP_PICT_SYNCHRONIZATION_IN = "synchronization_in";

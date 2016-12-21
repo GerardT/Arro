@@ -28,6 +28,7 @@ import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 import arro.Constants;
 import arro.diagram.features.ArroIDAddFeature;
 import arro.diagram.features.NullRemoveFeature;
+import arro.diagram.features.ReadyAddFeature;
 import arro.diagram.features.StepAddFeature;
 import arro.diagram.features.StepCreateFeature;
 import arro.diagram.features.StepDeleteFeature;
@@ -68,8 +69,11 @@ public class SfcLeafFeatureProvider extends DefaultFeatureProvider {
 		if (context instanceof IAddContext && 
 				(context.getNewObject() instanceof ArroModule || context.getNewObject() instanceof ArroSequenceChart)) {
 			return new ArroIDAddFeature(this);
-		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep) {
-			return new StepAddFeature(this);
+        } else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep &&
+                context.getProperty(Constants.PROP_CONTEXT_KEY).equals(Constants.PROP_CONTEXT_READY_STEP)) {
+            return new ReadyAddFeature(this);
+        } else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep) {
+            return new StepAddFeature(this);
 		}
 
 		return super.getAddFeature(context);

@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -44,6 +45,7 @@ import arro.Constants;
 import arro.domain.ArroDevice;
 import arro.domain.ArroModule;
 import arro.domain.ArroSequenceChart;
+import arro.domain.ArroStep;
 import arro.wizards.FileService;
 
 /**
@@ -63,7 +65,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
     private ArroModule nodeDiagram;
     private ArroDevice device;
     private ArroSequenceChart stateNode;
-    
+    private ArroStep readyStep;
 
 
     /**
@@ -146,6 +148,13 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
         nodeDiagram = new ArroModule();
         stateNode = new ArroSequenceChart();
         nodeDiagram.setStateDiagram(stateNode);
+        readyStep = new ArroStep();
+        try {
+            stateNode.addState(readyStep);
+        } catch (ExecutionException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
 
         final IFile file = f.getFile(new Path(fileName));
         try {
@@ -337,6 +346,15 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
         IAddFeature f = dtp.getFeatureProvider().getAddFeature(context);
         f.add(context);
 
+        // Create '_ready' step in diagram, calling .
+        context = new AddContext();  
+        context.setNewObject(readyStep);
+        context.setTargetContainer(diagram);
+        context.putProperty(Constants.PROP_CONTEXT_KEY, Constants.PROP_CONTEXT_READY_STEP);
+        
+        f = dtp.getFeatureProvider().getAddFeature(context);
+        f.add(context);
+
         // Serialize the diagram into XML.
         FileService.createEmfFileForDiagram(uri, diagram);
         
@@ -347,7 +365,9 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
         String contents =   "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
                 "<module id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
                 "    <device id=\"" + device.getId() + "\" url=\"" + language + ":" + diagramName + "\"/>\n" +
-                "    <sfc id=\"" + stateNode.getId() + "\" name=\"_sfc\" type=\"_Sfc\"/>\n" +
+                "    <sfc id=\"" + stateNode.getId() + "\" name=\"_sfc\" type=\"_Sfc\">\n" +
+                "        <step id=\"" + readyStep.getId() + "\" name=\"_ready\"/>" +
+                "    </sfc>\n" +
                 "</module>\n";
         return new ByteArrayInputStream(contents.getBytes());
     }

@@ -1,0 +1,46 @@
+package arro.diagram.features;
+
+import org.eclipse.graphiti.features.IAddFeature;
+import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.context.IAddContext;
+import org.eclipse.graphiti.features.impl.AbstractAddFeature;
+import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+
+import arro.Constants;
+import arro.domain.ArroStep;
+
+
+public class ReadyAddFeature extends AbstractAddFeature implements
+		IAddFeature {
+
+	public ReadyAddFeature(IFeatureProvider fp) {
+		super(fp);
+	}
+
+	public boolean canAdd(IAddContext context) {
+		// TODO: check for right domain object instance below
+		return /* context.getNewObject() instanceof DomainObject && */ context.getTargetContainer() instanceof Diagram;
+	}
+
+	public PictogramElement add(IAddContext context) {
+		
+        Object obj = context.getNewObject();
+        
+        if(!(obj instanceof ArroStep)) {
+            return null;
+        }
+        
+        ArroStep addedDomainObject = (ArroStep)obj;
+        
+        addedDomainObject.setName("_ready");
+
+        ContainerShape containerShape = new StepHelper().create(context, addedDomainObject, manageColor(Constants.CLASS_FOREGROUND), manageColor(Constants.CLASS_BACKGROUND));
+
+        // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
+        link(containerShape, addedDomainObject);
+		
+		return containerShape;
+	}
+}

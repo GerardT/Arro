@@ -32,6 +32,7 @@ import arro.diagram.features.ArroConnectionDeleteFeature;
 import arro.diagram.features.ArroIDAddFeature;
 import arro.diagram.features.ArroPadUpdateFeature;
 import arro.diagram.features.NullRemoveFeature;
+import arro.diagram.features.ReadyAddFeature;
 import arro.diagram.features.StepAddFeature;
 import arro.diagram.features.StepCreateFeature;
 import arro.diagram.features.StepDeleteFeature;
@@ -79,6 +80,8 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 		if (context instanceof IAddContext && 
 				(context.getNewObject() instanceof ArroModule || context.getNewObject() instanceof ArroSequenceChart)) {
 			return new ArroIDAddFeature(this);
+        } else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep && context.getProperty("empty") != null) {
+            return new ReadyAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep) {
 			return new StepAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroTransition) {
