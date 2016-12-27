@@ -31,6 +31,7 @@ public class ArroStepSection extends ArroGenericSection {
     private CLabel valueLabel;
     private String name = "";
     private boolean listenerFlag = false;
+    private ModifyListener listener = null;
 
     @Override
     public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
@@ -44,23 +45,26 @@ public class ArroStepSection extends ArroGenericSection {
 
         addLayout(parent);
 
-        nameTextVal.addModifyListener(new ModifyListener() {
+        listener = new ModifyListener() {
 
             public void modifyText(ModifyEvent e) {
-                name = Misc.checkString(nameTextVal);
-                
-                if(listenerFlag) {
-                    if(!name.equals("") && updateDomainAndPE()) {
-                        nameTextVal.setBackground(null);
-                    } else {
-                        // show error indication
-                        Display display = Display.getCurrent();
-                        Color color = display.getSystemColor(SWT.COLOR_RED);
-                        nameTextVal.setBackground(color);
+                if(!nameTextVal.getText().equals("_ready")) {
+                    name = Misc.checkString(nameTextVal);
+                    if(listenerFlag) {
+                        if(!name.equals("") && updateDomainAndPE()) {
+                            nameTextVal.setBackground(null);
+                        } else {
+                            // show error indication
+                            Display display = Display.getCurrent();
+                            Color color = display.getSystemColor(SWT.COLOR_RED);
+                            nameTextVal.setBackground(color);
+                        }
                     }
                 }
+                
             }
-        });
+        };
+        nameTextVal.addModifyListener(listener);
     }
     
     @Override
@@ -72,9 +76,12 @@ public class ArroStepSection extends ArroGenericSection {
             if (n != null) {
                 // Make sure to first read these variables from domain
                 name = n.getName() == null ? "" : n.getName();
-
+                
                 // Temp disable listener; listener only needed if user does types new value.
                 listenerFlag = false;
+                
+                nameTextVal.setEnabled(name.equals("_ready") ? false : true);
+
 
                 if(!(name.equals(nameTextVal))) {
                     nameTextVal.setText(name);
@@ -162,7 +169,7 @@ public class ArroStepSection extends ArroGenericSection {
     
     public ArroStep getState(PictogramElement pe) {
         if (pe != null) {
-               IFeatureProvider fp = getDiagramTypeProvider().getFeatureProvider();
+            IFeatureProvider fp = getDiagramTypeProvider().getFeatureProvider();
 
             Object[] eObject = fp.getAllBusinessObjectsForPictogramElement(pe);
 

@@ -4,6 +4,7 @@ import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 
@@ -22,6 +23,19 @@ public class StepDeleteFeature extends DefaultDeleteFeature implements ICustomUn
 	}
 	
 	public boolean canDelete(IDeleteContext context) {
+	    PictogramElement pe = context.getPictogramElement();
+        if (pe != null) {
+            Object[] eObject = getAllBusinessObjectsForPictogramElement(pe);
+
+            if (eObject.length != 0 && eObject[0] instanceof ArroStep) {
+                ArroStep step = (ArroStep) eObject[0];
+                if(step.getName().equals("_ready")) {
+                    return false;
+                }
+            }
+        }
+   
+	    
 		return true;
 	}
 	

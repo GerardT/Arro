@@ -1,5 +1,6 @@
 package arro.diagram.features;
 
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -60,7 +61,12 @@ public class StepAddFeature extends AbstractAddFeature implements IAddFeature, I
         context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
         context.putProperty(Constants.PROP_DOMAIN_MODULE_KEY, domainModule);
 
-        domainModule.getStateDiagram().addState(addedDomainObject);
+        try {
+            domainModule.getStateDiagram().addState(addedDomainObject);
+        } catch (ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
 	    // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
 		link(containerShape, addedDomainObject);

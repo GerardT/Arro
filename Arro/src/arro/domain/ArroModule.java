@@ -105,7 +105,7 @@ public class ArroModule extends NonEmfDomainObject  {
 	    }
 	}
 
-    public ArrayList<String> getPublishedActions() {
+    public ArrayList<ArroRequest> getPublishedActions() {
         return stateDiagram.getPublishedActions();
     }
 

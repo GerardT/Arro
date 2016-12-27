@@ -46,12 +46,18 @@ public class Constants {
 	// Properties
 	public final static String PROP_PAD_INPUT_KEY = "pad_input";
 	
-	// Pictogram types - Key
-	public final static String PROP_PICT_KEY = "pictogram";
-	
-	// Pictogram types - Values
-	public final static String PROP_PICT_NODE = "node";
-	public final static String PROP_PICT_STEP = "state_block";
+    // Context types - Key
+    public final static String PROP_CONTEXT_KEY = "context";
+    
+    // Pictogram types - Values
+    public final static String PROP_CONTEXT_READY_STEP = "_ready_step";
+    
+    // Pictogram types - Key
+    public final static String PROP_PICT_KEY = "pictogram";
+    
+    // Pictogram types - Values
+    public final static String PROP_PICT_NODE = "node";
+    public final static String PROP_PICT_STEP = "state_block";
 	public final static String PROP_PICT_TRANSITION = "transition";
 	public final static String PROP_PICT_NULL_TRANSITION = "null_transition";
 	public final static String PROP_PICT_SYNCHRONIZATION_IN = "synchronization_in";
@@ -89,10 +95,10 @@ public class Constants {
 	// Pre-defined pad names used in SFCs
 	public static final String PROP_PAD_NAME_STEP_IN = "Step-in";
 	public static final String PROP_PAD_NAME_STEP_OUT = "Step-out";
-	public static final String PROP_PAD_NAME_SYNC_START_IN = "Sync-start-in";
-	public static final String PROP_PAD_NAME_SYNC_START_OUT = "Sync-start-out";
-	public static final String PROP_PAD_NAME_SYNC_STOP_IN = "Sync-stop-in";
-	public static final String PROP_PAD_NAME_SYNC_STOP_OUT = "Sync-stop-out";
+//	public static final String PROP_PAD_NAME_SYNC_START_IN = "Sync-start-in";
+//	public static final String PROP_PAD_NAME_SYNC_START_OUT = "Sync-start-out";
+//	public static final String PROP_PAD_NAME_SYNC_STOP_IN = "Sync-stop-in";
+//	public static final String PROP_PAD_NAME_SYNC_STOP_OUT = "Sync-stop-out";
 
 	
 	public static final IColorConstant PAD_TEXT_FOREGROUND = new ColorConstant(51, 51, 153);

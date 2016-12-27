@@ -28,12 +28,12 @@ import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 import arro.Constants;
 import arro.diagram.features.ArroIDAddFeature;
 import arro.diagram.features.NullRemoveFeature;
+import arro.diagram.features.ReadyAddFeature;
 import arro.diagram.features.StepAddFeature;
 import arro.diagram.features.StepCreateFeature;
 import arro.diagram.features.StepDeleteFeature;
 import arro.diagram.features.StepLayoutFeature;
 import arro.diagram.features.StepUpdateFeature;
-import arro.diagram.features.SynchronizationLayoutFeature;
 import arro.domain.ArroModule;
 import arro.domain.ArroSequenceChart;
 import arro.domain.ArroStep;
@@ -69,8 +69,11 @@ public class SfcLeafFeatureProvider extends DefaultFeatureProvider {
 		if (context instanceof IAddContext && 
 				(context.getNewObject() instanceof ArroModule || context.getNewObject() instanceof ArroSequenceChart)) {
 			return new ArroIDAddFeature(this);
-		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep) {
-			return new StepAddFeature(this);
+        } else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep &&
+                context.getProperty(Constants.PROP_CONTEXT_KEY).equals(Constants.PROP_CONTEXT_READY_STEP)) {
+            return new ReadyAddFeature(this);
+        } else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep) {
+            return new StepAddFeature(this);
 		}
 
 		return super.getAddFeature(context);
@@ -117,8 +120,6 @@ public class SfcLeafFeatureProvider extends DefaultFeatureProvider {
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_STEP)) {
 				return new StepLayoutFeature(this);				
-			} else if(pict != null && (pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_IN) || pict.equals(Constants.PROP_PICT_SYNCHRONIZATION_OUT))) {
-				return new SynchronizationLayoutFeature(this);				
 			}
 		}
 	

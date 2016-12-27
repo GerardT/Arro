@@ -113,6 +113,12 @@ public class WidgetUtil {
 	    return pads;
 	}
 	
+	/**
+	 * Get the parent shape of the anchor.
+	 * 
+	 * @param anchor
+	 * @return
+	 */
 	public static ContainerShape getCsFromAnchor(BoxRelativeAnchor anchor) {
 		AnchorContainer cont = anchor.getParent();
 		EObject main = cont.eContainer();

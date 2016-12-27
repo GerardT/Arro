@@ -11,6 +11,7 @@ import arro.Constants;
 import arro.domain.ArroModule;
 import arro.domain.ArroNode;
 import arro.domain.ArroStep;
+import arro.domain.ArroTransition;
 import arro.domain.ArroSequenceChart;
 import arro.editors.StateDiagramEditor;
 import util.Logger;
@@ -46,12 +47,10 @@ public class TransitionDeleteFeature extends DefaultDeleteFeature implements ICu
 
 	@Override
 	protected void deleteBusinessObject(Object bo) {
-		if(bo instanceof ArroNode) {
-			ArroStep obj = (ArroStep)bo;
+		if(bo instanceof ArroTransition) {
+			ArroTransition obj = (ArroTransition)bo;
 			
-			obj.getParent().removeStep(obj);
-			
-//			obj.getParent().purgeConnections();
+			obj.getParent().removeTransition(obj);
 		}
 	}
 

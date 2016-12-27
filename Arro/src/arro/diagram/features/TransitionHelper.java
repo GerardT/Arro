@@ -1,16 +1,12 @@
 package arro.diagram.features;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IAddContext;
-import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.styles.Color;
-import org.eclipse.graphiti.mm.algorithms.styles.Point;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
-import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
@@ -45,16 +41,16 @@ public class TransitionHelper {
         assert(endType != null);
         
 		// The following combinations are allowed:
-        if((
-        		(startType.equals(Constants.PROP_PAD_NAME_SYNC_START_OUT) && endType.equals(Constants.PROP_PAD_NAME_STEP_IN)) ||
-        		(startType.equals(Constants.PROP_PAD_NAME_STEP_OUT) && endType.equals(Constants.PROP_PAD_NAME_SYNC_STOP_IN))
-        		
-        		)) {
-            Graphiti.getPeService().setPropertyValue(connection, Constants.PROP_PICT_KEY, Constants.PROP_PICT_NULL_TRANSITION);
-    		polyline = gaService.createPlainPolyline(connection);
-			
-			polyline.setForeground(fg);
-        } else {
+//        if((
+//        		(startType.equals(Constants.PROP_PAD_NAME_SYNC_START_OUT) && endType.equals(Constants.PROP_PAD_NAME_STEP_IN)) ||
+//        		(startType.equals(Constants.PROP_PAD_NAME_STEP_OUT) && endType.equals(Constants.PROP_PAD_NAME_SYNC_STOP_IN))
+//        		
+//        		)) {
+//            Graphiti.getPeService().setPropertyValue(connection, Constants.PROP_PICT_KEY, Constants.PROP_PICT_NULL_TRANSITION);
+//    		polyline = gaService.createPlainPolyline(connection);
+//			
+//			polyline.setForeground(fg);
+//        } else {
             Graphiti.getPeService().setPropertyValue(connection, Constants.PROP_PICT_KEY, Constants.PROP_PICT_TRANSITION);
     		polyline = gaService.createPlainPolyline(connection);
     		
@@ -66,7 +62,7 @@ public class TransitionHelper {
 			polyline.setForeground(fg);
 			bar.setForeground(fg);
 	        bar.setLineWidth(2);	     
-        }
+//        }
         return connection;
        
 	}

@@ -30,7 +30,7 @@ public class ArroConditionSection extends ArroGenericSection {
 
     private Text nameTextVal;
     private CLabel valueLabel;
-    CCombo allowedModes;
+    //CCombo allowedModes;
     
     private String name = "";
     private boolean listenerFlag = false;
@@ -48,7 +48,7 @@ public class ArroConditionSection extends ArroGenericSection {
         valueLabel = factory.createCLabel(composite, "Condition:");
         nameTextVal = factory.createText(composite, "");
         
-        allowedModes = factory.createCCombo(composite);
+        // allowedModes = factory.createCCombo(composite);
 
         addLayout(parent);
 
@@ -150,7 +150,7 @@ public class ArroConditionSection extends ArroGenericSection {
         //data.right = new FormAttachment(50, 0);
         data.top = new FormAttachment(nameTextVal, VSPACE);
         //data.width = SWT.BORDER;
-        allowedModes.setLayoutData(data);
+        //allowedModes.setLayoutData(data);
     }
 
     

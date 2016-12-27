@@ -104,12 +104,6 @@
              label="Transition">
           </propertyTab>
           <propertyTab
-             afterTab="arro.param.tab"
-             category="Graphiti"
-             id="arro.published-actions.tab"
-             label="Published Actions">
-          </propertyTab>
-          <propertyTab
              category="Graphiti"
              id="arro.step.tab"
              label="Step">
@@ -118,7 +112,7 @@
              afterTab="arro.main.tab"
              category="Graphiti"
              id="arro.set-actions.tab"
-             label="Set Actions">
+             label="Send Requests">
           </propertyTab>
       </propertyTabs>
       <propertyTabs
@@ -141,12 +135,6 @@
              label="Transition">
           </propertyTab>
           <propertyTab
-             afterTab="arro.param.tab"
-             category="Graphiti"
-             id="arro.published-actions.tab"
-             label="Published Actions">
-          </propertyTab>
-          <propertyTab
              category="Graphiti"
              id="arro.step.tab"
              label="Step">
@@ -155,7 +143,7 @@
              afterTab="arro.main.tab"
              category="Graphiti"
              id="arro.set-actions.tab"
-             label="Set Actions">
+             label="Send Requests">
           </propertyTab>
       </propertyTabs>
     </extension>
@@ -212,12 +200,6 @@
               id="arro.modedef.section"
               tab="arro.modedef.tab">
           </propertySection>
-          <propertySection
-              class="property.ArroPublishedActionsSection"
-              filter="property.ArroPublishedActionsFilter"
-              id="arro.published-actions.section"
-              tab="arro.published-actions.tab">
-          </propertySection>
       </propertySections>
       <propertySections
           contributorId="ArroFunctionLeafDiagram.PropertyContributor">
@@ -268,12 +250,6 @@
               filter="property.ArroConditionFilter"
               id="arro.modedef.section"
               tab="arro.modedef.tab">
-          </propertySection>
-          <propertySection
-              class="property.ArroPublishedActionsSection"
-              filter="property.ArroPublishedActionsFilter"
-              id="arro.published-actions.section"
-              tab="arro.published-actions.tab">
           </propertySection>
       </propertySections>
     </extension>
