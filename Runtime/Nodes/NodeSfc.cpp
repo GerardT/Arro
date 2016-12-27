@@ -23,7 +23,7 @@ NodeSfc::NodeSfc(Process* d, TiXmlElement* elt):
     m_process{d} {
 
     // Define "start" as initial step
-    m_activeSteps.insert("start");
+    m_activeSteps.insert("_ready");
 
     // Read XML blocks and register steps
     TiXmlElement* eltStep = elt->FirstChildElement("step");
@@ -161,7 +161,8 @@ SfcTransition::SfcTransition(const std::string& condition, const std::string& fr
         m_trace.println("Parsing condition succeeded");
     }
     else {
-        throw std::runtime_error("Parsing condition failed " + m_expression);
+        ServerEngine::console(string("Parsing condition failed for ") + this->m_parent.getProcess()->getName() + ": \'" + m_expression + "\'");
+        throw std::runtime_error("Parsing condition failed: \'" + m_expression + "\'");
     }
 }
 

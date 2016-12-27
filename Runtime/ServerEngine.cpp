@@ -269,9 +269,8 @@ static void server()
                         ServerEngine::console("run successful");
                     } catch ( const std::runtime_error& e ) {
                         trace.println(string("Runtime error ") + e.what());
-                        cleanup();
 
-                        ServerEngine::console("run failed");
+                        cleanup();
                     }
                 }
             }
