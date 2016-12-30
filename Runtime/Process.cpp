@@ -149,7 +149,7 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
             }
             else if(className == "Servo") {
                m_trace.println("new NodeServo(" + instance + ")");
-                new NodeServo(this, instance, params);
+                m_device = new NodeServo(this, instance, params);
             }
 //            else if(className == "Linear") {
 //                trace.println("new NodeLinear(" + instance + ")");
