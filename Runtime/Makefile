@@ -8,7 +8,13 @@
 #
 CC            = gcc
 CXX           = g++
-DEFINES       = -DUNICODE 
+HOST          = $(shell hostname)
+ifeq ($(HOST), raspberrypi)
+DEFINES       = -DUNICODE -DRPI
+else
+DEFINES       = -DUNICODE
+endif
+
 CFLAGS        = -pipe -Wall -Wextra $(DEFINES) `python2.7-config --cflags`
 CXXFLAGS      = -pipe -std=c++0x -g -frtti -Wall -Wextra -fexceptions $(DEFINES) `python2.7-config --cflags`
 # INCPATH       = -I"." -I"../../protobuf-2.5.0/src"
@@ -23,7 +29,6 @@ SRCDIR       := ../Runtime
 MKDIR_P      := mkdir -p
 _dummy1      := $(shell mkdir -p debug)
 _dummy2      := $(shell mkdir -p debug/Nodes)
-
 
 DEPS         := $(SRCS:.cpp=.d)
 -include $(DEPS)
@@ -44,6 +49,7 @@ SRCS         := main.cpp \
 		Nodes/NodePython.cpp \
 		Nodes/NodeTimer.cpp \
 		Nodes/NodeServo.cpp \
+		Nodes/NodeDCMotor.cpp \
 		tinyxmlparser.cpp \
 		tinyxmlerror.cpp \
 		tinyxml.cpp \

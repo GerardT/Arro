@@ -10,7 +10,7 @@
 #include <fcntl.h>
 
 #include "NodeDb.h"
-#include "NodeServo.h"
+#include "NodeDCMotor.h"
 
 using namespace std;
 using namespace Arro;
@@ -21,7 +21,6 @@ using namespace arro;
     #define i2c_smbus_write_byte_data(file, mode, data) 1
     #define i2c_smbus_read_byte_data(file, command) 1
 #endif
-
 
 // Registers/etc.
 #define  __SUBADR1             0x02
@@ -39,10 +38,13 @@ using namespace arro;
 #define  __ALLLED_OFF_H        0xFD
 
 
-static RegisterMe<NodeServo> registerMe("Servo");
+static RegisterMe<NodeDCMotor> registerMe("Servo");
+
+
+
 
 unsigned char
-NodeServo::Servo::i2c_readU8(unsigned char command) {
+NodeDCMotor::MotorHAT::i2c_readU8(unsigned char command) {
     // Using I2C Read, equivalent of i2c_smbus_read_byte(file)
     // if (read(file, buf, 1) != 1) {
     __s32 ret  = i2c_smbus_read_byte_data(m_file, command);
@@ -56,7 +58,7 @@ NodeServo::Servo::i2c_readU8(unsigned char command) {
 }
 
 void
-NodeServo::Servo::i2c_write8(unsigned char command, unsigned short value) {
+NodeDCMotor::MotorHAT::i2c_write8(unsigned char command, unsigned short value) {
     // Using I2C Write, equivalent of
     // i2c_smbus_write_word_data(file, register, 0x6543)
 
@@ -76,7 +78,7 @@ NodeServo::Servo::i2c_write8(unsigned char command, unsigned short value) {
 }
 
 void
-NodeServo::Servo::setPWM(int channel, int on, int off) {
+NodeDCMotor::MotorHAT::setPWM(int channel, int on, int off) {
     i2c_write8(__LED0_ON_L+4*channel, on & 0xFF);
     i2c_write8(__LED0_ON_H+4*channel, on >> 8);
     i2c_write8(__LED0_OFF_L+4*channel, off & 0xFF);
@@ -84,7 +86,7 @@ NodeServo::Servo::setPWM(int channel, int on, int off) {
 }
 
 void
-NodeServo::Servo::setPWMFreq(double freq) {
+NodeDCMotor::MotorHAT::setPWMFreq(double freq) {
     m_prescaleval = 25000000.0;   // 25MHz
     m_prescaleval /= 4096.0;      // 12-bit
     m_prescaleval /= float(freq);
@@ -107,92 +109,170 @@ NodeServo::Servo::setPWMFreq(double freq) {
     i2c_write8(__MODE1, oldmode | 0x80);
 }
 
-NodeServo::Servo::Servo(int address, const char* filename):
+NodeDCMotor::MotorHAT::MotorHAT(int address, const char* filename, int freq):
     m_trace("Servo", true),
     m_prescaleval(0),
-    m_addr(address){
+    m_i2caddr(address),
+    m_frequency(freq) {
+    m_trace.println("NodeDCMotor::MotorHAT::MotorHAT");
 
     if ((m_file = open(filename,O_RDWR)) < 0) {
         m_trace.fatal("Failed to open the bus errno", errno);
     }
 
-    if (ioctl(m_file,I2C_SLAVE,m_addr) < 0) {
+    if (ioctl(m_file, I2C_SLAVE, m_i2caddr) < 0) {
         m_trace.fatal("Failed to acquire bus access and/or talk to slave");
     }
 
     /* Reseting PCA9685 */
-    i2c_smbus_write_byte_data(m_file, __MODE1, 0x00);
+    //i2c_smbus_write_byte_data(m_file, __MODE1, 0x00);
 
-    setPWMFreq(50.0);
+
+
+
+    //    self.motors = [ Adafruit_DCMotor(self, m) for m in range(4) ]
+    //    self.steppers = [ Adafruit_StepperMotor(self, 1), Adafruit_StepperMotor(self, 2) ]
+    //    self._pwm =  PWM(addr, debug=False)
+
+    setPWMFreq(m_frequency);
 
 }
 
 void
-NodeServo::Servo::start(int ch, int val) {
-    setPWM(ch, 0, val);
+NodeDCMotor::MotorHAT::setPin(int pin, int value) {
+    m_trace.println("NodeDCMotor::MotorHAT::setPin");
+
+    if ((pin < 0) or (pin > 15)) {
+        throw std::runtime_error("PWM pin must be between 0 and 15 inclusive");
+    }
+    if ((value != 0) and (value != 1)) {
+        throw std::runtime_error("Pin value must be 0 or 1!");
+    }
+    if (value == 0) {
+        setPWM(pin, 0, 4096);
+    }
+    if (value == 1) {
+        setPWM(pin, 4096, 0);
+    }
 }
 
-NodeServo::Servo* NodeServo::m_pServo = nullptr;
+
+NodeDCMotor::MotorHAT* NodeDCMotor::m_pMotorHAT = nullptr;
 
 
-NodeServo::NodeServo(Process* d, const string& /*name*/, ConfigReader::StringMap& params):
-    m_trace("NodeServo", true),
+NodeDCMotor::NodeDCMotor(Process* d, const string& /*name*/, ConfigReader::StringMap& params):
+    m_trace("NodeDCMotor", true),
     m_device(d),
-    m_previous_position(0),
-    m_actual_position(0),
-    m_ms_elapsed(0),
-    m_actual_mode("Idle"),
     m_Ch(0) {
 
-    if(!m_pServo) {
-        m_pServo = new Servo();
+    if(!m_pMotorHAT) {
+        m_pMotorHAT = new MotorHAT();
     }
 
     try {
-        m_Ch = stod(params.at("Channel"));
+        m_Ch = stod(params.at("Motor"));
+        m_Ch = 0;
     }
     catch (std::out_of_range) {
         m_trace.println("### param not found Ch ");
     }
+    int pwm;
+    int in1;
+    int in2;
+
+    if (m_Ch == 0) {
+        pwm = 8;
+        in2 = 9;
+        in1 = 10;
+    }
+    else if (m_Ch == 1) {
+        pwm = 13;
+        in2 = 12;
+        in1 = 11;
+    }
+    else if (m_Ch == 2) {
+        pwm = 2;
+        in2 = 3;
+        in1 = 4;
+    }
+    else if (m_Ch == 3) {
+        pwm = 7;
+        in2 = 6;
+        in1 = 5;
+    }
+    else
+    {
+        throw std::runtime_error("MotorHAT Motor must be between 1 and 4 inclusive");
+    }
+
+    m_PWMpin = pwm;
+    m_IN1pin = in1;
+    m_IN2pin = in2;
+
 }
 
 void
-NodeServo::handleMessage(MessageBuf* m, const std::string& padName) {
-    if(padName == "sub1") {
+NodeDCMotor::run(NodeDCMotor::MotorHAT::dir command) {
+    m_trace.println("NodeDCMotor::run");
+    if(m_pMotorHAT) {
+        if (command == MotorHAT::FORWARD) {
+            m_pMotorHAT->setPin(m_IN2pin, 0);
+            m_pMotorHAT->setPin(m_IN1pin, 1);
+        }
+        if (command == MotorHAT::BACKWARD) {
+            m_pMotorHAT->setPin(m_IN1pin, 0);
+            m_pMotorHAT->setPin(m_IN2pin, 1);
+        }
+        if (command == MotorHAT::RELEASE) {
+            m_pMotorHAT->setPin(m_IN1pin, 0);
+            m_pMotorHAT->setPin(m_IN2pin, 0);
+        }
+    }
+}
+
+void
+NodeDCMotor::setSpeed(int speed) {
+    m_trace.println("NodeDCMotor::setSpeed");
+    if (speed < 0) {
+        speed = 0;
+    }
+    if (speed > 255) {
+        speed = 255;
+    }
+    m_pMotorHAT->setPWM(m_Ch, 0, speed * 16);
+}
+
+
+
+void
+NodeDCMotor::handleMessage(MessageBuf* m, const std::string& padName) {
+    m_trace.println("NodeDCMotor::handleMessage");
+    if(padName == "speed") {
         auto msg = new Value();
         msg->ParseFromString(m->c_str());
 
         assert(msg->GetTypeName() == "arro.Value");
-        m_actual_position = ((Value*)msg)->value();
-    } else if(padName == "timer") {
-        auto msg = new Tick();
+
+        setSpeed(((Value*)msg)->value());
+
+    } else if(padName == "direction") {
+        auto msg = new Value();
         msg->ParseFromString(m->c_str());
 
-        m_trace.println(string(msg->GetTypeName()));
-        assert(msg->GetTypeName() == "arro.Tick");
-        auto tick = (Tick*)msg;
-        m_ms_elapsed = tick->ms();
+        int dir = ((Value*)msg)->value();
+        if(dir >= 0 && dir <= 4) {
+            run((MotorHAT::dir)dir);
+        }
 
-    } else if (padName == "mode") {
-        auto msg = new Mode();
-        msg->ParseFromString(m->c_str());
+        assert(msg->GetTypeName() == "arro.Value");
 
-        assert(msg->GetTypeName() == "arro.Mode");
-        m_actual_mode = ((Mode*)msg)->mode();
     } else {
         m_trace.println(string("Message received from ") + padName);
     }
 }
 
 void
-NodeServo::runCycle() {
-    m_trace.println(string("NodeServo input = ") + to_string((long double)m_actual_position));
+NodeDCMotor::runCycle() {
+    m_trace.println("NodeDCMotor::runCycle");
 
-    if(true /*actual_mode == "Active"*/
-    && m_actual_position != m_previous_position
-    && m_actual_position > 0 && m_actual_position < 400) {
-        m_pServo->start(m_Ch, 200 + (m_actual_position * 2));
-        m_previous_position = m_actual_position;
-        m_ms_elapsed /= 1000;
-    }
 }

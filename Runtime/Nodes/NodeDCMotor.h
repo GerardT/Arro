@@ -1,5 +1,5 @@
-#ifndef ARRO_NODE_SERVO_H
-#define ARRO_NODE_SERVO_H
+#ifndef ARRO_NODE_DCMOTOR_H
+#define ARRO_NODE_DCMOTOR_H
 
 
 #include <tinyxml.h>
@@ -14,7 +14,7 @@
 #include "ServerEngine.h"
 
 namespace Arro {
-    class NodeServo: public IDevice {
+    class NodeDCMotor: public IDevice {
     public:
 
         /**
@@ -24,12 +24,12 @@ namespace Arro {
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodeServo(Arro::Process* d, const std::string& name, Arro::ConfigReader::StringMap& params);
-        virtual ~NodeServo() {};
+        NodeDCMotor(Arro::Process* d, const std::string& name, Arro::ConfigReader::StringMap& params);
+        virtual ~NodeDCMotor() {};
 
         // Copy and assignment is not supported.
-        NodeServo(const NodeServo&) = delete;
-        NodeServo& operator=(const NodeServo& other) = delete;
+        NodeDCMotor(const NodeDCMotor&) = delete;
+        NodeDCMotor& operator=(const NodeDCMotor& other) = delete;
 
         /**
          * Handle a message that is sent to this node.
@@ -44,14 +44,26 @@ namespace Arro {
          */
         void runCycle();
 
-    private:
-        class Servo {
+        class MotorHAT {
         public:
-            Servo(int address = 0x40, const char* filename = "/dev/i2c-1");
-            // Servo(int address = 0x60, const char* filename = "/dev/i2c-1");
-            virtual ~Servo() {};
-            void start(int ch, int val);
+            enum dir {
+                FORWARD = 1,
+                BACKWARD = 2,
+                BRAKE = 3,
+                RELEASE = 4
+            };
+            enum step {
+                SINGLE = 1,
+                DOUBLE = 2,
+                INTERLEAVE = 3,
+                MICROSTEP = 4
+            };
 
+            MotorHAT(int address = 0x60, const char* filename = "/dev/i2c-1", int freq = 1600);
+            ~MotorHAT() {};
+            void setPin(int pin, int value);
+
+        private:
             /**
              * Read 1 byte from specified register.
              *
@@ -65,6 +77,8 @@ namespace Arro {
              * \param command Register to write to.
              */
             void i2c_write8(unsigned char command, unsigned short value);
+
+        public:
 
             /**
              * Sets a single PWM channel
@@ -82,24 +96,33 @@ namespace Arro {
              */
             void setPWMFreq(double freq);
 
+
         private:
             Trace m_trace;
             double m_prescaleval;
             char m_filename[40];
-            int m_addr;           // The I2C address
+            int m_i2caddr;           // The I2C address
+            int m_frequency;           // default @1600Hz PWM freq
             int m_file;
         };
 
+        void run(MotorHAT::dir command);
+
+        void setSpeed(int speed);
+
+        void setPin(int pin, int value);
+
+
+
         Trace m_trace;
         Process* m_device;
-        double m_previous_position;
-        double m_actual_position;
-        int m_ms_elapsed;
-        std::string m_actual_mode;
+        int m_PWMpin;
+        int m_IN1pin;
+        int m_IN2pin;
         int m_Ch;
         ConfigReader::StringMap m_params;
 
-        static Servo* m_pServo;
+        static MotorHAT* m_pMotorHAT;
     };
 }
 
