@@ -80,14 +80,14 @@ Process::runCycle() {
 }
 
 void
-Process::registerInput(const string& interfaceName, bool enableRunCycle) {
-    m_interfaceName = interfaceName;
+Process::registerInput(const string& interfName, bool enableRunCycle) {
+    //m_interfaceName = interfName;
     m_enableRunCycle = enableRunCycle;
-    m_nodeDb.registerNodeInput(this, interfaceName, [this](MessageBuf* msg) {
+    m_nodeDb.registerNodeInput(this, interfName, [this](MessageBuf* msg, const std::string& interfaceName) {
         if(m_enableRunCycle) {
             m_doRunCycle = true;
         }
-        m_device->handleMessage(msg, m_interfaceName);
+        m_device->handleMessage(msg, interfaceName);
     });
 }
 
