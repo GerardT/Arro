@@ -5,6 +5,7 @@
 #include "Trace.h"
 #include "ServerEngine.h"
 #include "NodeSfc.h"
+#include "NodeDCMotor.h"
 #include "NodePid.h"
 #include "NodePython.h"
 #include "NodePass.h"
@@ -150,6 +151,10 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
             else if(className == "Servo") {
                m_trace.println("new NodeServo(" + instance + ")");
                 m_device = new NodeServo(this, instance, params);
+            }
+            else if(className == "DCMotor") {
+               m_trace.println("new NodeDCMotor(" + instance + ")");
+                m_device = new NodeDCMotor(this, instance, params);
             }
 //            else if(className == "Linear") {
 //                trace.println("new NodeLinear(" + instance + ")");

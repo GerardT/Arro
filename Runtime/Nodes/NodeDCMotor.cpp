@@ -23,10 +23,11 @@ using namespace arro;
 #endif
 
 // Registers/etc.
+#define  __MODE1               0x00
+#define  __MODE2               0x01
 #define  __SUBADR1             0x02
 #define  __SUBADR2             0x03
 #define  __SUBADR3             0x04
-#define  __MODE1               0x00
 #define  __PRESCALE            0xFE
 #define  __LED0_ON_L           0x06
 #define  __LED0_ON_H           0x07
@@ -37,8 +38,14 @@ using namespace arro;
 #define  __ALLLED_OFF_L        0xFC
 #define  __ALLLED_OFF_H        0xFD
 
+// Bits
+#define __RESTART              0x80
+#define __SLEEP                0x10
+#define __ALLCALL              0x01
+#define __INVRT                0x10
+#define __OUTDRV               0x04
 
-static RegisterMe<NodeDCMotor> registerMe("Servo");
+static RegisterMe<NodeDCMotor> registerMe("DCMotor");
 
 
 
@@ -110,7 +117,7 @@ NodeDCMotor::MotorHAT::setPWMFreq(double freq) {
 }
 
 NodeDCMotor::MotorHAT::MotorHAT(int address, const char* filename, int freq):
-    m_trace("Servo", true),
+    m_trace("DCMotor", true),
     m_prescaleval(0),
     m_i2caddr(address),
     m_frequency(freq) {
@@ -125,7 +132,10 @@ NodeDCMotor::MotorHAT::MotorHAT(int address, const char* filename, int freq):
     }
 
     /* Reseting PCA9685 */
-    //i2c_smbus_write_byte_data(m_file, __MODE1, 0x00);
+    i2c_smbus_write_byte_data(m_file, __MODE2, __OUTDRV);
+    i2c_smbus_write_byte_data(m_file, __MODE1, __ALLCALL);
+    std::chrono::milliseconds timespan(5);
+    std::this_thread::sleep_for(timespan);
 
 
 
@@ -134,7 +144,6 @@ NodeDCMotor::MotorHAT::MotorHAT(int address, const char* filename, int freq):
     //    self.steppers = [ Adafruit_StepperMotor(self, 1), Adafruit_StepperMotor(self, 2) ]
     //    self._pwm =  PWM(addr, debug=False)
 
-    setPWMFreq(m_frequency);
 
 }
 
@@ -180,6 +189,7 @@ NodeDCMotor::NodeDCMotor(Process* d, const string& /*name*/, ConfigReader::Strin
     int in1;
     int in2;
 
+    m_trace.println(string("Init motor ") + std::to_string(m_Ch));
     if (m_Ch == 0) {
         pwm = 8;
         in2 = 9;
@@ -254,6 +264,7 @@ NodeDCMotor::handleMessage(MessageBuf* m, const std::string& padName) {
         assert(msg->GetTypeName() == "arro.Value");
 
         setSpeed(((Value*)msg)->value());
+        run(MotorHAT::FORWARD);
 
     } else if(padName == "direction") {
         auto msg = new Value();
