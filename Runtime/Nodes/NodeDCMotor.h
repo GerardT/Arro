@@ -89,6 +89,7 @@ namespace Arro {
              */
             void setPWM(int channel, int on, int off);
 
+            void setAllPWM(int on, int off);
             /**
              * Sets the PWM frequency.
              *

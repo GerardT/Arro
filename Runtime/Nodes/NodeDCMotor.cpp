@@ -33,10 +33,10 @@ using namespace arro;
 #define  __LED0_ON_H           0x07
 #define  __LED0_OFF_L          0x08
 #define  __LED0_OFF_H          0x09
-#define  __ALLLED_ON_L         0xFA
-#define  __ALLLED_ON_H         0xFB
-#define  __ALLLED_OFF_L        0xFC
-#define  __ALLLED_OFF_H        0xFD
+#define  __ALL_LED_ON_L        0xFA
+#define  __ALL_LED_ON_H        0xFB
+#define  __ALL_LED_OFF_L       0xFC
+#define  __ALL_LED_OFF_H       0xFD
 
 // Bits
 #define __RESTART              0x80
@@ -85,6 +85,15 @@ NodeDCMotor::MotorHAT::i2c_write8(unsigned char command, unsigned short value) {
 }
 
 void
+NodeDCMotor::MotorHAT::setAllPWM(int on, int off) {
+    i2c_write8(__ALL_LED_ON_L, on & 0xFF);
+    i2c_write8(__ALL_LED_ON_H, on >> 8);
+    i2c_write8(__ALL_LED_OFF_L, off & 0xFF);
+    i2c_write8(__ALL_LED_OFF_H, off >> 8);
+}
+
+
+void
 NodeDCMotor::MotorHAT::setPWM(int channel, int on, int off) {
     i2c_write8(__LED0_ON_L+4*channel, on & 0xFF);
     i2c_write8(__LED0_ON_H+4*channel, on >> 8);
@@ -106,7 +115,7 @@ NodeDCMotor::MotorHAT::setPWMFreq(double freq) {
     m_trace.println("Final pre-scale", prescale);
 
     int oldmode = i2c_readU8(__MODE1);
-    int newmode = (oldmode & 0x7F) | 0x10;  // sleep
+    int newmode = (oldmode & 0x7F) | __SLEEP;  // sleep
     i2c_write8(__MODE1, newmode);           // go to sleep
     i2c_write8(__PRESCALE, prescale);
     i2c_write8(__MODE1, oldmode);
@@ -132,11 +141,16 @@ NodeDCMotor::MotorHAT::MotorHAT(int address, const char* filename, int freq):
     }
 
     /* Reseting PCA9685 */
+    setAllPWM(0, 0);
     i2c_smbus_write_byte_data(m_file, __MODE2, __OUTDRV);
     i2c_smbus_write_byte_data(m_file, __MODE1, __ALLCALL);
     std::chrono::milliseconds timespan(5);
     std::this_thread::sleep_for(timespan);
 
+    int oldmode = i2c_readU8(__MODE1);
+    int newmode = oldmode & ~(__SLEEP);  // reset sleep
+    i2c_write8(__MODE1, newmode);
+    std::this_thread::sleep_for(timespan);
 
 
 
@@ -180,10 +194,10 @@ NodeDCMotor::NodeDCMotor(Process* d, const string& /*name*/, ConfigReader::Strin
 
     try {
         m_Ch = stod(params.at("Motor"));
-        m_Ch = 0;
     }
     catch (std::out_of_range) {
         m_trace.println("### param not found Ch ");
+        m_Ch = 0;
     }
     int pwm;
     int in1;
@@ -257,6 +271,7 @@ NodeDCMotor::setSpeed(int speed) {
 void
 NodeDCMotor::handleMessage(MessageBuf* m, const std::string& padName) {
     m_trace.println("NodeDCMotor::handleMessage");
+    m_trace.println(padName);
     if(padName == "speed") {
         auto msg = new Value();
         msg->ParseFromString(m->c_str());
