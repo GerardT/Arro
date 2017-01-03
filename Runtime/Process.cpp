@@ -5,6 +5,7 @@
 #include "Trace.h"
 #include "ServerEngine.h"
 #include "NodeSfc.h"
+#include "NodeDCMotor.h"
 #include "NodePid.h"
 #include "NodePython.h"
 #include "NodePass.h"
@@ -79,14 +80,14 @@ Process::runCycle() {
 }
 
 void
-Process::registerInput(const string& interfaceName, bool enableRunCycle) {
-    m_interfaceName = interfaceName;
+Process::registerInput(const string& interfName, bool enableRunCycle) {
+    //m_interfaceName = interfName;
     m_enableRunCycle = enableRunCycle;
-    m_nodeDb.registerNodeInput(this, interfaceName, [this](MessageBuf* msg) {
+    m_nodeDb.registerNodeInput(this, interfName, [this](MessageBuf* msg, const std::string& interfaceName) {
         if(m_enableRunCycle) {
             m_doRunCycle = true;
         }
-        m_device->handleMessage(msg, m_interfaceName);
+        m_device->handleMessage(msg, interfaceName);
     });
 }
 
@@ -149,7 +150,11 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
             }
             else if(className == "Servo") {
                m_trace.println("new NodeServo(" + instance + ")");
-                new NodeServo(this, instance, params);
+                m_device = new NodeServo(this, instance, params);
+            }
+            else if(className == "DCMotor") {
+               m_trace.println("new NodeDCMotor(" + instance + ")");
+                m_device = new NodeDCMotor(this, instance, params);
             }
 //            else if(className == "Linear") {
 //                trace.println("new NodeLinear(" + instance + ")");

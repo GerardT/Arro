@@ -26,7 +26,7 @@ PythonGlue::PythonGlue():
     /*
      * Setup for C -> Python.
      */
-    PyObject *dot = PyUnicode_FromString(".");  // Return value: New reference.
+    PyObject *dot = PyUnicode_FromString(ARRO_FOLDER);  // Return value: New reference.
     PyObject *sys = PyImport_ImportModule("sys");  // Return value: New reference.
     PyObject *path = PyObject_GetAttrString(sys, "path");  //Return value: New reference.
     PyList_Append(path, dot); // Return value: int

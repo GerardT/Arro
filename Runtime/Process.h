@@ -96,7 +96,7 @@ namespace Arro
     private:
         Trace m_trace;
         NodeDb& m_nodeDb;
-        std::string m_interfaceName;
+        //std::string m_interfaceName;
         bool m_enableRunCycle;
         IDevice* m_device;
         bool m_doRunCycle;

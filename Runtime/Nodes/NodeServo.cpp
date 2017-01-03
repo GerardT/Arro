@@ -3,7 +3,7 @@
 #include <chrono>
 #include <thread>
 #include <linux/i2c-dev.h>
-#include <linux/i2c.h>
+//#include <linux/i2c.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -16,9 +16,12 @@ using namespace std;
 using namespace Arro;
 using namespace arro;
 
-// To stub out for now
-#define i2c_smbus_write_byte_data(file, mode, data) 1
-#define i2c_smbus_read_byte_data(file, command) 1
+// To stub out
+#ifndef RPI
+    #define i2c_smbus_write_byte_data(file, mode, data) 1
+    #define i2c_smbus_read_byte_data(file, command) 1
+#endif
+
 
 // Registers/etc.
 #define  __SUBADR1             0x02

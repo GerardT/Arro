@@ -47,7 +47,8 @@ namespace Arro
              * \param l Listener
              * \param n Node to which this input is attached.
              */
-            NodeSingleInput(std::function<void (MessageBuf* m_msg)> l, AbstractNode* n): m_callback(l), m_node(n) {};
+            NodeSingleInput(const std::string& interfaceName, std::function<void (MessageBuf* m_msg, const std::string& interfaceName)> l, AbstractNode* n):
+                m_callback(l), m_node(n), m_interfaceName(interfaceName) { };
             virtual ~NodeSingleInput() {};
 
             // Copy and assignment is not supported.
@@ -62,8 +63,10 @@ namespace Arro
             void handleMessage(MessageBuf* msg);
 
         private:
-            std::function<void (MessageBuf* m_msg)> m_callback;
+            std::function<void (MessageBuf* m_msg, const std::string& interfaceName)> m_callback;
             AbstractNode* m_node;
+        public:
+            std::string m_interfaceName;
 
         };
 
@@ -177,7 +180,7 @@ namespace Arro
          * \param name Name of the interface as "node.node.interface".
          * \param n The instance of the node.
          */
-        NodeSingleInput* registerNodeInput(AbstractNode* node, const std::string& interfaceName, std::function<void (MessageBuf* m_msg)> listen);
+        NodeSingleInput* registerNodeInput(AbstractNode* node, const std::string& interfaceName, std::function<void (MessageBuf* m_msg, const std::string& interfaceName)> listen);
 
         /**
          * Register an output with the node.

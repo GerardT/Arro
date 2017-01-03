@@ -205,6 +205,9 @@ static void server()
 
             sscanf(buffer, "%s", command);
 
+            syswrap(string("mkdir -p ") + ARRO_FOLDER);
+            syswrap(string("touch ") + ARRO_FOLDER + "/arro_api.py");
+
             if(!strcmp(command, "echo"))
             {
                 trace.println(string("got line ") + buffer);
@@ -226,7 +229,9 @@ static void server()
                 int c = 0;
                 char *f;
                 sscanf(buffer+strlen(command), "%s %d", filename, &size);
-                filehandle = open(filename, O_CREAT | O_TRUNC | O_WRONLY, 0666);
+                string fullname(ARRO_FOLDER);
+                fullname += filename;
+                filehandle = open(fullname.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0666);
                 f = (char*)malloc(size);
                 while(size > 0)
                 {
@@ -247,7 +252,7 @@ static void server()
             }
             else if(!strcmp(command, "protobuf"))
             {
-                syswrap("protoc --python_out=. arro.proto");
+                syswrap(string("protoc --python_out=") + ARRO_FOLDER + " arro.proto");
                 ServerEngine::console("protobuf successful");
             }
             else if(!strcmp(command, "run"))
@@ -269,9 +274,8 @@ static void server()
                         ServerEngine::console("run successful");
                     } catch ( const std::runtime_error& e ) {
                         trace.println(string("Runtime error ") + e.what());
-                        cleanup();
 
-                        ServerEngine::console("run failed");
+                        cleanup();
                     }
                 }
             }
