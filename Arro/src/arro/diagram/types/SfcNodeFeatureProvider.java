@@ -80,7 +80,8 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 		if (context instanceof IAddContext && 
 				(context.getNewObject() instanceof ArroModule || context.getNewObject() instanceof ArroSequenceChart)) {
 			return new ArroIDAddFeature(this);
-        } else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep && context.getProperty("empty") != null) {
+        } else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep &&
+                context.getProperty(Constants.PROP_CONTEXT_KEY).equals(Constants.PROP_CONTEXT_READY_STEP)) {
             return new ReadyAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep) {
 			return new StepAddFeature(this);
