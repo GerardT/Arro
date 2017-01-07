@@ -18,8 +18,36 @@ using namespace arro;
 
 // To stub out
 #ifndef RPI
-    #define i2c_smbus_write_byte_data(file, mode, data) 1
-    #define i2c_smbus_read_byte_data(file, command) 1
+typedef signed char s8;
+typedef unsigned char u8;
+
+typedef signed short s16;
+typedef unsigned short u16;
+
+typedef signed int s32;
+typedef unsigned int u32;
+
+typedef signed long long s64;
+
+s32 i2c_smbus_read_byte(int /*client*/){
+    return 0;
+}
+s32 i2c_smbus_write_byte(int/*client*/, u8 /*value*/){
+    return 0;
+}
+s32 i2c_smbus_read_byte_data(int/*client*/, u8 /*command*/){
+    return 0;
+}
+s32 i2c_smbus_write_byte_data(int/*client*/, u8 /*command*/, u8 /*value*/){
+    return 0;
+}
+s32 i2c_smbus_read_word_data(int/*client*/, u8 /*command*/){
+    return 0;
+}
+s32 i2c_smbus_write_word_data(int/*client*/,  u8 /*command*/, u16 /*value*/){
+    return 0;
+}
+
 #endif
 
 // Registers/etc.
@@ -126,12 +154,13 @@ NodeDCMotor::MotorHAT::setPWMFreq(double freq) {
 }
 
 NodeDCMotor::MotorHAT::MotorHAT(int address, const char* filename, int freq):
-    m_trace("DCMotor", true),
+    m_trace("DCMotor", false),
     m_prescaleval(0),
     m_i2caddr(address),
     m_frequency(freq) {
     m_trace.println("NodeDCMotor::MotorHAT::MotorHAT");
 
+#ifdef RPI
     if ((m_file = open(filename,O_RDWR)) < 0) {
         m_trace.fatal("Failed to open the bus errno", errno);
     }
@@ -139,6 +168,9 @@ NodeDCMotor::MotorHAT::MotorHAT(int address, const char* filename, int freq):
     if (ioctl(m_file, I2C_SLAVE, m_i2caddr) < 0) {
         m_trace.fatal("Failed to acquire bus access and/or talk to slave");
     }
+#else
+    m_trace.println(string("Not opening") + filename);
+#endif
 
     /* Reseting PCA9685 */
     setAllPWM(0, 0);
@@ -183,7 +215,7 @@ NodeDCMotor::MotorHAT::setPin(int pin, int value) {
 NodeDCMotor::MotorHAT* NodeDCMotor::m_pMotorHAT = nullptr;
 
 
-NodeDCMotor::NodeDCMotor(Process* d, const string& /*name*/, ConfigReader::StringMap& params):
+NodeDCMotor::NodeDCMotor(Process* d, const string& /*name*/, ConfigReader::StringMap& params, TiXmlElement*):
     m_trace("NodeDCMotor", true),
     m_device(d),
     m_Ch(0) {
@@ -291,6 +323,20 @@ NodeDCMotor::handleMessage(MessageBuf* m, const std::string& padName) {
         }
 
         assert(msg->GetTypeName() == "arro.Value");
+
+    } else if(padName == "_action") {
+        auto msg = new Action();
+        msg->ParseFromString(m->c_str());
+
+        string a = msg->action();
+
+        if(a == "_terminated") {
+            m_trace.println("Received _terminated");
+            // Switch off the motor
+            run(MotorHAT::RELEASE);
+        }
+
+        assert(msg->GetTypeName() == "arro.Action");
 
     } else {
         m_trace.println(string("Message received from ") + padName);

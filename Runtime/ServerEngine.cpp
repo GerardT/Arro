@@ -96,6 +96,20 @@ static int readln(int sockfd, char* buffer, size_t n/*size*/) {
 static void cleanup()
 {
     trace.println("Cleanup");
+
+    // send "terminate" message.
+    auto act = new arro::Action();
+    act->set_action("_terminated");
+    string s = act->SerializeAsString();
+    MessageBuf msg(s);
+    free(act);
+    nodeDb->getInput(".main._action")->handleMessage(&msg);
+
+    // FIXME Now sleep 1 sec
+    std::chrono::milliseconds timespan(10000);
+    std::this_thread::sleep_for(timespan);
+
+
     if(nodeDb) {
         /* 1: stop message flow */
         trace.println("-- nodeDb");

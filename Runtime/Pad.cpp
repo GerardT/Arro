@@ -23,7 +23,7 @@ Pad::Pad(NodeDb& nodeDb, const string& /*datatype*/, const string& name):
 
     m_in = nodeDb.registerNodeInput(this, "", [this](MessageBuf* msg, const std::string&) {
         // do not put in queue but instead forward directly to target node.
-        trace.println("Pad forward ");
+        trace.println(string("Pad forward ") + this->getName());
         m_out->forwardMessage(msg);
     });
     m_out = nodeDb.registerNodeOutput(this, "");

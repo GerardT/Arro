@@ -24,7 +24,7 @@ namespace Arro {
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodeDCMotor(Arro::Process* d, const std::string& name, Arro::ConfigReader::StringMap& params);
+        NodeDCMotor(Arro::Process* d, const std::string& name, Arro::ConfigReader::StringMap& params, TiXmlElement*);
         virtual ~NodeDCMotor() {};
 
         // Copy and assignment is not supported.

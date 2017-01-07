@@ -16,11 +16,11 @@ using namespace Arro;
 using namespace arro;
 
 
-//static RegisterMe<NodeSfc> registerMe;
+static RegisterMe<NodeSfc> registerMe("_SFC");
 
-NodeSfc::NodeSfc(Process* d, TiXmlElement* elt):
+NodeSfc::NodeSfc(Process* device, const string& /*name*/, ConfigReader::StringMap& /*params*/, TiXmlElement* elt):
     m_trace{"NodeSfc", true},
-    m_process{d} {
+    m_process{device} {
 
     // Define "start" as initial step
     m_activeSteps.insert("_ready");
@@ -83,7 +83,11 @@ NodeSfc::handleMessage(MessageBuf* m, const std::string& padName) {
     auto msg = new arro::Step();
     msg->ParseFromString(m->c_str());
 
+    m_trace.println(string("SFC: ") + m_process->getName() + " received " + msg->name());
 
+
+    // m_currentInputs hold the values that have been read from input. If entry does
+    // not exist yet, add it.
     if(m_currentInputs.find(padName) == m_currentInputs.end()) {
         m_trace.println("Adding input " + padName + " msg " + msg->name());
     }
@@ -118,7 +122,7 @@ NodeSfc::runCycle() {
 #define END          10
 
 
-SfcTransition::SfcTransition(const std::string& condition, const std::string& from, const std::string& to, const NodeSfc& parent):
+SfcTransition::SfcTransition(const std::string& condition, const std::string& from, const std::string& to, NodeSfc& parent):
     m_trace{"SfcTransition", true},
     m_parent{parent},
     m_expression{condition},
@@ -132,15 +136,16 @@ SfcTransition::SfcTransition(const std::string& condition, const std::string& fr
     m_parser.addRule(SINGLE_STATE,  'n', LIST_END,     [this](const std::string& token){
                                                                                          bool ret = m_parent.hasStep(m_context.node, token);
                                                                                          if(ret) {
-                                                                                             ret = m_parent.nodeAtStep(m_context.node, token);
+                                                                                             //ret = m_parent.nodeAtStep(m_context.node, token);
                                                                                              m_trace.println("Node at step ", ret);
+                                                                                             m_context.expValue = ret;
                                                                                          }
                                                                                          return ret; });
 
     m_parser.addRule(SINGLE_STATE,  'n', SINGLE_STATE, [this](const std::string& token){
                                                                                          bool ret = m_parent.hasStep(m_context.node, token);
                                                                                          if(ret) {
-                                                                                             ret = m_parent.nodeAtStep(m_context.node, token);
+                                                                                             // ret = m_parent.nodeAtStep(m_context.node, token);
                                                                                              m_trace.println("Node at step ", ret);
                                                                                              m_context.expValue = ret;
                                                                                          }
@@ -152,6 +157,7 @@ SfcTransition::SfcTransition(const std::string& condition, const std::string& fr
     m_parser.addRule(DONE,          'o', START,        [this](const std::string&      ){ return true; });  // OR
     m_parser.addRule(DONE,          '$', END,          [this](const std::string&      ){ if(m_context.expValue) {
                                                                                              sendActions();
+                                                                                             m_parent.updateActiveStep(m_from, m_to);
                                                                                          }
                                                                                          return true; });
 

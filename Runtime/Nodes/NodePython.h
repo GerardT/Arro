@@ -20,7 +20,7 @@ namespace Arro {
          * \param className Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodePython(Process* device, const std::string& className, ConfigReader::StringMap& params);
+        NodePython(Process* device, const std::string& className, ConfigReader::StringMap& params, TiXmlElement*);
         virtual ~NodePython();
 
         // Copy and assignment is not supported.

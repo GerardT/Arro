@@ -16,7 +16,7 @@ namespace Arro {
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodePid(Process* device, const std::string& name, ConfigReader::StringMap& params);
+        NodePid(Process* device, const std::string& name, ConfigReader::StringMap& params, TiXmlElement*);
         virtual ~NodePid() {};
 
         // Copy and assignment is not supported.

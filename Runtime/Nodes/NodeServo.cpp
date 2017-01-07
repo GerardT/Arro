@@ -135,7 +135,7 @@ NodeServo::Servo::start(int ch, int val) {
 NodeServo::Servo* NodeServo::m_pServo = nullptr;
 
 
-NodeServo::NodeServo(Process* d, const string& /*name*/, ConfigReader::StringMap& params):
+NodeServo::NodeServo(Process* d, const string& /*name*/, ConfigReader::StringMap& params, TiXmlElement*):
     m_trace("NodeServo", true),
     m_device(d),
     m_previous_position(0),

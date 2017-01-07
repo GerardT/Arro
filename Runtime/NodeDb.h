@@ -219,6 +219,7 @@ namespace Arro
 
         /**
          * Get a node from its name.
+         * Note: only 'leaf' nodes are returned; others are not registered in allNodes.
          *
          * \param name Name of the node to lookup.
          *

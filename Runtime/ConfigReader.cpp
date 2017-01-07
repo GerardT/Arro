@@ -155,9 +155,36 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             sfcNode->registerInput("_action", true);
 
             // EXTRA Create an _action and _step pad in every module
-            new Pad(m_nodeDb, "Action", instance + ARRO_NAME_SEPARATOR + "_action");
-            new Pad(m_nodeDb, "Mode", instance + ARRO_NAME_SEPARATOR + "_step");
+            // If processNode != nullptr then we know a 'leaf' node is being added
+            if(!processNode) {
+                new Pad(m_nodeDb, "Action", instance + ARRO_NAME_SEPARATOR + "_action");
+                new Pad(m_nodeDb, "Mode", instance + ARRO_NAME_SEPARATOR + "_step");
 
+                // connect Pad to Sfc
+                {
+                    string from = instance + ARRO_NAME_SEPARATOR + "_action";
+
+                    string to = instanceSfc + ARRO_NAME_SEPARATOR + "_action";
+
+                    m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
+                    m_nodeDb.connect(from, to);
+                }
+                // connect Sfc to Pad
+                {
+                    string from = instanceSfc + ARRO_NAME_SEPARATOR + "_step";
+
+                    string to = instance + ARRO_NAME_SEPARATOR + "_step";
+
+                    m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
+                    m_nodeDb.connect(from, to);
+                }
+            }
+            else {
+                string from = "_action";
+                string to = "_step";
+                processNode->registerInput(from, true);
+                processNode->registerOutput(to);
+            }
         }
 
         elt = elt->NextSiblingElement("sfc");
@@ -214,6 +241,8 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
         if(datatypeAttr != nullptr && idAttr != nullptr) {
             string inst = instance + ARRO_NAME_SEPARATOR + *idAttr;
+
+            // If processNode != nullptr then we know a 'leaf' node is being added
             if(processNode) {
                 if(*inputAttr == "true") {
                     if(runAttr != nullptr && *runAttr == "true") {

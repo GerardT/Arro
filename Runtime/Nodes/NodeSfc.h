@@ -43,7 +43,7 @@ namespace Arro {
 
     class SfcTransition {
     public:
-        SfcTransition(const std::string& condition, const std::string& from, const std::string& to, const NodeSfc& parent);
+        SfcTransition(const std::string& condition, const std::string& from, const std::string& to, NodeSfc& parent);
 
         /**
          * Check if any of the transitions in this SFC can fire.
@@ -56,13 +56,15 @@ namespace Arro {
         void sendActions();
 
         void AddAction(const std::string& nodeName, const std::string& actionString) {
+            m_trace.println("Adding action " + actionString);
+
             m_actions[nodeName] = actionString;
         }
 
 
     private:
         Trace m_trace;
-        const NodeSfc& m_parent;
+        NodeSfc& m_parent;
         std::string m_expression;
         std::map<std::string, std::string> m_actions;
         std::list<Instruction> m_instrList;
@@ -88,7 +90,7 @@ namespace Arro {
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodeSfc(Process* device, TiXmlElement* elt);
+        NodeSfc(Process* d, const std::string& name, ConfigReader::StringMap& params, TiXmlElement* elt);
         virtual ~NodeSfc() {};
 
         // Copy and assignment is not supported.
@@ -118,7 +120,7 @@ namespace Arro {
          * @param sfc
          */
         void registerSfc(const std::string& name, NodeSfc* sfc) {
-            m_trace.println(std::string("Registering node ") + name);
+            m_trace.println(std::string("Registering node: ") + name);
             m_childSfc[name] = sfc;
         }
 
@@ -131,40 +133,58 @@ namespace Arro {
          * @return
          */
         bool hasStep(const std::string& nodeName, const std::string& stepName) const {
-            //std::string tmp = name;
-            m_trace.println("checking step " + nodeName);
+            m_trace.println("checking node " + nodeName);
             try {
-                NodeSfc* sfc = m_childSfc.at(nodeName);
-                for(auto it = sfc->m_steps.begin(); it != sfc->m_steps.end(); ++it) {
-                    if((*it)->getName() == stepName) {
-                        m_trace.println("good " + nodeName);
-                        return true;
+                if(nodeName == "request") {
+                    for(auto it = m_steps.begin(); it != m_steps.end(); ++it) {
+                        if((*it)->getName() == stepName) {
+                            m_trace.println("good " + nodeName);
+                            return true;
+                        }
+                    }
+                } else {
+                    NodeSfc* sfc = m_childSfc.at(nodeName);
+                    for(auto it = sfc->m_steps.begin(); it != sfc->m_steps.end(); ++it) {
+                        if((*it)->getName() == stepName) {
+                            m_trace.println("good " + nodeName);
+                            return true;
+                        }
                     }
                 }
             }
             catch (std::out_of_range) {
-                m_trace.println("Node in expression not found " + nodeName);
-                throw std::runtime_error("Node in expression not found " + nodeName);
+                m_trace.println("Node in expression not found: " + nodeName);
+                throw std::runtime_error("Node in expression not found: " + nodeName);
             }
 
-            m_trace.println("step not found " + stepName);
-            throw std::runtime_error("step not found " + stepName);
+            m_trace.println(std::string("step not found: ") + stepName + " for node: " + nodeName);
+            throw std::runtime_error(std::string("step not found: ") + stepName + " for node: " + nodeName);
             return false;
         }
 
         bool nodeAtStep(const std::string& node, const std::string& step) const {
-            std::string nodeName = /*this->m_process->getName() + ARRO_NAME_SEPARATOR +*/ "_step_" + node;
+            if(node == "request") {
+                return (m_activeSteps.find(step) != m_activeSteps.end());
+            } else {
+                std::string nodeName = /*this->m_process->getName() + ARRO_NAME_SEPARATOR +*/ "_step_" + node;
 
-            if(m_currentInputs.find(nodeName) != m_currentInputs.end()) {
-                const std::string& value = m_currentInputs.at(nodeName);
+                if(m_currentInputs.find(nodeName) != m_currentInputs.end()) {
+                    const std::string& value = m_currentInputs.at(nodeName);
 
-                return value == step;
-            }
-            // dump currentInputs
-            for(auto it = m_currentInputs.begin(); it != m_currentInputs.end(); ++it) {
-                m_trace.println("input: " + it->first + " value " + it->second);
+                    return value == step;
+                }
+                // dump currentInputs
+                for(auto it = m_currentInputs.begin(); it != m_currentInputs.end(); ++it) {
+                    m_trace.println("input: " + it->first + " value: " + it->second);
+                }
             }
             return false;
+        }
+
+        void updateActiveStep(const std::string from, const std::string to) {
+            m_activeSteps.erase(from);
+            m_activeSteps.insert(to);
+
         }
 
         const Process* getProcess() const {

@@ -14,7 +14,7 @@ static RegisterMe<NodePython> registerMe("Python");
  * Will instantiate an object of class className inside Python that
  * will be used for the lifetime of the Process.
  */
-NodePython::NodePython(Process* d, const string& className, ConfigReader::StringMap& /*params*/):
+NodePython::NodePython(Process* d, const string& className, ConfigReader::StringMap& /*params*/, TiXmlElement*):
     m_trace("NodePython", true),
     m_device(d)
 {

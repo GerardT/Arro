@@ -9,7 +9,7 @@ using namespace arro;
 
 static RegisterMe<NodePid> registerMe("pid");
 
-NodePid::NodePid(Process* d, const string& /*name*/, ConfigReader::StringMap& params):
+NodePid::NodePid(Process* d, const string& /*name*/, ConfigReader::StringMap& params, TiXmlElement*):
     m_trace("NodePid", true),
     m_device(d) {
 

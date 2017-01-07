@@ -121,20 +121,25 @@ Process::getOutput(const string& name) const {
 void
 Process::getPrimitive(const string& url, const string& instance, ConfigReader::StringMap& params, TiXmlElement* elt) {
     m_device = nullptr;
+    ServerEngine::Factory factory;
 
     if(url.find("Python:") == 0) {
         m_trace.println("new NodePython(" + instance + ")");
         try {
             string className = url.substr(7);
-            m_device = new NodePython(this, className, params);
+            if(ServerEngine::getFactory("Python", factory)) {
+                m_device = factory(this, className, params, nullptr);
+            }
         } catch(out_of_range &) {
             throw std::runtime_error("Invalid URL for Python node " + url);
         }
     } else if(url.find("Sfc:") == 0) {
+        ConfigReader::StringMap params{};
         m_trace.println("new NodeSfc(" + instance + ")");
         try {
-            //string className = url.substr(7);
-            m_device = new NodeSfc(this, elt);
+            if(ServerEngine::getFactory("_SFC", factory)) {
+                m_device = factory(this, "", params, elt);
+            }
         } catch(out_of_range &) {
             throw std::runtime_error("Invalid URL for SFC node " + url);
         }
@@ -142,37 +147,37 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
     else if(url.find("Native:") == 0) {
         try {
             string className = url.substr(7);
-            ServerEngine::Factory factory;
 
-            if(className == "pid") {
-                m_trace.println("new Pid(" + instance + ")");
-                m_device = new NodePid(this, instance, params);
-            }
-            else if(className == "Servo") {
-               m_trace.println("new NodeServo(" + instance + ")");
-                m_device = new NodeServo(this, instance, params);
-            }
-            else if(className == "DCMotor") {
-               m_trace.println("new NodeDCMotor(" + instance + ")");
-                m_device = new NodeDCMotor(this, instance, params);
-            }
+//            if(className == "pid") {
+//                m_trace.println("new Pid(" + instance + ")");
+//                m_device = new NodePid(this, instance, params, nullptr);
+//            }
+//            else if(className == "Servo") {
+//               m_trace.println("new NodeServo(" + instance + ")");
+//                m_device = new NodeServo(this, instance, params, nullptr);
+//            }
+//            else if(className == "DCMotor") {
+//               m_trace.println("new NodeDCMotor(" + instance + ")");
+//                m_device = new NodeDCMotor(this, instance, params, nullptr);
+//            }
 //            else if(className == "Linear") {
 //                trace.println("new NodeLinear(" + instance + ")");
-//                device = new NodeLinear(this, instance, params);
+//                device = new NodeLinear(this, instance, params, nullptr);
 //            }
 //            else if(className == "TsReader") {
 //                trace.println("new NodeTsReader(" + instance + ")");
-//                //device = new NodeTsReader(instance, params);
+//                //device = new NodeTsReader(instance, params, nullptr);
 //            }
 //            else if(className == "TsSection") {
 //                trace.println("new NodeTsSection(" + instance + ")");
-//                //device = new NodeTsSection(instance, params);
+//                //device = new NodeTsSection(instance, params, nullptr);
 //            }
-            else if(className == "pass") {
+//            else
+            if(className == "pass") {
             }
             else if(ServerEngine::getFactory(className, factory)) {
                 m_trace.println("new " + className + "(" + instance + ")");
-                m_device = factory(this, instance, params);
+                m_device = factory(this, instance, params, nullptr);
             }
             else {
                 m_trace.println("unknown node" + instance );
