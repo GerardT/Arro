@@ -218,7 +218,8 @@ NodeDCMotor::MotorHAT* NodeDCMotor::m_pMotorHAT = nullptr;
 NodeDCMotor::NodeDCMotor(Process* d, const string& /*name*/, ConfigReader::StringMap& params, TiXmlElement*):
     m_trace("NodeDCMotor", true),
     m_device(d),
-    m_Ch(0) {
+    m_Ch(0),
+    m_running(true) {
 
     if(!m_pMotorHAT) {
         m_pMotorHAT = new MotorHAT();
@@ -304,7 +305,7 @@ void
 NodeDCMotor::handleMessage(MessageBuf* m, const std::string& padName) {
     m_trace.println("NodeDCMotor::handleMessage");
     m_trace.println(padName);
-    if(padName == "speed") {
+    if(m_running && padName == "speed") {
         auto msg = new Value();
         msg->ParseFromString(m->c_str());
 
@@ -313,7 +314,7 @@ NodeDCMotor::handleMessage(MessageBuf* m, const std::string& padName) {
         setSpeed(((Value*)msg)->value());
         run(MotorHAT::FORWARD);
 
-    } else if(padName == "direction") {
+    } else if(m_running && padName == "direction") {
         auto msg = new Value();
         msg->ParseFromString(m->c_str());
 
@@ -332,6 +333,7 @@ NodeDCMotor::handleMessage(MessageBuf* m, const std::string& padName) {
 
         if(a == "_terminated") {
             m_trace.println("Received _terminated");
+            m_running = false;
             // Switch off the motor
             run(MotorHAT::RELEASE);
         }

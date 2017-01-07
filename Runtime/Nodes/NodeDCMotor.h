@@ -124,6 +124,8 @@ namespace Arro {
         ConfigReader::StringMap m_params;
 
         static MotorHAT* m_pMotorHAT;
+
+        bool m_running;
     };
 }
 
