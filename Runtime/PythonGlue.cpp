@@ -36,6 +36,8 @@ PythonGlue::PythonGlue():
 
     if(loadModule() == nullptr) {
         instance = nullptr;
+        // Finish the Python interpreter since destructor is not called after throwing exception.
+        Py_Finalize();
         throw std::runtime_error("Failed to load");
     }
 
@@ -59,6 +61,7 @@ PythonGlue::~PythonGlue() {
      * Cleanup for C -> Python.
      */
     // Don't Py_DECREF pDict, pDictApi.
+    Py_DECREF(m_pModuleApi);
     Py_DECREF(m_pModule);
 
     // Finish the Python Interpreter

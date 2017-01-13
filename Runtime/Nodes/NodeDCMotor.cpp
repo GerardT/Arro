@@ -312,7 +312,6 @@ NodeDCMotor::handleMessage(MessageBuf* m, const std::string& padName) {
         assert(msg->GetTypeName() == "arro.Value");
 
         setSpeed(((Value*)msg)->value());
-        run(MotorHAT::FORWARD);
 
     } else if(m_running && padName == "direction") {
         auto msg = new Value();

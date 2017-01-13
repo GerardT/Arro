@@ -97,20 +97,26 @@ static void cleanup()
 {
     trace.println("Cleanup");
 
-    // send "terminate" message.
-    auto act = new arro::Action();
-    act->set_action("_terminated");
-    string s = act->SerializeAsString();
-    MessageBuf msg(s);
-    free(act);
-    nodeDb->getInput(".main._action")->handleMessage(&msg);
-
-    // FIXME Now sleep 1 sec
-    std::chrono::milliseconds timespan(10000);
-    std::this_thread::sleep_for(timespan);
 
 
     if(nodeDb) {
+        /* 1: request change to _terminated */
+        auto input = nodeDb->getInput(".main._action");
+        if(input) {
+            // send "terminate" message.
+            auto act = new arro::Action();
+            act->set_action("_terminated");
+            string s = act->SerializeAsString();
+            MessageBuf msg(s);
+            free(act);
+
+            input->handleMessage(&msg);
+
+            // FIXME Now sleep 1 sec
+            std::chrono::milliseconds timespan(10000);
+            std::this_thread::sleep_for(timespan);
+        }
+
         /* 1: stop message flow */
         trace.println("-- nodeDb");
         nodeDb->stop();
@@ -133,6 +139,7 @@ static void cleanup()
         close(newsockfd);
         newsockfd = -1;
     }
+    trace.println("Cleanup done");
 }
 
 /**
