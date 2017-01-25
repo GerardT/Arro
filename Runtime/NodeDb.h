@@ -47,8 +47,8 @@ namespace Arro
              * \param l Listener
              * \param n Node to which this input is attached.
              */
-            NodeSingleInput(const std::string& interfaceName, std::function<void (MessageBuf* m_msg, const std::string& interfaceName)> l, AbstractNode* n):
-                m_callback(l), m_node(n), m_interfaceName(interfaceName) { };
+            NodeSingleInput(const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> l, AbstractNode* n):
+                m_callback(l), m_node(n), m_msg(new std::string()), m_interfaceName(interfaceName) { };
             virtual ~NodeSingleInput() {};
 
             // Copy and assignment is not supported.
@@ -60,11 +60,14 @@ namespace Arro
              *
              * \param msg Message to pass on.
              */
-            void handleMessage(MessageBuf* msg);
+            void handleMessage(const MessageBuf& msg);
+
+            const MessageBuf& getData() const { return m_msg; };
 
         private:
-            std::function<void (MessageBuf* m_msg, const std::string& interfaceName)> m_callback;
+            std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> m_callback;
             AbstractNode* m_node;
+            MessageBuf m_msg;
         public:
             std::string m_interfaceName;
 
@@ -103,7 +106,7 @@ namespace Arro
              *
              * \param msg Message to forward.
              */
-            void forwardMessage(MessageBuf* msg);
+            void forwardMessage(const MessageBuf& msg);
 
             /**
              * Submit a Protobuf buffer into msg queue.
@@ -132,7 +135,7 @@ namespace Arro
              * \param o NodeMultiOutput instance where to send this message to.
              * \param s Message buffer to send.
              */
-            FullMsg(NodeMultiOutput* o, MessageBuf* s);
+            FullMsg(NodeMultiOutput* o, MessageBuf& s);
             virtual ~FullMsg() {};
 
             // Copy and assignment is not supported.
@@ -141,7 +144,7 @@ namespace Arro
 
         // FIXME Should be private
             NodeMultiOutput* m_output;
-            std::string* m_msg;
+            MessageBuf m_msg;
         };
 
     public:
@@ -180,7 +183,7 @@ namespace Arro
          * \param name Name of the interface as "node.node.interface".
          * \param n The instance of the node.
          */
-        NodeSingleInput* registerNodeInput(AbstractNode* node, const std::string& interfaceName, std::function<void (MessageBuf* m_msg, const std::string& interfaceName)> listen);
+        NodeSingleInput* registerNodeInput(AbstractNode* node, const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> listen);
 
         /**
          * Register an output with the node.

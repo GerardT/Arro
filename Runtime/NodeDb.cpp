@@ -34,7 +34,8 @@ NodeDb::~NodeDb() {
 }
 
 void
-NodeDb::NodeSingleInput::handleMessage(MessageBuf* msg) {
+NodeDb::NodeSingleInput::handleMessage(const MessageBuf& msg) {
+    m_msg = msg;
     m_callback(msg, m_interfaceName);
 }
 
@@ -54,18 +55,19 @@ NodeDb::NodeMultiOutput::connectInput(NodeSingleInput* i) {
 }
 
 void
-NodeDb::NodeMultiOutput::forwardMessage(MessageBuf* msg) {
+NodeDb::NodeMultiOutput::forwardMessage(const MessageBuf& msg) {
     for_each(m_inputs.begin(), m_inputs.end(), [msg](NodeSingleInput* i) { i->handleMessage(msg); });
 }
 void
 NodeDb::NodeMultiOutput::submitMessage(google::protobuf::MessageLite* msg) {
     string s = msg->SerializeAsString();
     submitMessageBuffer(s.c_str());
+    free(msg);
 }
 
 void
 NodeDb::NodeMultiOutput::submitMessageBuffer(const char* msg) {
-    auto s = new MessageBuf(msg);
+    MessageBuf s(new string(msg));
     auto fm = new FullMsg(this, s);
 
     std::lock_guard<std::mutex> lock(m_nm->m_mutex);
@@ -97,7 +99,7 @@ NodeDb::registerNode(AbstractNode* node, const string& name) {
 
 NodeDb::NodeSingleInput*
 NodeDb::registerNodeInput(AbstractNode* node, const string& interfaceName,
-                          std::function<void (MessageBuf* msg, const std::string& interfaceName)> listen) {
+                          std::function<void (const MessageBuf& msg, const std::string& interfaceName)> listen) {
     auto n = new NodeDb::NodeSingleInput(interfaceName, listen, node);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
@@ -138,7 +140,7 @@ NodeDb::getInput(const std::string& name) {
 }
 
 
-NodeDb::FullMsg::FullMsg(NodeMultiOutput* o /*string s*/, MessageBuf* m) {
+NodeDb::FullMsg::FullMsg(NodeMultiOutput* o /*string s*/, MessageBuf& m) {
     //target = s;
     m_output = o;
     m_msg = m;
@@ -161,9 +163,9 @@ NodeDb::runCycle(NodeDb* nm) {
                     nm->m_trace.println("new msg");
                     nm->m_pInQueue->pop();
                     if(fm != nullptr) {
-                        MessageBuf* msg = fm->m_msg;
-                        fm->m_output->forwardMessage(msg);
-                        delete msg;
+                        //MessageBuf msg = fm->m_msg;
+                        fm->m_output->forwardMessage(fm->m_msg);
+                        // delete msg;
                         delete fm;
                     }
                 }

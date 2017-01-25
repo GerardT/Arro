@@ -41,7 +41,7 @@ NodeTimer::~NodeTimer() {
     timers.remove(this);
 }
 
-void NodeTimer::handleMessage(MessageBuf* m, const std::string& padName) {
+void NodeTimer::handleMessage(const MessageBuf& m, const std::string& padName) {
     if (padName == "mode") {
         Mode* msg = new Mode();
         msg->ParseFromString(m->c_str());

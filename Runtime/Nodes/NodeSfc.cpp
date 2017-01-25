@@ -77,11 +77,11 @@ NodeSfc::test() {
 
 
 void
-NodeSfc::handleMessage(MessageBuf* m, const std::string& padName) {
+NodeSfc::handleMessage(const MessageBuf& m, const std::string& padName) {
     string action_input = this->m_process->getName() + ARRO_NAME_SEPARATOR + "_action";
 
     auto msg = new arro::Step();
-    msg->ParseFromString(m->c_str());
+    msg->ParseFromString((m)->c_str());
 
     m_trace.println(string("SFC: ") + m_process->getName() + " received " + msg->name());
 

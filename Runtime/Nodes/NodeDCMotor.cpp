@@ -302,7 +302,7 @@ NodeDCMotor::setSpeed(int speed) {
 
 
 void
-NodeDCMotor::handleMessage(MessageBuf* m, const std::string& padName) {
+NodeDCMotor::handleMessage(const MessageBuf& m, const std::string& padName) {
     m_trace.println("NodeDCMotor::handleMessage");
     m_trace.println(padName);
     if(m_running && padName == "speed") {

@@ -57,10 +57,9 @@ Process::Process(NodeDb& db, const string& url, const string& instance, ConfigRe
         auto kv = new arro::KeyValuePair();
         kv->set_key(iter->first.c_str());
         kv->set_value(iter->second.c_str());
-        string s = kv->SerializeAsString();
-        MessageBuf msg(s);
+        MessageBuf msg(new string(kv->SerializeAsString()));
         free(kv);
-        m_device->handleMessage(&msg, "config");
+        m_device->handleMessage(msg, "config");
     }
 
     db.registerNode(this, instance);
@@ -70,6 +69,30 @@ Process::Process(NodeDb& db, const string& url, const string& instance, ConfigRe
 Process::~Process() {
     if(m_device) delete m_device;
 }
+
+void
+Process::sendParameters(ConfigReader::StringMap& params) {
+    std::map<std::string, std::string>::iterator iter;
+
+    auto block = new arro::ParameterBlock();
+
+    for (iter = params.begin(); iter != params.end(); ++iter) {
+        m_trace.println("    parameter " + iter->first + " " + iter->second);
+
+        auto kv = block->add_kv();
+
+        kv->set_key(iter->first.c_str());
+        kv->set_value(iter->second.c_str());
+    }
+
+    MessageBuf msg(new string(block->SerializeAsString()));
+    free(block);
+
+    // get _config input and send a message to it.
+    auto input = getInput("_config");
+    input->handleMessage(msg);
+}
+
 
 void
 Process::runCycle() {
@@ -83,7 +106,7 @@ void
 Process::registerInput(const string& interfName, bool enableRunCycle) {
     //m_interfaceName = interfName;
     m_enableRunCycle = enableRunCycle;
-    m_nodeDb.registerNodeInput(this, interfName, [this](MessageBuf* msg, const std::string& interfaceName) {
+    m_nodeDb.registerNodeInput(this, interfName, [this](const MessageBuf& msg, const std::string& interfaceName) {
         if(m_enableRunCycle) {
             m_doRunCycle = true;
         }
@@ -95,6 +118,13 @@ void
 Process::registerOutput(const string& interfaceName) {
     m_nodeDb.registerNodeOutput(this, interfaceName);
 }
+
+
+MessageBuf
+Process::getInputData(const std::string& name) const {
+    return getInput(name)->getData();
+}
+
 
 NodeDb::NodeSingleInput*
 Process::getInput(const string& name) const {

@@ -157,7 +157,7 @@ NodeServo::NodeServo(Process* d, const string& /*name*/, ConfigReader::StringMap
 }
 
 void
-NodeServo::handleMessage(MessageBuf* m, const std::string& padName) {
+NodeServo::handleMessage(const MessageBuf& m, const std::string& padName) {
     if(padName == "sub1") {
         auto msg = new Value();
         msg->ParseFromString(m->c_str());

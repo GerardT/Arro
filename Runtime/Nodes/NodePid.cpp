@@ -32,7 +32,7 @@ NodePid::NodePid(Process* d, const string& /*name*/, ConfigReader::StringMap& pa
 }
 
 void
-NodePid::handleMessage(MessageBuf* m, const std::string& padName) {
+NodePid::handleMessage(const MessageBuf& m, const std::string& padName) {
     if(padName == "actualValue") {
         Value* msg = new Value();
         msg->ParseFromString(m->c_str());

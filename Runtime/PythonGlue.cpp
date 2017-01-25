@@ -85,6 +85,28 @@ PythonGlue::getMessage(PyObject * /*self*/, PyObject *args)
     }
 }
 
+
+PyObject*
+PythonGlue::getInput(PyObject * /*self*/, PyObject *args)
+{
+    PyObject *obj;
+    const char* pad;
+
+    if(!PyArg_ParseTuple(args, "Os", &obj, &pad))  // Return value: int
+        return nullptr;
+
+    instance->m_trace.println(string("parameter padname: ") + pad);
+
+    NodePython* np = instance->m_instanceMap[obj];
+    if(!np) {
+        Py_INCREF(Py_None);
+        return Py_None;
+        //return nullptr; // FIXME: do i need to set an error?
+    } else {
+        return np->getInputData(pad);
+    }
+}
+
 PyObject*
 PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
 {
@@ -112,7 +134,8 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
  */
 static PyMethodDef ArroMethods[] = {
     {"getMessage",  PythonGlue::getMessage, METH_VARARGS, "Get a message from the queue."},
-    {"sendMessage",  PythonGlue::sendMessage, METH_VARARGS, "Send a message into the queue."},
+    {"getInput",    PythonGlue::getInput, METH_VARARGS, "Get a message from the pad."},
+    {"sendMessage", PythonGlue::sendMessage, METH_VARARGS, "Send a message into the queue."},
     {nullptr, nullptr, 0, nullptr}        /* Sentinel */
 };
 

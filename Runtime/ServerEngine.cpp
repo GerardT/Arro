@@ -106,11 +106,10 @@ static void cleanup()
             // send "terminate" message.
             auto act = new arro::Action();
             act->set_action("_terminated");
-            string s = act->SerializeAsString();
-            MessageBuf msg(s);
+            MessageBuf msg(new string(act->SerializeAsString()));
             free(act);
 
-            input->handleMessage(&msg);
+            input->handleMessage(msg);
 
             // FIXME Now sleep 1 sec
             std::chrono::milliseconds timespan(10000);

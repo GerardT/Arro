@@ -126,6 +126,13 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             // create Process object; inputs & outputs to be added later.
             processNode = new Process(m_nodeDb, *typeURL, instance, *params);
 
+            // register config not for parameter reception
+            processNode->registerInput("_config", true);
+
+            // TODO maybe find another place for this invocation..
+            processNode->sendParameters(*params);
+
+
             delete params;
         }
         elt = elt->NextSiblingElement("device");

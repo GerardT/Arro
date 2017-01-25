@@ -48,7 +48,7 @@ NodePython::~NodePython() {
  * storing in temp queue.
  */
 void
-NodePython::handleMessage(MessageBuf* msg, const string& padName) {
+NodePython::handleMessage(const MessageBuf& msg, const string& padName) {
     PyObject* tuple = Py_BuildValue("s s", padName.c_str(), msg->c_str());  // Return value: New reference.
 
     m_messages.push(tuple);
@@ -88,6 +88,18 @@ NodePython::getMessage() {
         Py_INCREF(Py_None);
         return Py_None;
     }
+}
+
+/**
+ * Python -> C. Returns a message from input.
+ */
+PyObject*
+NodePython::getInputData(const string& pad) {
+    MessageBuf data = m_device->getInputData(pad);
+
+    PyObject* tuple = Py_BuildValue("s", data->c_str());  // Return value: New reference.
+
+    return tuple;
 }
 
 /**

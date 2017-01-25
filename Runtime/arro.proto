@@ -6,6 +6,10 @@ message KeyValuePair {
     string value = 2;
 }
 
+message ParameterBlock {
+    repeated KeyValuePair kv = 1;
+}
+
 message Token {
     int32 value = 1;
 }

@@ -34,6 +34,8 @@ namespace Arro
         Process(const Process&) = delete;
         Process& operator=(const Process& other) = delete;
 
+        void sendParameters(ConfigReader::StringMap& params);
+
         void test() {
             m_device->test();
         }
@@ -58,7 +60,14 @@ namespace Arro
         virtual void registerOutput(const std::string& interfaceName);
 
         /**
-         * Lookup an input by its name, which is concatenated: "procesname.name".
+         * Lookup an input by its name, which is internally concatenated: "procesname.name".
+         *
+         * \param name Name of input.
+         */
+        MessageBuf  getInputData(const std::string& name) const;
+
+        /**
+         * Lookup an input by its name, which is internally concatenated: "procesname.name".
          *
          * \param name Name of input.
          */
