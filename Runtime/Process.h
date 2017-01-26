@@ -26,7 +26,7 @@ namespace Arro
          * \param instance Name of this instance.
          * \param params List of parameters to pass to node.
          */
-        Process(NodeDb& nodeDb, const std::string& url, const std::string& instance, ConfigReader::StringMap params, TiXmlElement* elt = nullptr);
+        Process(NodeDb& nodeDb, const std::string& url, const std::string& instance, StringMap params, TiXmlElement* elt = nullptr);
         Process(NodeDb& nodeDb, const std::string& instance);
         ~Process();
 
@@ -34,14 +34,11 @@ namespace Arro
         Process(const Process&) = delete;
         Process& operator=(const Process& other) = delete;
 
-        void sendParameters(ConfigReader::StringMap& params);
+        void sendParameters(StringMap& params);
 
         void test() {
             m_device->test();
         }
-
-        bool hasStep(const std::string& name, const std::string& step);
-
 
         /**
          * Called from ConfigReader in order to register an input Pad as input. Basically
@@ -71,14 +68,16 @@ namespace Arro
          *
          * \param name Name of input.
          */
-        NodeDb::NodeSingleInput*  getInput(const std::string& name) const;
+        NodeSingleInput*  getInput(const std::string& name) const;
 
         /**
          * Lookup an output by its name, which is concatenated: "procesname.name".
          *
          * \param name Name of output.
          */
-        NodeDb::NodeMultiOutput* getOutput(const std::string& name) const;
+        NodeMultiOutput* getOutput(const std::string& name) const;
+
+        virtual void submitMessage(std::string pad, google::protobuf::MessageLite* msg) const;
 
         /**
          * Let implementation of Process run one execution cycle. Only run a
@@ -94,7 +93,7 @@ namespace Arro
          * \param instance Node instance.
          * \param params Parameter list to pass to the node.
          */
-        void getPrimitive(const std::string& url, const std::string& instance, ConfigReader::StringMap& params, TiXmlElement* elt = nullptr);
+        void getPrimitive(const std::string& url, const std::string& instance, StringMap& params, TiXmlElement* elt = nullptr);
 
         /**
          * TODO this is not the happiest function, it is for SFC only. Should be something more elegant.

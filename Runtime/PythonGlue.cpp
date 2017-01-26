@@ -225,9 +225,9 @@ PythonGlue::captureError() {
         PyObject *item = PyList_GetItem(list, i);  // Return value: Borrowed reference.
 
 #if 0 /* Python3 */
-        ServerEngine::console(string("Python ") + PyUnicode_AsUTF8(item));
+        SendToConsole(string("Python ") + PyUnicode_AsUTF8(item));
 #else
-        ServerEngine::console(string("Python ") + PyString_AsString(item));
+        SendToConsole(string("Python ") + PyString_AsString(item));
 #endif
     }
 

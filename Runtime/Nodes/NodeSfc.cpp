@@ -2,12 +2,7 @@
 #include <vector>
 #include <exception>
 
-#include "Trace.h"
-#include "ConfigReader.h"
-#include "ServerEngine.h"
-
 #include "arro.pb.h"
-#include "NodeDb.h"
 #include "NodeSfc.h"
 
 
@@ -18,7 +13,7 @@ using namespace arro;
 
 static RegisterMe<NodeSfc> registerMe("_SFC");
 
-NodeSfc::NodeSfc(Process* device, const string& /*name*/, ConfigReader::StringMap& /*params*/, TiXmlElement* elt):
+NodeSfc::NodeSfc(AbstractNode* device, const string& /*name*/, StringMap& /*params*/, TiXmlElement* elt):
     m_trace{"NodeSfc", true},
     m_process{device} {
 
@@ -167,7 +162,7 @@ SfcTransition::SfcTransition(const std::string& condition, const std::string& fr
         m_trace.println("Parsing condition succeeded");
     }
     else {
-        ServerEngine::console(string("Parsing condition failed for ") + this->m_parent.getProcess()->getName() + ": \'" + m_expression + "\'");
+        SendToConsole(string("Parsing condition failed for ") + this->m_parent.getProcess()->getName() + ": \'" + m_expression + "\'");
         throw std::runtime_error("Parsing condition failed: \'" + m_expression + "\'");
     }
 }
@@ -190,7 +185,7 @@ SfcTransition::sendActions() {
 
         action->set_action(it->second);
 
-        m_parent.getProcess()->getOutput(string("_action_") + it->first)->submitMessage(action);
+        m_parent.getProcess()->submitMessage(string("_action_") + it->first, action);
     }
 }
 

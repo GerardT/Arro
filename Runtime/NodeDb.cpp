@@ -34,18 +34,18 @@ NodeDb::~NodeDb() {
 }
 
 void
-NodeDb::NodeSingleInput::handleMessage(const MessageBuf& msg) {
+NodeSingleInput::handleMessage(const MessageBuf& msg) {
     m_msg = msg;
     m_callback(msg, m_interfaceName);
 }
 
-NodeDb::NodeMultiOutput::NodeMultiOutput(NodeDb* n):
+NodeMultiOutput::NodeMultiOutput(NodeDb* n):
     m_nm{n},
     m_inputs{} {
 }
 
 void
-NodeDb::NodeMultiOutput::connectInput(NodeSingleInput* i) {
+NodeMultiOutput::connectInput(NodeSingleInput* i) {
     if(i) {
         m_inputs.push_back((NodeSingleInput*)i);
     }
@@ -55,20 +55,20 @@ NodeDb::NodeMultiOutput::connectInput(NodeSingleInput* i) {
 }
 
 void
-NodeDb::NodeMultiOutput::forwardMessage(const MessageBuf& msg) {
+NodeMultiOutput::forwardMessage(const MessageBuf& msg) {
     for_each(m_inputs.begin(), m_inputs.end(), [msg](NodeSingleInput* i) { i->handleMessage(msg); });
 }
 void
-NodeDb::NodeMultiOutput::submitMessage(google::protobuf::MessageLite* msg) {
+NodeMultiOutput::submitMessage(google::protobuf::MessageLite* msg) {
     string s = msg->SerializeAsString();
     submitMessageBuffer(s.c_str());
     free(msg);
 }
 
 void
-NodeDb::NodeMultiOutput::submitMessageBuffer(const char* msg) {
+NodeMultiOutput::submitMessageBuffer(const char* msg) {
     MessageBuf s(new string(msg));
-    auto fm = new FullMsg(this, s);
+    auto fm = new NodeDb::FullMsg(this, s);
 
     std::lock_guard<std::mutex> lock(m_nm->m_mutex);
     m_nm->m_pInQueue->push(fm);
@@ -97,25 +97,25 @@ NodeDb::registerNode(AbstractNode* node, const string& name) {
      return node;
 }
 
-NodeDb::NodeSingleInput*
+NodeSingleInput*
 NodeDb::registerNodeInput(AbstractNode* node, const string& interfaceName,
                           std::function<void (const MessageBuf& msg, const std::string& interfaceName)> listen) {
-    auto n = new NodeDb::NodeSingleInput(interfaceName, listen, node);
+    auto n = new NodeSingleInput(interfaceName, listen, node);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
         m_allInputs [node->getName()] = unique_ptr<NodeSingleInput>(n);
         m_trace.println(string("registering input ") + node->getName());
-        return (NodeDb::NodeSingleInput*)n;
+        return (NodeSingleInput*)n;
     } else {
         m_allInputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = unique_ptr<NodeSingleInput>(n);
         m_trace.println(("registering input ") + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
-        return (NodeDb::NodeSingleInput*)n;
+        return (NodeSingleInput*)n;
     }
 }
 
-NodeDb::NodeMultiOutput*
+NodeMultiOutput*
 NodeDb::registerNodeOutput(AbstractNode* node, const string& interfaceName) {
-    auto n = new NodeDb::NodeMultiOutput(this);
+    auto n = new NodeMultiOutput(this);
 
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
@@ -129,12 +129,12 @@ NodeDb::registerNodeOutput(AbstractNode* node, const string& interfaceName) {
     }
 }
 
-NodeDb::NodeMultiOutput*
+NodeMultiOutput*
 NodeDb::getOutput(const string& name) {
     return (NodeMultiOutput*)&(*((m_allOutputs[name])));
 }
 
-NodeDb::NodeSingleInput*
+NodeSingleInput*
 NodeDb::getInput(const std::string& name) {
     return (NodeSingleInput*)&(*(m_allInputs[name]));  // Since using unique_ptr, we have to get pointer first (*)
 }
@@ -187,7 +187,7 @@ NodeDb::runCycle(NodeDb* nm) {
         // If exception, for instance Python (syntax) error, then thread exits here.
         // User can stop NodeDb after that.
         nm->m_trace.println("Execution stopped, error " + string(e.what()));
-        ServerEngine::console(string(e.what()));
+        SendToConsole(string(e.what()));
     }
 }
 

@@ -102,7 +102,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
     if(def == nullptr)
     {
-        ServerEngine::console("Element not found: " + typeName);
+        SendToConsole("Element not found: " + typeName);
         m_trace.println("Element not found: " + typeName);
         throw std::runtime_error("Element not found: " + typeName);
     }

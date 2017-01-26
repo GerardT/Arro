@@ -5,9 +5,7 @@
 #include <list>
 #include <algorithm>
 
-#include "NodeDb.h"
 #include "NodeTimer.h"
-#include "ServerEngine.h"
 
 using namespace std;
 using namespace Arro;
@@ -22,7 +20,7 @@ static RegisterMe<NodeTimer> registerMe("Timer");
 
 
 
-NodeTimer::NodeTimer(Process* d, const string& /*name*/, ConfigReader::StringMap& params, TiXmlElement*):
+NodeTimer::NodeTimer(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodePid", true),
     m_device(d) {
 
@@ -62,7 +60,7 @@ void NodeTimer::timer () {
     tick->set_ms(ARRO_TIMEOUT /* elapsed time in ms */);
 
     try {
-        m_device->getOutput("aTick")->submitMessage(tick);
+        m_device->submitMessage("aTick", tick);
     }
     catch(runtime_error&) {
         m_trace.println("Timer failed to update");

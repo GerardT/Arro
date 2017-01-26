@@ -2,6 +2,7 @@
 #define ARRO_NODE_PASS_H
 
 #include "Trace.h"
+#include "AbstractNode.h"
 
 namespace Arro {
     class NodePass: public IDevice {
@@ -34,7 +35,7 @@ namespace Arro {
         void runCycle();
     private:
         Trace m_trace;
-        NodeDb::NodeMultiOutput* m_result;
+        NodeMultiOutput* m_result;
     };
 }
 

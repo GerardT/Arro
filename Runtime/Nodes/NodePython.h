@@ -5,9 +5,8 @@
 #include <Python.h>
 
 #include "arro.pb.h"
-#include "ConfigReader.h"
-#include "NodeDb.h"
-#include "Process.h"
+#include "Trace.h"
+#include "AbstractNode.h"
 
 
 namespace Arro {
@@ -20,7 +19,7 @@ namespace Arro {
          * \param className Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodePython(Process* device, const std::string& className, ConfigReader::StringMap& params, TiXmlElement*);
+        NodePython(AbstractNode* device, const std::string& className, StringMap& params, TiXmlElement*);
         virtual ~NodePython();
 
         // Copy and assignment is not supported.
@@ -45,8 +44,8 @@ namespace Arro {
 
     private:
         Trace m_trace;
-        ConfigReader::StringMap m_params;
-        Process* m_device;
+        StringMap m_params;
+        AbstractNode* m_device;
         PyObject *m_pFunc, *m_pValue, *m_pArgs, *m_pClass, *m_pInstance;
         std::queue<PyObject*> m_messages;
     };

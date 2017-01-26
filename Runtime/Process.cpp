@@ -36,7 +36,7 @@ Process::Process(NodeDb& db, const string& instance):
 
 }
 
-Process::Process(NodeDb& db, const string& url, const string& instance, ConfigReader::StringMap params, TiXmlElement* elt):
+Process::Process(NodeDb& db, const string& url, const string& instance, StringMap params, TiXmlElement* elt):
     AbstractNode{instance},
     m_trace{"Process", true},
     m_nodeDb{db},
@@ -71,7 +71,7 @@ Process::~Process() {
 }
 
 void
-Process::sendParameters(ConfigReader::StringMap& params) {
+Process::sendParameters(StringMap& params) {
     std::map<std::string, std::string>::iterator iter;
 
     auto block = new arro::ParameterBlock();
@@ -126,7 +126,7 @@ Process::getInputData(const std::string& name) const {
 }
 
 
-NodeDb::NodeSingleInput*
+NodeSingleInput*
 Process::getInput(const string& name) const {
     auto in = m_nodeDb.getInput(getName() + "." + name);
     if(in) {
@@ -137,7 +137,7 @@ Process::getInput(const string& name) const {
     }
 }
 
-NodeDb::NodeMultiOutput*
+NodeMultiOutput*
 Process::getOutput(const string& name) const {
     auto out = m_nodeDb.getOutput(getName() + "." + name);
     if(out) {
@@ -149,9 +149,15 @@ Process::getOutput(const string& name) const {
 }
 
 void
-Process::getPrimitive(const string& url, const string& instance, ConfigReader::StringMap& params, TiXmlElement* elt) {
+Process::submitMessage(string pad, google::protobuf::MessageLite* value) const {
+    getOutput(pad)->submitMessage(value);
+}
+
+
+void
+Process::getPrimitive(const string& url, const string& instance, StringMap& params, TiXmlElement* elt) {
     m_device = nullptr;
-    ServerEngine::Factory factory;
+    Factory factory;
 
     if(url.find("Python:") == 0) {
         m_trace.println("new NodePython(" + instance + ")");
@@ -164,7 +170,7 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
             throw std::runtime_error("Invalid URL for Python node " + url);
         }
     } else if(url.find("Sfc:") == 0) {
-        ConfigReader::StringMap params{};
+        StringMap params{};
         m_trace.println("new NodeSfc(" + instance + ")");
         try {
             if(ServerEngine::getFactory("_SFC", factory)) {
@@ -211,7 +217,7 @@ Process::getPrimitive(const string& url, const string& instance, ConfigReader::S
             }
             else {
                 m_trace.println("unknown node" + instance );
-                ServerEngine::console(string("unknown node ") + className);
+                SendToConsole(string("unknown node ") + className);
             }
         } catch(out_of_range &) {
             m_trace.println("native node not found");

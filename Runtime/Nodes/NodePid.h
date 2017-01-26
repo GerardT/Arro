@@ -2,9 +2,8 @@
 #define ARRO_NODE_PID_H
 
 #include "arro.pb.h"
-#include "ConfigReader.h"
-#include "NodeDb.h"
-#include "Process.h"
+#include "Trace.h"
+#include "AbstractNode.h"
 
 namespace Arro {
     class NodePid: public IDevice {
@@ -16,7 +15,7 @@ namespace Arro {
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodePid(Process* device, const std::string& name, ConfigReader::StringMap& params, TiXmlElement*);
+        NodePid(AbstractNode* device, const std::string& name, StringMap& params, TiXmlElement*);
         virtual ~NodePid() {};
 
         // Copy and assignment is not supported.
@@ -48,8 +47,8 @@ namespace Arro {
         double m_Kp;    // factor for "proportional" control
         double m_Ki;    // factor for "integral" control
         double m_Kd;    // factor for "derivative" control
-        ConfigReader::StringMap m_params;
-        Process* m_device;
+        StringMap m_params;
+        AbstractNode* m_device;
     };
 }
 

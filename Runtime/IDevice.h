@@ -5,8 +5,8 @@
 #include <memory>
 
 namespace Arro {
-    //typedef std::string MessageBuf;
     typedef std::shared_ptr<const std::string> MessageBuf;
+
 
     /**
      * \brief Interface to be implemented by all devices.

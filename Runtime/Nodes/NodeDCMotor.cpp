@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "NodeDb.h"
 #include "NodeDCMotor.h"
 
 using namespace std;
@@ -215,7 +214,7 @@ NodeDCMotor::MotorHAT::setPin(int pin, int value) {
 NodeDCMotor::MotorHAT* NodeDCMotor::m_pMotorHAT = nullptr;
 
 
-NodeDCMotor::NodeDCMotor(Process* d, const string& /*name*/, ConfigReader::StringMap& params, TiXmlElement*):
+NodeDCMotor::NodeDCMotor(AbstractNode* d, const string& /*name*/, Arro::StringMap& params, TiXmlElement*):
     m_trace("NodeDCMotor", true),
     m_device(d),
     m_Ch(0),

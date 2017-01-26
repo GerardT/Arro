@@ -1,7 +1,5 @@
 #include "arro.pb.h"
-#include "NodeDb.h"
 #include "NodePid.h"
-#include "ServerEngine.h"
 
 using namespace std;
 using namespace Arro;
@@ -9,7 +7,7 @@ using namespace arro;
 
 static RegisterMe<NodePid> registerMe("pid");
 
-NodePid::NodePid(Process* d, const string& /*name*/, ConfigReader::StringMap& params, TiXmlElement*):
+NodePid::NodePid(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodePid", true),
     m_device(d) {
 
@@ -93,6 +91,6 @@ NodePid::runCycle() {
 
         value->set_value(output);
 
-        m_device->getOutput("output")->submitMessage(value);
+        m_device->submitMessage("output", value);
     }
 }

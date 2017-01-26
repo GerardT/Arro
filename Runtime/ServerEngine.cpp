@@ -25,7 +25,7 @@ static int newsockfd = -1;
 static NodeDb* nodeDb = nullptr;
 static PythonGlue* pg = nullptr;
 static Trace trace("ServerEngine", true);
-static std::map<std::string, ServerEngine::Factory > m_deviceRegister;
+static std::map<std::string, Factory > m_deviceRegister;
 
 
 
@@ -215,7 +215,7 @@ static void server()
             trace.fatal("ERROR on accept");
         }
 
-        ServerEngine::console("========================");
+        SendToConsole("========================");
 
         /* If connection is established then start communicating */
         bzero(buffer,ARRO_BUFFER_SIZE);
@@ -231,7 +231,7 @@ static void server()
             if(!strcmp(command, "echo"))
             {
                 trace.println(string("got line ") + buffer);
-                ServerEngine::console("ServerEngine::console echo\n");
+                SendToConsole("ServerEngine::console echo\n");
                 break;
             }
             else if(!strcmp(command, "ls"))
@@ -263,23 +263,23 @@ static void server()
                 free(f);
                 if(c != -1)
                 {
-                    ServerEngine::console("put successful");
+                    SendToConsole("put successful");
                 }
                 else
                 {
-                    ServerEngine::console("put failed");
+                    SendToConsole("put failed");
                 }
             }
             else if(!strcmp(command, "protobuf"))
             {
                 syswrap(string("protoc --python_out=") + ARRO_FOLDER + " arro.proto");
-                ServerEngine::console("protobuf successful");
+                SendToConsole("protobuf successful");
             }
             else if(!strcmp(command, "run"))
             {
                 if(nodeDb)
                 {
-                    ServerEngine::console("run failed, engine running, terminate first");
+                    SendToConsole("run failed, engine running, terminate first");
                 }
                 else
                 {
@@ -288,10 +288,10 @@ static void server()
                         pg = new PythonGlue();
 
                         ConfigReader reader(ARRO_CONFIG_FILE, *nodeDb);
-                        ServerEngine::console("loading successful");
+                        SendToConsole("loading successful");
 
                         nodeDb->start();
-                        ServerEngine::console("run successful");
+                        SendToConsole("run successful");
                     } catch ( const std::runtime_error& e ) {
                         trace.println(string("Runtime error ") + e.what());
 
@@ -340,7 +340,7 @@ void ServerEngine::stop()
     trace.println("server completed.");
 }
 
-void ServerEngine::console(string s)
+void Arro::SendToConsole(string s)
 {
     if(newsockfd >= 0) {
         s += "\n";
@@ -348,11 +348,11 @@ void ServerEngine::console(string s)
     }
 }
 
-void ServerEngine::registerFactory(const std::string& name, ServerEngine::Factory factory) {
+void Arro::registerFactory(const std::string& name, Factory factory) {
     m_deviceRegister[name] = factory;
 }
 
-bool ServerEngine::getFactory(const std::string& name, ServerEngine::Factory& factory) {
+bool ServerEngine::getFactory(const std::string& name, Factory& factory) {
     if(m_deviceRegister.find(name) != m_deviceRegister.end()) {
         factory =  m_deviceRegister.at(name);
         return true;

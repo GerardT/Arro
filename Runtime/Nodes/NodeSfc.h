@@ -2,9 +2,8 @@
 #define ARRO_NODE_SFC_H
 
 #include "arro.pb.h"
-#include "ConfigReader.h"
-#include "NodeDb.h"
-#include "Process.h"
+#include "Trace.h"
+#include "AbstractNode.h"
 
 #include "Parser.hpp"
 
@@ -90,7 +89,7 @@ namespace Arro {
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodeSfc(Process* d, const std::string& name, ConfigReader::StringMap& params, TiXmlElement* elt);
+        NodeSfc(AbstractNode* d, const std::string& name, StringMap& params, TiXmlElement* elt);
         virtual ~NodeSfc() {};
 
         // Copy and assignment is not supported.
@@ -187,7 +186,7 @@ namespace Arro {
 
         }
 
-        const Process* getProcess() const {
+        const AbstractNode* getProcess() const {
             return m_process;
         }
 
@@ -198,7 +197,7 @@ namespace Arro {
 
     private:
         Trace m_trace;
-        Process* m_process;
+        AbstractNode* m_process;
         // List of steps for this SFC
         std::list<std::unique_ptr<SfcStep> > m_steps;
         // List of transitions for this SFC

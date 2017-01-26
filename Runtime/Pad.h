@@ -34,11 +34,22 @@ namespace Arro
          */
         void runCycle() {};
 
+        /**
+         * More dummy implementations of virtual functions.
+         */
+        virtual void registerInput(const std::string& /*interfaceName*/, bool /*enableRunCycle*/) {};
+        virtual void registerOutput(const std::string& /*interfaceName*/) {};
+        virtual MessageBuf getInputData(const std::string& /*name*/) const { return MessageBuf{}; };
+        virtual NodeSingleInput*  getInput(const std::string& /*name*/) const {return nullptr; };
+        virtual NodeMultiOutput* getOutput(const std::string& /*name*/) const {return nullptr; };
+        virtual void sendParameters(StringMap& /*params*/)  {};
+        virtual void submitMessage(std::string /*pad*/, google::protobuf::MessageLite* /*msg*/) const {};
+
     private:
         Trace trace;
-        NodeDb::NodeMultiOutput* m_result;
-        NodeDb::NodeSingleInput* m_in;
-        NodeDb::NodeMultiOutput* m_out;
+        NodeMultiOutput* m_result;
+        NodeSingleInput* m_in;
+        NodeMultiOutput* m_out;
     };
 }
 
