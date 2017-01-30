@@ -21,12 +21,12 @@ using namespace std;
 
 
 Process::Process(NodeDb& db, const string& instance):
-    AbstractNode{instance},
+    AbstractNode{},
     m_trace{"Process", true},
     m_nodeDb{db},
-    m_enableRunCycle{false},
     m_device{nullptr},
-    m_doRunCycle{false} {
+    m_doRunCycle{false},
+    m_name{instance} {
 
     m_trace.println("Creating sfc " + instance + "._sfc");
 
@@ -37,12 +37,12 @@ Process::Process(NodeDb& db, const string& instance):
 }
 
 Process::Process(NodeDb& db, const string& url, const string& instance, StringMap params, TiXmlElement* elt):
-    AbstractNode{instance},
+    AbstractNode{},
     m_trace{"Process", true},
     m_nodeDb{db},
-    m_enableRunCycle{false},
     m_device{nullptr},
-    m_doRunCycle{false} {
+    m_doRunCycle{false},
+    m_name{instance} {
 
     m_trace.println("Creating instance of " + url);
 
@@ -104,10 +104,9 @@ Process::runCycle() {
 
 void
 Process::registerInput(const string& interfName, bool enableRunCycle) {
-    //m_interfaceName = interfName;
-    m_enableRunCycle = enableRunCycle;
-    m_nodeDb.registerNodeInput(this, interfName, [this](const MessageBuf& msg, const std::string& interfaceName) {
-        if(m_enableRunCycle) {
+    // only need to capture enableRunCycle
+    m_nodeDb.registerNodeInput(this, interfName, [=](const MessageBuf& msg, const std::string& interfaceName) {
+        if(enableRunCycle) {
             m_doRunCycle = true;
         }
         m_device->handleMessage(msg, interfaceName);

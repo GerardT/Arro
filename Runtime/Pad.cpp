@@ -13,11 +13,12 @@ using namespace Arro;
  * TODO: maybe we could remove Pads and connect Process outputs directly to Process inputs.
  */
 Pad::Pad(NodeDb& nodeDb, const string& /*datatype*/, const string& name):
-    AbstractNode{name},
+    AbstractNode{},
     trace{"Pad", false},
     m_result{nullptr},
     m_in{nullptr},
-    m_out{nullptr} {
+    m_out{nullptr},
+    m_name{name} {
 
     nodeDb.registerNode(this, name);
 

@@ -101,13 +101,14 @@ namespace Arro
          */
         void registerSfc(const std::string& name, Process* sfc);
 
+        virtual const std::string& getName() const { return m_name; };
+
     private:
         Trace m_trace;
         NodeDb& m_nodeDb;
-        //std::string m_interfaceName;
-        bool m_enableRunCycle;
         IDevice* m_device;
         bool m_doRunCycle;
+        std::string m_name;
     };
 }
 

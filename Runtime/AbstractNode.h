@@ -48,27 +48,10 @@ namespace Arro
          *
          * \param n Name of the node.
          */
-        AbstractNode(const std::string& n): m_name(n) {};
+        AbstractNode() {};
         virtual ~AbstractNode() {};
 
         virtual void sendParameters(StringMap& params) = 0;
-
-// TODO move registerInput and registerOutput to ConfigReader
-        /**
-         * Called from ConfigReader in order to register an input Pad as input. Basically
-         * it installs a listener for this Pad that handles incoming messages.
-         *
-         * \param interfaceName Name of the interface to register.
-         * \param enableRunCycle Set runCycle to true every time a message is received on this interface.
-         */
-        virtual void registerInput(const std::string& interfaceName, bool enableRunCycle) = 0;
-
-        /**
-         * Called from ConfigReader in order to register an output Pad as output.
-         *
-         * \param interfaceName Name of the interface to register.
-         */
-        virtual void registerOutput(const std::string& interfaceName) = 0;
 
         /**
          * Lookup an input by its name, which is internally concatenated: "procesname.name".
@@ -98,15 +81,13 @@ namespace Arro
          *
          * \return name Name of the node.
          */
-        const std::string& getName() const { return m_name; };
+        virtual const std::string& getName() const = 0;
 
         /**
          * Make the node execute one cycle.
          */
         virtual void runCycle() = 0;
 
-    private:
-        std::string m_name;
     };
 
 
