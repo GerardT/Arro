@@ -60,7 +60,7 @@ void NodeTimer::timer () {
     tick->set_ms(ARRO_TIMEOUT /* elapsed time in ms */);
 
     try {
-        m_device->submitMessage("aTick", tick);
+        m_device->setOutputData(m_device->getOutput("aTick"), tick);
     }
     catch(runtime_error&) {
         m_trace.println("Timer failed to update");

@@ -184,8 +184,9 @@ SfcTransition::sendActions() {
         m_trace.println("Send action " + it->second + " to " + it->first);
 
         action->set_action(it->second);
+        auto p = m_parent.getProcess();
 
-        m_parent.getProcess()->submitMessage(string("_action_") + it->first, action);
+        p->setOutputData(p->getOutput(string("_action_") + it->first), action);
     }
 }
 

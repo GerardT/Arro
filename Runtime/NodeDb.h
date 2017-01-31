@@ -21,6 +21,7 @@
 #include "Trace.h"
 #include "IDevice.h"
 
+
 namespace Arro
 {
 class NodeDb;

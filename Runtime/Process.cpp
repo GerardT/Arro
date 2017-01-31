@@ -21,7 +21,7 @@ using namespace std;
 
 
 Process::Process(NodeDb& db, const string& instance):
-    AbstractNode{},
+    RealNode{},
     m_trace{"Process", true},
     m_nodeDb{db},
     m_device{nullptr},
@@ -37,7 +37,7 @@ Process::Process(NodeDb& db, const string& instance):
 }
 
 Process::Process(NodeDb& db, const string& url, const string& instance, StringMap params, TiXmlElement* elt):
-    AbstractNode{},
+    RealNode{},
     m_trace{"Process", true},
     m_nodeDb{db},
     m_device{nullptr},
@@ -120,8 +120,8 @@ Process::registerOutput(const string& interfaceName) {
 
 
 MessageBuf
-Process::getInputData(const std::string& name) const {
-    return getInput(name)->getData();
+Process::getInputData(NodeSingleInput* input) const {
+    return input->getData();
 }
 
 
@@ -148,8 +148,8 @@ Process::getOutput(const string& name) const {
 }
 
 void
-Process::submitMessage(string pad, google::protobuf::MessageLite* value) const {
-    getOutput(pad)->submitMessage(value);
+Process::setOutputData(NodeMultiOutput* output, google::protobuf::MessageLite* value) const {
+    output->submitMessage(value);
 }
 
 

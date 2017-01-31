@@ -95,7 +95,7 @@ NodePython::getMessage() {
  */
 PyObject*
 NodePython::getInputData(const string& pad) {
-    MessageBuf data = m_device->getInputData(pad);
+    MessageBuf data = m_device->getInputData(m_device->getInput(pad));
 
     PyObject* tuple = Py_BuildValue("s", data->c_str());  // Return value: New reference.
 

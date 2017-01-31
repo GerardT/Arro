@@ -9,6 +9,7 @@
 #include <google/protobuf/message.h>
 
 
+
 #define ARRO_NAME_SEPARATOR "."
 
 namespace Arro
@@ -28,25 +29,10 @@ namespace Arro
     void SendToConsole(std::string s);
 
 
-    /**
-     * \brief Abstract base class for Pad and Process.
-     *
-     * The name is the instance name: ".node.subnode.subnode"
-     *
-     * AbstractNode is the NodeDb-internal representation of a Node.
-     *
-     * A typical Eclipse diagram consists of nodes and pads. The pads are the
-     * connection points to other nodes in parent diagrams.
-     * Both pads and nodes are implemented as nodes that receive and send messages
-     * to each other. The use NodeSingleInput and NodeMultiOutput objects to connect
-     * to each other.
-     */
     class AbstractNode {
     public:
         /**
          * Constructor.
-         *
-         * \param n Name of the node.
          */
         AbstractNode() {};
         virtual ~AbstractNode() {};
@@ -54,18 +40,13 @@ namespace Arro
         virtual void sendParameters(StringMap& params) = 0;
 
         /**
-         * Lookup an input by its name, which is internally concatenated: "procesname.name".
-         *
-         * \param name Name of input.
-         */
-        virtual MessageBuf getInputData(const std::string& name) const = 0;
-
-        /**
-         * Lookup an input by its name, which is internally concatenated: "procesname.name".
+         * Lookup an input by its name, which is internally concatenated: "nodename.name".
          *
          * \param name Name of input.
          */
         virtual NodeSingleInput*  getInput(const std::string& name) const = 0;
+
+        virtual MessageBuf getInputData(NodeSingleInput* input) const = 0;
 
         /**
          * Lookup an output by its name, which is concatenated: "procesname.name".
@@ -74,7 +55,7 @@ namespace Arro
          */
         virtual NodeMultiOutput* getOutput(const std::string& name) const = 0;
 
-        virtual void submitMessage(std::string pad, google::protobuf::MessageLite* msg) const = 0;
+        virtual void setOutputData(NodeMultiOutput* output, google::protobuf::MessageLite* msg) const = 0;
 
         /**
          * Get name of the node.
@@ -84,10 +65,8 @@ namespace Arro
         virtual const std::string& getName() const = 0;
 
         /**
-         * Make the node execute one cycle.
+         * TODO add API for debugging, e.g. single step support for Timer node.
          */
-        virtual void runCycle() = 0;
-
     };
 
 

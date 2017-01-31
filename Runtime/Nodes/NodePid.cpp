@@ -91,6 +91,6 @@ NodePid::runCycle() {
 
         value->set_value(output);
 
-        m_device->submitMessage("output", value);
+        m_device->setOutputData(m_device->getOutput("output"), value);
     }
 }

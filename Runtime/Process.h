@@ -4,6 +4,7 @@
 #include "Trace.h"
 #include "ConfigReader.h"
 #include "NodeDb.h"
+#include "RealNode.h"
 
 namespace Arro
 {
@@ -15,7 +16,7 @@ namespace Arro
      * Process is for functional process nodes, Pad is for non-functional connection pads.
      * This constructor creates (depending on url) one associated IDevice derived instance.
      */
-    class Process: public AbstractNode {
+    class Process: public RealNode {
 
     public:
         /**
@@ -61,14 +62,14 @@ namespace Arro
          *
          * \param name Name of input.
          */
-        MessageBuf  getInputData(const std::string& name) const;
+        MessageBuf  getInputData(NodeSingleInput* input) const;
 
         /**
          * Lookup an input by its name, which is internally concatenated: "procesname.name".
          *
          * \param name Name of input.
          */
-        NodeSingleInput*  getInput(const std::string& name) const;
+        NodeSingleInput* getInput(const std::string& name) const;
 
         /**
          * Lookup an output by its name, which is concatenated: "procesname.name".
@@ -77,7 +78,7 @@ namespace Arro
          */
         NodeMultiOutput* getOutput(const std::string& name) const;
 
-        virtual void submitMessage(std::string pad, google::protobuf::MessageLite* msg) const;
+        virtual void setOutputData(NodeMultiOutput* output, google::protobuf::MessageLite* msg) const;
 
         /**
          * Let implementation of Process run one execution cycle. Only run a

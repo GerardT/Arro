@@ -8,6 +8,7 @@
 
 #include "ServerEngine.h"
 #include "NodeDb.h"
+#include "RealNode.h"
 #include "NodeTimer.h"
 
 
@@ -173,7 +174,10 @@ NodeDb::runCycle(NodeDb* nm) {
 
             /* Then trigger all runCycle methods on nodes */
             for(auto it = nm->m_allNodes.begin(); it != nm->m_allNodes.end(); ++it) {
-                it->second->runCycle();
+                AbstractNode* an = &(*(it->second));
+                ((RealNode*)(an))->runCycle();
+
+                //it->second->runCycle();
             }
 
             {

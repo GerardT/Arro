@@ -3,6 +3,7 @@
 
 #include "Trace.h"
 #include "NodeDb.h"
+#include "RealNode.h"
 
 namespace Arro
 {
@@ -12,7 +13,7 @@ namespace Arro
      *
      * An instance of this class will just forward messages to/from the associated node.
      */
-    class Pad: public AbstractNode {
+    class Pad: public RealNode {
     public:
 
         /**
@@ -39,11 +40,11 @@ namespace Arro
         /**
          * More dummy implementations of virtual functions.
          */
-        virtual MessageBuf getInputData(const std::string& /*name*/) const { return MessageBuf{}; };
-        virtual NodeSingleInput*  getInput(const std::string& /*name*/) const {return nullptr; };
+        virtual MessageBuf getInputData(NodeSingleInput* /*input*/) const { return MessageBuf{}; };
+        virtual NodeSingleInput* getInput(const std::string& /*name*/) const {return nullptr; };
         virtual NodeMultiOutput* getOutput(const std::string& /*name*/) const {return nullptr; };
         virtual void sendParameters(StringMap& /*params*/)  {};
-        virtual void submitMessage(std::string /*pad*/, google::protobuf::MessageLite* /*msg*/) const {};
+        virtual void setOutputData(NodeMultiOutput* /*output*/, google::protobuf::MessageLite* /*msg*/) const {};
 
     private:
         Trace trace;
