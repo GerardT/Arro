@@ -50,6 +50,7 @@ SRCS         := main.cpp \
 		Nodes/NodeTimer.cpp \
 		Nodes/NodeServo.cpp \
 		Nodes/NodeDCMotor.cpp \
+		Nodes/NodeUiOut.cpp \
 		tinyxmlparser.cpp \
 		tinyxmlerror.cpp \
 		tinyxml.cpp \
