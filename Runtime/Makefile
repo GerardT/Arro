@@ -36,6 +36,7 @@ DEPS         := $(SRCS:.cpp=.d)
 SRCS         := main.cpp \
 		Trace.cpp \
 		ServerEngine.cpp \
+		SocketClient.cpp \
 		ConfigReader.cpp \
 		NodeDb.cpp \
 		arro.pb.cpp \

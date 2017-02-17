@@ -9,6 +9,7 @@
 #include <sys/sendfile.h>  /*for sendfile()*/
 #include <fcntl.h>  /*for O_RDONLY*/
 
+#include "SocketClient.h"
 #include "ServerEngine.h"
 #include "ConfigReader.h"
 #include "NodeDb.h"
@@ -29,66 +30,6 @@ static std::map<std::string, Factory > m_deviceRegister;
 
 
 
-/**
- * Blocking read from socket until '\n' received. If socket is closed
- * then 'terminate' is returned in string buffer.
- *
- * \param sockfd File descriptor for IP socket.
- * \param buffer Buffer to return string into. May contain "terminate" if socket closed or EOF received.
- * \param n Max nr of characters to read.
- *
- * \return Actual nr of characters read.
- */
-static int readln(int sockfd, char* buffer, size_t n/*size*/) {
-    ssize_t numRead;                    /* # of bytes fetched by last read() */
-    size_t totRead;                     /* Total bytes read so far */
-    char *buf;
-    char ch;
-
-    if (n <= 0 || buffer == nullptr) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    buf = buffer;
-
-    totRead = 0;
-    for (;;) {
-        numRead = read(sockfd, &ch, 1);
-
-        if (numRead == -1) {
-            if (errno == EINTR)         /* Interrupted --> restart read() */
-                continue;
-            else {
-                // Make losing socket to terminate process.
-                trace.println("ServerEngine losing socket, terminated!");
-                strcpy(buffer, "terminate");
-                return strlen("terminate");
-            }
-
-        } else if (numRead == 0) {      /* EOF */
-            if (totRead == 0) {         /* No bytes read */
-                trace.println("ServerEngine terminated!\n");
-                strcpy(buffer, "terminate");
-                return strlen("terminate");
-            }
-            else
-                break;
-
-        } else {                        /* 'numRead' must be 1 if we get here */
-            if (totRead < n - 1) {      /* Discard > (n - 1) bytes */
-                totRead++;
-                *buf++ = ch;
-            }
-
-            if (ch == '\n')
-                break;
-        }
-    }
-
-    *buf = '\0';
-    return totRead;
-}
 
 /**
  * Cleanup after exception of terminate command.
@@ -218,8 +159,8 @@ static void server()
         SendToConsole("========================");
 
         /* If connection is established then start communicating */
-        bzero(buffer,ARRO_BUFFER_SIZE);
-        while ((n = readln( newsockfd,buffer, ARRO_BUFFER_SIZE - 1 )) != 0)
+        bzero(buffer, ARRO_BUFFER_SIZE);
+        while ((n = SocketClient::readln( newsockfd, buffer, ARRO_BUFFER_SIZE - 1 )) != 0)
         {
             trace.println(string("command: ") + buffer);
 
