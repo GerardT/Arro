@@ -52,6 +52,7 @@ SRCS         := main.cpp \
 		Nodes/NodeServo.cpp \
 		Nodes/NodeDCMotor.cpp \
 		Nodes/NodeUiOut.cpp \
+		Nodes/NodeUiReceiveNumber.cpp \
 		tinyxmlparser.cpp \
 		tinyxmlerror.cpp \
 		tinyxml.cpp \

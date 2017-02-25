@@ -15,22 +15,38 @@
 #include <sys/socket.h>    //socket
 #include <arpa/inet.h> //inet_addr
 #include <netdb.h> //hostent
+#include <mutex>
+#include <queue>
+#include <map>
 
+namespace Arro
+{
+class NodeRef;
+
+// Singleton class
 class SocketClient {
 private:
     int sock;
     struct sockaddr_in m_server;
     std::thread* m_thrd;
+    std::mutex m_mutex;
+    std::queue<std::shared_ptr<std::string>> m_stringQueue;
+
+    std::map<std::string, NodeRef*> m_clients;
 
 public:
     SocketClient(const std::string& address, int port);
     virtual ~SocketClient();
-    int getSock() { return sock; };
     bool conn(const std::string& address, int port);
-    bool send_data(std::string data);
-    static void server(SocketClient* me);
+    NodeRef* subscribe(const std::string& nodeName, std::function<void ()> listen);
+    bool getMessage(NodeRef* uiClient, std::shared_ptr<std::string>& data);
+    bool sendMessage(NodeRef* uiClient, const std::string& data);
+    void serve();
     static int readln(int sockfd, char* buffer, size_t n/*size*/);
+    static SocketClient* getInstance() { return m_inst; };
+    static SocketClient* m_inst;
 };
+}
 
 
 #endif /* SOCKETCLIENT_H_ */

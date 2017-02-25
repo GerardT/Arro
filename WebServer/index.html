@@ -7,7 +7,8 @@
     window.addEventListener("load", function() {
         
         // create websocket instance
-        var mySocket = new WebSocket("ws://localhost:8080/ws");
+        //var mySocket = new WebSocket("ws://localhost:8080/ws");
+        var mySocket = new WebSocket("ws://" + location.host + "/ws");
         
         // add event listener reacting when message is received
         mySocket.onmessage = function (event) {

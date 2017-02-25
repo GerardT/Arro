@@ -14,6 +14,7 @@
 #include "ConfigReader.h"
 #include "NodeDb.h"
 #include "Process.h"
+#include "SocketClient.h"
 
 
 using namespace Arro;
@@ -64,6 +65,11 @@ Process::Process(NodeDb& db, const string& url, const string& instance, StringMa
 
     db.registerNode(this, instance);
 
+    m_uiClient = SocketClient::getInstance()->subscribe(instance, [=]() {
+                        m_doRunCycle = true;
+                    });
+
+
 }
 
 Process::~Process() {
@@ -92,6 +98,24 @@ Process::sendParameters(StringMap& params) {
     auto input = getInput("_config");
     input->handleMessage(msg);
 }
+
+
+void
+Process::UiSend(const std::string& json) {
+    SocketClient::getInstance()->sendMessage(m_uiClient, json);
+}
+
+bool
+Process::UiReceive(std::string& json) {
+    std::shared_ptr<std::string> msg;
+    if(SocketClient::getInstance()->getMessage(m_uiClient, msg)) {
+        json = *msg;
+        return true;
+    }
+    return false;
+}
+
+
 
 
 void

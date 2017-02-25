@@ -21,16 +21,37 @@
 
 
 using namespace std;
+using namespace Arro;
+
+static void server(SocketClient* me) {
+    me->serve();
+}
+
+SocketClient* SocketClient::m_inst = nullptr;
+
+class Arro::NodeRef {
+public:
+    NodeRef(const std::string& n, std::function<void ()> l):
+        nodeName{n},
+        listen{l}
+        {};
+private:
+    string nodeName;
+    std::function<void ()> listen;
+};
 
 /**
     TCP Client class
 */
-SocketClient::SocketClient(const std::string& address, int port)
+SocketClient::SocketClient(const std::string& address, int port):
+       m_mutex{}
 {
     sock = -1;
     conn(address, port);
 
-    m_thrd = new std::thread(SocketClient::server, this);     // spawn new thread that calls server()
+    m_inst = this;
+
+    m_thrd = new std::thread(server, this);     // spawn new thread that calls server()
 }
 
 SocketClient::~SocketClient() {
@@ -39,6 +60,49 @@ SocketClient::~SocketClient() {
 
     delete m_thrd;
 }
+
+
+NodeRef*
+SocketClient::subscribe(const string& nodeName, std::function<void ()> listen) {
+    NodeRef* n = new NodeRef(nodeName, listen);
+    m_clients[nodeName] = n;
+    return n;
+}
+
+
+/**
+    Send data to the connected host
+*/
+bool
+SocketClient::sendMessage(NodeRef* uiClient, const string& data) {
+    // TODO add address to json message
+    //Send some data
+    if( send(sock , data.c_str() , strlen( data.c_str() ) , 0) < 0)
+    {
+        perror("Send failed : ");
+        return false;
+    }
+    cout<<"Data send\n";
+
+    return true;
+}
+
+bool
+SocketClient::getMessage(NodeRef* uiClient, std::shared_ptr<std::string>& data) {
+    // TODO match json message
+
+    std::unique_lock<std::mutex> lock(m_mutex);
+
+    if(!(m_stringQueue.empty())) {
+        data = m_stringQueue.front();
+        m_stringQueue.pop();
+        return true;
+    }
+
+    return false;
+}
+
+
 
 /**
     Connect to a host on a certain port number
@@ -108,35 +172,22 @@ SocketClient::conn(const std::string& address, int port) {
     return true;
 }
 
-/**
-    Send data to the connected host
-*/
-bool
-SocketClient::send_data(string data) {
-    //Send some data
-    if( send(sock , data.c_str() , strlen( data.c_str() ) , 0) < 0)
-    {
-        perror("Send failed : ");
-        return false;
-    }
-    cout<<"Data send\n";
-
-    return true;
-}
-
 void
-SocketClient::server(SocketClient* me) {
+SocketClient::serve() {
     //send some data
     char buffer[100];
     bzero(buffer, 100);
     int n;
 
-    while ((n = SocketClient::readln( me->getSock(), buffer, 100 )) != 0)
+    while ((n = SocketClient::readln( sock, buffer, 100 )) != 0)
     {
+        {
+            std::unique_lock<std::mutex> lock(m_mutex);
+
+            m_stringQueue.push(std::shared_ptr<string>(new string(buffer)));
+        }
+
         printf("buffer %s\n", buffer);
-        std::chrono::milliseconds timespan(1000);
-        std::this_thread::sleep_for(timespan);
-        me->send_data("{\"firstName\":\"Piet\",\"lastName\":\"Paaltjes\"}\n");
         if(!strcmp(buffer, "terminate")) {
             break;
         }
