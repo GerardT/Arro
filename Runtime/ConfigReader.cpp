@@ -9,6 +9,7 @@
 #include "NodeDb.h"
 #include "Pad.h"
 #include "Process.h"
+#include "SocketClient.h"
 
 
 using namespace std;
@@ -43,6 +44,8 @@ ConfigReader::ConfigReader(const string& filename, NodeDb& db):
 
     // Recursively process all modules, starting with "Main"
     makeNodeInstance("Main", "main", "", *params, nullptr);
+
+    SocketClient::getInstance()->generateWebUi();
 }
 
 ConfigReader::~ConfigReader() {

@@ -33,3 +33,7 @@ message Tick {
 message Value {
     int32 value = 1;
 }
+
+message Json {
+    string data = 1;
+}

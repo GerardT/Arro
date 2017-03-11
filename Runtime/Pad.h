@@ -30,10 +30,6 @@ namespace Arro
         Pad(const Pad&) = delete;
         Pad& operator=(const Pad& other) = delete;
 
-        virtual void UiSend(const std::string& ) {};
-
-        virtual bool UiReceive(std::string& ) { return false; };
-
         virtual const std::string& getName() const { return m_name; };
 
         /**

@@ -25,6 +25,18 @@ class NodeRef;
 
 // Singleton class
 class SocketClient {
+public:
+    SocketClient(const std::string& address, int port);
+    virtual ~SocketClient();
+    bool conn(const std::string& address, int port);
+    NodeRef* subscribe(const std::string& nodeName, std::function<void (const std::string& data)> listen);
+    void unsubscribe(NodeRef* clientId);
+    bool sendMessage(NodeRef* uiClient, const std::string& data);
+    static int readln(int sockfd, char* buffer, size_t n/*size*/);
+    void serve();
+    static SocketClient* getInstance() { return m_inst; };
+    void generateWebUi();
+
 private:
     int sock;
     struct sockaddr_in m_server;
@@ -33,17 +45,6 @@ private:
     std::queue<std::shared_ptr<std::string>> m_stringQueue;
 
     std::map<std::string, NodeRef*> m_clients;
-
-public:
-    SocketClient(const std::string& address, int port);
-    virtual ~SocketClient();
-    bool conn(const std::string& address, int port);
-    NodeRef* subscribe(const std::string& nodeName, std::function<void ()> listen);
-    bool getMessage(NodeRef* uiClient, std::shared_ptr<std::string>& data);
-    bool sendMessage(NodeRef* uiClient, const std::string& data);
-    void serve();
-    static int readln(int sockfd, char* buffer, size_t n/*size*/);
-    static SocketClient* getInstance() { return m_inst; };
     static SocketClient* m_inst;
 };
 }

@@ -1,9 +1,3 @@
-/*
- * SocketClient.cpp
- *
- *  Created on: Feb 14, 2017
- *      Author: gerard
- */
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,13 +25,14 @@ SocketClient* SocketClient::m_inst = nullptr;
 
 class Arro::NodeRef {
 public:
-    NodeRef(const std::string& n, std::function<void ()> l):
+    NodeRef(const std::string& n, std::function<void (const std::string& data)> l):
         nodeName{n},
         listen{l}
         {};
-private:
+    const string& getName() { return nodeName; };
+public:
     string nodeName;
-    std::function<void ()> listen;
+    std::function<void (const std::string& data)> listen;
 };
 
 /**
@@ -63,45 +58,47 @@ SocketClient::~SocketClient() {
 
 
 NodeRef*
-SocketClient::subscribe(const string& nodeName, std::function<void ()> listen) {
+SocketClient::subscribe(const string& nodeName, std::function<void (const std::string& data)> listen) {
     NodeRef* n = new NodeRef(nodeName, listen);
     m_clients[nodeName] = n;
     return n;
 }
 
+void
+SocketClient::unsubscribe(NodeRef* clientId) {
+    m_clients.erase(clientId->getName());
+}
+
+void
+SocketClient::generateWebUi() {
+    auto fp = fopen("ui.html", "w");
+    for(std::pair<std::string, NodeRef*> node: m_clients) {
+        fprintf(fp, "address %s", node.second->nodeName.c_str());
+
+    }
+    fclose(fp);
+}
+
 
 /**
     Send data to the connected host
+    Add address:
+    { "address" : "xyz.abc", "data" : {  ... data ...  };
+
 */
 bool
 SocketClient::sendMessage(NodeRef* uiClient, const string& data) {
-    // TODO add address to json message
-    //Send some data
-    if( send(sock , data.c_str() , strlen( data.c_str() ) , 0) < 0)
+    string newData = "{ \"address\" : \"" + uiClient->getName() + "\", \"data\" : " + data + "}";
+
+    if( send(sock , newData.c_str() , strlen( newData.c_str() ) , 0) < 0)
     {
         perror("Send failed : ");
         return false;
     }
-    cout<<"Data send\n";
+    cout<<"Data send" << newData << "\n";
 
     return true;
 }
-
-bool
-SocketClient::getMessage(NodeRef* uiClient, std::shared_ptr<std::string>& data) {
-    // TODO match json message
-
-    std::unique_lock<std::mutex> lock(m_mutex);
-
-    if(!(m_stringQueue.empty())) {
-        data = m_stringQueue.front();
-        m_stringQueue.pop();
-        return true;
-    }
-
-    return false;
-}
-
 
 
 /**
@@ -171,23 +168,56 @@ SocketClient::conn(const std::string& address, int port) {
     cout<<"Connected\n";
     return true;
 }
-
+#define BUFSIZE 1000
 void
 SocketClient::serve() {
-    //send some data
-    char buffer[100];
-    bzero(buffer, 100);
+    char buffer[BUFSIZE];
+    bzero(buffer, BUFSIZE);
     int n;
 
-    while ((n = SocketClient::readln( sock, buffer, 100 )) != 0)
+    while ((n = SocketClient::readln( sock, buffer, BUFSIZE )) != 0)
     {
         {
             std::unique_lock<std::mutex> lock(m_mutex);
 
-            m_stringQueue.push(std::shared_ptr<string>(new string(buffer)));
+
+            /*
+            Strip address:
+            { "address" : "xyz.abc", "data" : {  ... data ...  };
+
+            */
+            string tmp(buffer);
+            size_t colon = tmp.find(":");
+            size_t start_address = tmp.find("\"", colon) + 1;
+            size_t end_address = tmp.find("\"", start_address) - 1;
+            size_t start_data = tmp.find("{", end_address);
+            size_t end_data = tmp.rfind("}");
+            if(start_data < end_data && end_data < BUFSIZE) {
+                string address = tmp.substr(start_address, end_address - start_address + 1);
+
+                string data = tmp.substr(start_data, end_data - start_data);
+
+                try {
+                    NodeRef* listener = m_clients.at(address);
+
+                    listener->listen(data);
+
+                } catch (std::out_of_range) {
+
+                }
+
+                //string* data = new string(tmp.substr(start_data, end_data - start_data));
+                //m_stringQueue.push(std::shared_ptr<string>(data));
+                //printf("address %s data %s\n", address.c_str(), data->c_str());
+
+                printf("address %s data %s\n", address.c_str(), data.c_str());
+            } else {
+                printf("buffer %s\n", buffer);
+
+            }
+
         }
 
-        printf("buffer %s\n", buffer);
         if(!strcmp(buffer, "terminate")) {
             break;
         }

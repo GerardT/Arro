@@ -65,10 +65,6 @@ Process::Process(NodeDb& db, const string& url, const string& instance, StringMa
 
     db.registerNode(this, instance);
 
-    m_uiClient = SocketClient::getInstance()->subscribe(instance, [=]() {
-                        m_doRunCycle = true;
-                    });
-
 
 }
 
@@ -98,24 +94,6 @@ Process::sendParameters(StringMap& params) {
     auto input = getInput("_config");
     input->handleMessage(msg);
 }
-
-
-void
-Process::UiSend(const std::string& json) {
-    SocketClient::getInstance()->sendMessage(m_uiClient, json);
-}
-
-bool
-Process::UiReceive(std::string& json) {
-    std::shared_ptr<std::string> msg;
-    if(SocketClient::getInstance()->getMessage(m_uiClient, msg)) {
-        json = *msg;
-        return true;
-    }
-    return false;
-}
-
-
 
 
 void
@@ -207,31 +185,6 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
         try {
             string className = url.substr(7);
 
-//            if(className == "pid") {
-//                m_trace.println("new Pid(" + instance + ")");
-//                m_device = new NodePid(this, instance, params, nullptr);
-//            }
-//            else if(className == "Servo") {
-//               m_trace.println("new NodeServo(" + instance + ")");
-//                m_device = new NodeServo(this, instance, params, nullptr);
-//            }
-//            else if(className == "DCMotor") {
-//               m_trace.println("new NodeDCMotor(" + instance + ")");
-//                m_device = new NodeDCMotor(this, instance, params, nullptr);
-//            }
-//            else if(className == "Linear") {
-//                trace.println("new NodeLinear(" + instance + ")");
-//                device = new NodeLinear(this, instance, params, nullptr);
-//            }
-//            else if(className == "TsReader") {
-//                trace.println("new NodeTsReader(" + instance + ")");
-//                //device = new NodeTsReader(instance, params, nullptr);
-//            }
-//            else if(className == "TsSection") {
-//                trace.println("new NodeTsSection(" + instance + ")");
-//                //device = new NodeTsSection(instance, params, nullptr);
-//            }
-//            else
             if(className == "pass") {
             }
             else if(ServerEngine::getFactory(className, factory)) {

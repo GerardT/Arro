@@ -9,7 +9,6 @@
 namespace Arro
 {
     class NodeSfc;
-    class NodeRef;
 
     /**
      * \brief Process, like Pad, implements AbstractNode.
@@ -41,10 +40,6 @@ namespace Arro
         void test() {
             m_device->test();
         }
-
-        virtual void UiSend(const std::string& json);
-
-        virtual bool UiReceive(std::string& json);
 
         /**
          * Called from ConfigReader in order to register an input Pad as input. Basically
@@ -115,7 +110,6 @@ namespace Arro
         IDevice* m_device;
         bool m_doRunCycle;
         std::string m_name;
-        NodeRef* m_uiClient;
     };
 }
 

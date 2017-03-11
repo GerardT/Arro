@@ -37,10 +37,6 @@ namespace Arro
         AbstractNode() {};
         virtual ~AbstractNode() {};
 
-        virtual void UiSend(const std::string& json) = 0;
-
-        virtual bool UiReceive(std::string& json) = 0;
-
         virtual void sendParameters(StringMap& params) = 0;
 
         /**
