@@ -34,7 +34,13 @@ public class ReadyAddFeature extends AbstractAddFeature implements
         
         ArroStep addedDomainObject = (ArroStep)obj;
         
-        addedDomainObject.setName("_ready");
+        if(context.getProperty(Constants.PROP_CONTEXT_NAME_KEY) == null) {
+            return null;
+        }
+                
+        String name = (String) context.getProperty(Constants.PROP_CONTEXT_NAME_KEY);
+        
+        addedDomainObject.setName(name);
 
         ContainerShape containerShape = new StepHelper().create(context, addedDomainObject, manageColor(Constants.CLASS_FOREGROUND), manageColor(Constants.CLASS_BACKGROUND));
 

@@ -47,10 +47,11 @@ public class Constants {
 	public final static String PROP_PAD_INPUT_KEY = "pad_input";
 	
     // Context types - Key
-    public final static String PROP_CONTEXT_KEY = "context";
+    public final static String PROP_CONTEXT_NAME_KEY = "context_name";
     
     // Pictogram types - Values
-    public final static String PROP_CONTEXT_READY_STEP = "_ready_step";
+    public final static String PROP_CONTEXT_READY_STEP = "_ready";
+    public final static String PROP_CONTEXT_TERM_STEP = "_terminated";
     
     // Pictogram types - Key
     public final static String PROP_PICT_KEY = "pictogram";

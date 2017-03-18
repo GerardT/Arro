@@ -66,6 +66,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
     private ArroDevice device;
     private ArroSequenceChart stateNode;
     private ArroStep readyStep;
+    private ArroStep termStep;
 
 
     /**
@@ -149,8 +150,10 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
         stateNode = new ArroSequenceChart();
         nodeDiagram.setStateDiagram(stateNode);
         readyStep = new ArroStep();
+        termStep = new ArroStep();
         try {
             stateNode.addState(readyStep);
+            stateNode.addState(termStep);
         } catch (ExecutionException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -350,7 +353,16 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
         context = new AddContext();  
         context.setNewObject(readyStep);
         context.setTargetContainer(diagram);
-        context.putProperty(Constants.PROP_CONTEXT_KEY, Constants.PROP_CONTEXT_READY_STEP);
+        context.putProperty(Constants.PROP_CONTEXT_NAME_KEY, Constants.PROP_CONTEXT_READY_STEP);
+        
+        f = dtp.getFeatureProvider().getAddFeature(context);
+        f.add(context);
+
+        // Create '_terminated' step in diagram, calling .
+        context = new AddContext();  
+        context.setNewObject(termStep);
+        context.setTargetContainer(diagram);
+        context.putProperty(Constants.PROP_CONTEXT_NAME_KEY, Constants.PROP_CONTEXT_TERM_STEP);
         
         f = dtp.getFeatureProvider().getAddFeature(context);
         f.add(context);
@@ -366,7 +378,8 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
                 "<module id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
                 "    <device id=\"" + device.getId() + "\" url=\"" + language + ":" + diagramName + "\"/>\n" +
                 "    <sfc id=\"" + stateNode.getId() + "\" name=\"_sfc\" type=\"_Sfc\">\n" +
-                "        <step id=\"" + readyStep.getId() + "\" name=\"_ready\"/>" +
+                "        <step id=\"" + readyStep.getId() + "\" name=\"" + Constants.PROP_CONTEXT_READY_STEP + "\"/>" +
+                "        <step id=\"" + termStep.getId() + "\" name=\"" + Constants.PROP_CONTEXT_TERM_STEP + "\"/>" +
                 "    </sfc>\n" +
                 "</module>\n";
         return new ByteArrayInputStream(contents.getBytes());

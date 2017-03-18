@@ -70,7 +70,7 @@ public class SfcLeafFeatureProvider extends DefaultFeatureProvider {
 				(context.getNewObject() instanceof ArroModule || context.getNewObject() instanceof ArroSequenceChart)) {
 			return new ArroIDAddFeature(this);
         } else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep &&
-                context.getProperty(Constants.PROP_CONTEXT_KEY).equals(Constants.PROP_CONTEXT_READY_STEP)) {
+                context.getProperty(Constants.PROP_CONTEXT_NAME_KEY) != null) {
             return new ReadyAddFeature(this);
         } else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep) {
             return new StepAddFeature(this);

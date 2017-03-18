@@ -53,7 +53,11 @@ public class StepHelper {
         // the width needed for the anchor
         invisibleRectangle = gaService.createInvisibleRectangle(containerShape);
         {
-            gaService.setLocationAndSize(invisibleRectangle, context.getX(), context.getY(), width, height);
+            if(addedDomainObject.getName().equalsIgnoreCase(Constants.PROP_CONTEXT_TERM_STEP)) {
+                gaService.setLocationAndSize(invisibleRectangle, context.getX(), context.getY() + 200, width, height);
+            } else {
+                gaService.setLocationAndSize(invisibleRectangle, context.getX(), context.getY(), width, height);
+            }
         }
 
 		{
