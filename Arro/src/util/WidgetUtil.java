@@ -2,13 +2,17 @@ package util;
 
 import java.util.HashMap;
 
+import org.eclipse.draw2d.ChopboxAnchor;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
+import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.Text;
+import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
@@ -64,19 +68,32 @@ public class WidgetUtil {
 	    return null;
 	}
 
-	public static RoundedRectangle getRoundedRectangle(ContainerShape cs) {
-		GraphicsAlgorithm invisibleRectangle = cs.getGraphicsAlgorithm();
-		
-		EList<GraphicsAlgorithm> list = invisibleRectangle.getGraphicsAlgorithmChildren();
-		
-		for(GraphicsAlgorithm innerGa: list) {
-			if (innerGa instanceof RoundedRectangle) {
-				return (RoundedRectangle) innerGa;
-			}
-		}
-		return null;
-	}
-	
+    public static RoundedRectangle getRoundedRectangle(ContainerShape cs) {
+        GraphicsAlgorithm invisibleRectangle = cs.getGraphicsAlgorithm();
+        
+        EList<GraphicsAlgorithm> list = invisibleRectangle.getGraphicsAlgorithmChildren();
+        
+        for(GraphicsAlgorithm innerGa: list) {
+            if (innerGa instanceof RoundedRectangle) {
+                return (RoundedRectangle) innerGa;
+            }
+        }
+        return null;
+    }
+    
+    public static Ellipse getEllipse(ContainerShape cs) {
+        GraphicsAlgorithm invisibleRectangle = cs.getGraphicsAlgorithm();
+        
+        EList<GraphicsAlgorithm> list = invisibleRectangle.getGraphicsAlgorithmChildren();
+        
+        for(GraphicsAlgorithm innerGa: list) {
+            if (innerGa instanceof RoundedRectangle) {
+                return (Ellipse) innerGa;
+            }
+        }
+        return null;
+    }
+    
 	public static Polyline getSeparator(ContainerShape cs) {
 		GraphicsAlgorithm invisibleRectangle = cs.getGraphicsAlgorithm();
 		
@@ -113,25 +130,41 @@ public class WidgetUtil {
 	    return pads;
 	}
 	
-	/**
-	 * Get the parent shape of the anchor.
-	 * 
-	 * @param anchor
-	 * @return
-	 */
-	public static ContainerShape getCsFromAnchor(BoxRelativeAnchor anchor) {
-		AnchorContainer cont = anchor.getParent();
-		EObject main = cont.eContainer();
-		if(main instanceof Diagram /* FIXME this is to make ArroPad work */) {
-			return (ContainerShape) cont;
-		} else {
-			if(main instanceof ContainerShape) {
-				return (ContainerShape)main;
-			}
-		}
+    /**
+     * Get the parent shape of the anchor.
+     * 
+     * @param anchor
+     * @return
+     */
+    public static ContainerShape getCsFromAnchor(BoxRelativeAnchor anchor) {
+        AnchorContainer cont = anchor.getParent();
+        EObject main = cont.eContainer();
+        if(main instanceof Diagram /* FIXME this is to make ArroPad work */) {
+            return (ContainerShape) cont;
+        } else {
+            if(main instanceof ContainerShape) {
+                return (ContainerShape)main;
+            }
+        }
         Logger.out.trace(Logger.ERROR, "Couldn't find parent container");
 
-		return null;
-	}
-	
+        return null;
+    }
+    
+    public static ContainerShape getCsFromChopBoxAnchor(ChopboxAnchor anchor) {
+        AnchorContainer cont = ((Anchor) anchor).getParent();
+        EObject main = cont.eContainer();
+        if(main instanceof Diagram /* FIXME this is to make ArroPad work */) {
+            return (ContainerShape) cont;
+        } else {
+            if(main instanceof ContainerShape) {
+                return (ContainerShape)main;
+            }
+        }
+        Logger.out.trace(Logger.ERROR, "Couldn't find parent container");
+
+        return null;
+    }
+    
+    
 }

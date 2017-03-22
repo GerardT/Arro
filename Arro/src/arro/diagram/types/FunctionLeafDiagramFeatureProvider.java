@@ -64,14 +64,8 @@ public class FunctionLeafDiagramFeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
-		/* original
-		return new ICreateFeature[] {new ArroNodeCreateFeature(this)};
-		*/
-		ICreateFeature[] features = new ICreateFeature[0];
-		
-		// Add 1 Create...features 1 right side of screen.
-		// FIXME: remove this
-		return features;
+        // Nodes are only 'created' by dragging into diagram.
+        return new ICreateFeature[] {};
 	}
 	
 	@Override

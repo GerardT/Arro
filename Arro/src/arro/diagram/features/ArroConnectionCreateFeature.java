@@ -106,6 +106,7 @@ public class ArroConnectionCreateFeature extends AbstractCreateConnectionFeature
 	public Connection create(ICreateConnectionContext context) {
 		Connection newConnection = null;
 
+        // TODO see also ArroTransitionCreateFeature -> model object created, which is better?
 		Object newDomainObjectConnection = null;
 
         AddConnectionContext addContext = new AddConnectionContext(context.getSourceAnchor(), context.getTargetAnchor());

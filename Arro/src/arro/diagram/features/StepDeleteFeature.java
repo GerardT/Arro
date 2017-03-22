@@ -29,7 +29,7 @@ public class StepDeleteFeature extends DefaultDeleteFeature implements ICustomUn
 
             if (eObject.length != 0 && eObject[0] instanceof ArroStep) {
                 ArroStep step = (ArroStep) eObject[0];
-                if(step.getName().equals("_ready")) {
+                if(step.getName().equals("_ready")|| step.getName().equals("_terminated")) {
                     return false;
                 }
             }

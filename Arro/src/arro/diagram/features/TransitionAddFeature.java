@@ -32,7 +32,7 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
 	}
 
 	/**
-	 * Called when a State is added to the diagram.
+	 * Called when a Transition is added to the diagram.
 	 */
 	public PictogramElement add(IAddContext context) {
         
@@ -43,14 +43,18 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
         }
         ArroModule domainModule =  ((StateDiagramEditor)dc).getDomainModule();
         
+        // instead of this
   		Object obj = context.getNewObject();
 		
         if(!(obj instanceof ArroTransition)) {
         	return null;
         }
         
-      ArroTransition addedDomainObject = (ArroTransition)obj;
-//        ArroTransition addedDomainObject = new ArroTransition();
+        ArroTransition addedDomainObject = (ArroTransition)obj;
+        // we could do this
+        // ArroTransition addedDomainObject = new ArroTransition();
+        
+        // TODO not right to use names here, names may change..
         addedDomainObject.setSource((String) context.getProperty(Constants.PROP_SOURCE_PAD_KEY));
         addedDomainObject.setTarget((String) context.getProperty(Constants.PROP_TARGET_PAD_KEY));
 
@@ -73,17 +77,7 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
             e.printStackTrace();
         }
         
-	    // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
 		link(connection, addedDomainObject);
-		
-//		// After PE was linked to domain object..
-//
-//        // To set location and size.
-//	    LayoutContext layoutContext = new LayoutContext(containerShape);
-//	    ILayoutFeature layoutFeature = getFeatureProvider().getLayoutFeature(layoutContext);
-//	    layoutFeature.layout(layoutContext);
-//
-
 		
 		return connection;
 	}

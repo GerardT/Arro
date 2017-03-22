@@ -37,7 +37,6 @@ import arro.diagram.features.ArroConnectionCreateFeature;
 import arro.diagram.features.ArroConnectionDeleteFeature;
 import arro.diagram.features.ArroIDAddFeature;
 import arro.diagram.features.ArroNodeAddFeature;
-import arro.diagram.features.ArroNodeCreateFeature;
 import arro.diagram.features.ArroNodeDeleteFeature;
 import arro.diagram.features.ArroNodeLayoutFeature;
 import arro.diagram.features.ArroNodeUpdateFeature;
@@ -66,15 +65,8 @@ public class FunctionNodeDiagramFeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
-		/* original
-		return new ICreateFeature[] {new ArroNodeCreateFeature(this)};
-		*/
-		ICreateFeature[] features = new ICreateFeature[1];
-		
-		// Add 1 Create...features 1 right side of screen.
-		// FIXME: remove this
-		features[0] = new ArroNodeCreateFeature(this);
-		return features;
+        // Nodes are only 'created' by dragging into diagram.
+        return new ICreateFeature[] {};
 	}
 	
 	@Override

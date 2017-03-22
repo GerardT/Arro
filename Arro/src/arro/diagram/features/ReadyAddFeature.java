@@ -11,7 +11,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import arro.Constants;
 import arro.domain.ArroStep;
 
-
+// Ready steps are standard steps _ready and _terminated.
 public class ReadyAddFeature extends AbstractAddFeature implements
 		IAddFeature {
 
