@@ -12,7 +12,7 @@ import arro.Constants;
 //  <>                    Anchor
 //     <              >   Text
 
-public class ArroNodeAnchorPosition {
+public class NodeAnchorPosition {
 	boolean isLeft;
 	int index;
 	GraphicsAlgorithm rect;
@@ -20,7 +20,7 @@ public class ArroNodeAnchorPosition {
 	// This is the size of the small (invisible) rectangle surrounding anchor + anchor text.
 	private static final int ANCHOR_BOX_WIDTH = 80;
 	
-	ArroNodeAnchorPosition(GraphicsAlgorithm rect, boolean isLeft, int index) {
+	NodeAnchorPosition(GraphicsAlgorithm rect, boolean isLeft, int index) {
 		this.isLeft = isLeft;
 		this.index = index;
 		this.rect = rect;

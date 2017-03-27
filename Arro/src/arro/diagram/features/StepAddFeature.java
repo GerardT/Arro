@@ -56,7 +56,7 @@ public class StepAddFeature extends AbstractAddFeature implements IAddFeature, I
         }
         addedDomainObject.setName(instanceName);
 
-		ContainerShape containerShape = new StepHelper().create(context, addedDomainObject, manageColor(Constants.CLASS_FOREGROUND), manageColor(Constants.CLASS_BACKGROUND));
+		ContainerShape containerShape = new StepHelper(getDiagram()).create(context, addedDomainObject);
 		
         context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
         context.putProperty(Constants.PROP_DOMAIN_MODULE_KEY, domainModule);

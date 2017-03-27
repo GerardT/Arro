@@ -36,10 +36,10 @@ import arro.diagram.features.ArroConnectionAddFeature;
 import arro.diagram.features.ArroConnectionCreateFeature;
 import arro.diagram.features.ArroConnectionDeleteFeature;
 import arro.diagram.features.ArroIDAddFeature;
-import arro.diagram.features.ArroNodeAddFeature;
-import arro.diagram.features.ArroNodeDeleteFeature;
-import arro.diagram.features.ArroNodeLayoutFeature;
-import arro.diagram.features.ArroNodeUpdateFeature;
+import arro.diagram.features.NodeAddFeature;
+import arro.diagram.features.NodeDeleteFeature;
+import arro.diagram.features.NodeLayoutFeature;
+import arro.diagram.features.NodeUpdateFeature;
 import arro.diagram.features.ArroPadAddFeature;
 import arro.diagram.features.ArroPadDeleteFeature;
 import arro.diagram.features.ArroPadLayoutFeature;
@@ -80,7 +80,7 @@ public class FunctionNodeDiagramFeatureProvider extends DefaultFeatureProvider {
 		if (context instanceof IAddConnectionContext /* && context.getNewObject() instanceof <DomainObject> */) {
 			return new ArroConnectionAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroNode) {
-			return new ArroNodeAddFeature(this);
+			return new NodeAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroModule) {
 			return new ArroIDAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroDevice) {
@@ -89,7 +89,7 @@ public class FunctionNodeDiagramFeatureProvider extends DefaultFeatureProvider {
 			IFile file = (IFile)context.getNewObject();
 			if(file.getName().endsWith("." + Constants.NODE_EXT)) {
 				// Add a Node even if a diagram was added...
-				return new ArroNodeAddFeature(this);
+				return new NodeAddFeature(this);
 			} else if(file.getName().endsWith(".amsg")) {
 				// Add a Node even if a diagram was added...
 				return new ArroPadAddFeature(this);
@@ -125,7 +125,7 @@ public class FunctionNodeDiagramFeatureProvider extends DefaultFeatureProvider {
 			String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_NODE)) {
-				return  new ArroNodeDeleteFeature(this);				
+				return  new NodeDeleteFeature(this);				
 			} else if(pict != null && pict.equals(Constants.PROP_PICT_PAD)) {
 				return  new ArroPadDeleteFeature(this);				
 			} else if(pict != null && pict.equals(Constants.PROP_PICT_CONNECTION)) {
@@ -160,7 +160,7 @@ public class FunctionNodeDiagramFeatureProvider extends DefaultFeatureProvider {
 			String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_NODE)) {
-				return  new ArroNodeLayoutFeature(this);				
+				return  new NodeLayoutFeature(this);				
 			} else if(pict != null && pict.equals(Constants.PROP_PICT_PAD)) {
 				return  new ArroPadLayoutFeature(this);				
 			} 
@@ -178,7 +178,7 @@ public class FunctionNodeDiagramFeatureProvider extends DefaultFeatureProvider {
 			String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
 			
 			if(pict != null && pict.equals(Constants.PROP_PICT_NODE)) {
-				return  new ArroNodeUpdateFeature(this);				
+				return  new NodeUpdateFeature(this);				
 			} else if(pict != null && pict.equals(Constants.PROP_PICT_PAD)) {
 				return  new ArroPadUpdateFeature(this);				
 			}

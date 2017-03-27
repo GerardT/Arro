@@ -42,7 +42,7 @@ public class ReadyAddFeature extends AbstractAddFeature implements
         
         addedDomainObject.setName(name);
 
-        ContainerShape containerShape = new StepHelper().create(context, addedDomainObject, manageColor(Constants.CLASS_FOREGROUND), manageColor(Constants.CLASS_BACKGROUND));
+        ContainerShape containerShape = new StepHelper(getDiagram()).create(context, addedDomainObject);
 
         // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
         link(containerShape, addedDomainObject);

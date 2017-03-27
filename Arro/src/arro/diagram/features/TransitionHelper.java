@@ -20,9 +20,14 @@ public class TransitionHelper {
 	private Connection connection;
 	private Polyline polyline, bar;
 	private ConnectionDecorator cd;
+    private Diagram diagram;    
+    
+    public TransitionHelper(Diagram d) {
+        diagram = d;
+    }
+    	
 	
-	
-	public Connection create(IAddContext context, ArroTransition addedDomainObject, Color fg, Color bg, Diagram targetDiagram) {
+	public Connection create(IAddContext context, ArroTransition addedDomainObject, Diagram targetDiagram) {
 		IAddConnectionContext addConContext = (IAddConnectionContext) context;
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		IGaService gaService = Graphiti.getGaService();
@@ -30,6 +35,8 @@ public class TransitionHelper {
 		Anchor start = addConContext.getSourceAnchor();
 		Anchor end = addConContext.getTargetAnchor();
 		
+        Color fg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_FOREGROUND);
+        
 		if(start != end) {
 	        connection = peCreateService.createFreeFormConnection(targetDiagram);
 	        connection.setStart(addConContext.getSourceAnchor());
@@ -52,4 +59,10 @@ public class TransitionHelper {
         return connection;
        
 	}
+	
+//    public void layout(ContainerShape cs, IFeatureProvider fp) {
+//        read(cs, fp); 
+//        redraw();
+//    }
+    
 }

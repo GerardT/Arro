@@ -22,7 +22,7 @@ public class MyResourceChangeReporter implements IResourceChangeListener {
             Logger.out.trace(Logger.EDITOR, " is about to be deleted.");
             break;
          case IResourceChangeEvent.POST_CHANGE:
-//            Logger.out.trace(Logger.EDITOR, "Resources have changed.");
+            Logger.out.trace(Logger.EDITOR, "Resources have changed.");
 			try {
 				
 				event.getDelta().accept(new DeltaHandler());

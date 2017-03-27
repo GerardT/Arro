@@ -65,7 +65,7 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
         }
         addedDomainObject.setName(instanceName);
 
-		Connection connection = new TransitionHelper().create(context, addedDomainObject, manageColor(IColorConstant.BLACK), manageColor(Constants.CLASS_BACKGROUND), getDiagram());
+		Connection connection = new TransitionHelper(getDiagram()).create(context, addedDomainObject, getDiagram());
 
 		context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
         context.putProperty(Constants.PROP_DOMAIN_MODULE_KEY, domainModule);

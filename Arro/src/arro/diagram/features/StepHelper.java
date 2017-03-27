@@ -2,7 +2,6 @@ package arro.diagram.features;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.features.context.IAddContext;
-import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
@@ -31,12 +30,16 @@ public class StepHelper {
 	private Ellipse roundedRectangle;
 	private Text text;
 	private GraphicsAlgorithm anch1, anch2;
+    private Diagram diagram;	
 	
-	
+    public StepHelper(Diagram d) {
+        diagram = d;
+    }
+    
 	// Can't make it a object attribute since this code is called from different
 	// contexts (so different object instances)!
 	
-	public ContainerShape create(IAddContext context, ArroStep addedDomainObject, Color fg, Color bg) {
+	public ContainerShape create(IAddContext context, ArroStep addedDomainObject) {
 	    final int width = 100;
 	    final int height = 100;
 
@@ -69,6 +72,7 @@ public class StepHelper {
         {
         	Shape textShape = peCreateService.createShape(containerShape, false);
 			text = gaService.createText(textShape, addedDomainObject.getName());
+	        Color fg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_FOREGROUND);
 	        text.setForeground(fg);
 			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
@@ -78,14 +82,21 @@ public class StepHelper {
             peCreateService.createChopboxAnchor(containerShape);
         }
         
-        layout(fg, bg);
+        redraw();
         
         return containerShape;
        
 	}
+	
+    public void layout(ContainerShape cs) {
+        read(cs); 
+        redraw();
+    }
+    
+
 	// Retrieve all the text and anchor objects so they can be updated in layout function.
 	// Just rewriting the diagram would break e.g. connections that the anchors may have.
-	public void read(ILayoutContext context, ContainerShape cs, Color fg, Color bg) {
+	private void read(ContainerShape cs) {
 		containerShape = cs;
 		invisibleRectangle = WidgetUtil.getInvisibleRectangle(containerShape);
 		roundedRectangle = WidgetUtil.getEllipse(containerShape);
@@ -111,14 +122,16 @@ public class StepHelper {
 				anch2 = ((BoxRelativeAnchor)anchor).getGraphicsAlgorithm();
 			}
 		}
-        layout(fg, bg);
 	    
 	}
-	private void layout(Color fg, Color bg) {
+	private void redraw() {
 	    final int width = invisibleRectangle.getWidth();
 	    final int height = invisibleRectangle.getHeight();
 		IGaService gaService = Graphiti.getGaService();
 		
+        Color fg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_FOREGROUND);
+        Color bg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_BACKGROUND);
+        
 		gaService.setLocationAndSize(roundedRectangle, 0, 0, width, height);
 		roundedRectangle.setFilled(false);
         roundedRectangle.setForeground(fg);

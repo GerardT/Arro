@@ -13,9 +13,9 @@ import arro.domain.ArroNode;
 import arro.domain.ArroModule;
 import arro.editors.FunctionDiagramEditor;
 
-public class ArroNodeDeleteFeature extends DefaultDeleteFeature implements ICustomUndoRedoFeature {
+public class NodeDeleteFeature extends DefaultDeleteFeature implements ICustomUndoRedoFeature {
 
-	public ArroNodeDeleteFeature(IFeatureProvider fp) {
+	public NodeDeleteFeature(IFeatureProvider fp) {
 		super(fp);
 	}
 	
