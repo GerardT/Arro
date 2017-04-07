@@ -13,6 +13,7 @@ import org.eclipse.graphiti.features.impl.IIndependenceSolver;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 import util.Logger;
+import workspace.ResourceCache;
 
 
 /**

@@ -33,9 +33,9 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import arro.Constants;
-import arro.domain.ResourceCache;
-import util.ArroZipFile;
 import util.PathUtil;
+import workspace.ArroZipFile;
+import workspace.ResourceCache;
 
 /**
  * An example showing how to create a multi-page editor. This example has 3

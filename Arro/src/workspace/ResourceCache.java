@@ -1,4 +1,4 @@
-package arro.domain;
+package workspace;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,8 +31,8 @@ import org.w3c.dom.NodeList;
 
 import util.Logger;
 import util.PathUtil;
-import util.ArroZipFile;
 import arro.Constants;
+import arro.domain.ArroModule;
 
 /**
  * Simple cache for ArroZipFile instances. Such instances will keep

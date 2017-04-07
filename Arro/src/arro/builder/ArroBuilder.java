@@ -36,7 +36,7 @@ import util.Logger;
 import util.Misc;
 import util.PathUtil;
 import util.PbScalarTypes;
-import util.ArroZipFile;
+import workspace.ArroZipFile;
 import arro.Constants;
 
 public class ArroBuilder extends IncrementalProjectBuilder {

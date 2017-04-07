@@ -1,4 +1,4 @@
-package util;
+package workspace;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,6 +32,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import util.Logger;
+import util.PathUtil;
 
 /**
  * Class supporting zip files. By creating an instance it will

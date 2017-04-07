@@ -11,7 +11,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
 import arro.Constants;
-import arro.domain.ResourceCache;
+import workspace.ResourceCache;
 
 
 /**

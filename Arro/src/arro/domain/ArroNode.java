@@ -11,6 +11,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import util.Logger;
+import workspace.ResourceCache;
 
 /**
  * This class represents a node as shown in a diagram, the diagram

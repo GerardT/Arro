@@ -1,7 +1,7 @@
 package arro.editors;
 
 import arro.Constants;
-import util.ArroZipFile;
+import workspace.ArroZipFile;
 
 public class StateDiagramEditor extends FunctionDiagramEditor {
     public StateDiagramEditor(ArroZipFile zip) {

@@ -13,8 +13,8 @@ import org.eclipse.ui.PartInitException;
 
 import arro.Constants;
 import arro.domain.ArroModule;
-import util.ArroZipFile;
 import util.PathUtil;
+import workspace.ArroZipFile;
 
 /**
  * Subclass of DiagramEditor (Graphiti diagram editor), allows override some
