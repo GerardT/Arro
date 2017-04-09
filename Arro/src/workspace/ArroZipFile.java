@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -47,7 +46,7 @@ public class ArroZipFile {
 	private Map<String, String> meta = new HashMap<String, String>();
 	private IFile zipFile;
 	private IFolder tempFolder;
-	private Object domainDiagram;
+	private Object domainDiagram = null;
 	private DocumentBuilderFactory builderFactory;
 
 	/**

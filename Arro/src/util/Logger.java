@@ -23,11 +23,21 @@ public class Logger {
 	MessageConsoleStream console;
 	
 	public static final String STD = "/debug/option1";
-	public static final String BUILDER = "/debug/option2";
-	public static final String EDITOR = "/debug/option3";
+	public static final String BUILDER = "/debug/builder";
+    public static final String EDITOR = "/debug/editor";
+    public static final String WS = "/debug/workspace";
 	public static final String ERROR = "/debug/error";
 
 	
+	// Add to Debug Configurations -> Arguments:
+	//  -debug /Users/gerard/git/Arro/Arro/debug.txt
+	//
+	// File containing:
+    // #Arro/debug/option1=true
+    // #Arro/debug/option2=true
+    // # Arro/debug/option3=true
+    // #Arro/debug/error=true
+
 	private Logger(BundleContext context) {
 		ServiceTracker debugTracker = new ServiceTracker(context, DebugOptions.class.getName(), null);
 		debugTracker.open(true);

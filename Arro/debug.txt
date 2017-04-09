@@ -1,0 +1,4 @@
+#Arro/debug/option1=true
+#Arro/debug/builder=true
+#Arro/debug/editor=true
+Arro/debug/workspace=true
