@@ -23,8 +23,6 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.ui.part.FileEditorInput;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -44,8 +42,6 @@ import util.PathUtil;
 public class ResourceCache {
     private static ResourceCache myCache = null;
     private HashMap<String, ArroZipFile> cache;
-    private IFolder save = null;
-
     
     /* for XML load / store */
     DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -59,6 +55,10 @@ public class ResourceCache {
         loadResourcesFromWorkspace();
     }
     
+    /**
+     *  Load zipped modules in workspace, unzip and read META file.
+     * - <typeName>.anod into .<typeName>.anod and .<typeName>.anod.xml
+     */ 
     public void loadResourcesFromWorkspace() {
         // build a map of all files in workspace
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -89,16 +89,11 @@ public class ResourceCache {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        }
-           
+        }   
     }
 
 
     /**
-     * Open domain file <typeName> by unzipping it:
-     * - <typeName>.anod into .<typeName>.anod and .<typeName>.anod.xml
-     * Zip file also contains other stuff, but we only need module here.
-     * 
      * Then read the domain file (.<typeName>.anod) into a DomainModule
      * instance and register this instance in the cache.
      * 
@@ -106,24 +101,7 @@ public class ResourceCache {
      */
     public ArroZipFile getZip(String typeName) throws RuntimeException {
         ArroZipFile zip = null;
-        IFolder folder = getDiagramFolder(null);
-
-        if(cache.containsKey(typeName)) {
-            // Already in cache, double check that file exists..
-              if(folder.getFile(typeName + "." + Constants.NODE_EXT).exists()) {
-                  zip = cache.get(typeName);
-              } else {
-                  cache.remove(typeName);
-              }
-
-        } else {
-            if(folder.getFile(typeName + "." + Constants.NODE_EXT).exists()) {
-                zip = new ArroZipFile(folder.getFile(typeName + "." + Constants.NODE_EXT));
-            } else {
-                throw new RuntimeException("No zip file with this name");
-            }
-            cache.put(PathUtil.truncExtension(typeName), zip);        
-        }
+        zip = cache.get(typeName);
         if(zip.getDomainDiagram() == null) {
             ArroModule module = loadModule(zip, typeName);
             zip.setDomainDiagram(module);
@@ -176,27 +154,7 @@ public class ResourceCache {
 
         if(cache.containsKey(typeName)) {
             cache.remove(typeName);
-        }
-    }
-
-
-    /**
-     * First call for opening a resource will allow this function
-     * to determine the folder where all files exist.
-     * In future a more advanced mechanism could be thought of.
-     * 
-     * @param fei
-     * @return
-     */
-   public IFolder getDiagramFolder(FileEditorInput fei) {
-        if(fei != null) {
-            IProject project = fei.getFile().getProject();
-            IPath p = fei.getFile().getProjectRelativePath().removeLastSegments(1);
-            Logger.out.trace(Logger.STD, p.toString());
-            save = project.getFolder(p.toString());
-            return project.getFolder(p.toString());
-        } else {
-            return save; // FIXME something better? --> caller must search through all resources in the project
+            // and remove unzipped files
         }
     }
 
@@ -293,8 +251,6 @@ public class ResourceCache {
            e.printStackTrace();
        }
    }
-
-
 
 }
 

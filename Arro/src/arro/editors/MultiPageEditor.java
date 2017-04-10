@@ -180,9 +180,6 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         // let's here unzip the file and create a FileEditorInput for each of the subfiles.
         FileEditorInput fei = (FileEditorInput) getEditorInput();
         
-        // Make this call to do some init inside ResourceCache. It's a bit ugly..
-        ResourceCache.getInstance().getDiagramFolder(fei);
-        
         String fileName = fei.getFile().getName();
         
         // Unzip Function Diagram file and load domain data in cache.

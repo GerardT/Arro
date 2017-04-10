@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -45,9 +46,9 @@ public class ArroZipFile {
 	private Map<String, IFile> files = new HashMap<String, IFile>();
 	private Map<String, String> meta = new HashMap<String, String>();
 	private IFile zipFile;
-	private IFolder tempFolder;
 	private Object domainDiagram = null;
 	private DocumentBuilderFactory builderFactory;
+    private IFolder tempFolder;
 
 	/**
 	 * Constructor.
@@ -134,6 +135,11 @@ public class ArroZipFile {
 	            	String value = eElement.getAttribute("value");
 	            	meta.put(key, value);
 	    		}
+	    	}
+	    	
+	    	if(!meta.containsKey("UUID")) {
+                String uuid = UUID.randomUUID().toString();
+                meta.put("UUID", uuid);
 	    	}
 	    } catch (Exception e) {
 	    	// no file
