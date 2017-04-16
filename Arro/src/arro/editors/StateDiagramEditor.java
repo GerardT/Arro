@@ -1,10 +1,10 @@
 package arro.editors;
 
 import arro.Constants;
-import workspace.ArroZipFile;
+import workspace.ArroModuleContainer;
 
 public class StateDiagramEditor extends FunctionDiagramEditor {
-    public StateDiagramEditor(ArroZipFile zip) {
+    public StateDiagramEditor(ArroModuleContainer zip) {
         super(zip, Constants.FunctionBlock);
     }
 }
@@ -21,10 +21,10 @@ public class StateDiagramEditor extends FunctionDiagramEditor {
 //	
 //	private String diagramName;
 //	private ArroModule domainModule;
-//	private ArroZipFile zip;
+//	private ModuleContainer zip;
 //	
 //
-//	public StateDiagramEditor(ArroZipFile zip) {
+//	public StateDiagramEditor(ModuleContainer zip) {
 //		super();
 //		this.zip = zip;
 //	}

@@ -30,5 +30,9 @@ public class NonEmfDomainObject {
 		this.id = id;
 		POJOIndependenceSolver.getInstance().RegisterPOJOObject(this);
 	}
+	
+	public void update() {
+	    
+	}
 
 }

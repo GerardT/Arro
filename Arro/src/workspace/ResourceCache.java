@@ -3,7 +3,11 @@ package workspace;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,7 +20,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
@@ -34,14 +37,15 @@ import util.Logger;
 import util.PathUtil;
 
 /**
- * Simple cache for ArroZipFile instances. Such instances will keep
+ * Simple cache for ModuleContainer instances. Such instances will keep
  * their zipped files unzipped and editable as long as the instance
  * exists. Cleanup is done when??
  * 
  */
 public class ResourceCache {
     private static ResourceCache myCache = null;
-    private HashMap<String, ArroZipFile> cache;
+    private ConcurrentHashMap<String, ArroModuleContainer> cache;
+    private Lock lock;
     
     /* for XML load / store */
     DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -50,7 +54,8 @@ public class ResourceCache {
      * Constructor, init the cache.
      */
     public ResourceCache() {
-        cache = new HashMap<String, ArroZipFile>();
+        lock = new ReentrantLock();
+        cache = new ConcurrentHashMap<String, ArroModuleContainer>();
         
         loadResourcesFromWorkspace();
     }
@@ -58,39 +63,64 @@ public class ResourceCache {
     /**
      *  Load zipped modules in workspace, unzip and read META file.
      * - <typeName>.anod into .<typeName>.anod and .<typeName>.anod.xml
+     * @return 
      */ 
     public void loadResourcesFromWorkspace() {
-        // build a map of all files in workspace
-        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-        IProject[] projects = workspaceRoot.getProjects();
-        
-        for(IProject p: projects) {
-            IResource r = p.getFolder("diagrams");
-            try {
-                r.accept(new IResourceVisitor() {
+        if(lock.tryLock()) {
+            // build a map of all files in workspace
+            IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+            IProject[] projects = workspaceRoot.getProjects();
+            
+            for(IProject p: projects) {
+                IResource r = p.getFolder("diagrams");
+                try {
+                    r.accept(new IResourceVisitor() {
 
-                    @Override
-                    public boolean visit(IResource r) throws CoreException {
-                        String typeName = r.getName();
-                        int ix = typeName.indexOf(".anod");
-                        if(!typeName.startsWith(".") && ix > 0) {
-                            typeName = typeName.substring(0, ix);
-                            if(!cache.containsKey(typeName)) {
+                        @Override
+                        public boolean visit(IResource r) throws CoreException {
+                            String typeName = r.getName();
+                            int ix = typeName.indexOf(".anod");
+                            if(!typeName.startsWith(".") && ix > 0) {
                                 typeName = typeName.substring(0, ix);
-                                ArroZipFile zip = new ArroZipFile((IFile) r);
-                                cache.put(PathUtil.truncExtension(typeName), zip);  
-                                Logger.out.trace(Logger.WS, typeName + " was added.");
+                                if(!cache.containsKey(typeName)) {
+                                    ArroModuleContainer zip = new ArroModuleContainer((IFile) r);
+                                    cache.put(PathUtil.truncExtension(typeName), zip);  
+                                    Logger.out.trace(Logger.WS, typeName + " was added.");
+                                }
                             }
+                            return true;
                         }
-                        return true;
-                    }
-                });
-            } catch (CoreException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                    });
+                } catch (CoreException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
-        }   
+            lock.unlock();
+        }
     }
+    
+    public void lock() {
+        lock.lock();
+    }
+
+    public void unlock() {
+        lock.unlock();
+    }
+
+
+    /**
+     * Note, by updating and saving into the resource, the update will trigger an
+     * update in the Graphiti diagram as well.
+     */
+     public void updateDependents() {
+         Collection<ArroModuleContainer> zips = cache.values();
+         for(ArroModuleContainer zip: zips) {
+             getZip(zip.getName());
+             zip.updateDependencies();
+         }
+             
+     }
 
 
     /**
@@ -99,29 +129,10 @@ public class ResourceCache {
      * 
      * FIXME: must search all resources in the open project.
      */
-    public ArroZipFile getZip(String typeName) throws RuntimeException {
-        ArroZipFile zip = null;
-        zip = cache.get(typeName);
-        if(zip.getDomainDiagram() == null) {
-            ArroModule module = loadModule(zip, typeName);
-            zip.setDomainDiagram(module);
-        }
-        return zip;
+    public ArroModuleContainer getZip(String typeName) throws RuntimeException {
+        loadResourcesFromWorkspace();
+        return cache.get(typeName);
     }
-    
-
-    /**
-     * Save specified zip file, leaving unzipped files open
-     * for further editing.
-     * 
-     * @param zip
-     */
-    public void storeDomainDiagram(ArroZipFile zip) {
-        ArroModule dnd = (ArroModule)zip.getDomainDiagram();
-        
-        storeModule(dnd, zip, zip.getName());
-    }
-
     
     /**
      * Get singleton object.
@@ -158,99 +169,14 @@ public class ResourceCache {
         }
     }
 
-   
-   private ArroModule loadModule(ArroZipFile zip, String typeName) {
-       // TODO: handle error if zip file removed.
-       String fileName = zip.getName();
-
-       ArroModule n = null;
-       
-       try {
-           
-           Logger.out.trace(Logger.STD, "Loading for " + zip.getName());
-           
-           n = new ArroModule();
-           // FIXME compare name in file with name passed as parameter.
-           n.setType(typeName);
-
-
-           InputStream fXmlFile = zip.getFile(Constants.HIDDEN_RESOURCE + fileName + ".xml").getContents();
-           if(fXmlFile == null) {
-               // file doesn't exist
-               return null;
-           }
-           DocumentBuilder dBuilder = builderFactory.newDocumentBuilder();
-           Document doc = dBuilder.parse(fXmlFile);
-        
-           //optional, but recommended
-           //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
-           doc.getDocumentElement().normalize();
-        
-           Logger.out.trace(Logger.STD, "Root element :" + doc.getDocumentElement().getNodeName());
-           
-           NodeList nList = doc.getElementsByTagName("module");
-           for (int temp = 0; temp < nList.getLength(); temp++) {
-        
-               Node nNode = nList.item(temp);
-               
-               // FIXME we expect only one node!
-               n.xmlRead(nNode);
-           }
-       } catch (Exception e) {
-           /* no file */;
-           throw new RuntimeException("Module not found "  + typeName);
-       }
-       return n;
-   }
-   private void storeModule(ArroModule domainModule, ArroZipFile zip, String fileName) {
-       DocumentBuilder builder = null;
-       
-       try {
-           builder = builderFactory.newDocumentBuilder();
-                
-           // root elements
-           Document doc = builder.newDocument();
-
-           Element elt = doc.createElement("module");
-           doc.appendChild(elt);
-           
-           domainModule.xmlWrite(doc, elt);
-    
-           // write the content into xml file
-           TransformerFactory transformerFactory = TransformerFactory.newInstance();
-           transformerFactory.setAttribute("indent-number", 4);
-
-           Transformer transformer = transformerFactory.newTransformer();
-           transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-           transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-           transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-
-           Logger.out.trace(Logger.STD, "Saving to " + fileName);
-           
-           DOMSource source = new DOMSource(doc);
-           ByteArrayOutputStream fXmlFile = new ByteArrayOutputStream();
-
-           StreamResult result = new StreamResult(fXmlFile /*new File(fullPath)*/);
-           transformer.transform(source, result);
-    
-           // Output to console for testing
-           StreamResult result2 = new StreamResult(System.out);
-           transformer.transform(source, result2);
-
-           IFile f = zip.getFile(Constants.HIDDEN_RESOURCE + fileName + ".xml");
-           f.setContents(new ByteArrayInputStream(fXmlFile.toByteArray()), true, true, null);
-    
-           Logger.out.trace(Logger.STD, "File saved!");
-    
-       } catch (ParserConfigurationException pce) {
-           pce.printStackTrace();
-       } catch (TransformerException tfe) {
-           tfe.printStackTrace();
-       } catch (CoreException e) {
-           // TODO Auto-generated catch block
-           e.printStackTrace();
-       }
-   }
-
+    public ArroModuleContainer getZipByUuid(String uuid) {
+        Collection<ArroModuleContainer> zips = cache.values();
+        for(ArroModuleContainer zip: zips) {
+            if(zip.getMETA("UUID") == uuid) {
+                return zip;
+            }
+        }
+        return null;
+    }
 }
 

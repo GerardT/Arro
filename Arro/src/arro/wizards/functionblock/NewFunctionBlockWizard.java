@@ -46,6 +46,7 @@ import arro.domain.ArroModule;
 import arro.domain.ArroSequenceChart;
 import arro.domain.ArroStep;
 import arro.wizards.FileService;
+import workspace.ResourceCache;
 
 /**
  * This is a sample new wizard. Its role is to create a new file 
@@ -149,7 +150,10 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
         stateNode = new ArroSequenceChart();
         nodeDiagram.setStateDiagram(stateNode);
         readyStep = new ArroStep();
+        readyStep.setName(Constants.PROP_CONTEXT_READY_STEP);
         termStep = new ArroStep();
+        termStep.setName(Constants.PROP_CONTEXT_TERM_STEP);
+        
         try {
             stateNode.addState(readyStep);
             stateNode.addState(termStep);
@@ -158,6 +162,9 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
             e1.printStackTrace();
         }
 
+        // Since the zip file is being created already, it will trigger resource updates
+        // that are incomplete and cause issues such as missing META.
+        ResourceCache.getInstance().lock();
 		final IFile file = f.getFile(new Path(fileName));
 		try {
 			// Create a zip file...
@@ -247,6 +254,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 			}
 			
 			bao.close();
+	        ResourceCache.getInstance().unlock();
 
 			
 		} catch (IOException e) {

@@ -34,7 +34,7 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 
 import arro.Constants;
 import util.PathUtil;
-import workspace.ArroZipFile;
+import workspace.ArroModuleContainer;
 import workspace.ResourceCache;
 
 /**
@@ -55,7 +55,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     private StateDiagramEditor stateEditor;
     private TextEditor pythonEditor;
     
-    private ArroZipFile zip = null;
+    private ArroModuleContainer zip = null;
 
 	private int documentType = Constants.FunctionBlock;
 
@@ -76,7 +76,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Creates page 0 of the multi-page editor, which contains the function diagram.
      */
-    void createPage0(String fileName, ArroZipFile zip) {
+    void createPage0(String fileName, ArroModuleContainer zip) {
 
         IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + fileName);
         if(file != null) {
@@ -99,7 +99,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Creates page 1 of the multi-page editor, which shows the Python code.
      */
-    void createPage1(String fileName, ArroZipFile zip) {
+    void createPage1(String fileName, ArroModuleContainer zip) {
         IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + fileName + ".py");
         if(file != null) {
         	FileEditorInput fei2 = new FileEditorInput(file);
@@ -123,7 +123,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Creates page 2 of the multi-page editor, which contains the sequence diagram.
      */
-    void createPage2(String fileName, ArroZipFile zip) {
+    void createPage2(String fileName, ArroModuleContainer zip) {
 
         //IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + fileName);
         IFile file = zip.getFile(Constants.SFC_FILE_NAME);
@@ -228,7 +228,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
             getEditor(i++).doSave(monitor);
         }
         
-		ResourceCache.getInstance().storeDomainDiagram(zip);
+		zip.storeDomainDiagram();
         
         // then zip the whole thing again
         //FileEditorInput fei = (FileEditorInput) getEditorInput();

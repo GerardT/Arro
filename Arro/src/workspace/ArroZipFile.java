@@ -46,7 +46,6 @@ public class ArroZipFile {
 	private Map<String, IFile> files = new HashMap<String, IFile>();
 	private Map<String, String> meta = new HashMap<String, String>();
 	private IFile zipFile;
-	private Object domainDiagram = null;
 	private DocumentBuilderFactory builderFactory;
     private IFolder tempFolder;
 
@@ -222,25 +221,6 @@ public class ArroZipFile {
 	}
 	
 	/**
-	 * Just for convenience, store the parsed diagram info with the
-	 * zip file data.
-	 * 
-	 * @param diagram
-	 */
-	public void setDomainDiagram(Object diagram) {
-		domainDiagram = diagram;
-	}
-	
-	/**
-	 * See setDomainDiagram.
-	 * 
-	 * @return
-	 */
-	public Object getDomainDiagram() {
-		return domainDiagram;
-	}
-	
-	/**
 	 * Returns specified file that is zipped inside zip file. We
 	 * don't 'export' META as a file. Use API instead.
 	 * 
@@ -256,7 +236,7 @@ public class ArroZipFile {
 		}
 	}
 	
-	/**
+    /**
 	 * Save the zip file. Leave unzipped files open.
 	 */
     public void save() {
@@ -311,86 +291,6 @@ public class ArroZipFile {
     }
 
 
-
-    /**
-     * Used during build process. FIXME: might have some improvement.
-     * 
-     * @param folder
-     * @param zipFile
-     * @param entryName
-     * @param file
-     */
-	public static void unzipAndConcatenateBody(IFolder folder, IFile zipFile, String entryName, IFile file, boolean skipFirstLine) {
-        try {
-            InputStream source = zipFile.getContents(true);
-            ZipInputStream in = new ZipInputStream(source);
-            
-            ZipEntry entry = in.getNextEntry();
-            while(entry != null) {
-            	if(entry.getName().equals(entryName)) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        	        byte[] buffer = new byte[1024];
-        	        int count;
-        	        while ((count = in.read(buffer)) != -1) {
-        	            baos.write(buffer, 0, count);
-        	        }
-        	        String tmp = baos.toString();
-        	        int firstPosition = 0;
-        	        if(skipFirstLine) {
-            	        firstPosition = tmp.indexOf('\n') + 1;
-        	        }
-
-        	        file.appendContents(new ByteArrayInputStream(tmp.substring(firstPosition,  tmp.length()).getBytes()), true, true, null);
-                }
-            	entry = in.getNextEntry();        			
-            }
-        } catch (CoreException e) {
-            // TODO Auto-generated catch block
-			// never mind, if temp file existed then just overwrite.
-            // e.printStackTrace();
-        } catch (IOException e) {
-			// TODO Auto-generated catch block
-        	e.printStackTrace();
-		}
-	}
-
-    /**
-     * Used during build process. FIXME: might have some improvement.
-     * 
-     * @param folder
-     * @param zipFile
-     * @param entryName
-     * @param file
-     */
-	public static boolean unzipAndStage(IFolder folder, IFile zipFile, String entryName) {
-		boolean retval = false;
-        try {
-            InputStream source = zipFile.getContents(true);
-            ZipInputStream in = new ZipInputStream(source);
-            IFile pythonFile = folder.getFile(PathUtil.truncExtension(zipFile.getName()) + ".py");
-            
-            ZipEntry entry = in.getNextEntry();
-            while(entry != null) {
-            	if(entry.getName().equals(entryName)) {
-            		retval = true;
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        	        byte[] buffer = new byte[1024];
-        	        int count;
-        	        while ((count = in.read(buffer)) != -1) {
-        	            baos.write(buffer, 0, count);
-        	        }
-        	        pythonFile.create(new ByteArrayInputStream(baos.toByteArray()), true, null);
-                }
-            	entry = in.getNextEntry();        			
-            }
-        } catch (CoreException e) {
-            retval = false;
-        } catch (IOException e) {
-			retval = false;
-		}
-        return retval;
-	}
-
 	/**
 	 * Return filename.
 	 * 
@@ -399,4 +299,5 @@ public class ArroZipFile {
 	public String getName() {
 		return zipFile.getName();
 	}
+
 }

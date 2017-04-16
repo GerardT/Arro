@@ -32,12 +32,12 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import arro.Constants;
 import util.Logger;
 import util.Misc;
 import util.PathUtil;
 import util.PbScalarTypes;
-import workspace.ArroZipFile;
-import arro.Constants;
+import workspace.ArroModuleContainer;
 
 public class ArroBuilder extends IncrementalProjectBuilder {
 
@@ -382,11 +382,11 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			
 			if(!(file.getName().startsWith(Constants.HIDDEN_RESOURCE))) {
 				Logger.out.trace(Logger.BUILDER, "Node to check " + file.getName());
-		        ArroZipFile.unzipAndConcatenateBody(buildInfo.folder, file, Constants.HIDDEN_RESOURCE + resource.getName() + ".xml", buildInfo.resultFileNodes, true);
+				ArroModuleContainer.unzipAndConcatenateBody(buildInfo.folder, file, Constants.HIDDEN_RESOURCE + resource.getName() + ".xml", buildInfo.resultFileNodes, true);
 			}
 
 			// Stage .py files
-			if(ArroZipFile.unzipAndStage(buildInfo.folder, file, Constants.HIDDEN_RESOURCE + resource.getName() + ".py")) {
+			if(ArroModuleContainer.unzipAndStage(buildInfo.folder, file, Constants.HIDDEN_RESOURCE + resource.getName() + ".py")) {
 				Logger.out.trace(Logger.BUILDER, "Node to check " + file.getName());
 
 				try {

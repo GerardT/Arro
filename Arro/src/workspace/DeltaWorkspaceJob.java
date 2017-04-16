@@ -12,6 +12,7 @@ class DeltaWorkspaceJob extends WorkspaceJob {
     public IStatus runInWorkspace(IProgressMonitor monitor) {
         //do the actual work in here
         ResourceCache.getInstance().loadResourcesFromWorkspace();
+        ResourceCache.getInstance().updateDependents();
         return Status.OK_STATUS;
     }
 }

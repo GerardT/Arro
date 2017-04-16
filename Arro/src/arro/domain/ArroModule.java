@@ -33,6 +33,10 @@ public class ArroModule extends NonEmfDomainObject  {
 		stateDiagram = null;
 	}
 	
+	public void update() {
+	    
+	}
+	
 	/*
 	 * Node functions: get / add / remove.
 	 */
