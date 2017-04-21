@@ -47,6 +47,7 @@ import arro.domain.ArroModule;
 import arro.domain.ArroSequenceChart;
 import arro.domain.ArroStep;
 import arro.wizards.FileService;
+import workspace.ResourceCache;
 
 /**
  * This is a sample new wizard. Its role is to create a new file 
@@ -151,6 +152,8 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
         nodeDiagram.setStateDiagram(stateNode);
         readyStep = new ArroStep();
         termStep = new ArroStep();
+        readyStep.setName(Constants.PROP_CONTEXT_READY_STEP);
+        termStep.setName(Constants.PROP_CONTEXT_TERM_STEP);
         try {
             stateNode.addState(readyStep);
             stateNode.addState(termStep);
@@ -159,6 +162,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
             e1.printStackTrace();
         }
 
+        ResourceCache.getInstance().lock();
         final IFile file = f.getFile(new Path(fileName));
         try {
             // Create a zip file...
@@ -187,7 +191,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
             {
 
                 // name the file inside the zip file 
-                out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName));
+                out.putNextEntry(new ZipEntry(Constants.FUNCTION_FILE_NAME));
                 
                 // fill with initial data
                 // Not very nice: we borrow the file for temporarily writing the diagram data into.
@@ -203,7 +207,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
             }
             {
                 // name the xml file inside the zip file 
-                out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName + ".xml"));
+                out.putNextEntry(new ZipEntry(Constants.MODULE_FILE_NAME));
                 
                 // fill with initial data
                 // Not very nice: we borrow the file for temporarily writing the diagram data into.
@@ -221,7 +225,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
             if(language.equals(Constants.NODE_PYTHON))
             {
                 // name the python file inside the zip file 
-                out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName + ".py"));
+                out.putNextEntry(new ZipEntry(Constants.PYTHON_FILE_NAME));
                 
                 // fill with initial data
                 // Not very nice: we borrow the file for temporarily writing the diagram data into.
@@ -264,6 +268,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
             }
             
             bao.close();
+            ResourceCache.getInstance().unlock();
 
             
         } catch (IOException e) {

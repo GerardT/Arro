@@ -57,21 +57,26 @@ public class ArroNode extends NonEmfDomainObject {
     /**
      * 
      */
-    public void update() {
+    public ArroModuleContainer update() {
         ArroModuleContainer moduleByName = ResourceCache.getInstance().getZip(nodeType);
         if(moduleByName != null) {
             if(moduleByName.getUuid().equals(uuid)) {
                 // all OK, do nothing
+                return moduleByName;
             } else {
                 // search for UUID
                 ArroModuleContainer moduleByUuid = ResourceCache.getInstance().getZipByUuid(uuid);
                 if(moduleByUuid != null) {
                     // update name
                     nodeType = moduleByUuid.getName();
+                    Logger.out.trace(Logger.WS, "Rename to " + nodeType);
                     needsUpdate = true;
+                    return moduleByUuid;
                 } else {
                     // update UUID
                     uuid = moduleByName.getUuid();
+                    Logger.out.trace(Logger.WS, "Reconnecting to " + uuid);
+                    return moduleByName;
                 }
             }
         } else {
@@ -80,9 +85,13 @@ public class ArroNode extends NonEmfDomainObject {
             if(moduleByUuid != null) {
                 // update name
                 nodeType = moduleByUuid.getName();
+                Logger.out.trace(Logger.WS, "Rename to " + nodeType);
                 needsUpdate = true;
+                return moduleByUuid;
             } else {
                 // really really not found!
+                Logger.out.trace(Logger.WS, "Reference broken for " + nodeType);
+                return null;
             }
         }
     }
@@ -95,7 +104,13 @@ public class ArroNode extends NonEmfDomainObject {
 	 * @return
 	 */
 	public ArroModule getAssociatedModule() {
-        return (ArroModule)ResourceCache.getInstance().getZip(getType()).getDomainDiagram();
+	    ArroModuleContainer m = update();
+	    if(m != null) {
+	        return (ArroModule) update().getDomainDiagram();
+	    } else {
+	        return null;
+	    }
+        //return (ArroModule)ResourceCache.getInstance().getZip(getType()).getDomainDiagram();
 	}
 	
 	/**
@@ -195,7 +210,7 @@ public class ArroNode extends NonEmfDomainObject {
         elt.setAttributeNode(attr);
         
         attr = doc.createAttribute("uuid");
-        attr.setValue(getType());
+        attr.setValue(getUuid());
         elt.setAttributeNode(attr);
         
         int count = parameterList.size();
@@ -219,12 +234,16 @@ public class ArroNode extends NonEmfDomainObject {
         }
     }
     
+    private String getUuid() {
+        return uuid;
+    }
+
     public void xmlRead(Node nNode) {
         Element eElement = (Element) nNode;
         setId(eElement.getAttribute("id"));
         setName(eElement.getAttribute("name"));
         setType(eElement.getAttribute("type"));
-        setType(eElement.getAttribute("uuid"));
+        setUuid(eElement.getAttribute("uuid"));
         
         NodeList nList = nNode.getChildNodes();
         for (int temp = 0; temp < nList.getLength(); temp++) {
@@ -240,6 +259,11 @@ public class ArroNode extends NonEmfDomainObject {
                         ""));
             }
         }
+    }
+
+    private void setUuid(String uuid) {
+        this.uuid = uuid;
+        
     }
 
 

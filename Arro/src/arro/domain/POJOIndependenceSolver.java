@@ -87,13 +87,8 @@ public class POJOIndependenceSolver implements IIndependenceSolver {
 	public void removeBusinessObject(Object bo) {
 	}
 
-	public void RemovePOJOObjects(String fullName) {
-		// TODO Auto-generated method stub
-        String name = fullName.  substring(0, fullName.indexOf('.'));
+	public void RemovePOJOObjects(String name) {
 		Logger.out.trace(Logger.STD, "Remove POJO file " + name);
-		
-		ResourceCache.getInstance().removeFromCache(name);
-		
 	}
 
 	public void RegisterPOJOObject(NonEmfDomainObject nonEmfDomainObject) {

@@ -65,7 +65,7 @@ public class ResourceCache {
      * - <typeName>.anod into .<typeName>.anod and .<typeName>.anod.xml
      * @return 
      */ 
-    public void loadResourcesFromWorkspace() {
+    private void loadResourcesFromWorkspace() {
         if(lock.tryLock()) {
             // build a map of all files in workspace
             IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -82,11 +82,7 @@ public class ResourceCache {
                             int ix = typeName.indexOf(".anod");
                             if(!typeName.startsWith(".") && ix > 0) {
                                 typeName = typeName.substring(0, ix);
-                                if(!cache.containsKey(typeName)) {
-                                    ArroModuleContainer zip = new ArroModuleContainer((IFile) r);
-                                    cache.put(PathUtil.truncExtension(typeName), zip);  
-                                    Logger.out.trace(Logger.WS, typeName + " was added.");
-                                }
+                                addToCache(typeName, r);
                             }
                             return true;
                         }
@@ -100,6 +96,24 @@ public class ResourceCache {
         }
     }
     
+    public synchronized void addToCache(String typeName, IResource res) throws RuntimeException {
+        if(!cache.containsKey(typeName)) {
+            ArroModuleContainer zip = new ArroModuleContainer((IFile) res);
+            cache.put(PathUtil.truncExtension(typeName), zip);  
+            Logger.out.trace(Logger.WS, typeName + " was added.");
+        }
+    }
+    
+    public synchronized void removeFromCache(String typeName, IResource res) throws RuntimeException {
+        if(cache.containsKey(typeName)) {
+            // remove unzipped files
+            ArroModuleContainer c = cache.get(typeName);
+            c.cleanup();
+            
+            cache.remove(typeName);
+        }
+    }
+
     public void lock() {
         lock.lock();
     }
@@ -146,33 +160,10 @@ public class ResourceCache {
         return myCache;
     }
 
-    /**
-     * Open domain file <typeName> by unzipping it:
-     * - <typeName>.anod into .<typeName>.anod and .<typeName>.anod.xml
-     * Zip file also contains other stuff, but we only need module here.
-     * 
-     * Then read the domain file (.<typeName>.anod) into a DomainModule
-     * instance and register this instance in the cache.
-     * 
-     * FIXME: must search all resources in the open project.
-     * 
-     * META contains UUID.
-     * If a module (zip file) is added, then all other modules are checked:
-     * - if they reference the UUID inside the added module (so the added module was renamed / moved)
-     * - otherwise, if they reference the module name. If so then the referred UUID is used as reference from now on.
-     */
-    public void removeFromCache(String typeName) throws RuntimeException {
-
-        if(cache.containsKey(typeName)) {
-            cache.remove(typeName);
-            // and remove unzipped files
-        }
-    }
-
     public ArroModuleContainer getZipByUuid(String uuid) {
         Collection<ArroModuleContainer> zips = cache.values();
         for(ArroModuleContainer zip: zips) {
-            if(zip.getMETA("UUID") == uuid) {
+            if(zip.getMETA("UUID").equals(uuid)) {
                 return zip;
             }
         }

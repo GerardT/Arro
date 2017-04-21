@@ -150,8 +150,8 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
         stateNode = new ArroSequenceChart();
         nodeDiagram.setStateDiagram(stateNode);
         readyStep = new ArroStep();
-        readyStep.setName(Constants.PROP_CONTEXT_READY_STEP);
         termStep = new ArroStep();
+        readyStep.setName(Constants.PROP_CONTEXT_READY_STEP);
         termStep.setName(Constants.PROP_CONTEXT_TERM_STEP);
         
         try {
@@ -193,7 +193,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 			{
 		        
 				// name the diagram file inside the zip file 
-		        out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName));
+		        out.putNextEntry(new ZipEntry(Constants.FUNCTION_FILE_NAME));
 		        
 		        // fill with initial data
 		        // Not very nice: we borrow the file for temporarily writing the diagram data into.
@@ -228,7 +228,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 			}
 			{
 				// name the xml file inside the zip file 
-		        out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName + ".xml"));
+		        out.putNextEntry(new ZipEntry(Constants.MODULE_FILE_NAME));
 		        
 		        // fill with initial data
 		        // Not very nice: we borrow the file for temporarily writing the diagram data into.

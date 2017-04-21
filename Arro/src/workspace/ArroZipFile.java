@@ -106,8 +106,20 @@ public class ArroZipFile {
     		}
             readMETA();
     	}
+    }	
+
+    public void cleanup() {
+        tempFolder = (IFolder)zipFile.getParent();
+        tempFolder = tempFolder.getFolder("." + PathUtil.truncExtension(zipFile.getName()));
+        
+        try {
+            tempFolder.delete(true, null);
+        } catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
-	
+
 	private void readMETA() {
 	    try {
 	    	
@@ -260,7 +272,7 @@ public class ArroZipFile {
 	            source = entry.getValue().getContents(true);
 
 	            // name the file inside the zip file  - use same name as if unzipped
-		        out.putNextEntry(new ZipEntry(entry.getKey() /*Constants.HIDDEN_RESOURCE + fileName*/));
+		        out.putNextEntry(new ZipEntry(entry.getKey()));
 		        
 		        while ((count = source.read(b)) > 0) {
 		            out.write(b, 0, count);

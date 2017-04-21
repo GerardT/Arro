@@ -1,7 +1,9 @@
 package arro.diagram.features;
 
+import java.awt.List;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Vector;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -28,6 +30,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.services.IPeService;
 
 import arro.Constants;
+import arro.domain.ArroModule;
 import arro.domain.ArroNode;
 import arro.domain.ArroPad;
 import arro.domain.NonEmfDomainObject;
@@ -310,7 +313,14 @@ public class NodeHelper {
         if(domainObject instanceof ArroNode) {
             // Read the Node info using node-type
             try {
-                domainPads = ((ArroNode)domainObject).getAssociatedModule().getPads();
+                // TODO make it better
+                ArroModule m = ((ArroNode)domainObject).getAssociatedModule();
+                if(m == null) {
+                    // for now, just create empty set.
+                    domainPads = new Vector<ArroPad>();
+                } else {
+                    domainPads = ((ArroNode)domainObject).getAssociatedModule().getPads();
+                }
                 Logger.out.trace(Logger.EDITOR, "Found " + domainPads.size() + " pads");
 
                 // Each pad has its name as property. Function getAnchors returns a map with name as key.

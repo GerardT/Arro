@@ -382,11 +382,11 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			
 			if(!(file.getName().startsWith(Constants.HIDDEN_RESOURCE))) {
 				Logger.out.trace(Logger.BUILDER, "Node to check " + file.getName());
-				ArroModuleContainer.unzipAndConcatenateBody(buildInfo.folder, file, Constants.HIDDEN_RESOURCE + resource.getName() + ".xml", buildInfo.resultFileNodes, true);
+				ArroModuleContainer.unzipAndConcatenateBody(buildInfo.folder, file, Constants.MODULE_FILE_NAME, buildInfo.resultFileNodes, true);
 			}
 
 			// Stage .py files
-			if(ArroModuleContainer.unzipAndStage(buildInfo.folder, file, Constants.HIDDEN_RESOURCE + resource.getName() + ".py")) {
+			if(ArroModuleContainer.unzipAndStage(buildInfo.folder, file, Constants.PYTHON_FILE_NAME)) {
 				Logger.out.trace(Logger.BUILDER, "Node to check " + file.getName());
 
 				try {

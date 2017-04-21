@@ -13,7 +13,10 @@ public class Constants {
 	public final static String MESSAGE_EXT = "amsg";
 	
 	// temp file name after unzip
-	public final static String SFC_FILE_NAME = Constants.HIDDEN_RESOURCE + Constants.STATE_NODE_DIAGRAM_TYPE;
+    public final static String SFC_FILE_NAME = Constants.HIDDEN_RESOURCE + "SfcDiagram.xml";
+    public final static String FUNCTION_FILE_NAME = Constants.HIDDEN_RESOURCE + "FunctionDiagram.xml";
+    public final static String MODULE_FILE_NAME = Constants.HIDDEN_RESOURCE + "Module.xml";
+    public final static String PYTHON_FILE_NAME = Constants.HIDDEN_RESOURCE + "Module.py";
 	
 	// Editor types - Diagram.getDiagramTypeId() will return:
     public final static String FUNCTION_NODE_DIAGRAM_TYPE = "Arro"; // must match with plugin.xml

@@ -84,6 +84,10 @@ public class ArroModuleContainer extends ArroZipFile {
         domainDiagram.update();
     }
 
+    public String getUuid() {
+        return super.getMETA("UUID");
+    }
+
 
     /**
      * Used during build process. FIXME: might have some improvement.
@@ -182,7 +186,7 @@ public class ArroModuleContainer extends ArroZipFile {
             n.setType(typeName);
 
 
-            InputStream fXmlFile = zip.getFile(Constants.HIDDEN_RESOURCE + fileName + ".xml").getContents();
+            InputStream fXmlFile = zip.getFile(Constants.MODULE_FILE_NAME).getContents();
             if(fXmlFile == null) {
                 // file doesn't exist
                 return null;
@@ -246,7 +250,7 @@ public class ArroModuleContainer extends ArroZipFile {
             StreamResult result2 = new StreamResult(System.out);
             transformer.transform(source, result2);
 
-            IFile f = zip.getFile(Constants.HIDDEN_RESOURCE + fileName + ".xml");
+            IFile f = zip.getFile(Constants.MODULE_FILE_NAME);
             f.setContents(new ByteArrayInputStream(fXmlFile.toByteArray()), true, true, null);
      
             Logger.out.trace(Logger.STD, "File saved!");
@@ -260,10 +264,5 @@ public class ArroModuleContainer extends ArroZipFile {
             e.printStackTrace();
         }
     }
-
-    public String getUuid() {
-        return super.getMETA("UUID");
-    }
-
 
 }

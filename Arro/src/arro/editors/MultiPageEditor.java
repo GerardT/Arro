@@ -78,7 +78,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
      */
     void createPage0(String fileName, ArroModuleContainer zip) {
 
-        IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + fileName);
+        IFile file = zip.getFile(Constants.FUNCTION_FILE_NAME);
         if(file != null) {
         	FileEditorInput fei2 = new FileEditorInput(file);
         	
@@ -100,7 +100,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
      * Creates page 1 of the multi-page editor, which shows the Python code.
      */
     void createPage1(String fileName, ArroModuleContainer zip) {
-        IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + fileName + ".py");
+        IFile file = zip.getFile(Constants.PYTHON_FILE_NAME);
         if(file != null) {
         	FileEditorInput fei2 = new FileEditorInput(file);
         	
@@ -125,7 +125,6 @@ public class MultiPageEditor extends MultiPageEditorPart implements
      */
     void createPage2(String fileName, ArroModuleContainer zip) {
 
-        //IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + fileName);
         IFile file = zip.getFile(Constants.SFC_FILE_NAME);
         if(file != null) {
         	FileEditorInput fei2 = new FileEditorInput(file);

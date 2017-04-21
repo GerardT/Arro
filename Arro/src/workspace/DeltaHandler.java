@@ -10,24 +10,28 @@ import util.Logger;
 class DeltaHandler implements IResourceDeltaVisitor {
     public boolean visit(IResourceDelta delta) {
         IResource res = delta.getResource();
-        switch (delta.getKind()) {
+        String name = res.getName();
+        int ix = name.indexOf(".anod");
+        if(ix != -1) {
+            name = name.substring(0, name.indexOf(".anod"));
+            
+            switch (delta.getKind()) {
             case IResourceDelta.ADDED:
-	            Logger.out.trace(Logger.WS, "Resource " + res.getFullPath().toPortableString() + " was added.");
-	            DeltaWorkspaceJob job = new DeltaWorkspaceJob();
-	            //job.setRule(myProject);
-	            job.schedule();
-	                
-	            break;
-	        case IResourceDelta.REMOVED:
-                Logger.out.trace(Logger.WS, "Resource " + res.getFullPath().toPortableString() + " was removed.");
-	            
-	            POJOIndependenceSolver.getInstance().RemovePOJOObjects(res.getName());
-
-	    	    break;
-	        case IResourceDelta.CHANGED:
+                Logger.out.trace(Logger.WS, "Resource " + res.getFullPath().toPortableString() + " was added.");
+                WorkspaceAdditionJob job1 = new WorkspaceAdditionJob(name, res);
+                job1.schedule();
+                break;
+            case IResourceDelta.REMOVED:
+                Logger.out.trace(Logger.WS, "Resource " + res.getFullPath().toPortableString() + " was removed.");              
+                POJOIndependenceSolver.getInstance().RemovePOJOObjects(name);
+                WorkspaceRemovalJob job2 = new WorkspaceRemovalJob(name, res);
+                job2.schedule();
+                break;
+            case IResourceDelta.CHANGED:
                 // Logger.out.trace(Logger.WS, "Resource " + res.getFullPath().toPortableString() + " has changed.");
-	            break;
+                break;
          }
+        }
          return true; // visit the children
     }
 }
