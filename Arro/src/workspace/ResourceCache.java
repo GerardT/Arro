@@ -66,41 +66,41 @@ public class ResourceCache {
      * @return 
      */ 
     private void loadResourcesFromWorkspace() {
-        if(lock.tryLock()) {
-            // build a map of all files in workspace
-            IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-            IProject[] projects = workspaceRoot.getProjects();
-            
-            for(IProject p: projects) {
-                IResource r = p.getFolder("diagrams");
-                try {
-                    r.accept(new IResourceVisitor() {
+        // build a map of all files in workspace
+        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+        IProject[] projects = workspaceRoot.getProjects();
+        
+        for(IProject p: projects) {
+            IResource r = p.getFolder("diagrams");
+            try {
+                r.accept(new IResourceVisitor() {
 
-                        @Override
-                        public boolean visit(IResource r) throws CoreException {
-                            String typeName = r.getName();
-                            int ix = typeName.indexOf(".anod");
-                            if(!typeName.startsWith(".") && ix > 0) {
-                                typeName = typeName.substring(0, ix);
-                                addToCache(typeName, r);
-                            }
-                            return true;
+                    @Override
+                    public boolean visit(IResource r) throws CoreException {
+                        String typeName = r.getName();
+                        int ix = typeName.indexOf(".anod");
+                        if(!typeName.startsWith(".") && ix > 0) {
+                            typeName = typeName.substring(0, ix);
+                            addToCache(typeName, r);
                         }
-                    });
-                } catch (CoreException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                        return true;
+                    }
+                });
+            } catch (CoreException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-            lock.unlock();
         }
     }
     
     public synchronized void addToCache(String typeName, IResource res) throws RuntimeException {
-        if(!cache.containsKey(typeName)) {
-            ArroModuleContainer zip = new ArroModuleContainer((IFile) res);
-            cache.put(PathUtil.truncExtension(typeName), zip);  
-            Logger.out.trace(Logger.WS, typeName + " was added.");
+        if(lock.tryLock()) {
+            if(!cache.containsKey(typeName)) {
+                ArroModuleContainer zip = new ArroModuleContainer((IFile) res);
+                cache.put(PathUtil.truncExtension(typeName), zip);  
+                Logger.out.trace(Logger.WS, typeName + " was added.");
+            }
+            lock.unlock();
         }
     }
     

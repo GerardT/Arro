@@ -85,6 +85,10 @@ public class ArroNode extends NonEmfDomainObject {
             if(moduleByUuid != null) {
                 // update name
                 nodeType = moduleByUuid.getName();
+                int ix = nodeType.indexOf(".anod");
+                if(ix != -1) {
+                    nodeType = nodeType.substring(0, ix);
+                }
                 Logger.out.trace(Logger.WS, "Rename to " + nodeType);
                 needsUpdate = true;
                 return moduleByUuid;

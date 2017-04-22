@@ -170,7 +170,7 @@ public class ArroModuleContainer extends ArroZipFile {
 
     
     
-    private ArroModule loadModule(ArroModuleContainer zip) {
+    private synchronized ArroModule loadModule(ArroModuleContainer zip) {
         // TODO: handle error if zip file removed.
         String fileName = zip.getName();
         String typeName = fileName.substring(0, fileName.indexOf(".anod"));
@@ -210,7 +210,7 @@ public class ArroModuleContainer extends ArroZipFile {
             }
         } catch (Exception e) {
             /* no file */;
-            throw new RuntimeException("Module not found "  + typeName);
+            throw new RuntimeException("Error " + e.getMessage() + " for type "  + typeName);
         }
         return n;
     }

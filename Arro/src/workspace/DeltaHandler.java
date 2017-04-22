@@ -13,7 +13,7 @@ class DeltaHandler implements IResourceDeltaVisitor {
         String name = res.getName();
         int ix = name.indexOf(".anod");
         if(ix != -1) {
-            name = name.substring(0, name.indexOf(".anod"));
+            name = name.substring(0, ix);
             
             switch (delta.getKind()) {
             case IResourceDelta.ADDED:

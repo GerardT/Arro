@@ -65,11 +65,7 @@ public class ArroZipFile {
     	if(zipFile.exists()) {
             try {
         		// Create a hidden temp folder where we unzip to.
-            	tempFolder = (IFolder)zipFile.getParent();
-            	tempFolder = tempFolder.getFolder("." + PathUtil.truncExtension(zipFile.getName()));
-            	if(!tempFolder.exists()) {
-            		tempFolder.create(true, true, null);
-            	}
+            	tempFolder = getTempFolder();
             	
                 InputStream source = zipFile.getContents(true);
                 ZipInputStream in = new ZipInputStream(source);
@@ -108,10 +104,21 @@ public class ArroZipFile {
     	}
     }	
 
+	public IFolder getTempFolder() {
+	    IFolder folder = (IFolder)zipFile.getParent();
+	    folder = folder.getFolder("." + PathUtil.truncExtension(zipFile.getName()));
+	    if(!folder.exists()) {
+	        try {
+	            folder.create(true, true, null);
+            } catch (CoreException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+	    }
+	    return folder;
+	}
+	
     public void cleanup() {
-        tempFolder = (IFolder)zipFile.getParent();
-        tempFolder = tempFolder.getFolder("." + PathUtil.truncExtension(zipFile.getName()));
-        
         try {
             tempFolder.delete(true, null);
         } catch (CoreException e) {
