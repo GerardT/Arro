@@ -64,9 +64,29 @@ public class ArroZipFile {
 
     	if(zipFile.exists()) {
             try {
-        		// Create a hidden temp folder where we unzip to.
-            	tempFolder = getTempFolder();
-            	
+                InputStream sourceMeta = zipFile.getContents(true);
+                
+                // Search for META
+                ZipInputStream inMeta = new ZipInputStream(sourceMeta);
+                
+                ZipEntry entryMeta = inMeta.getNextEntry();
+                while(entryMeta != null) {
+                    if(entryMeta.getName().equals("META")) {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        byte[] buffer = new byte[1024];
+                        int count;
+                        while ((count = inMeta.read(buffer)) != -1) {
+                            baos.write(buffer, 0, count);
+                        }
+                        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                        readMETA(bais);
+                    }
+                    entryMeta = inMeta.getNextEntry();                  
+                }
+                
+                tempFolder = getTempFolder();
+
+                // Open rest
                 InputStream source = zipFile.getContents(true);
                 ZipInputStream in = new ZipInputStream(source);
                 
@@ -87,7 +107,8 @@ public class ArroZipFile {
                        
                         // Copy initial contents..
                         if (!file.exists()) {
-                        	file.create(bais, IResource.NONE, null);
+                            // TODO why not file.create(in, IResource.NONE, null);
+                            file.create(bais, IResource.NONE, null);
                         } else {
                         	// don't touch. FIXME: do touch
                         	file.setContents(bais, true, false, null);
@@ -95,18 +116,19 @@ public class ArroZipFile {
                     }
                 	entry = in.getNextEntry();        			
                 }
+                readMETA(files.get("META").getContents());
             } catch (CoreException e) {
                 throw new RuntimeException(e.getMessage());
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage());
     		}
-            readMETA();
     	}
     }	
 
 	public IFolder getTempFolder() {
 	    IFolder folder = (IFolder)zipFile.getParent();
-	    folder = folder.getFolder("." + PathUtil.truncExtension(zipFile.getName()));
+        //folder = folder.getFolder("." + PathUtil.truncExtension(zipFile.getName()));
+        folder = folder.getFolder("." + meta.get("UUID"));
 	    if(!folder.exists()) {
 	        try {
 	            folder.create(true, true, null);
@@ -127,14 +149,13 @@ public class ArroZipFile {
         }
     }
 
-	private void readMETA() {
+	private void readMETA(InputStream fXmlFile) {
 	    try {
 	    	
 	    	Logger.out.trace(Logger.STD, "Reading META");
 		    
-	    	InputStream fXmlFile = files.get("META").getContents();
-
 	    	DocumentBuilder dBuilder = builderFactory.newDocumentBuilder();
+	    	// For some reason, DocumentBuilder.parse closes the stream..
 	    	Document doc = dBuilder.parse(fXmlFile);
 	     
 	    	//optional, but recommended

@@ -107,9 +107,9 @@ public class ResourceCache {
     public synchronized void removeFromCache(String typeName, IResource res) throws RuntimeException {
         if(cache.containsKey(typeName)) {
             // remove unzipped files
-            ArroModuleContainer c = cache.get(typeName);
-            c.cleanup();
-            
+//            ArroModuleContainer c = cache.get(typeName);
+//            c.cleanup();
+//            
             cache.remove(typeName);
         }
     }

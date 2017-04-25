@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -288,6 +289,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 							"	<entry key=\"name\" value=\"" + diagramName + "\"/>\n" +
 							"	<entry key=\"type\" value=\"" + Constants.FUNCTION_BLOCK + "\"/>\n" +
 							"	<entry key=\"version\" value=\"0.90\"/>\n" +
+                            "   <entry key=\"UUID\" value=\"" + UUID.randomUUID().toString() + "\"/>\n" +
 							"</metadata>\n";
 		return new ByteArrayInputStream(contents.getBytes());
 	}
