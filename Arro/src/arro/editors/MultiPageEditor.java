@@ -2,6 +2,7 @@ package arro.editors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -33,7 +34,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import arro.Constants;
-import util.PathUtil;
+import util.Logger;
 import workspace.ArroModuleContainer;
 import workspace.ResourceCache;
 
@@ -51,9 +52,9 @@ public class MultiPageEditor extends MultiPageEditorPart implements
 
     /** The text editor used in page 0. */
     // private TextEditor editor;
-    private FunctionDiagramEditor functionEditor;
-    private StateDiagramEditor stateEditor;
-    private TextEditor pythonEditor;
+    private FunctionDiagramEditor functionEditor = null;
+    private StateDiagramEditor stateEditor = null;
+    private TextEditor pythonEditor = null;
     
     private ArroModuleContainer zip = null;
 
@@ -82,7 +83,6 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         if(file != null) {
         	FileEditorInput fei2 = new FileEditorInput(file);
         	
-
             try {
             	// pass the file so later it knows where to store the .xml file.
                 functionEditor = new FunctionDiagramEditor(zip, documentType);
@@ -129,12 +129,13 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         if(file != null) {
         	FileEditorInput fei2 = new FileEditorInput(file);
         	
-
             try {
             	// pass the file so later it knows where to store the .xml file.
                 stateEditor = new StateDiagramEditor(zip);
                 
                 int index = addPage(stateEditor, fei2);
+                
+                // can we do: e = old.getEditor(1); addPage(e)??
                 setPageText(index, "Sequence Diagram");
             } catch (PartInitException e) {
                 ErrorDialog.openError(getSite().getShell(),
@@ -182,16 +183,20 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         String fileName = fei.getFile().getName();
         
         // Unzip Function Diagram file and load domain data in cache.
-        zip = ResourceCache.getInstance().getZip(PathUtil.truncExtension(fileName));
+        zip = ResourceCache.getInstance().getZipByFile(fei.getFile());
+        
+        Logger.out.trace(Logger.MPE, "Opening new file " + fileName);
+        
+        zip.setEditor(this);
         
         if(zip.getMETA("type").equals(Constants.FUNCTION_BLOCK)) {
-			documentType = Constants.FunctionBlock;
-		} else if(zip.getMETA("type").equals(Constants.CODE_BLOCK)){
-	        if(zip.getMETA("language").equals(Constants.NODE_PYTHON)) {
-	        	documentType = Constants.CodeBlockPython;
-	        } else if(zip.getMETA("language").equals(Constants.NODE_NATIVE)) {
-		        documentType = Constants.CodeBlockNative;
-	        }
+            documentType = Constants.FunctionBlock;
+        } else if(zip.getMETA("type").equals(Constants.CODE_BLOCK)){
+            if(zip.getMETA("language").equals(Constants.NODE_PYTHON)) {
+                documentType = Constants.CodeBlockPython;
+            } else if(zip.getMETA("language").equals(Constants.NODE_NATIVE)) {
+                documentType = Constants.CodeBlockNative;
+            }
         }
 
         // Create page 0 containing Graphiti editor. File was just unzipped in ResourceCache.
@@ -204,7 +209,22 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         //createPage2();
     }
 
+
+    /**
+     * After a rename of the resource this method is called.
+     * @param res
+     */
+    public void changeInput(IResource res) {
+        final FileEditorInput fei = new FileEditorInput((IFile) res);
+        setInput(fei);
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                setPartName(fei.getName());
+            }
+        });
+    }
     
+
     /**
      * The <code>MultiPageEditorPart</code> implementation of this
      * <code>IWorkbenchPart</code> method disposes all nested editors.
@@ -229,9 +249,6 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         
 		zip.storeDomainDiagram();
         
-        // then zip the whole thing again
-        //FileEditorInput fei = (FileEditorInput) getEditorInput();
-		
         zip.save();
     }
 
@@ -270,14 +287,13 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         super.init(site, editorInput);
         
 		setPartName(editorInput.getName());
-
     }
 
     /*
      * (non-Javadoc) Method declared on IEditorPart.
      */
     public boolean isSaveAsAllowed() {
-        return true;
+        return false;
     }
 
     /**
@@ -327,8 +343,5 @@ public class MultiPageEditor extends MultiPageEditorPart implements
             text.setFont(font);
         }
     }
-    
-    
-
 
 }

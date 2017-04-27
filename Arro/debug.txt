@@ -1,4 +1,8 @@
-#Arro/debug/option1=true
-#Arro/debug/builder=true
-#Arro/debug/editor=true
+#
+# Switch traces on/off
+#
+Arro/debug/option1=false
+Arro/debug/builder=false
+Arro/debug/editor=false
 Arro/debug/workspace=true
+Arro/debug/mpeditor=true

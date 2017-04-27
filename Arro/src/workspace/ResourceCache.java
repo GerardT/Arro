@@ -1,23 +1,13 @@
 package workspace;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -26,13 +16,7 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import arro.Constants;
-import arro.domain.ArroModule;
 import util.Logger;
 import util.PathUtil;
 
@@ -95,10 +79,28 @@ public class ResourceCache {
     
     public synchronized void addToCache(String typeName, IResource res) throws RuntimeException {
         if(lock.tryLock()) {
-            if(!cache.containsKey(typeName)) {
-                ArroModuleContainer zip = new ArroModuleContainer((IFile) res);
+            Map<String, String> meta = new HashMap<String, String>();
+            
+            ArroZipFile.getMeta((IFile) res, meta );
+            String uuid = meta.get("UUID");
+            
+            // now check if this entry is already in list
+            ArroModuleContainer zip = getZipByUuid(uuid);
+            if(zip == null) {
+                zip = new ArroModuleContainer((IFile) res);
                 cache.put(PathUtil.truncExtension(typeName), zip);  
-                Logger.out.trace(Logger.WS, typeName + " was added.");
+                Logger.out.trace(Logger.WS, "New " + typeName + " was added.");
+            } else {
+                // If renamed, first remove old name
+                cache.remove(zip.getName());
+                
+                // Change zip file in ArroZip
+                zip.changeFile(res);
+                cache.put(PathUtil.truncExtension(typeName), zip);  
+                Logger.out.trace(Logger.WS, "Existing " + typeName + " was added.");
+                if(zip.getEditor() != null) {
+                    zip.getEditor().changeInput(res);
+                }
             }
             lock.unlock();
         }
@@ -110,7 +112,7 @@ public class ResourceCache {
 //            ArroModuleContainer c = cache.get(typeName);
 //            c.cleanup();
 //            
-            cache.remove(typeName);
+//            cache.remove(typeName);
         }
     }
 
@@ -133,7 +135,6 @@ public class ResourceCache {
              getZip(zip.getName());
              zip.updateDependencies();
          }
-             
      }
 
 
@@ -144,10 +145,27 @@ public class ResourceCache {
      * FIXME: must search all resources in the open project.
      */
     public ArroModuleContainer getZip(String typeName) throws RuntimeException {
-        loadResourcesFromWorkspace();
+        //loadResourcesFromWorkspace();
         return cache.get(typeName);
     }
     
+    public ArroModuleContainer getZipByFile(IFile zipFile) {
+        Map<String, String> meta = new HashMap<String, String>();
+        
+        ArroZipFile.getMeta(zipFile, meta );
+        String uuid = meta.get("UUID");
+        
+        // Do we know it already?
+        ArroModuleContainer zip = getZipByUuid(uuid);
+        if(zip == null) {
+            String fileName = zipFile.getName();
+            zip = new ArroModuleContainer(zipFile);
+            cache.put(PathUtil.truncExtension(fileName), zip);  
+            Logger.out.trace(Logger.WS, "New " + fileName + " was added.");
+        }
+        return zip;
+    }
+
     /**
      * Get singleton object.
      * 

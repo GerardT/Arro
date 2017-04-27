@@ -25,6 +25,7 @@ public class Logger {
 	public static final String STD = "/debug/option1";
 	public static final String BUILDER = "/debug/builder";
     public static final String EDITOR = "/debug/editor";
+    public static final String MPE = "/debug/mpeditor";
     public static final String WS = "/debug/workspace";
 	public static final String ERROR = "/debug/error";
 

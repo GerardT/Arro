@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -34,7 +33,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import util.Logger;
-import util.PathUtil;
 
 /**
  * Class supporting zip files. By creating an instance it will
@@ -60,31 +58,18 @@ public class ArroZipFile {
 	public ArroZipFile(IFile zipFile) {
 		this.zipFile = zipFile;
 		
+		getMeta(zipFile, meta);
+		
 		builderFactory = DocumentBuilderFactory.newInstance();
 
     	if(zipFile.exists()) {
             try {
-                InputStream sourceMeta = zipFile.getContents(true);
-                
-                // Search for META
-                ZipInputStream inMeta = new ZipInputStream(sourceMeta);
-                
-                ZipEntry entryMeta = inMeta.getNextEntry();
-                while(entryMeta != null) {
-                    if(entryMeta.getName().equals("META")) {
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        byte[] buffer = new byte[1024];
-                        int count;
-                        while ((count = inMeta.read(buffer)) != -1) {
-                            baos.write(buffer, 0, count);
-                        }
-                        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-                        readMETA(bais);
-                    }
-                    entryMeta = inMeta.getNextEntry();                  
-                }
-                
                 tempFolder = getTempFolder();
+                if(tempFolder.exists()) {
+                    Logger.out.trace(Logger.WS, "Existing temp folder " + tempFolder.getName());
+                } else {
+                    Logger.out.trace(Logger.WS, "New temp folder " + tempFolder.getName());
+                }
 
                 // Open rest
                 InputStream source = zipFile.getContents(true);
@@ -116,7 +101,7 @@ public class ArroZipFile {
                     }
                 	entry = in.getNextEntry();        			
                 }
-                readMETA(files.get("META").getContents());
+                readMETA(files.get("META").getContents(), meta);
             } catch (CoreException e) {
                 throw new RuntimeException(e.getMessage());
             } catch (IOException e) {
@@ -125,9 +110,44 @@ public class ArroZipFile {
     	}
     }	
 
+
+    public void changeFile(IResource res) {
+        zipFile = (IFile) res;
+    }
+    public static void getMeta(IFile zipFile, Map<String, String> metaDb) {
+        
+        if(zipFile.exists()) {
+            try {
+                InputStream sourceMeta = zipFile.getContents(true);
+                
+                // Search for META
+                ZipInputStream inMeta = new ZipInputStream(sourceMeta);
+                
+                ZipEntry entryMeta = inMeta.getNextEntry();
+                while(entryMeta != null) {
+                    if(entryMeta.getName().equals("META")) {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        byte[] buffer = new byte[1024];
+                        int count;
+                        while ((count = inMeta.read(buffer)) != -1) {
+                            baos.write(buffer, 0, count);
+                        }
+                        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                        readMETA(bais, metaDb);
+                    }
+                    entryMeta = inMeta.getNextEntry();                  
+                }
+                
+            } catch (CoreException e) {
+                throw new RuntimeException(e.getMessage());
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+    }   
+
 	public IFolder getTempFolder() {
 	    IFolder folder = (IFolder)zipFile.getParent();
-        //folder = folder.getFolder("." + PathUtil.truncExtension(zipFile.getName()));
         folder = folder.getFolder("." + meta.get("UUID"));
 	    if(!folder.exists()) {
 	        try {
@@ -149,12 +169,14 @@ public class ArroZipFile {
         }
     }
 
-	private void readMETA(InputStream fXmlFile) {
+	private static void readMETA(InputStream fXmlFile, Map<String, String> metaDb) {
 	    try {
 	    	
-	    	Logger.out.trace(Logger.STD, "Reading META");
+	    	Logger.out.trace(Logger.WS, "Reading META");
 		    
-	    	DocumentBuilder dBuilder = builderFactory.newDocumentBuilder();
+	        DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
+
+	    	DocumentBuilder dBuilder = bf.newDocumentBuilder();
 	    	// For some reason, DocumentBuilder.parse closes the stream..
 	    	Document doc = dBuilder.parse(fXmlFile);
 	     
@@ -172,13 +194,8 @@ public class ArroZipFile {
 	    			Element eElement = (Element) nNode;
 	            	String key = eElement.getAttribute("key");
 	            	String value = eElement.getAttribute("value");
-	            	meta.put(key, value);
+	            	metaDb.put(key, value);
 	    		}
-	    	}
-	    	
-	    	if(!meta.containsKey("UUID")) {
-                String uuid = UUID.randomUUID().toString();
-                meta.put("UUID", uuid);
 	    	}
 	    } catch (Exception e) {
 	    	// no file
@@ -228,7 +245,7 @@ public class ArroZipFile {
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 		    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-		    Logger.out.trace(Logger.STD, "Saving META");
+		    Logger.out.trace(Logger.WS, "Saving META");
 			
 			DOMSource source = new DOMSource(doc);
 			ByteArrayOutputStream fXmlFile = new ByteArrayOutputStream();
@@ -248,7 +265,7 @@ public class ArroZipFile {
 				file.create(new ByteArrayInputStream(fXmlFile.toByteArray()), true, null /*monitor*/);
 			}
 	 
-			Logger.out.trace(Logger.STD, "File saved!");
+			Logger.out.trace(Logger.WS, "File saved!");
 	 
 		} catch (ParserConfigurationException pce) {
 			pce.printStackTrace();

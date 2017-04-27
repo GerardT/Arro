@@ -19,6 +19,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,11 +29,13 @@ import org.w3c.dom.NodeList;
 import arro.Constants;
 import arro.domain.ArroModule;
 import arro.domain.NonEmfDomainObject;
+import arro.editors.MultiPageEditor;
 import util.Logger;
 import util.PathUtil;
 
 public class ArroModuleContainer extends ArroZipFile {
     private NonEmfDomainObject domainDiagram = null;
+    private MultiPageEditor editor = null;
     
     /* for XML load / store */
     DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -86,6 +89,14 @@ public class ArroModuleContainer extends ArroZipFile {
 
     public String getUuid() {
         return super.getMETA("UUID");
+    }
+
+    public MultiPageEditor getEditor() {
+        return editor;
+    }
+
+    public void setEditor(MultiPageEditor editor) {
+        this.editor = editor;
     }
 
 
@@ -179,7 +190,7 @@ public class ArroModuleContainer extends ArroZipFile {
         
         try {
             
-            Logger.out.trace(Logger.STD, "Loading for " + zip.getName());
+            Logger.out.trace(Logger.WS, "Loading for " + zip.getName());
             
             n = new ArroModule();
             // FIXME compare name in file with name passed as parameter.
@@ -198,7 +209,7 @@ public class ArroModuleContainer extends ArroZipFile {
             //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
             doc.getDocumentElement().normalize();
          
-            Logger.out.trace(Logger.STD, "Root element :" + doc.getDocumentElement().getNodeName());
+            Logger.out.trace(Logger.WS, "Root element :" + doc.getDocumentElement().getNodeName());
             
             NodeList nList = doc.getElementsByTagName("module");
             for (int temp = 0; temp < nList.getLength(); temp++) {
@@ -238,7 +249,7 @@ public class ArroModuleContainer extends ArroZipFile {
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-            Logger.out.trace(Logger.STD, "Saving to " + fileName);
+            Logger.out.trace(Logger.WS, "Saving to " + fileName);
             
             DOMSource source = new DOMSource(doc);
             ByteArrayOutputStream fXmlFile = new ByteArrayOutputStream();
@@ -253,7 +264,7 @@ public class ArroModuleContainer extends ArroZipFile {
             IFile f = zip.getFile(Constants.MODULE_FILE_NAME);
             f.setContents(new ByteArrayInputStream(fXmlFile.toByteArray()), true, true, null);
      
-            Logger.out.trace(Logger.STD, "File saved!");
+            Logger.out.trace(Logger.WS, "File saved!");
      
         } catch (ParserConfigurationException pce) {
             pce.printStackTrace();
@@ -264,5 +275,4 @@ public class ArroModuleContainer extends ArroZipFile {
             e.printStackTrace();
         }
     }
-
 }
