@@ -19,7 +19,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,7 +32,7 @@ import arro.editors.MultiPageEditor;
 import util.Logger;
 import util.PathUtil;
 
-public class ArroModuleContainer extends ArroZipFile {
+public class ArroModuleContainer extends  ArroZipFile {
     private NonEmfDomainObject domainDiagram = null;
     private MultiPageEditor editor = null;
     
@@ -83,8 +82,10 @@ public class ArroModuleContainer extends ArroZipFile {
     }
 
     public void updateDependencies() {
-        getDomainDiagram();
-        domainDiagram.update();
+        //getDomainDiagram();
+        if(domainDiagram != null) {
+            domainDiagram.update();
+        }
     }
 
     public String getUuid() {

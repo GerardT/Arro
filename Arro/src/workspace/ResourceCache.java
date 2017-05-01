@@ -38,6 +38,7 @@ public class ResourceCache {
      * Constructor, init the cache.
      */
     public ResourceCache() {
+        removeTempFiles();
         lock = new ReentrantLock();
         cache = new ConcurrentHashMap<String, ArroModuleContainer>();
         
@@ -62,10 +63,38 @@ public class ResourceCache {
                     @Override
                     public boolean visit(IResource r) throws CoreException {
                         String typeName = r.getName();
-                        int ix = typeName.indexOf(".anod");
-                        if(!typeName.startsWith(".") && ix > 0) {
-                            typeName = typeName.substring(0, ix);
-                            addToCache(typeName, r);
+                        if(!typeName.startsWith(".")) {
+                            int ix = typeName.indexOf(".anod");
+                            if(ix > 0) {
+                                typeName = typeName.substring(0, ix);
+                                addToCache(typeName, r);
+                            }
+                        }
+                        return true;
+                    }
+                });
+            } catch (CoreException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    private void removeTempFiles() {
+        // build a map of all files in workspace
+        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+        IProject[] projects = workspaceRoot.getProjects();
+        
+        for(IProject p: projects) {
+            IResource r = p.getFolder("diagrams");
+            try {
+                r.accept(new IResourceVisitor() {
+
+                    @Override
+                    public boolean visit(IResource r) throws CoreException {
+                        String typeName = r.getName();
+                        if(typeName.startsWith(".")) {
+                            r.delete(true, null);
                         }
                         return true;
                     }
@@ -90,17 +119,21 @@ public class ResourceCache {
                 zip = new ArroModuleContainer((IFile) res);
                 cache.put(PathUtil.truncExtension(typeName), zip);  
                 Logger.out.trace(Logger.WS, "New " + typeName + " was added.");
-            } else {
+                updateDependents();
+            } else if(!PathUtil.truncExtension(zip.getName()).equals(typeName)) {
                 // If renamed, first remove old name
-                cache.remove(zip.getName());
+                cache.remove(PathUtil.truncExtension(zip.getName()));
+                Logger.out.trace(Logger.WS, "Existing " + PathUtil.truncExtension(zip.getName()) + " was removed.");
                 
                 // Change zip file in ArroZip
                 zip.changeFile(res);
+                zip.setMETA("name", PathUtil.truncExtension(zip.getName()));
                 cache.put(PathUtil.truncExtension(typeName), zip);  
                 Logger.out.trace(Logger.WS, "Existing " + typeName + " was added.");
                 if(zip.getEditor() != null) {
                     zip.getEditor().changeInput(res);
                 }
+                updateDependents();
             }
             lock.unlock();
         }
@@ -132,7 +165,7 @@ public class ResourceCache {
      public void updateDependents() {
          Collection<ArroModuleContainer> zips = cache.values();
          for(ArroModuleContainer zip: zips) {
-             getZip(zip.getName());
+             //getZip(zip.getName());
              zip.updateDependencies();
          }
      }

@@ -111,9 +111,22 @@ public class ArroZipFile {
     }	
 
 
+	/**
+	 * Change the resource that should be used for zipping / unzipping
+	 * from now oon.
+	 * 
+	 * @param res
+	 */
     public void changeFile(IResource res) {
         zipFile = (IFile) res;
     }
+    
+    /**
+     * Get Meta data from zip file without creating ArroZipFile object.
+     * 
+     * @param zipFile
+     * @param metaDb
+     */
     public static void getMeta(IFile zipFile, Map<String, String> metaDb) {
         
         if(zipFile.exists()) {
@@ -144,8 +157,35 @@ public class ArroZipFile {
                 throw new RuntimeException(e.getMessage());
             }
         }
-    }   
+    }
+    
+    /**
+     * Return Meta property as contained in ArroZipFile object.
+     * 
+     * @param key
+     * @return
+     */
+    public String getMETA(String key) {
+        return meta.get(key);
+    }
 
+    /**
+     * Set Meta property in ArroZipFile object.
+     * 
+     * @param key
+     * @param value
+     */
+    public void setMETA(String key, String value) {
+        meta.put(key, value);
+    }
+    
+
+
+    /**
+     * Return the temp folder that contains unzipped content.
+     * 
+     * @return
+     */
 	public IFolder getTempFolder() {
 	    IFolder folder = (IFolder)zipFile.getParent();
         folder = folder.getFolder("." + meta.get("UUID"));
@@ -160,123 +200,7 @@ public class ArroZipFile {
 	    return folder;
 	}
 	
-    public void cleanup() {
-        try {
-            tempFolder.delete(true, null);
-        } catch (CoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-	private static void readMETA(InputStream fXmlFile, Map<String, String> metaDb) {
-	    try {
-	    	
-	    	Logger.out.trace(Logger.WS, "Reading META");
-		    
-	        DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
-
-	    	DocumentBuilder dBuilder = bf.newDocumentBuilder();
-	    	// For some reason, DocumentBuilder.parse closes the stream..
-	    	Document doc = dBuilder.parse(fXmlFile);
-	     
-	    	//optional, but recommended
-	    	//read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
-	    	doc.getDocumentElement().normalize();
-	     
-	    	NodeList nList = doc.getElementsByTagName("entry");
-	    	for (int temp = 0; temp < nList.getLength(); temp++) {
-	     
-	    		Node nNode = nList.item(temp);
-	    		
-	    		if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-	    			 
-	    			Element eElement = (Element) nNode;
-	            	String key = eElement.getAttribute("key");
-	            	String value = eElement.getAttribute("value");
-	            	metaDb.put(key, value);
-	    		}
-	    	}
-	    } catch (Exception e) {
-	    	// no file
-        }
-	}
-	
-	public String getMETA(String key) {
-		return meta.get(key);
-	}
-	
-	public void setMETA(String key, String value) {
-		meta.put(key, value);
-	}
-	
-	private void saveMETA() {
-		try {
-			DocumentBuilder builder = builderFactory.newDocumentBuilder();
-		    	 
-			// root elements
-			Document doc = builder.newDocument();
-
-			Element elt = doc.createElement("metadata");
-			doc.appendChild(elt);
-			
-			Attr attr = null;
-			
-			Set<Entry<String, String>> set = meta.entrySet();
-			for(Entry<String, String> entry: set) {
-				Element sub = doc.createElement("entry");
-				elt.appendChild(sub);
-				
-				attr = doc.createAttribute("key");
-				attr.setValue(entry.getKey());
-				sub.setAttributeNode(attr);
-				
-				attr = doc.createAttribute("value");
-				attr.setValue(entry.getValue());
-				sub.setAttributeNode(attr);
-			}
-	 
-			// write the content into xml file
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-	        transformerFactory.setAttribute("indent-number", 4);
-
-			Transformer transformer = transformerFactory.newTransformer();
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-
-		    Logger.out.trace(Logger.WS, "Saving META");
-			
-			DOMSource source = new DOMSource(doc);
-			ByteArrayOutputStream fXmlFile = new ByteArrayOutputStream();
-
-			StreamResult result = new StreamResult(fXmlFile /*new File(fullPath)*/);
-			transformer.transform(source, result);
-	 
-			// Output to console for testing
-			StreamResult result2 = new StreamResult(System.out);
-			transformer.transform(source, result2);
-			
-			IFile file = files.get("META");
-
-			if (file.exists()) {
-				file.setContents(new ByteArrayInputStream(fXmlFile.toByteArray()), true, true, null);
-			} else {
-				file.create(new ByteArrayInputStream(fXmlFile.toByteArray()), true, null /*monitor*/);
-			}
-	 
-			Logger.out.trace(Logger.WS, "File saved!");
-	 
-		} catch (ParserConfigurationException pce) {
-			pce.printStackTrace();
-		} catch (TransformerException tfe) {
-			tfe.printStackTrace();
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
+    
 	/**
 	 * Returns specified file that is zipped inside zip file. We
 	 * don't 'export' META as a file. Use API instead.
@@ -349,7 +273,7 @@ public class ArroZipFile {
 
 
 	/**
-	 * Return filename.
+	 * Return filename of zipfile.
 	 * 
 	 * @return
 	 */
@@ -357,4 +281,105 @@ public class ArroZipFile {
 		return zipFile.getName();
 	}
 
+
+    private static void readMETA(InputStream fXmlFile, Map<String, String> metaDb) {
+        try {
+            
+            Logger.out.trace(Logger.WS, "Reading META");
+            
+            DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
+
+            DocumentBuilder dBuilder = bf.newDocumentBuilder();
+            // For some reason, DocumentBuilder.parse closes the stream..
+            Document doc = dBuilder.parse(fXmlFile);
+         
+            //optional, but recommended
+            //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
+            doc.getDocumentElement().normalize();
+         
+            NodeList nList = doc.getElementsByTagName("entry");
+            for (int temp = 0; temp < nList.getLength(); temp++) {
+         
+                Node nNode = nList.item(temp);
+                
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                     
+                    Element eElement = (Element) nNode;
+                    String key = eElement.getAttribute("key");
+                    String value = eElement.getAttribute("value");
+                    metaDb.put(key, value);
+                }
+            }
+        } catch (Exception e) {
+            // no file
+        }
+    }
+    
+    private void saveMETA() {
+        try {
+            DocumentBuilder builder = builderFactory.newDocumentBuilder();
+                 
+            // root elements
+            Document doc = builder.newDocument();
+
+            Element elt = doc.createElement("metadata");
+            doc.appendChild(elt);
+            
+            Attr attr = null;
+            
+            Set<Entry<String, String>> set = meta.entrySet();
+            for(Entry<String, String> entry: set) {
+                Element sub = doc.createElement("entry");
+                elt.appendChild(sub);
+                
+                attr = doc.createAttribute("key");
+                attr.setValue(entry.getKey());
+                sub.setAttributeNode(attr);
+                
+                attr = doc.createAttribute("value");
+                attr.setValue(entry.getValue());
+                sub.setAttributeNode(attr);
+            }
+     
+            // write the content into xml file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setAttribute("indent-number", 4);
+
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+            Logger.out.trace(Logger.WS, "Saving META");
+            
+            DOMSource source = new DOMSource(doc);
+            ByteArrayOutputStream fXmlFile = new ByteArrayOutputStream();
+
+            StreamResult result = new StreamResult(fXmlFile /*new File(fullPath)*/);
+            transformer.transform(source, result);
+     
+            // Output to console for testing
+            StreamResult result2 = new StreamResult(System.out);
+            transformer.transform(source, result2);
+            
+            IFile file = files.get("META");
+
+            if (file.exists()) {
+                file.setContents(new ByteArrayInputStream(fXmlFile.toByteArray()), true, true, null);
+            } else {
+                file.create(new ByteArrayInputStream(fXmlFile.toByteArray()), true, null /*monitor*/);
+            }
+     
+            Logger.out.trace(Logger.WS, "File saved!");
+     
+        } catch (ParserConfigurationException pce) {
+            pce.printStackTrace();
+        } catch (TransformerException tfe) {
+            tfe.printStackTrace();
+        } catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
 }
