@@ -189,24 +189,29 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         
         zip.setEditor(this);
         
-        if(zip.getMETA("type").equals(Constants.FUNCTION_BLOCK)) {
-            documentType = Constants.FunctionBlock;
-        } else if(zip.getMETA("type").equals(Constants.CODE_BLOCK)){
-            if(zip.getMETA("language").equals(Constants.NODE_PYTHON)) {
-                documentType = Constants.CodeBlockPython;
-            } else if(zip.getMETA("language").equals(Constants.NODE_NATIVE)) {
-                documentType = Constants.CodeBlockNative;
+        if(zip != null) {
+            if(zip.getMETA("type").equals(Constants.FUNCTION_BLOCK)) {
+                documentType = Constants.FunctionBlock;
+            } else if(zip.getMETA("type").equals(Constants.CODE_BLOCK)){
+                if(zip.getMETA("language").equals(Constants.NODE_PYTHON)) {
+                    documentType = Constants.CodeBlockPython;
+                } else if(zip.getMETA("language").equals(Constants.NODE_NATIVE)) {
+                    documentType = Constants.CodeBlockNative;
+                }
             }
-        }
 
-        // Create page 0 containing Graphiti editor. File was just unzipped in ResourceCache.
-        createPage0(fei.getName(), zip);
-        createPage2(fei.getName(), zip);
-        if(documentType == Constants.CodeBlockPython) {
-            createPage1(fei.getName(), zip);
-        }
+            // Create page 0 containing Graphiti editor. File was just unzipped in ResourceCache.
+            createPage0(fei.getName(), zip);
+            createPage2(fei.getName(), zip);
+            if(documentType == Constants.CodeBlockPython) {
+                createPage1(fei.getName(), zip);
+            }
 
-        //createPage2();
+            //createPage2();
+        } else {
+            Logger.out.trace(Logger.MPE, "File " + fileName + " could not be opened");
+        }
+        
     }
 
 

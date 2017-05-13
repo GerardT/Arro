@@ -1,4 +1,6 @@
 #
+# Add path of this file to Debug Configurations -> Arguments:
+#     -debug /.../Arro/Arro/debug.txt
 # Switch traces on/off
 #
 Arro/debug/option1=false

@@ -185,17 +185,10 @@ public class ResourceCache {
     public ArroModuleContainer getZipByFile(IFile zipFile) {
         Map<String, String> meta = new HashMap<String, String>();
         
-        ArroZipFile.getMeta(zipFile, meta );
-        String uuid = meta.get("UUID");
-        
-        // Do we know it already?
-        ArroModuleContainer zip = getZipByUuid(uuid);
-        if(zip == null) {
-            String fileName = zipFile.getName();
-            zip = new ArroModuleContainer(zipFile);
-            cache.put(PathUtil.truncExtension(fileName), zip);  
-            Logger.out.trace(Logger.WS, "New " + fileName + " was added.");
-        }
+        String fileName = zipFile.getName();
+        ArroModuleContainer zip = new ArroModuleContainer(zipFile);
+        cache.put(PathUtil.truncExtension(fileName), zip);  
+        Logger.out.trace(Logger.WS, "New " + fileName + " was added.");
         return zip;
     }
 
@@ -214,7 +207,8 @@ public class ResourceCache {
     public ArroModuleContainer getZipByUuid(String uuid) {
         Collection<ArroModuleContainer> zips = cache.values();
         for(ArroModuleContainer zip: zips) {
-            if(zip.getMETA("UUID").equals(uuid)) {
+            String value = zip.getMETA("UUID");
+            if(value != null && value.equals(uuid)) {
                 return zip;
             }
         }

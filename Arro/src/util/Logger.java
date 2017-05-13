@@ -11,7 +11,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 
 import arro.Constants;
-import workspace.ResourceCache;
 
 
 /**
@@ -31,13 +30,13 @@ public class Logger {
 
 	
 	// Add to Debug Configurations -> Arguments:
-	//  -debug /Users/gerard/git/Arro/Arro/debug.txt
+	//  -debug /..../Arro/Arro/debug.txt
 	//
-	// File containing:
-    // #Arro/debug/option1=true
-    // #Arro/debug/option2=true
-    // # Arro/debug/option3=true
-    // #Arro/debug/error=true
+	// File containing (example):
+    // Arro/debug/option1=true
+    // Arro/debug/option2=false
+    // Arro/debug/option3=false
+    // Arro/debug/error=false
 
 	private Logger(BundleContext context) {
 		ServiceTracker debugTracker = new ServiceTracker(context, DebugOptions.class.getName(), null);
@@ -51,7 +50,6 @@ public class Logger {
 		
 		MessageConsole myConsole = findConsole(Constants.CONSOLE_NAME);
 		console = myConsole.newMessageStream();
-
 	}
 	
 	/**
@@ -66,7 +64,6 @@ public class Logger {
 		}
 		return instance;
 	}
-	
 	
 	private MessageConsole findConsole(String name) {
 	    ConsolePlugin plugin = ConsolePlugin.getDefault();
@@ -84,6 +81,4 @@ public class Logger {
 	public static void writeToConsole(String msg) {
 		instance.console.println(msg);
 	}
-
-
 }
