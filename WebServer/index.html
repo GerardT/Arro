@@ -21,11 +21,13 @@
         form[0].addEventListener("submit", function (e) {
             // on forms submission send input to our server
             input_text = input.value;
-            object =
-                {
-                    firstName: "John",
-                    lastName: "Doe"
-                };
+            object = {
+              "address": ".main.aUiUserInput", 
+              "data": {
+                         firstName: "John",
+                         lastName: "Doe"
+                      }
+            };
             mySocket.send(JSON.stringify(object) + "\n");
             e.preventDefault()
         })

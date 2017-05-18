@@ -42,9 +42,10 @@ class WebSocketProtocol(WebSocketServerProtocol):
             print "was binary"
 
     def send(self, payload):
-        obj = json.loads(payload.decode('utf8'))
-        print obj
-        self.sendMessage(json.dumps(obj).encode('utf8'))
+        # obj = json.loads(payload.decode('utf8'))
+        # print obj
+        # self.sendMessage(json.dumps(obj).encode('utf8'))
+        self.sendMessage(payload)
 
 
 
