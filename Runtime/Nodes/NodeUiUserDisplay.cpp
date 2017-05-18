@@ -72,8 +72,12 @@ void NodeUiUserDisplay::runCycle() {
 
     MessageBuf buf = m_device->getInputData(m_input);
 
+    Json* msg = new Json();
+    msg->ParseFromString((*buf).c_str());
+
+
     if(buf != nullptr) {
-        SocketClient::getInstance()->sendMessage(m_uiClient, *buf);
+        SocketClient::getInstance()->sendMessage(m_uiClient, msg->data());
     }
 }
 
