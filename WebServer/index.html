@@ -8,6 +8,8 @@
     <link rel="import" href="bower_components/paper-checkbox/paper-checkbox.html">
     <link rel="import" href="bower_components/paper-slider/paper-slider.html">
     <link rel="import" href="bower_components/paper-progress/paper-progress.html">
+    <!-- Imports custom element -->
+    <link rel="import" href="arro-slider.html">
 
 
     <style>
@@ -35,17 +37,17 @@
     </paper-button>
     <paper-checkbox checked> On </paper-checkbox>
     <paper-checkbox> Off </paper-checkbox>
-    <paper-slider> </paper-slider>
-    <paper-slider> </paper-slider>
     <paper-progress id=".main.aUiUserDisplay" value="50" class="slow red"> </paper-progress>
-    <paper-slider id="abc" min="0" max="100" value="{{sliderValue}}" on-change="{{sliderChange}}"></paper-slider>
+
+    <!-- Runs custom element -->
+    <arro-slider name="Test" address=".main.aUiUserInput"></arro-slider>
 
     <div id="greeting"></div>
 
 
     <script type="text/javascript">
     // use vanilla JS because why not
-    var mySocket = 0; 
+    mySocket = 0; 
     var greeting = document.getElementById("greeting");
     window.addEventListener("load", function() {
         
@@ -69,16 +71,6 @@
     });
 
       document.addEventListener('WebComponentsReady', function() {
-        abc = document.getElementById("abc");
-        abc.addEventListener('value-change', function() {
-            object = {
-              "address": ".main.aUiUserInput", 
-              "data": {
-                         value: abc.value
-                      }
-            };
-            mySocket.send(JSON.stringify(object) + "\n");
-        });
 
         var button = document.querySelector('paper-button');
         button.addEventListener('click', function() {
