@@ -20,24 +20,27 @@
                 type: String,
                 value: 'myname'
             },
-            address: {
+            id: {
                 type: String,
                 value: 'myaddress'
             }
-        }
-    });
+        },
+        // add a callback to the element's prototype
+        ready: function() {
+            slider = document.getElementById("slider");
+            myaddr = this.id;
+            slider.addEventListener('value-change', function() {
+                object = {
+                    "address": myaddr, 
+                    "data": {
+                               value: slider.value
+                            }
+                  };
+                  mySocket.send(JSON.stringify(object) + "\n");
+            })
 
-    document.addEventListener('WebComponentsReady', function() {
-        abc = document.getElementById("slider");
-        abc.addEventListener('value-change', function() {
-            object = {
-                "address": ".main.aUiUserInput", 
-                "data": {
-                           value: abc.value
-                        }
-              };
-              mySocket.send(JSON.stringify(object) + "\n");
-      });
+        }
+
     });
 </script>
 

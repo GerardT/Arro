@@ -1,0 +1,35 @@
+
+<!-- Imports polymer -->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/paper-progress/paper-progress.html">
+
+<!-- Defines element markup -->
+<dom-module id="arro-progress">
+    <template>
+        <p><strong>{{name}}</strong></p>
+        <paper-progress value={{value}} class="slow red"> </paper-progress>
+    </template>
+</dom-module>
+
+<!-- Registers custom element -->
+<script>
+    Polymer({
+        is: 'arro-progress',
+        properties: {
+            name: {
+                type: String,
+                value: 'myname'
+            },
+            id: {
+                type: String,
+                value: 'myaddress'
+            }
+        },
+        // add a callback to the element's prototype
+        ready: function() {
+
+        }
+
+    });
+</script>
+
