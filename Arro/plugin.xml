@@ -24,6 +24,11 @@
             type="ArroSfcLeafDiagram"
             id="Arro.ArroSfcLeafDiagramType">
          </diagramType>
+         <diagramType
+            name="Arro UI Diagram Type"
+            type="ArroUiBlockDiagram"
+            id="Arro.ArroUiBlockDiagram">
+         </diagramType>
     </extension>
     <extension
          point="org.eclipse.graphiti.ui.diagramTypeProviders">
@@ -62,6 +67,14 @@
             id="Arro.FunctionLeafDiagramTypeProvider">
             <diagramType
                id="Arro.ArroFunctionLeafDiagram">
+            </diagramType>
+       </diagramTypeProvider>
+       <diagramTypeProvider
+            name="Arro UI Diagram Type Provider"
+            class="arro.diagram.types.UiBlockDiagramTypeProvider"
+            id="Arro.UiBlockDiagramTypeProvider">
+            <diagramType
+               id="Arro.ArroUiBlockDiagram">
             </diagramType>
        </diagramTypeProvider>
     </extension>
@@ -489,6 +502,13 @@
               icon="icons/sample.gif"
               id="arro.wizards.NewDeviceWizard"
               name="Code Block">
+        </wizard>
+        <wizard
+              category="Arro"
+              class="arro.wizards.uiblock.NewUiBlockWizard"
+              icon="icons/sample.gif"
+              id="arro.wizards.NewUiDeviceWizard"
+              name="UI Device">
         </wizard>
     </extension>
     

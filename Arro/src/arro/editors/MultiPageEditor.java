@@ -55,6 +55,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     private FunctionDiagramEditor functionEditor = null;
     private StateDiagramEditor stateEditor = null;
     private TextEditor pythonEditor = null;
+    private TextEditor htmlEditor = null;
     
     private ArroModuleContainer zip = null;
 
@@ -102,12 +103,12 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     void createPage1(String fileName, ArroModuleContainer zip) {
         IFile file = zip.getFile(Constants.PYTHON_FILE_NAME);
         if(file != null) {
-        	FileEditorInput fei2 = new FileEditorInput(file);
-        	
-    		if(zip.getMETA("type").equals(Constants.CODE_BLOCK)) {
-    			
+            FileEditorInput fei2 = new FileEditorInput(file);
+            
+            if(zip.getMETA("type").equals(Constants.CODE_BLOCK)) {
+                
                 try {
-                	// pass the file so later it knows where to store the .py file.
+                    // pass the file so later it knows where to store the .py file.
                     pythonEditor = new TextEditor();
                     
                     int index = addPage(pythonEditor, fei2);
@@ -116,7 +117,31 @@ public class MultiPageEditor extends MultiPageEditorPart implements
                     ErrorDialog.openError(getSite().getShell(),
                             "Error creating nested text editor", null, e.getStatus());
                 }
-    		}
+            }
+        }
+    }
+
+    /**
+     * Creates page 1 of the multi-page editor, which shows the Python code.
+     */
+    void createPageHtml(String fileName, ArroModuleContainer zip) {
+        IFile file = zip.getFile(Constants.UI_FILE_NAME);
+        if(file != null) {
+            FileEditorInput fei2 = new FileEditorInput(file);
+            
+            if(zip.getMETA("type").equals(Constants.UI_BLOCK)) {
+                
+                try {
+                    // pass the file so later it knows where to store the .py file.
+                    htmlEditor = new TextEditor();
+                    
+                    int index = addPage(htmlEditor, fei2);
+                    setPageText(index, "HTML Code");
+                } catch (PartInitException e) {
+                    ErrorDialog.openError(getSite().getShell(),
+                            "Error creating nested text editor", null, e.getStatus());
+                }
+            }
         }
     }
 
@@ -198,13 +223,20 @@ public class MultiPageEditor extends MultiPageEditorPart implements
                 } else if(zip.getMETA("language").equals(Constants.NODE_NATIVE)) {
                     documentType = Constants.CodeBlockNative;
                 }
+            } else if(zip.getMETA("type").equals(Constants.UI_BLOCK)){
+                documentType = Constants.CodeBlockHtml;
             }
 
             // Create page 0 containing Graphiti editor. File was just unzipped in ResourceCache.
-            createPage0(fei.getName(), zip);
-            createPage2(fei.getName(), zip);
-            if(documentType == Constants.CodeBlockPython) {
-                createPage1(fei.getName(), zip);
+            if(documentType == Constants.CodeBlockHtml) {
+                createPage0(fei.getName(), zip);
+                createPageHtml(fei.getName(), zip);
+            } else {
+                createPage0(fei.getName(), zip);
+                createPage2(fei.getName(), zip);
+                if(documentType == Constants.CodeBlockPython) {
+                    createPage1(fei.getName(), zip);
+                }
             }
 
             //createPage2();
@@ -245,11 +277,9 @@ public class MultiPageEditor extends MultiPageEditorPart implements
      * Saves the multi-page editor's document.
      */
     public void doSave(IProgressMonitor monitor) {
-        int i = 0;
-        getEditor(i++).doSave(monitor);
-        getEditor(i++).doSave(monitor);
-        if(documentType == Constants.CodeBlockPython) {
-            getEditor(i++).doSave(monitor);
+        int count = getPageCount();
+        for(int i = 0; i < count; i++) {
+            getEditor(i).doSave(monitor);
         }
         
 		zip.storeDomainDiagram();
