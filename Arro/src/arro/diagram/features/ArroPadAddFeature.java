@@ -71,6 +71,7 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
         
 
         ArroModule domainModule;
+        boolean isInput = true;
         int docType;
         Object obj = context.getNewObject();
         if(obj instanceof IFile) {
@@ -104,6 +105,11 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
             docType = Constants.CodeBlockHtml;
             instanceName = (String) context.getProperty(Constants.PROP_CONTEXT_NAME_KEY);
             className = "Json";
+            if(instanceName.equals("input")) {
+                isInput = true;
+            } else {
+                isInput = false;
+            }
 
         }
         if(!(obj instanceof ArroPad)) {
@@ -130,9 +136,13 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 		{
 			gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), width, height);
 			roundedRectangle.setFilled(true);
-			
-	        roundedRectangle.setForeground(manageColor(Constants.PAD_FOREGROUND_INPUT));
-	        roundedRectangle.setBackground(manageColor(Constants.PAD_BACKGROUND_INPUT));
+			if(isInput) {
+	            roundedRectangle.setForeground(manageColor(Constants.PAD_FOREGROUND_INPUT));
+	            roundedRectangle.setBackground(manageColor(Constants.PAD_BACKGROUND_INPUT));
+			} else {
+	            roundedRectangle.setForeground(manageColor(Constants.PAD_FOREGROUND_OUTPUT));
+	            roundedRectangle.setBackground(manageColor(Constants.PAD_BACKGROUND_OUTPUT));
+			}
 	        roundedRectangle.setLineWidth(2);
 		}
 		

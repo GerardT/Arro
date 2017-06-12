@@ -1,4 +1,4 @@
-package arro.wizards.uiblock;
+package arro.wizards.uiinputblock;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -45,7 +45,6 @@ import arro.Constants;
 import arro.domain.ArroDevice;
 import arro.domain.ArroModule;
 import arro.domain.ArroPad;
-import arro.domain.ArroStep;
 import arro.wizards.FileService;
 import workspace.ResourceCache;
 
@@ -60,8 +59,8 @@ import workspace.ResourceCache;
  * be able to open it.
  */
 
-public class NewUiBlockWizard extends Wizard implements INewWizard {
-    private NewUiBlockWizardPage page;
+public class NewUiInputBlockWizard extends Wizard implements INewWizard {
+    private NewUiInputBlockWizardPage page;
     private ISelection selection;
     private ArroModule nodeDiagram;
     private ArroDevice device;
@@ -71,7 +70,7 @@ public class NewUiBlockWizard extends Wizard implements INewWizard {
     /**
      * Constructor for SampleNewWizard.
      */
-    public NewUiBlockWizard() {
+    public NewUiInputBlockWizard() {
         super();
         setNeedsProgressMonitor(true);
     }
@@ -81,7 +80,7 @@ public class NewUiBlockWizard extends Wizard implements INewWizard {
      */
 
     public void addPages() {
-        page = new NewUiBlockWizardPage(selection);
+        page = new NewUiInputBlockWizardPage(selection);
         addPage(page);
     }
 
@@ -148,7 +147,7 @@ public class NewUiBlockWizard extends Wizard implements INewWizard {
         // Setup domain structures
         nodeDiagram = new ArroModule();
         pad = new ArroPad();
-        pad.setName("input");
+        pad.setName("output");
 
         ResourceCache.getInstance().lock();
         final IFile file = f.getFile(new Path(fileName));
@@ -315,7 +314,7 @@ public class NewUiBlockWizard extends Wizard implements INewWizard {
         context.setNewObject(pad);
         context.setTargetContainer(diagram);
         context.putProperty(Constants.PROP_CONTEXT_MOD_KEY, nodeDiagram);
-        context.putProperty(Constants.PROP_CONTEXT_NAME_KEY, "input");
+        context.putProperty(Constants.PROP_CONTEXT_NAME_KEY, "output");
         
         f = dtp.getFeatureProvider().getAddFeature(context);
         f.add(context);
@@ -330,7 +329,7 @@ public class NewUiBlockWizard extends Wizard implements INewWizard {
         String contents =   "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
                 "<module id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
                 "    <device id=\"" + device.getId() + "\" url=\"" + "html:" + diagramName + "\"/>\n" +
-                "        <pad id=\"" + pad.getId() + "\" input=\"true\" name=\"input\" run=\"true\" type=\"Json\"/>" +
+                "        <pad id=\"" + pad.getId() + "\" input=\"false\" name=\"output\" run=\"true\" type=\"Json\"/>" +
                 "</module>\n";
         return new ByteArrayInputStream(contents.getBytes());
     }

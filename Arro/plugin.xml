@@ -505,10 +505,17 @@
         </wizard>
         <wizard
               category="Arro"
-              class="arro.wizards.uiblock.NewUiBlockWizard"
+              class="arro.wizards.uiinputblock.NewUiInputBlockWizard"
               icon="icons/sample.gif"
-              id="arro.wizards.NewUiDeviceWizard"
-              name="UI Device">
+              id="arro.wizards.NewUiInputDeviceWizard"
+              name="UI Input Device">
+        </wizard>
+        <wizard
+              category="Arro"
+              class="arro.wizards.uioutputblock.NewUiOutputBlockWizard"
+              icon="icons/sample.gif"
+              id="arro.wizards.NewUiOutputDeviceWizard"
+              name="UI Output Device">
         </wizard>
     </extension>
     

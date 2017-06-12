@@ -1,4 +1,4 @@
-package arro.wizards.uiblock;
+package arro.wizards.uiinputblock;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -16,7 +16,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -30,12 +29,10 @@ import arro.Constants;
  * OR with the extension that matches the expected one (Constants.NODE_EXT).
  */
 
-public class NewUiBlockWizardPage extends WizardPage {
+public class NewUiInputBlockWizardPage extends WizardPage {
 	private Text containerText;
 
 	private Text fileText;
-	private Combo language;
-
 	private ISelection selection;
 
 	/**
@@ -43,9 +40,9 @@ public class NewUiBlockWizardPage extends WizardPage {
 	 * 
 	 * @param pageName
 	 */
-	public NewUiBlockWizardPage(ISelection selection) {
+	public NewUiInputBlockWizardPage(ISelection selection) {
 		super("wizardPage");
-		setTitle("Arro UI Block");
+		setTitle("Arro UI Input Block");
 		setDescription("This wizard creates a new file with *." + Constants.NODE_EXT + " extension that can be opened by the diagram editor.");
 		this.selection = selection;
 	}
@@ -124,7 +121,7 @@ public class NewUiBlockWizardPage extends WizardPage {
 			}
 		}
 
-		fileText.setText("NewUI");
+		fileText.setText("NewUiInput");
 	}
 
 	/**
