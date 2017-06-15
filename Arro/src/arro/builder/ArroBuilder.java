@@ -206,9 +206,11 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 	 * Entry point for the build process. It should depend on kind if full or incremental
 	 * build is done. We always do full build.
 	 * 
-	 * First create 2 files with skeleton info:
+	 * First create 4 files with skeleton info:
 	 * arro.proto - for messages
 	 * arro.xml- for function diagrams.
+	 * arro.html - for webcomponents UI
+	 * arro_pgm.py - for.. 
 	 * 
 	 * Then run sort of a fake build, one that just collects file names in the project. These are
 	 * collected in BuildInfo.
@@ -238,18 +240,48 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			baos.close();
 			
             // Write prolog for arro.xml
-			baos = new ByteArrayOutputStream();
-			baos.write(("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n" +
-						"<modules>\n").getBytes());
-	    	
-			IFile resultFileNodes = folder.getFile("arro.xml");
+            baos = new ByteArrayOutputStream();
+            baos.write(("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n" +
+                        "<modules>\n").getBytes());
+            
+            IFile resultFileNodes = folder.getFile("arro.xml");
 
-			if (resultFileNodes.exists()) {
-				resultFileNodes.setContents(new ByteArrayInputStream(baos.toByteArray()), true, true, null);
-			} else {
-				resultFileNodes.create(new ByteArrayInputStream(baos.toByteArray()), true, null);
-			}
-			baos.close();
+            if (resultFileNodes.exists()) {
+                resultFileNodes.setContents(new ByteArrayInputStream(baos.toByteArray()), true, true, null);
+            } else {
+                resultFileNodes.create(new ByteArrayInputStream(baos.toByteArray()), true, null);
+            }
+            baos.close();
+
+            // Write prolog for arro.html
+            baos = new ByteArrayOutputStream();
+            baos.write((
+"<!DOCTYPE html>\n" +
+"<meta charset=\"UTF-8\"> \n" +
+"<html lang=\"en\">\n" +
+"  <head>\n" +
+"    <script src=\"https://polygit.org/components/webcomponentsjs/webcomponents-loader.js\"></script>\n" +
+"    <link rel=\"import\" href=\"bower_components/paper-button/paper-button.html\">\n" +
+"    <link rel=\"import\" href=\"bower_components/paper-checkbox/paper-checkbox.html\">\n" +
+"    <link rel=\"import\" href=\"bower_components/paper-slider/paper-slider.html\">\n" +
+"    <link rel=\"import\" href=\"bower_components/paper-progress/paper-progress.html\">\n" +
+"    <!-- Import all elements here -->\n" +
+"    <link rel=\"import\" href=\"arro-slider.html\">\n" +
+"    <link rel=\"import\" href=\"arro-progress.html\">\n" +
+"    <style>\n" +
+"    </style>\n" +
+"  </head>\n" +
+"  <body>\n" +
+"      <!-- Instantiate all elements here -->\n\n").getBytes());
+            
+            IFile resultFileHtml = folder.getFile("arro.html");
+
+            if (resultFileHtml.exists()) {
+                resultFileHtml.setContents(new ByteArrayInputStream(baos.toByteArray()), true, true, null);
+            } else {
+                resultFileHtml.create(new ByteArrayInputStream(baos.toByteArray()), true, null);
+            }
+            baos.close();
 
             // Write prolog for arro_pgm.py
 			baos = new ByteArrayOutputStream();
@@ -283,6 +315,27 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			
             // Write epilog for arro.xml
 			resultFileNodes.appendContents(new ByteArrayInputStream("</modules>\n".getBytes()), true, true, null);
+
+            // Write epilog for arro.html
+            resultFileHtml.appendContents(new ByteArrayInputStream((
+"    <script type=\"text/javascript\">\n" +
+"    // use vanilla JS because why not\n" +
+"    mySocket = 0; \n" +
+"    window.addEventListener(\"load\", function() {\n" +
+"        // create websocket instance\n" +
+"        mySocket = new WebSocket(\"ws://\" + location.host + \"/ws\");\n" +
+"        // Display output\n" +
+"        // add event listener reacting when message is received\n" +
+"        mySocket.onmessage = function (event) {\n" +
+"            json = JSON.parse(event.data);\n" +
+"            address = json.address;\n" +
+"            var web_component = document.getElementById(address);\n" +
+"            web_component.value = json.data.value;\n" +
+"        };\n" +
+"    });\n" +
+"    </script>\n" +
+"  </body>\n" +
+"</html>\n").getBytes()), true, true, null);
 
 	    } catch (Exception e) {
 	    	e.printStackTrace();
