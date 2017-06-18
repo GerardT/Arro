@@ -27,8 +27,8 @@
         },
         // add a callback to the element's prototype
         ready: function() {
-            slider = document.getElementById("slider");
-            myaddr = this.id;
+            var myaddr = this.id;
+            var slider = this.$.slider;
             slider.addEventListener('value-change', function() {
                 object = {
                     "address": myaddr, 

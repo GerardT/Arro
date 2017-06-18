@@ -15,7 +15,8 @@ from autobahn.twisted.websocket import WebSocketServerFactory, \
 from autobahn.twisted.resource import WebSocketResource
 
 
-# protocol class to specify the behavior of the server
+# Websocket protocol handler used by WebSocketFactory to
+# support communication with browser.
 class WebSocketProtocol(WebSocketServerProtocol):
     def onOpen(self):
         """
@@ -49,7 +50,12 @@ class WebSocketProtocol(WebSocketServerProtocol):
 
 
 
-class LocalSocketProtocol(protocol.Protocol):
+# Socket protocol handler used by LocalSocketFactory to
+# support communication with Arro server sw.
+#class LocalSocketProtocol(protocol.Protocol):
+class LocalSocketProtocol(LineReceiver):
+    delimiter = '\n'
+
     def __init__(self, factory):
         self.factory = factory
         self.peer = self
@@ -62,8 +68,10 @@ class LocalSocketProtocol(protocol.Protocol):
         Remove client from list of tracked connections.
         """
         self.factory.unregister(self)
-    def dataReceived(self, payload):
+    def lineReceived(self, payload):
+        # problem here: need to recognize separate messages.
         print 'LocalSocketProtocol LocalSocketProtocol ' + payload
+        # use factory method to send message to browser
         self.factory.communicate(payload)
         #self.transport.write(payload)
 
@@ -71,8 +79,9 @@ class LocalSocketProtocol(protocol.Protocol):
         print "server message received"
         self.transport.write(payload)
 
-
+# browser clients
 clients = []
+# arro server (could theoretically be more than 1)
 servers = []
 
 
@@ -123,18 +132,17 @@ if __name__ == "__main__":
     # instance of WebSocketProtocol for each connection
     factory = WebSocketFactory(u"ws://127.0.0.1:8080")
     factory.protocol = WebSocketProtocol
-    # connect the resource to the factory
+
+    # connect the resource (web page) to the factory
     resource = WebSocketResource(factory)
-
-    # 2 websockets resources on "/ws1" and "/ws2" path
+    # and assign resource to a root URL ("/ws1")
     root.putChild(u"ws", resource)
-    #root.putChild(u"ws2", resource)
-
-
+ 
+    # start 'normal' socket
     endpoints.serverFromString(reactor, "tcp:9000").listen(LocalSocketFactory())
 
 
-    # serve html as well
+    # start web socket
     site = Site(root)
     reactor.listenTCP(8080, site)
     reactor.run()
