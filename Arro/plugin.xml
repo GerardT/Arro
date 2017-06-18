@@ -274,7 +274,7 @@
              class="arro.messageeditor.MessageEditor"
              contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
              extensions="amsg"
-             icon="icons/sample.gif"
+             icon="icons/icon_interface.png"
              id="arro.editors.MessageEditor"
              name="Message Type Editor">
        </editor>
@@ -282,7 +282,7 @@
              class="arro.editors.MultiPageEditor"
              contributorClass="arro.editors.MultiPageEditorContributor"
              extensions="anod"
-             icon="icons/sample.gif"
+             icon="icons/icon_composite.png"
              id="arro.editors.MultiPageEditor"
              name="Function Diagram Editor">
        </editor>
@@ -485,35 +485,35 @@
         <wizard
             category="Arro"
             class="arro.wizards.message.NewMessageWizard"
-            icon="icons/sample.gif"
+            icon="icons/icon_interface.png"
             id="arro.wizards.SampleNewWizard"
             name="Message Definition">
         </wizard>
         <wizard
               category="Arro"
               class="arro.wizards.functionblock.NewFunctionBlockWizard"
-              icon="icons/sample.gif"
+              icon="icons/icon_composite.png"
               id="arro.wizards.SampleNewWizard"
               name="Function Block">
         </wizard>
         <wizard
               category="Arro"
               class="arro.wizards.codeblock.NewCodeBlockWizard"
-              icon="icons/sample.gif"
+              icon="icons/icon_composite.pngf"
               id="arro.wizards.NewDeviceWizard"
               name="Code Block">
         </wizard>
         <wizard
               category="Arro"
               class="arro.wizards.uiinputblock.NewUiInputBlockWizard"
-              icon="icons/sample.gif"
+              icon="icons/icon_composite.png"
               id="arro.wizards.NewUiInputDeviceWizard"
               name="UI Input Device">
         </wizard>
         <wizard
               category="Arro"
               class="arro.wizards.uioutputblock.NewUiOutputBlockWizard"
-              icon="icons/sample.gif"
+              icon="icons/icon_composite.png"
               id="arro.wizards.NewUiOutputDeviceWizard"
               name="UI Output Device">
         </wizard>

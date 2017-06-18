@@ -328,7 +328,7 @@ public class NewUiOutputBlockWizard extends Wizard implements INewWizard {
     private InputStream openXmlStream(IFile file, String diagramName) throws CoreException {
         String contents =   "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
                 "<module id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
-                "    <device id=\"" + device.getId() + "\" url=\"" + "html:" + diagramName + "\"/>\n" +
+                "    <device id=\"" + device.getId() + "\" url=\"" + "UiOut:" + diagramName + "\"/>\n" +
                 "        <pad id=\"" + pad.getId() + "\" input=\"true\" name=\"input\" run=\"true\" type=\"Json\"/>" +
                 "</module>\n";
         return new ByteArrayInputStream(contents.getBytes());
