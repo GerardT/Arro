@@ -91,7 +91,7 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 
 		public boolean visit(IResource resource) {
 			Logger.out.trace(Logger.BUILDER, "Try checking resource " + resource.getName());
-			checkXML(resource);
+			//checkXML(resource);
 			processResource(resource, buildInfo);
 			//return true to continue visiting children.
 			return true;
