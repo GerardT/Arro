@@ -28,7 +28,7 @@ namespace Arro
          * \param params List of parameters to pass to node.
          */
         Process(NodeDb& nodeDb, const std::string& url, const std::string& instance, StringMap params, TiXmlElement* elt = nullptr);
-        Process(NodeDb& nodeDb, const std::string& instance);
+        //Process(NodeDb& nodeDb, const std::string& instance);
         ~Process();
 
         // Copy and assignment is not supported.

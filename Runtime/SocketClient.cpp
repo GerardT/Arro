@@ -25,14 +25,18 @@ SocketClient* SocketClient::m_inst = nullptr;
 
 class Arro::NodeRef {
 public:
-    NodeRef(const std::string& n, std::function<void (const std::string& data)> l):
+    NodeRef(const std::string& n, const std::string& component, std::function<void (const std::string& data)> l):
         nodeName{n},
-        listen{l}
+        listen{l},
+        webComponent{component}
         {};
-    const string& getName() { return nodeName; };
+        const string& getName() { return nodeName; };
+        const string& getComponent() { return webComponent; };
 public:
     string nodeName;
     std::function<void (const std::string& data)> listen;
+private:
+    std::string webComponent;
 };
 
 /**
@@ -58,8 +62,8 @@ SocketClient::~SocketClient() {
 
 
 NodeRef*
-SocketClient::subscribe(const string& nodeName, std::function<void (const std::string& data)> listen) {
-    NodeRef* n = new NodeRef(nodeName, listen);
+SocketClient::subscribe(const string& nodeName, const std::string& component, std::function<void (const std::string& data)> listen) {
+    NodeRef* n = new NodeRef(nodeName, component, listen);
     m_clients[nodeName] = n;
     return n;
 }
@@ -71,12 +75,30 @@ SocketClient::unsubscribe(NodeRef* clientId) {
 
 void
 SocketClient::generateWebUi() {
-    auto fp = fopen("ui.html", "w");
+    char* line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    auto fp2 = fopen("index.html", "w");
+
+    auto fp1 = fopen("download/arro.html", "r");
+    while((read = getline(&line, &len, fp1)) != -1)
+    {
+        fprintf(fp2, "%s", line);
+        if(strncmp(line, "      <!-- Instantiate all elements here -->", 38) == 0)
+        {
+            break;
+        }
+    }
     for(std::pair<std::string, NodeRef*> node: m_clients) {
-        fprintf(fp, "address %s", node.second->nodeName.c_str());
+        fprintf(fp2, "%s\n", node.second->getComponent().c_str());
 
     }
-    fclose(fp);
+    while((read = getline(&line, &len, fp1)) != -1)
+    {
+        fprintf(fp2, "%s", line);
+    }
+    fclose(fp1);
+    fclose(fp2);
 }
 
 
@@ -88,7 +110,7 @@ SocketClient::generateWebUi() {
 */
 bool
 SocketClient::sendMessage(NodeRef* uiClient, const string& data) {
-    string newData = "{ \"address\" : \"" + uiClient->getName() + "\", \"data\" : " + data + "}";
+    string newData = "{ \"address\" : \"" + uiClient->getName() + "\", \"data\" : " + data + "}\n";
 
     if( send(sock , newData.c_str() , strlen( newData.c_str() ) , 0) < 0)
     {

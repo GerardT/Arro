@@ -29,7 +29,7 @@ public:
     SocketClient(const std::string& address, int port);
     virtual ~SocketClient();
     bool conn(const std::string& address, int port);
-    NodeRef* subscribe(const std::string& nodeName, std::function<void (const std::string& data)> listen);
+    NodeRef* subscribe(const std::string& nodeName, const std::string& component, std::function<void (const std::string& data)> listen);
     void unsubscribe(NodeRef* clientId);
     bool sendMessage(NodeRef* uiClient, const std::string& data);
     static int readln(int sockfd, char* buffer, size_t n/*size*/);

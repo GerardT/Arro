@@ -48,13 +48,16 @@ using namespace std;
 using namespace Arro;
 using namespace arro;
 
-static RegisterMe<NodeUiUserDisplay> registerMe("UiUserDisplay");
+static RegisterMe<NodeUiUserDisplay> registerMe("_UiUserDisplay");
 
 NodeUiUserDisplay::NodeUiUserDisplay(AbstractNode* d, const string& /*name*/, StringMap& /*params*/, TiXmlElement*):
     m_trace("NodeUiReceiveNumber", true),
     m_device(d) {
 
-    m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), [=](const std::string& data) {
+    //     <arro-progress id=".main.aUiUserOutput" name="Test output"></arro-progress>
+    std::string name("Test output");
+    std::string inst = std::string("<arro-progress id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-progress>";
+    m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
                         // SocketClient::getInstance()->sendMessage(m_uiClient, data);
                     });
 

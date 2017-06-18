@@ -48,7 +48,7 @@ using namespace std;
 using namespace Arro;
 using namespace arro;
 
-static RegisterMe<NodeUiUserInput> registerMe("UiUserInput");
+static RegisterMe<NodeUiUserInput> registerMe("_UiUserInput");
 
 NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, StringMap& /*params*/, TiXmlElement*):
     m_trace("NodeUiReceiveNumber", true),
@@ -57,7 +57,11 @@ NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, String
     // TODO should get i/o here
     //m_output = m_device->getOutput("output");
 
-    m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), [=](const std::string& data) {
+    //     <arro-slider id=".main.aUiUserInput" name="Test input"></arro-slider>
+    std::string name("Test input");
+    std::string inst = std::string("<arro-slider id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-slider>";
+
+    m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
         m_output = m_device->getOutput("output");
 
         Json* value = new Json();

@@ -21,21 +21,22 @@ using namespace Arro;
 using namespace std;
 
 
-Process::Process(NodeDb& db, const string& instance):
-    RealNode{},
-    m_trace{"Process", true},
-    m_nodeDb{db},
-    m_device{nullptr},
-    m_doRunCycle{false},
-    m_name{instance} {
-
-    m_trace.println("Creating sfc " + instance + "._sfc");
-
-    m_trace.println("---> Never used?? <--- ");
-
-    db.registerNode(this, instance + "._sfc");
-
-}
+//Process::Process(NodeDb& db, const string& instance):
+//    RealNode{},
+//    m_trace{"Process", true},
+//    m_nodeDb{db},
+//    m_device{nullptr},
+//    m_doRunCycle{false},
+//    m_name{instance},
+//    m_webComponents(nullptr) {
+//
+//    m_trace.println("Creating sfc " + instance + "._sfc");
+//
+//    m_trace.println("---> Never used?? <--- ");
+//
+//    db.registerNode(this, instance + "._sfc");
+//
+//}
 
 Process::Process(NodeDb& db, const string& url, const string& instance, StringMap params, TiXmlElement* elt):
     RealNode{},
@@ -169,6 +170,26 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
             }
         } catch(out_of_range &) {
             throw std::runtime_error("Invalid URL for Python node " + url);
+        }
+    } else if(url.find("UiIn:") == 0) {
+        StringMap params{};
+        m_trace.println("new NodeUiIn(" + instance + ")");
+        try {
+            if(ServerEngine::getFactory("_UiUserInput", factory)) {
+                m_device = factory(this, "", params, elt);
+            }
+        } catch(out_of_range &) {
+            throw std::runtime_error("Invalid URL for SFC node " + url);
+        }
+    } else if(url.find("UiOut:") == 0) {
+        StringMap params{};
+        m_trace.println("new NodeUiOut(" + instance + ")");
+        try {
+            if(ServerEngine::getFactory("_UiUserDisplay", factory)) {
+                m_device = factory(this, "", params, elt);
+            }
+        } catch(out_of_range &) {
+            throw std::runtime_error("Invalid URL for SFC node " + url);
         }
     } else if(url.find("Sfc:") == 0) {
         StringMap params{};
