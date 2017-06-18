@@ -28,10 +28,12 @@ public class ArroPadUpdateFeature  extends DefaultUpdateDiagramFeature {
 		super(fp);
 	}
 	 
+    @Override
     public IReason updateNeeded(IUpdateContext context) {
     	return super.updateNeeded(context);
     }
  
+    @Override
     public boolean update(IUpdateContext context) {
         PictogramElement pictogramElement = context.getPictogramElement();
         

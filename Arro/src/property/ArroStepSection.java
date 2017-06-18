@@ -47,6 +47,7 @@ public class ArroStepSection extends ArroGenericSection {
 
         listener = new ModifyListener() {
 
+            @Override
             public void modifyText(ModifyEvent e) {
                 if(!(nameTextVal.getText().equals("_ready") || nameTextVal.getText().equals("_terminated"))) {
                     name = Misc.checkString(nameTextVal);
@@ -141,9 +142,11 @@ public class ArroStepSection extends ArroGenericSection {
         
         IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
                 
+            @Override
             public boolean canExecute(IContext context) {
                 return true;
             }
+            @Override
             public void execute(IContext context) {
                 final PictogramElement pe = getSelectedPictogramElement();
                 ArroStep n = getState(pe);

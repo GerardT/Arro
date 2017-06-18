@@ -376,7 +376,8 @@ public class MessageEditor extends EditorPart {
 
 	private void hookDoubleClickAction() {
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
+			@Override
+            public void doubleClick(DoubleClickEvent event) {
 				doubleClickAction.run();
 			}
 		});
@@ -385,7 +386,8 @@ public class MessageEditor extends EditorPart {
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
-	public void setFocus() {
+	@Override
+    public void setFocus() {
 		viewer.getControl().setFocus();
 		
 	    setUndoRedoActionHandlers();

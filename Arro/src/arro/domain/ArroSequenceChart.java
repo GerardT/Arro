@@ -19,7 +19,8 @@ public class ArroSequenceChart extends NonEmfDomainObject {
     private ArrayList<ArroRequest> publishedActions = new ArrayList<ArroRequest>();;
 	private ArroModule parent;
 	
-	@SuppressWarnings("unchecked")
+	@Override
+    @SuppressWarnings("unchecked")
 	public ArroSequenceChart clone() {
 		ArroSequenceChart diag = new ArroSequenceChart();
 		diag.steps = (HashMap<String, ArroStep>) steps.clone();

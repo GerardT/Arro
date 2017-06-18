@@ -53,6 +53,7 @@ public class ArroConditionSection extends ArroGenericSection {
 
         nameTextVal.addModifyListener(new ModifyListener() {
 
+            @Override
             public void modifyText(ModifyEvent e) {
                 //name = Misc.checkString(nameTextVal);
                 name = nameTextVal.getText();
@@ -172,9 +173,11 @@ public class ArroConditionSection extends ArroGenericSection {
         
         IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
                 
+            @Override
             public boolean canExecute(IContext context) {
                 return true;
             }
+            @Override
             public void execute(IContext context) {
                 ArroTransition n = getTransition();
 

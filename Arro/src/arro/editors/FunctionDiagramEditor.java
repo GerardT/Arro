@@ -54,7 +54,7 @@ public class FunctionDiagramEditor extends DiagramEditor {
 		
 		ArroModule domainObject = (ArroModule)zip.getDomainDiagram();
 		if(domainObject != null && domainObject instanceof ArroModule) {
-			domainModule = (ArroModule)domainObject;
+			domainModule = domainObject;
 		} else {
 	    	// Then it must be that a new diagram is created...
 	    	domainModule = new ArroModule();

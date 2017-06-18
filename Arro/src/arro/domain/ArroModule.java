@@ -34,7 +34,8 @@ public class ArroModule extends NonEmfDomainObject  {
 		stateDiagram = null;
 	}
 	
-	public ArroModuleContainer update() {
+	@Override
+    public ArroModuleContainer update() {
 	    // update all nodes
 	    Collection<ArroNode> v = nodes.values();
 	    for(ArroNode n : v) {

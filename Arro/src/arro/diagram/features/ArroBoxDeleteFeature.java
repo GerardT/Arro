@@ -11,7 +11,8 @@ public class ArroBoxDeleteFeature extends DefaultDeleteFeature {
 	public ArroBoxDeleteFeature(IFeatureProvider fp) {
 		super(fp);
 	}
-	public void delete(IDeleteContext context) {
+	@Override
+    public void delete(IDeleteContext context) {
 		Logger.out.trace(Logger.EDITOR, "trying to remove box");
 	}
 

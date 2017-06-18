@@ -33,7 +33,8 @@ public class NodeAddFeature extends AbstractAddFeature implements IAddFeature, I
 
 	}
 
-	public boolean canAdd(IAddContext context) {
+	@Override
+    public boolean canAdd(IAddContext context) {
 		// TODO: check for right domain object instance below
 		return (context.getNewObject() instanceof ArroNode && context.getTargetContainer() instanceof Diagram) ||
 		       (context.getNewObject() instanceof IFile && context.getTargetContainer() instanceof Diagram);
@@ -43,7 +44,8 @@ public class NodeAddFeature extends AbstractAddFeature implements IAddFeature, I
 	 * Called when a Node is added to the diagram, both for adding and 
 	 * drag and drop (DND).
 	 */
-	public PictogramElement add(IAddContext context) {
+	@Override
+    public PictogramElement add(IAddContext context) {
 		
 		// Can't make it a object attribute since this code is called from different
 		// contexts (so different object instances)!

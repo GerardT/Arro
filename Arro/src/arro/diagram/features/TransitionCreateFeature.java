@@ -23,7 +23,8 @@ public class TransitionCreateFeature extends AbstractCreateConnectionFeature
 		super(fp, "Create Transition", "Creates a new transition between two steps");
 	}
 
-	public boolean canStartConnection(ICreateConnectionContext context) {
+	@Override
+    public boolean canStartConnection(ICreateConnectionContext context) {
 		// TODO: check for right domain object instance below
 		// return getBusinessObjectForPictogramElement(context.getSourcePictogramElement()) instanceof <DomainObject>;
 
@@ -52,7 +53,8 @@ public class TransitionCreateFeature extends AbstractCreateConnectionFeature
 	 * check if connection allowed while hovering over anchors.
 	 * We might also check that the source anchor is of the right type.
 	 */
-	public boolean canCreate(ICreateConnectionContext context) {
+	@Override
+    public boolean canCreate(ICreateConnectionContext context) {
 		Anchor source = context.getSourceAnchor();
 		Anchor target = context.getTargetAnchor();		
 		
@@ -63,7 +65,8 @@ public class TransitionCreateFeature extends AbstractCreateConnectionFeature
 		}
 	}
 
-	public Connection create(ICreateConnectionContext context) {
+	@Override
+    public Connection create(ICreateConnectionContext context) {
 	    // Create a model element and add it to the resource of the diagram.
 	    // TODO see also ArroConnectionCreateFeature -> no model object created, which is better?
         ArroTransition newClass = new ArroTransition();

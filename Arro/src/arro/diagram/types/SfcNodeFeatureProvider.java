@@ -92,7 +92,8 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 	}
 	
 
-	public IRemoveFeature getRemoveFeature(IRemoveContext context) {
+	@Override
+    public IRemoveFeature getRemoveFeature(IRemoveContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
 		if (pictogramElement instanceof ContainerShape) {
 			Logger.out.trace(Logger.EDITOR, " ");
@@ -170,7 +171,8 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 		return super.getUpdateFeature(context);
 	}
 	
-	public IMoveAnchorFeature getMoveAnchorFeature(IMoveAnchorContext context) {
+	@Override
+    public IMoveAnchorFeature getMoveAnchorFeature(IMoveAnchorContext context) {
 		return null;
 	}
 	

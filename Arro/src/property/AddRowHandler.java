@@ -57,7 +57,8 @@ public class AddRowHandler extends AbstractHandler {
 			this.me = me;
 			this.selection = selection;
 		}
-		public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
 			StructuredSelection s = (StructuredSelection) selection;
 			//undoList = me.cloneMessageList();
 			if(s.isEmpty()) {
@@ -67,13 +68,15 @@ public class AddRowHandler extends AbstractHandler {
 			}
 			return Status.OK_STATUS;
 		}
-		public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
 			//redoList = me.cloneMessageList();
 			//me.setMessageList(undoList);
 
 			return Status.OK_STATUS;
 		}
-		public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
 			//undoList = me.cloneMessageList();
 			//me.setMessageList(redoList);
 

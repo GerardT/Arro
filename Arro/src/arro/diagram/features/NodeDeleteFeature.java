@@ -19,11 +19,13 @@ public class NodeDeleteFeature extends DefaultDeleteFeature implements ICustomUn
 		super(fp);
 	}
 	
-	public boolean canDelete(IDeleteContext context) {
+	@Override
+    public boolean canDelete(IDeleteContext context) {
 		return true;
 	}
 	
-	public void delete(IDeleteContext context) {
+	@Override
+    public void delete(IDeleteContext context) {
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
         if(!(dc instanceof FunctionDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");

@@ -35,6 +35,7 @@ public class StepUpdateFeature  extends DefaultUpdateDiagramFeature {
 	 * Tried also with box decorator, but that would change the rendering of PE
 	 * itself, ugly. So decided to decorate with icon is update needed.
 	 */
+    @Override
     public IReason updateNeeded(IUpdateContext context) {
         PictogramElement pictogramElement = context.getPictogramElement();
         NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement, getFeatureProvider());;
@@ -52,6 +53,7 @@ public class StepUpdateFeature  extends DefaultUpdateDiagramFeature {
     	return super.updateNeeded(context);
     }
     
+    @Override
     public boolean canUpdate(IUpdateContext context) {
 		return true;
     }
@@ -59,6 +61,7 @@ public class StepUpdateFeature  extends DefaultUpdateDiagramFeature {
     /*
      * Guess this is not automatically called unless AutoUpdate flags are set. See tutorial.
      */
+    @Override
     public boolean update(IUpdateContext context) {
         PictogramElement pictogramElement = context.getPictogramElement();
         NonEmfDomainObject bo = POJOIndependenceSolver.getInstance().findPOJOObjectByPictureElement(pictogramElement, getFeatureProvider());

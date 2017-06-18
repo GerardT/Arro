@@ -20,14 +20,16 @@ public class ArroIDAddFeature extends AbstractAddFeature implements IAddFeature 
 		super(fp);
 	}
 
-	public boolean canAdd(IAddContext context) {
+	@Override
+    public boolean canAdd(IAddContext context) {
 		return context.getTargetContainer() instanceof Diagram;
 	}
 
 	/**
 	 * Used to register a business object ID to the diagram.
 	 */
-	public PictogramElement add(IAddContext context) {
+	@Override
+    public PictogramElement add(IAddContext context) {
 		Object d = context.getNewObject();
 		
 		if(d instanceof ArroModule || d instanceof ArroSequenceChart) {

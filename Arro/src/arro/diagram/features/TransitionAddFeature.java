@@ -25,7 +25,8 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
 
 	}
 
-	public boolean canAdd(IAddContext context) {
+	@Override
+    public boolean canAdd(IAddContext context) {
 		// TODO: check for right domain object instance below
 		return (context.getNewObject() instanceof ArroTransition);
 	}
@@ -33,7 +34,8 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
 	/**
 	 * Called when a Transition is added to the diagram.
 	 */
-	public PictogramElement add(IAddContext context) {
+	@Override
+    public PictogramElement add(IAddContext context) {
         
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
         if(!(dc instanceof StateDiagramEditor)) {

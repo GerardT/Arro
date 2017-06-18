@@ -26,7 +26,8 @@ public class ArroConnectionCreateFeature extends AbstractCreateConnectionFeature
 		super(fp, "Create Connection", "Creates a new connection between two pads");
 	}
 
-	public boolean canStartConnection(ICreateConnectionContext context) {
+	@Override
+    public boolean canStartConnection(ICreateConnectionContext context) {
 		// TODO: check for right domain object instance below
 		// return getBusinessObjectForPictogramElement(context.getSourcePictogramElement()) instanceof <DomainObject>;
 
@@ -90,7 +91,8 @@ public class ArroConnectionCreateFeature extends AbstractCreateConnectionFeature
 	/**
 	 * check if connection allowed while hovering over anchors.
 	 */
-	public boolean canCreate(ICreateConnectionContext context) {
+	@Override
+    public boolean canCreate(ICreateConnectionContext context) {
 		StringParam ref = new StringParam();
 		ArroPad source = fetchPad(context.getSourcePictogramElement(), ref);
 		ArroPad target = fetchPad(context.getTargetPictogramElement(), ref);
@@ -102,7 +104,8 @@ public class ArroConnectionCreateFeature extends AbstractCreateConnectionFeature
 		return false;
 	}
 
-	public Connection create(ICreateConnectionContext context) {
+	@Override
+    public Connection create(ICreateConnectionContext context) {
 		Connection newConnection = null;
 
         // TODO see also ArroTransitionCreateFeature -> model object created, which is better?

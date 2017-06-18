@@ -18,7 +18,8 @@ public class AddRemoveSampleNatureHandler extends AbstractHandler {
 	/**
 	 * Called from project->right click->Configure->Enable Sample Builder
 	 */
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	@Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
 		// TODO Auto-generated method stub
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		//
@@ -30,7 +31,7 @@ public class AddRemoveSampleNatureHandler extends AbstractHandler {
 				if (element instanceof IProject) {
 					project = (IProject) element;
 				} else if (element instanceof IAdaptable) {
-					project = (IProject) ((IAdaptable) element)
+					project = ((IAdaptable) element)
 							.getAdapter(IProject.class);
 				}
 				if (project != null) {

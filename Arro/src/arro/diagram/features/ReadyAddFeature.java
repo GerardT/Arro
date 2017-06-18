@@ -19,12 +19,14 @@ public class ReadyAddFeature extends AbstractAddFeature implements
 		super(fp);
 	}
 
-	public boolean canAdd(IAddContext context) {
+	@Override
+    public boolean canAdd(IAddContext context) {
 		// TODO: check for right domain object instance below
 		return /* context.getNewObject() instanceof DomainObject && */ context.getTargetContainer() instanceof Diagram;
 	}
 
-	public PictogramElement add(IAddContext context) {
+	@Override
+    public PictogramElement add(IAddContext context) {
 		
         Object obj = context.getNewObject();
         

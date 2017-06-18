@@ -15,11 +15,13 @@ public class StepCreateFeature extends AbstractCreateFeature implements
 		super(fp, "Step", "Creates a new Step");
 	}
 
-	public boolean canCreate(ICreateContext context) {
+	@Override
+    public boolean canCreate(ICreateContext context) {
 		return context.getTargetContainer() instanceof Diagram;
 	}
 
-	public Object[] create(ICreateContext context) {
+	@Override
+    public Object[] create(ICreateContext context) {
 	    // Create a model element and add it to the resource of the diagram.
 		ArroStep newClass = new ArroStep();
 

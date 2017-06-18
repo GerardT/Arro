@@ -36,7 +36,8 @@ public class ArroPadLayoutFeature extends AbstractLayoutFeature implements
 		super(fp);
 	}
 
-	public boolean canLayout(ILayoutContext context) {
+	@Override
+    public boolean canLayout(ILayoutContext context) {
 		// TODO: check for right domain object instances below
 
 		return context.getPictogramElement() instanceof ContainerShape /* && getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof <DomainObject> */;
@@ -47,7 +48,8 @@ public class ArroPadLayoutFeature extends AbstractLayoutFeature implements
 	 * The layout method. Called if e.g. object is resized in diagram.
 	 * Needed specific code here for text placement and anchor placement.
 	 */
-	public boolean layout(ILayoutContext context) {
+	@Override
+    public boolean layout(ILayoutContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
 		if (pictogramElement instanceof ContainerShape) {
 			ContainerShape containerShape = (ContainerShape) pictogramElement;

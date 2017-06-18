@@ -18,12 +18,14 @@ public class NullRemoveFeature extends DefaultRemoveFeature {
 	 * will call remove(cs) in order to remove PE off the diagram, without
 	 * checking canRemove(cs) first.
 	 */
-	public boolean canRemove(IRemoveContext context) {
+	@Override
+    public boolean canRemove(IRemoveContext context) {
 		return false;
 	}
 	
 	
-	public void remove(IRemoveContext context) {
+	@Override
+    public void remove(IRemoveContext context) {
 		super.remove(context);
 		Logger.out.trace(Logger.EDITOR, "trying to remove ...");
 	}

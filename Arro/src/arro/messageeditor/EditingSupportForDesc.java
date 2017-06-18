@@ -30,17 +30,20 @@ public class EditingSupportForDesc extends EditingSupport {
 			this.selectedMessage = message;
 			this.newDescription = description;
 		}
-		public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
 			undoDescription = selectedMessage.getDescription();
 			selectedMessage.setDescription(newDescription);
 			return Status.OK_STATUS;
 		}
-		public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
 			redoDescription = selectedMessage.getDescription();
 			selectedMessage.setDescription(undoDescription);
 			return Status.OK_STATUS;
 		}
-		public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
 			undoDescription = selectedMessage.getDescription();
 			selectedMessage.setDescription(redoDescription);
 			return Status.OK_STATUS;

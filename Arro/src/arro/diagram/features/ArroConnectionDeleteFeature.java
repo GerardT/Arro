@@ -19,7 +19,8 @@ public class ArroConnectionDeleteFeature extends DefaultDeleteFeature implements
 		super(fp);
 	}
 	
-	public void delete(IDeleteContext context) {
+	@Override
+    public void delete(IDeleteContext context) {
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
         if(!(dc instanceof FunctionDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");

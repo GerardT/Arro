@@ -26,7 +26,8 @@ public class StepAddFeature extends AbstractAddFeature implements IAddFeature, I
 
 	}
 
-	public boolean canAdd(IAddContext context) {
+	@Override
+    public boolean canAdd(IAddContext context) {
 		// TODO: check for right domain object instance below
 		return (context.getNewObject() instanceof ArroStep && context.getTargetContainer() instanceof Diagram);
 	}
@@ -34,7 +35,8 @@ public class StepAddFeature extends AbstractAddFeature implements IAddFeature, I
 	/**
 	 * Called when a State is added to the diagram.
 	 */
-	public PictogramElement add(IAddContext context) {
+	@Override
+    public PictogramElement add(IAddContext context) {
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
         if(!(dc instanceof StateDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");

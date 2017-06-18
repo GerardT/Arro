@@ -31,7 +31,8 @@ public class AddRowHandler extends AbstractHandler {
 		super();
 	}
 	
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	@Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
 		//IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		IEditorPart activeEditor = HandlerUtil.getActiveEditor(event);
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
@@ -64,7 +65,8 @@ public class AddRowHandler extends AbstractHandler {
 			this.me = me;
 			this.selection = selection;
 		}
-		public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
 			StructuredSelection s = (StructuredSelection) selection;
 			undoList = me.cloneMessageList();
 			if(s.isEmpty()) {
@@ -74,7 +76,8 @@ public class AddRowHandler extends AbstractHandler {
 			}
 			return Status.OK_STATUS;
 		}
-		public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
 			redoList = me.cloneMessageList();
 	        // Build the string buffer "buf"
 //	        MessageDialog.openInformation(shell,
@@ -84,7 +87,8 @@ public class AddRowHandler extends AbstractHandler {
 
 			return Status.OK_STATUS;
 		}
-		public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
 			undoList = me.cloneMessageList();
 	        // Build the string buffer "buf"
 	        // simply re-calculate the delta
