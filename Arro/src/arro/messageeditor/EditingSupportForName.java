@@ -12,7 +12,6 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 
-import arro.messageeditor.EditingSupportForDesc.DeltaInfoOperation;
 import arro.messageeditor.MessageEditor.Message;
 
 

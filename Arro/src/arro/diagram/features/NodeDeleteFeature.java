@@ -7,11 +7,11 @@ import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 
-import util.Logger;
 import arro.Constants;
-import arro.domain.ArroNode;
 import arro.domain.ArroModule;
+import arro.domain.ArroNode;
 import arro.editors.FunctionDiagramEditor;
+import util.Logger;
 
 public class NodeDeleteFeature extends DefaultDeleteFeature implements ICustomUndoRedoFeature {
 

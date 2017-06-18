@@ -14,9 +14,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import util.Logger;
 import arro.editors.MultiPageEditor;
 import arro.messageeditor.MessageEditor;
+import util.Logger;
 
 
 

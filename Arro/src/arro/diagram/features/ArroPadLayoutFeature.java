@@ -18,11 +18,11 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 
-import util.Logger;
 import arro.Constants;
 import arro.domain.ArroPad;
 import arro.domain.NonEmfDomainObject;
 import arro.domain.POJOIndependenceSolver;
+import util.Logger;
 
 /**
  * The layout feature is for supporting correct resizing. Graphiti provides the concept of layout features,

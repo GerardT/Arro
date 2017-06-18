@@ -14,9 +14,9 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IThread;
 
-import util.Logger;
 import arro.Constants;
 import arro.launcher.TCPClient.Result;
+import util.Logger;
 
 public class ArroDebugTarget implements IDebugTarget {
 	TCPClient engine;

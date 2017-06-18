@@ -1,24 +1,5 @@
 package arro.builder;
 
-/*******************************************************************************
- * <copyright>
- *
- * Copyright (c) 2005, 2010 SAP AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    SAP AG - initial API, implementation and documentation
- *
- * </copyright>
- *
- *******************************************************************************/
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IProjectNature;
-import org.eclipse.core.runtime.CoreException;
 //public class ProjectNature implements IProjectNature {
 //
 //	public static final String NATURE_ID = "Arro.sampleNature"; //$NON-NLS-1$
@@ -45,8 +26,25 @@ import org.eclipse.core.runtime.CoreException;
 //	}
 //}
 import org.eclipse.core.resources.ICommand;
-
-import util.Logger;
+/*******************************************************************************
+ * <copyright>
+ *
+ * Copyright (c) 2005, 2010 SAP AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    SAP AG - initial API, implementation and documentation
+ *
+ * </copyright>
+ *
+ *******************************************************************************/
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IProjectNature;
+import org.eclipse.core.runtime.CoreException;
 
 public class ProjectNature implements IProjectNature {
 

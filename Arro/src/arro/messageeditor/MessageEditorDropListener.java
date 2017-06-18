@@ -15,9 +15,9 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TransferData;
 
-import util.Logger;
 import arro.Constants;
 import arro.messageeditor.MessageEditor.Message;
+import util.Logger;
 
 public class MessageEditorDropListener extends ViewerDropAdapter {
 

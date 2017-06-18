@@ -41,11 +41,11 @@ public class StepUpdateFeature  extends DefaultUpdateDiagramFeature {
 
         if(bo instanceof ArroStep) {
             //String type = ((ArroNode)bo).getType();
-            String name = bo.getName();
-            
-            if (pictogramElement instanceof ContainerShape) {
-                ContainerShape cs = (ContainerShape) pictogramElement;
-            }
+//            String name = bo.getName();
+//            
+//            if (pictogramElement instanceof ContainerShape) {
+//                ContainerShape cs = (ContainerShape) pictogramElement;
+//            }
             return Reason.createFalseReason();
         }
             

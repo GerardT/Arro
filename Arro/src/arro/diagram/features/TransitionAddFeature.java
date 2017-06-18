@@ -10,7 +10,6 @@ import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IDiagramContainer;
-import org.eclipse.graphiti.util.IColorConstant;
 
 import arro.Constants;
 import arro.domain.ArroModule;

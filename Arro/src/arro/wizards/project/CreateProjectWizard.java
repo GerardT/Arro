@@ -25,10 +25,10 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
-import util.Misc;
-import util.PbScalarTypes;
 import arro.Constants;
 import arro.builder.ProjectNature;
+import util.Misc;
+import util.PbScalarTypes;
 
 public class CreateProjectWizard extends BasicNewProjectResourceWizard {
 

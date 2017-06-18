@@ -93,11 +93,11 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 			
 			transition.xmlWrite(doc, sub);
 		}
-        for(ArroRequest action: publishedActions) {
-            
-            Element sub = doc.createElement("published-action");
-            elt.appendChild(sub);
-        }
+//        for(ArroRequest action: publishedActions) {
+//            
+//            Element sub = doc.createElement("published-action");
+//            elt.appendChild(sub);
+//        }
 	}
 	public void xmlRead(Node nNode) {
 		Element eElement = (Element) nNode;

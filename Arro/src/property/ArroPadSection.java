@@ -31,8 +31,8 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
-import util.Misc;
 import arro.domain.ArroPad;
+import util.Misc;
 
 public class ArroPadSection extends GFPropertySection implements ITabbedPropertyConstants {
 

@@ -13,8 +13,6 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
 import arro.Constants;
-import arro.domain.ArroNode;
-import arro.domain.ArroModule;
 
 
 public class ArroBoxAddFeature extends AbstractAddFeature implements

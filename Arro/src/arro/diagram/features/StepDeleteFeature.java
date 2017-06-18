@@ -10,9 +10,8 @@ import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 
 import arro.Constants;
 import arro.domain.ArroModule;
-import arro.domain.ArroNode;
-import arro.domain.ArroStep;
 import arro.domain.ArroSequenceChart;
+import arro.domain.ArroStep;
 import arro.editors.StateDiagramEditor;
 import util.Logger;
 

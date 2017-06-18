@@ -8,18 +8,13 @@ import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.palette.IPaletteCompartmentEntry;
 import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.tb.BorderDecorator;
-import org.eclipse.graphiti.tb.ColorDecorator;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
 import org.eclipse.graphiti.tb.IDecorator;
 import org.eclipse.graphiti.tb.ImageDecorator;
-import org.eclipse.swt.SWT;
 
 import arro.ArroImageProvider;
 import arro.Constants;
 import arro.domain.ArroNode;
-import arro.domain.NonEmfDomainObject;
-import arro.domain.POJOIndependenceSolver;
 
 public class StateDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider{
 
@@ -40,7 +35,7 @@ public class StateDiagramToolBehaviorProvider extends DefaultToolBehaviorProvide
         // add compartments from super class
         IPaletteCompartmentEntry[] superCompartments = super.getPalette();
         for (int i = 0; i < superCompartments.length; i++) {
-        	IPaletteCompartmentEntry comp = superCompartments[i];
+        	//IPaletteCompartmentEntry comp = superCompartments[i];
         	if(true /*comp.getLabel().equals("Step")*/) {
                 ret.add(superCompartments[i]);
         	}

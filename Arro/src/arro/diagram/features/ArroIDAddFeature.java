@@ -7,8 +7,8 @@ import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
-import arro.domain.ArroSequenceChart;
 import arro.domain.ArroModule;
+import arro.domain.ArroSequenceChart;
 
 /**
  * One feature for both Function and State diagrams.

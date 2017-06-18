@@ -23,11 +23,11 @@ import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
-import util.Logger;
 import arro.Constants;
-import arro.domain.ArroPad;
 import arro.domain.ArroModule;
+import arro.domain.ArroPad;
 import arro.editors.FunctionDiagramEditor;
+import util.Logger;
 
 
 public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature, ICustomUndoRedoFeature {

@@ -14,11 +14,11 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.IColorConstant;
 
-import util.Logger;
 import arro.Constants;
 import arro.domain.ArroConnection;
 import arro.domain.ArroModule;
 import arro.editors.FunctionDiagramEditor;
+import util.Logger;
 
 
 public class ArroConnectionAddFeature extends AbstractAddFeature implements

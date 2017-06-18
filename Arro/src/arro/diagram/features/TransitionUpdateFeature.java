@@ -11,7 +11,6 @@ import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 
-import arro.domain.ArroPad;
 import arro.domain.ArroStep;
 import arro.domain.NonEmfDomainObject;
 import arro.domain.POJOIndependenceSolver;
@@ -42,11 +41,11 @@ public class TransitionUpdateFeature  extends DefaultUpdateDiagramFeature {
 
         if(bo instanceof ArroStep) {
             //String type = ((ArroNode)bo).getType();
-            String name = bo.getName();
-            
-            if (pictogramElement instanceof ContainerShape) {
-                ContainerShape cs = (ContainerShape) pictogramElement;
-            }
+//            String name = bo.getName();
+//            
+//            if (pictogramElement instanceof ContainerShape) {
+//                ContainerShape cs = (ContainerShape) pictogramElement;
+//            }
             return Reason.createFalseReason();
         }
             
