@@ -93,10 +93,16 @@
            <propertyCategory category="Graphiti"> 
            </propertyCategory> 
         </propertyContributor> 
+        <propertyContributor contributorId="ArroUiBlockDiagram.PropertyContributor"> 
+           <propertyCategory category="Graphiti"> 
+           </propertyCategory> 
+        </propertyContributor> 
     </extension>
        
+    <!-- Define tabs -->
     <extension
       point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <!-- A block per ContributorId, define 5 tabs for composite diagrams -->
       <propertyTabs
           contributorId="Arro.PropertyContributor">
           <propertyTab
@@ -127,8 +133,9 @@
              id="arro.set-actions.tab"
              label="Send Requests">
           </propertyTab>
-      </propertyTabs>
-      <propertyTabs
+       </propertyTabs>
+       <!-- Define 5 tabs for device diagrams -->
+       <propertyTabs
           contributorId="ArroFunctionLeafDiagram.PropertyContributor">
           <propertyTab
              category="Graphiti"
@@ -159,8 +166,24 @@
              label="Send Requests">
           </propertyTab>
       </propertyTabs>
+       <!-- Define 2 tabs for UI diagrams -->
+       <propertyTabs
+          contributorId="ArroUiBlockDiagram.PropertyContributor">
+          <propertyTab
+             category="Graphiti"
+             id="arro.main.tab"
+             label="Main">
+          </propertyTab>
+          <propertyTab
+             afterTab="arro.main.tab"
+             category="Graphiti"
+             id="arro.param.tab"
+             label="Parameters">
+          </propertyTab>
+      </propertyTabs>
     </extension>
      
+    <!-- A block per ContributorId, declare section that feeds each tab -->
     <extension
       point="org.eclipse.ui.views.properties.tabbed.propertySections">
       <propertySections
@@ -263,6 +286,21 @@
               filter="property.ArroConditionFilter"
               id="arro.modedef.section"
               tab="arro.modedef.tab">
+          </propertySection>
+      </propertySections>
+      <propertySections
+          contributorId="ArroUiBlockDiagram.PropertyContributor">
+          <propertySection
+              class="property.ArroNodeSectionDevice"
+              filter="property.ArroNodeFilterDevice"
+              id="arro.node.section"
+              tab="arro.main.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroParamSectionDevice"
+              filter="property.ArroParamFilterDevice"
+              id="arro.param.section.device"
+              tab="arro.param.tab">
           </propertySection>
       </propertySections>
     </extension>
@@ -393,7 +431,7 @@
         <wizard
               category="Arro"
               class="arro.wizards.codeblock.NewCodeBlockWizard"
-              icon="icons/icon_composite.pngf"
+              icon="icons/icon_composite.png"
               id="arro.wizards.NewDeviceWizard"
               name="Code Block">
         </wizard>
