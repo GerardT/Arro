@@ -172,7 +172,6 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
             throw std::runtime_error("Invalid URL for Python node " + url);
         }
     } else if(url.find("UiIn:") == 0) {
-        StringMap params{};
         m_trace.println("new NodeUiIn(" + instance + ")");
         try {
             if(ServerEngine::getFactory("_UiUserInput", factory)) {
@@ -182,7 +181,6 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
             throw std::runtime_error("Invalid URL for SFC node " + url);
         }
     } else if(url.find("UiOut:") == 0) {
-        StringMap params{};
         m_trace.println("new NodeUiOut(" + instance + ")");
         try {
             if(ServerEngine::getFactory("_UiUserDisplay", factory)) {
