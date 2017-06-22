@@ -33,21 +33,24 @@ public class EditingSupportForSelection extends EditingSupport {
 			paramEditor.update();
 		}
 
-		public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
 			undoName = gs.getText(selectedRow);
 			gs.setText(newName, selectedRow);
 			paramEditor.update();
 			return Status.OK_STATUS;
 		}
 
-		public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
 			redoName = gs.getText(selectedRow);
 			gs.setText(undoName, selectedRow);
 			paramEditor.update();
 			return Status.OK_STATUS;
 		}
 
-		public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
 			undoName = gs.getText(selectedRow);
 			gs.setText(redoName, selectedRow);
 			paramEditor.update();

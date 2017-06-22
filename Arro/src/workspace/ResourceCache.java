@@ -183,7 +183,7 @@ public class ResourceCache {
     }
     
     public ArroModuleContainer getZipByFile(IFile zipFile) {
-        Map<String, String> meta = new HashMap<String, String>();
+        //Map<String, String> meta = new HashMap<String, String>();
         
         String fileName = zipFile.getName();
         ArroModuleContainer zip = new ArroModuleContainer(zipFile);

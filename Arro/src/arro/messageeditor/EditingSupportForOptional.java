@@ -14,7 +14,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 
-import arro.messageeditor.EditingSupportForDesc.DeltaInfoOperation;
 import arro.messageeditor.MessageEditor.Message;
 
 public class EditingSupportForOptional extends EditingSupport {
@@ -31,17 +30,20 @@ public class EditingSupportForOptional extends EditingSupport {
 				this.selectedMessage = message;
 				this.newRequired = required;
 			}
-			public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
+			@Override
+            public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
 				undoRequired = selectedMessage.getRequired();
 				selectedMessage.setRequired(newRequired);
 				return Status.OK_STATUS;
 			}
-			public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
+			@Override
+            public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
 				redoRequired = selectedMessage.getRequired();
 				selectedMessage.setRequired(undoRequired);
 				return Status.OK_STATUS;
 			}
-			public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
+			@Override
+            public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
 				undoRequired = selectedMessage.getRequired();
 				selectedMessage.setRequired(redoRequired);
 				return Status.OK_STATUS;
@@ -55,19 +57,23 @@ public class EditingSupportForOptional extends EditingSupport {
 	    this.editor = new TextCellEditor(viewer.getTable());
 	  }
 
-	  protected CellEditor getCellEditor(Object element) {
+	  @Override
+    protected CellEditor getCellEditor(Object element) {
 		return new CheckboxCellEditor(null, SWT.CHECK | SWT.READ_ONLY);
 	  }
 
-	  protected boolean canEdit(Object element) {
+	  @Override
+    protected boolean canEdit(Object element) {
 	    return true;
 	  }
 
-	  protected Object getValue(Object element) {
+	  @Override
+    protected Object getValue(Object element) {
 	    return ((Message) element).getRequired();
 	  }
 
-	  protected void setValue(Object element, Object userInputValue) {
+	  @Override
+    protected void setValue(Object element, Object userInputValue) {
 	    //((Message) element).setRequired((boolean)userInputValue);
 	    
 	    IUndoableOperation operation = new DeltaInfoOperation(((Message) element), (boolean)userInputValue);

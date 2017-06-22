@@ -13,7 +13,6 @@ import org.eclipse.graphiti.features.impl.IIndependenceSolver;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 import util.Logger;
-import workspace.ResourceCache;
 
 
 /**
@@ -59,7 +58,8 @@ public class POJOIndependenceSolver implements IIndependenceSolver {
 	 * @see getBusinessObjectForKey
 	 * @see org.eclipse.graphiti.features.impl.IIndependenceSolver#getKeyForBusinessObject(java.lang.Object)
 	 */
-	public String getKeyForBusinessObject(Object bo) {
+	@Override
+    public String getKeyForBusinessObject(Object bo) {
 		String result = null;
 		if(bo != null && bo instanceof NonEmfDomainObject ) {
 			result = ((NonEmfDomainObject) bo).getId();
@@ -74,7 +74,8 @@ public class POJOIndependenceSolver implements IIndependenceSolver {
 	 * @see getKeyForBusinessObject
 	 * @see org.eclipse.graphiti.features.impl.IIndependenceSolver#getBusinessObjectForKey(java.lang.String)
 	 */
-	public Object getBusinessObjectForKey(String key) {
+	@Override
+    public Object getBusinessObjectForKey(String key) {
 		return domainObjects.get(key);
 	}
 	

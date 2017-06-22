@@ -29,26 +29,26 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
-import util.Logger;
 import arro.Constants;
 import arro.diagram.features.ArroBoxAddFeature;
 import arro.diagram.features.ArroConnectionAddFeature;
 import arro.diagram.features.ArroConnectionCreateFeature;
 import arro.diagram.features.ArroConnectionDeleteFeature;
 import arro.diagram.features.ArroIDAddFeature;
-import arro.diagram.features.NodeAddFeature;
-import arro.diagram.features.NodeDeleteFeature;
-import arro.diagram.features.NodeLayoutFeature;
-import arro.diagram.features.NodeUpdateFeature;
 import arro.diagram.features.ArroPadAddFeature;
 import arro.diagram.features.ArroPadDeleteFeature;
 import arro.diagram.features.ArroPadLayoutFeature;
 import arro.diagram.features.ArroPadUpdateFeature;
+import arro.diagram.features.NodeAddFeature;
+import arro.diagram.features.NodeDeleteFeature;
+import arro.diagram.features.NodeLayoutFeature;
+import arro.diagram.features.NodeUpdateFeature;
 import arro.diagram.features.NullRemoveFeature;
 import arro.domain.ArroDevice;
-import arro.domain.ArroNode;
 import arro.domain.ArroModule;
+import arro.domain.ArroNode;
 import arro.domain.POJOIndependenceSolver;
+import util.Logger;
 
 
 public class FunctionNodeDiagramFeatureProvider extends DefaultFeatureProvider {
@@ -100,7 +100,8 @@ public class FunctionNodeDiagramFeatureProvider extends DefaultFeatureProvider {
 	}
 	
 
-	public IRemoveFeature getRemoveFeature(IRemoveContext context) {
+	@Override
+    public IRemoveFeature getRemoveFeature(IRemoveContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
 		if (pictogramElement instanceof ContainerShape) {
 			Logger.out.trace(Logger.EDITOR, " ");
@@ -187,7 +188,8 @@ public class FunctionNodeDiagramFeatureProvider extends DefaultFeatureProvider {
 		return super.getUpdateFeature(context);
 	}
 	
-	public IMoveAnchorFeature getMoveAnchorFeature(IMoveAnchorContext context) {
+	@Override
+    public IMoveAnchorFeature getMoveAnchorFeature(IMoveAnchorContext context) {
 		return null;
 	}
 	

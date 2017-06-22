@@ -7,8 +7,8 @@ import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
-import arro.domain.ArroSequenceChart;
 import arro.domain.ArroModule;
+import arro.domain.ArroSequenceChart;
 
 /**
  * One feature for both Function and State diagrams.
@@ -20,14 +20,16 @@ public class ArroIDAddFeature extends AbstractAddFeature implements IAddFeature 
 		super(fp);
 	}
 
-	public boolean canAdd(IAddContext context) {
+	@Override
+    public boolean canAdd(IAddContext context) {
 		return context.getTargetContainer() instanceof Diagram;
 	}
 
 	/**
 	 * Used to register a business object ID to the diagram.
 	 */
-	public PictogramElement add(IAddContext context) {
+	@Override
+    public PictogramElement add(IAddContext context) {
 		Object d = context.getNewObject();
 		
 		if(d instanceof ArroModule || d instanceof ArroSequenceChart) {

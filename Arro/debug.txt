@@ -6,5 +6,5 @@
 Arro/debug/option1=false
 Arro/debug/builder=false
 Arro/debug/editor=false
-Arro/debug/workspace=true
+Arro/debug/workspace=false
 Arro/debug/mpeditor=true

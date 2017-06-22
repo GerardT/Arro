@@ -15,9 +15,9 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TransferData;
 
-import util.Logger;
 import arro.Constants;
 import arro.messageeditor.MessageEditor.Message;
+import util.Logger;
 
 public class MessageEditorDropListener extends ViewerDropAdapter {
 
@@ -120,20 +120,23 @@ public class MessageEditorDropListener extends ViewerDropAdapter {
 			this.newType = newType;
 		}
 
-		public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
 			undoList = me.cloneMessageList();
 			me.addRow(newType);
 			return Status.OK_STATUS;
 		}
 
-		public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
 			redoList = me.cloneMessageList();
 			me.setMessageList(undoList);
 
 			return Status.OK_STATUS;
 		}
 
-		public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
 			undoList = me.cloneMessageList();
 			me.setMessageList(redoList);
 

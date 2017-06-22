@@ -16,6 +16,7 @@ class WorkspaceAdditionJob extends WorkspaceJob {
         this.name = name;
         this.res = res;
     }
+    @Override
     public IStatus runInWorkspace(IProgressMonitor monitor) {
         //do the actual work in here
         Logger.out.trace(Logger.WS, "WorkspaceAdditionJob add " + name);

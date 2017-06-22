@@ -43,9 +43,8 @@ import arro.diagram.features.TransitionCreateFeature;
 import arro.diagram.features.TransitionDeleteFeature;
 import arro.diagram.features.TransitionUpdateFeature;
 import arro.domain.ArroModule;
-import arro.domain.ArroStep;
 import arro.domain.ArroSequenceChart;
-import arro.domain.ArroSynchronization;
+import arro.domain.ArroStep;
 import arro.domain.ArroTransition;
 import arro.domain.POJOIndependenceSolver;
 import util.Logger;
@@ -93,7 +92,8 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 	}
 	
 
-	public IRemoveFeature getRemoveFeature(IRemoveContext context) {
+	@Override
+    public IRemoveFeature getRemoveFeature(IRemoveContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
 		if (pictogramElement instanceof ContainerShape) {
 			Logger.out.trace(Logger.EDITOR, " ");
@@ -171,7 +171,8 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 		return super.getUpdateFeature(context);
 	}
 	
-	public IMoveAnchorFeature getMoveAnchorFeature(IMoveAnchorContext context) {
+	@Override
+    public IMoveAnchorFeature getMoveAnchorFeature(IMoveAnchorContext context) {
 		return null;
 	}
 	

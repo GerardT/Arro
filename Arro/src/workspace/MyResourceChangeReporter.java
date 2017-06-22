@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.CoreException;
 import util.Logger;
 
 public class MyResourceChangeReporter implements IResourceChangeListener {
+    @Override
     public void resourceChanged(IResourceChangeEvent event) {
       IResource res = event.getResource();
       switch (event.getType()) {

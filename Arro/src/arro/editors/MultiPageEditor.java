@@ -187,6 +187,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         fontButton.setText("Change Font...");
 
         fontButton.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 setFont();
             }
@@ -199,6 +200,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Creates the pages of the multi-page editor.
      */
+    @Override
     protected void createPages() {
     	// Open the ZIP file and create unzipped files
     	
@@ -255,6 +257,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         final FileEditorInput fei = new FileEditorInput((IFile) res);
         setInput(fei);
         Display.getDefault().syncExec(new Runnable() {
+            @Override
             public void run() {
                 setPartName(fei.getName());
             }
@@ -267,6 +270,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
      * <code>IWorkbenchPart</code> method disposes all nested editors.
      * Subclasses may extend.
      */
+    @Override
     public void dispose() {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
         
@@ -276,6 +280,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Saves the multi-page editor's document.
      */
+    @Override
     public void doSave(IProgressMonitor monitor) {
         int count = getPageCount();
         for(int i = 0; i < count; i++) {
@@ -292,6 +297,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
      * text for page 0's tab, and updates this multi-page editor's input to
      * correspond to the nested editor's.
      */
+    @Override
     public void doSaveAs() {
 		MessageDialog.openInformation(null, "Arro", "SaveAs is not supported");
     	
@@ -313,6 +319,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
      * The <code>MultiPageEditor</code> implementation of this method
      * checks that the input is an instance of <code>IFileEditorInput</code>.
      */
+    @Override
     public void init(IEditorSite site, IEditorInput editorInput)
             throws PartInitException {
         if (!(editorInput instanceof IFileEditorInput)
@@ -327,6 +334,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /*
      * (non-Javadoc) Method declared on IEditorPart.
      */
+    @Override
     public boolean isSaveAsAllowed() {
         return false;
     }
@@ -334,6 +342,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Calculates the contents of page 2 when the it is activated.
      */
+    @Override
     protected void pageChange(int newPageIndex) {
         super.pageChange(newPageIndex);
         // if (newPageIndex == 2) {
@@ -344,9 +353,11 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Closes all project files on project close.
      */
+    @Override
     public void resourceChanged(final IResourceChangeEvent event) {
         if (event.getType() == IResourceChangeEvent.PRE_CLOSE) {
             Display.getDefault().asyncExec(new Runnable() {
+                @Override
                 public void run() {
                     IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
                             .getPages();

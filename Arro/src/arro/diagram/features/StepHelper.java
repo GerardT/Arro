@@ -111,7 +111,7 @@ public class StepHelper {
 		    	}
 	    	}
 	    }
-		AnchorContainer anchorList = (AnchorContainer) containerShape;
+		AnchorContainer anchorList = containerShape;
 		EList<Anchor>anchors = anchorList.getAnchors();
 		for(Anchor anchor: anchors) {
 			Logger.out.trace(Logger.EDITOR, anchor.toString());

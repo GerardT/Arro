@@ -14,9 +14,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import util.Logger;
 import arro.editors.MultiPageEditor;
 import arro.messageeditor.MessageEditor;
+import util.Logger;
 
 
 
@@ -52,7 +52,8 @@ public class DelRowHandler extends AbstractHandler {
 			this.me = me;
 			this.selection = selection;
 		}
-		public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
 			StructuredSelection s = (StructuredSelection) selection;
 			undoList = me.cloneMessageList();
 			if(s.isEmpty()) {
@@ -62,13 +63,15 @@ public class DelRowHandler extends AbstractHandler {
 			}
 			return Status.OK_STATUS;
 		}
-		public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
 			redoList = me.cloneMessageList();
 			me.setMessageList(undoList);
 
 			return Status.OK_STATUS;
 		}
-		public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
 			undoList = me.cloneMessageList();
 			me.setMessageList(redoList);
 

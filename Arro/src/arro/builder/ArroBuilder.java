@@ -56,7 +56,8 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 		 * 
 		 * @see org.eclipse.core.resources.IResourceDeltaVisitor#visit(org.eclipse.core.resources.IResourceDelta)
 		 */
-		public boolean visit(IResourceDelta delta) throws CoreException {
+		@Override
+        public boolean visit(IResourceDelta delta) throws CoreException {
 			IResource resource = delta.getResource();
 			switch (delta.getKind()) {
 			case IResourceDelta.ADDED:
@@ -89,9 +90,10 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			this.buildInfo = buildInfo;
 		}
 
-		public boolean visit(IResource resource) {
+		@Override
+        public boolean visit(IResource resource) {
 			Logger.out.trace(Logger.BUILDER, "Try checking resource " + resource.getName());
-			checkXML(resource);
+			//checkXML(resource);
 			processResource(resource, buildInfo);
 			//return true to continue visiting children.
 			return true;
@@ -111,7 +113,8 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			this.buildInfo = buildInfo;
 		}
 
-		public boolean visit(IResource resource) {
+		@Override
+        public boolean visit(IResource resource) {
 			Logger.out.trace(Logger.BUILDER, "Try adding resource " + resource.getName());
 			if (resource instanceof IFile && resource.getName().endsWith("." + Constants.MESSAGE_EXT)) {
 				buildInfo.add(resource.getName());
@@ -138,15 +141,18 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 					.getLineNumber(), severity);
 		}
 
-		public void error(SAXParseException exception) throws SAXException {
+		@Override
+        public void error(SAXParseException exception) throws SAXException {
 			addMarker(exception, IMarker.SEVERITY_ERROR);
 		}
 
-		public void fatalError(SAXParseException exception) throws SAXException {
+		@Override
+        public void fatalError(SAXParseException exception) throws SAXException {
 			addMarker(exception, IMarker.SEVERITY_ERROR);
 		}
 
-		public void warning(SAXParseException exception) throws SAXException {
+		@Override
+        public void warning(SAXParseException exception) throws SAXException {
 			addMarker(exception, IMarker.SEVERITY_WARNING);
 		}
 	}
@@ -216,7 +222,8 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 	 * collected in BuildInfo.
 	 * 
 	 */
-	@SuppressWarnings("unused")
+	@Override
+    @SuppressWarnings("unused")
 	protected IProject[] build(int kind, @SuppressWarnings("rawtypes") Map args, IProgressMonitor monitor)
 			throws CoreException {
 		
@@ -345,7 +352,8 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 		return null;
 	}
 
-	protected void clean(IProgressMonitor monitor) throws CoreException {
+	@Override
+    protected void clean(IProgressMonitor monitor) throws CoreException {
 		// delete markers set and files created
 		getProject().deleteMarkers(MARKER_TYPE, true, IResource.DEPTH_INFINITE);
 	}

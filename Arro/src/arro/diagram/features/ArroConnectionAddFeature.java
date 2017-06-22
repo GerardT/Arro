@@ -14,11 +14,11 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.IColorConstant;
 
-import util.Logger;
 import arro.Constants;
 import arro.domain.ArroConnection;
 import arro.domain.ArroModule;
 import arro.editors.FunctionDiagramEditor;
+import util.Logger;
 
 
 public class ArroConnectionAddFeature extends AbstractAddFeature implements
@@ -28,11 +28,13 @@ public class ArroConnectionAddFeature extends AbstractAddFeature implements
 		super(fp);
 	}
 
-	public boolean canAdd(IAddContext context) {
+	@Override
+    public boolean canAdd(IAddContext context) {
 		return context instanceof IAddConnectionContext /* && context.getNewObject() instanceof DomainObjectConnection */;
 	}
 
-	public PictogramElement add(IAddContext context) {
+	@Override
+    public PictogramElement add(IAddContext context) {
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
         if(!(dc instanceof FunctionDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");

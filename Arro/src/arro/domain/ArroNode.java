@@ -57,6 +57,7 @@ public class ArroNode extends NonEmfDomainObject {
     /**
      * 
      */
+    @Override
     public ArroModuleContainer update() {
         ArroModuleContainer moduleByName = ResourceCache.getInstance().getZip(nodeType);
         if(moduleByName != null) {

@@ -34,14 +34,14 @@ import arro.diagram.features.ArroBoxAddFeature;
 import arro.diagram.features.ArroConnectionAddFeature;
 import arro.diagram.features.ArroConnectionDeleteFeature;
 import arro.diagram.features.ArroIDAddFeature;
-import arro.diagram.features.NodeAddFeature;
-import arro.diagram.features.NodeDeleteFeature;
-import arro.diagram.features.NodeLayoutFeature;
-import arro.diagram.features.NodeUpdateFeature;
 import arro.diagram.features.ArroPadAddFeature;
 import arro.diagram.features.ArroPadDeleteFeature;
 import arro.diagram.features.ArroPadLayoutFeature;
 import arro.diagram.features.ArroPadUpdateFeature;
+import arro.diagram.features.NodeAddFeature;
+import arro.diagram.features.NodeDeleteFeature;
+import arro.diagram.features.NodeLayoutFeature;
+import arro.diagram.features.NodeUpdateFeature;
 import arro.diagram.features.NullRemoveFeature;
 import arro.domain.ArroDevice;
 import arro.domain.ArroModule;
@@ -99,7 +99,8 @@ public class FunctionLeafDiagramFeatureProvider extends DefaultFeatureProvider {
 	}
 	
 
-	public IRemoveFeature getRemoveFeature(IRemoveContext context) {
+	@Override
+    public IRemoveFeature getRemoveFeature(IRemoveContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
 		if (pictogramElement instanceof ContainerShape) {
 			Logger.out.trace(Logger.EDITOR, " ");
@@ -186,7 +187,8 @@ public class FunctionLeafDiagramFeatureProvider extends DefaultFeatureProvider {
 		return super.getUpdateFeature(context);
 	}
 	
-	public IMoveAnchorFeature getMoveAnchorFeature(IMoveAnchorContext context) {
+	@Override
+    public IMoveAnchorFeature getMoveAnchorFeature(IMoveAnchorContext context) {
 		return null;
 	}
 	

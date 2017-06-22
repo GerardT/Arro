@@ -1,7 +1,10 @@
 package arro.builder;
 
 import java.util.Iterator;
-import org.eclipse.core.commands.*;
+
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
@@ -12,12 +15,11 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class AddRemoveSampleNatureHandler extends AbstractHandler {
 
-	private ISelection selection;
-
 	/**
 	 * Called from project->right click->Configure->Enable Sample Builder
 	 */
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	@Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
 		// TODO Auto-generated method stub
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		//
@@ -29,7 +31,7 @@ public class AddRemoveSampleNatureHandler extends AbstractHandler {
 				if (element instanceof IProject) {
 					project = (IProject) element;
 				} else if (element instanceof IAdaptable) {
-					project = (IProject) ((IAdaptable) element)
+					project = ((IAdaptable) element)
 							.getAdapter(IProject.class);
 				}
 				if (project != null) {

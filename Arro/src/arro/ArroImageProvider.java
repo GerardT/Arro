@@ -1,10 +1,8 @@
 package arro;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
-
 import org.eclipse.graphiti.ui.platform.AbstractImageProvider;
-import org.eclipse.graphiti.ui.platform.IImageProvider;
+
+import util.ImageUtils;
 
 
 /**

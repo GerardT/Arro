@@ -31,6 +31,7 @@ public class NodeUpdateFeature  extends DefaultUpdateDiagramFeature {
 	 * itself, ugly. So decided to decorate with icon is update needed.
 	 */
 	
+    @Override
     public IReason updateNeeded(IUpdateContext context) {
         IReason reason = null;
         PictogramElement pictogramElement = context.getPictogramElement();
@@ -45,6 +46,7 @@ public class NodeUpdateFeature  extends DefaultUpdateDiagramFeature {
         }
     }
 
+    @Override
     public boolean canUpdate(IUpdateContext context) {
         return true;
     }
@@ -52,6 +54,7 @@ public class NodeUpdateFeature  extends DefaultUpdateDiagramFeature {
     /*
      * Guess this is not automatically called unless AutoUpdate flags are set. See tutorial.
      */
+    @Override
     public boolean update(IUpdateContext context) {
         Font font = manageFont(getDiagram(), "Tahoma", 8);
 

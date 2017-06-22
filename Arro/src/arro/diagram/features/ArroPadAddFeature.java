@@ -23,11 +23,11 @@ import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
-import util.Logger;
 import arro.Constants;
-import arro.domain.ArroPad;
 import arro.domain.ArroModule;
+import arro.domain.ArroPad;
 import arro.editors.FunctionDiagramEditor;
+import util.Logger;
 
 
 public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature, ICustomUndoRedoFeature {
@@ -36,7 +36,8 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 		super(fp);
 	}
 
-	public boolean canAdd(IAddContext context) {
+	@Override
+    public boolean canAdd(IAddContext context) {
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
         if(!(dc instanceof FunctionDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");
@@ -58,7 +59,8 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 	 * Called when a Node is added to the diagram, both for adding and 
 	 * drag and drop (DND).
 	 */
-	public PictogramElement add(IAddContext context) {
+	@Override
+    public PictogramElement add(IAddContext context) {
 		
 		// Can't make it a object attribute since this code is called from different
 		// contexts (so different object instances)!
@@ -121,7 +123,7 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
         addedDomainObject.setName(instanceName);
 
 
-		ContainerShape targetDiagram = (ContainerShape) context.getTargetContainer();
+		ContainerShape targetDiagram = context.getTargetContainer();
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		IGaService gaService = Graphiti.getGaService();
 		

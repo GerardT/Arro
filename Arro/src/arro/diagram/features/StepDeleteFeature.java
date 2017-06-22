@@ -10,9 +10,8 @@ import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 
 import arro.Constants;
 import arro.domain.ArroModule;
-import arro.domain.ArroNode;
-import arro.domain.ArroStep;
 import arro.domain.ArroSequenceChart;
+import arro.domain.ArroStep;
 import arro.editors.StateDiagramEditor;
 import util.Logger;
 
@@ -22,7 +21,8 @@ public class StepDeleteFeature extends DefaultDeleteFeature implements ICustomUn
 		super(fp);
 	}
 	
-	public boolean canDelete(IDeleteContext context) {
+	@Override
+    public boolean canDelete(IDeleteContext context) {
 	    PictogramElement pe = context.getPictogramElement();
         if (pe != null) {
             Object[] eObject = getAllBusinessObjectsForPictogramElement(pe);
@@ -39,7 +39,8 @@ public class StepDeleteFeature extends DefaultDeleteFeature implements ICustomUn
 		return true;
 	}
 	
-	public void delete(IDeleteContext context) {
+	@Override
+    public void delete(IDeleteContext context) {
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
         if(!(dc instanceof StateDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");

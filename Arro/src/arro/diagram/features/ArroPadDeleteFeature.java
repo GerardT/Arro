@@ -7,11 +7,11 @@ import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 
-import util.Logger;
 import arro.Constants;
-import arro.domain.ArroPad;
 import arro.domain.ArroModule;
+import arro.domain.ArroPad;
 import arro.editors.FunctionDiagramEditor;
+import util.Logger;
 
 public class ArroPadDeleteFeature extends DefaultDeleteFeature implements ICustomUndoRedoFeature {
 
@@ -19,11 +19,13 @@ public class ArroPadDeleteFeature extends DefaultDeleteFeature implements ICusto
 		super(fp);
 	}
 	
-	public boolean canDelete(IDeleteContext context) {
+	@Override
+    public boolean canDelete(IDeleteContext context) {
 		return true;
 	}
 	
-	public void delete(IDeleteContext context) {
+	@Override
+    public void delete(IDeleteContext context) {
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
         if(!(dc instanceof FunctionDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");

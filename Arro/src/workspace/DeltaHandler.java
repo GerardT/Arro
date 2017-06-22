@@ -8,6 +8,7 @@ import arro.domain.POJOIndependenceSolver;
 import util.Logger;
 
 class DeltaHandler implements IResourceDeltaVisitor {
+    @Override
     public boolean visit(IResourceDelta delta) {
         IResource res = delta.getResource();
         String name = res.getName();

@@ -10,7 +10,6 @@ import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IDiagramContainer;
-import org.eclipse.graphiti.util.IColorConstant;
 
 import arro.Constants;
 import arro.domain.ArroModule;
@@ -26,7 +25,8 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
 
 	}
 
-	public boolean canAdd(IAddContext context) {
+	@Override
+    public boolean canAdd(IAddContext context) {
 		// TODO: check for right domain object instance below
 		return (context.getNewObject() instanceof ArroTransition);
 	}
@@ -34,7 +34,8 @@ public class TransitionAddFeature extends AbstractAddFeature implements IAddFeat
 	/**
 	 * Called when a Transition is added to the diagram.
 	 */
-	public PictogramElement add(IAddContext context) {
+	@Override
+    public PictogramElement add(IAddContext context) {
         
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
         if(!(dc instanceof StateDiagramEditor)) {

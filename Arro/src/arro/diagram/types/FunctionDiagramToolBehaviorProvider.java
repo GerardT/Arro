@@ -8,18 +8,13 @@ import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.palette.IPaletteCompartmentEntry;
 import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.tb.BorderDecorator;
-import org.eclipse.graphiti.tb.ColorDecorator;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
 import org.eclipse.graphiti.tb.IDecorator;
 import org.eclipse.graphiti.tb.ImageDecorator;
-import org.eclipse.swt.SWT;
 
 import arro.ArroImageProvider;
 import arro.Constants;
 import arro.domain.ArroNode;
-import arro.domain.NonEmfDomainObject;
-import arro.domain.POJOIndependenceSolver;
 
 public class FunctionDiagramToolBehaviorProvider extends DefaultToolBehaviorProvider{
 
@@ -27,6 +22,7 @@ public class FunctionDiagramToolBehaviorProvider extends DefaultToolBehaviorProv
         super(dtp);
     }
     
+    @Override
     public boolean isShowFlyoutPalette() {
     	return true;
     }
@@ -34,6 +30,7 @@ public class FunctionDiagramToolBehaviorProvider extends DefaultToolBehaviorProv
     /**
      * Remove unneeded entries from Palette.
      */
+    @Override
     public IPaletteCompartmentEntry[] getPalette() {
     	ArrayList<IPaletteCompartmentEntry> ret = new ArrayList<IPaletteCompartmentEntry>();
     	
@@ -53,6 +50,7 @@ public class FunctionDiagramToolBehaviorProvider extends DefaultToolBehaviorProv
      * If the node needs update then return a decorator that shows an icon on top
      * of the node.
      */
+    @Override
     public IDecorator[] getDecorators(PictogramElement pe) {
         IFeatureProvider featureProvider = getFeatureProvider();
         Object bo = featureProvider.getBusinessObjectForPictogramElement(pe);
