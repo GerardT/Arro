@@ -50,7 +50,7 @@ using namespace arro;
 
 static RegisterMe<NodeUiUserInput> registerMe("_UiUserInput");
 
-NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, StringMap& /*params*/, TiXmlElement*):
+NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodeUiReceiveNumber", true),
     m_device(d) {
 
@@ -58,7 +58,14 @@ NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, String
     //m_output = m_device->getOutput("output");
 
     //     <arro-slider id=".main.aUiUserInput" name="Test input"></arro-slider>
-    std::string name("Test input");
+    std::string name;
+    auto iter = params.find(std::string("name"));
+    if(iter == params.end()) {
+        name = "No Name";
+    } else {
+        name = iter->second;
+        params.erase(iter);
+    }
     std::string inst = std::string("<arro-slider id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-slider>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
