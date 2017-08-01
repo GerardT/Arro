@@ -125,6 +125,21 @@ SfcTransition::SfcTransition(const std::string& condition, const std::string& fr
     m_to{to},
     m_parser{START, END}
 {
+Interpreter::Interpreter(std::string condition, ParserModel* pm):
+m_expression{condition},
+m_pm{pm},
+m_parser{START, END}
+{
+
+#if 0
+SfcTransition::SfcTransition(const std::string& condition, const std::string& from, const std::string& to, NodeSfc& parent):
+    m_trace{"SfcTransition", true},
+    m_parent{parent},
+    m_expression{condition},
+    m_from{from},
+    m_to{to},
+    m_parser{START, END}
+{
     m_parser.addRule(START,         'n', IN,           [this](const std::string& token){ m_context.node = token; return true; });
     m_parser.addRule(IN,            'i', LIST_BEGIN,   [this](const std::string&      ){ return true; });
     m_parser.addRule(LIST_BEGIN,    '(', SINGLE_STATE, [this](const std::string&      ){ return true; });
@@ -165,6 +180,7 @@ SfcTransition::SfcTransition(const std::string& condition, const std::string& fr
         SendToConsole(string("Parsing condition failed for ") + this->m_parent.getProcess()->getName() + ": \'" + m_expression + "\'");
         throw std::runtime_error("Parsing condition failed: \'" + m_expression + "\'");
     }
+#endif
 }
 
 void

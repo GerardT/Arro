@@ -18,7 +18,7 @@
 #include "Tokenizer.hpp"
 #include "Trace.h"
 
-
+#if 0
 typedef std::function<bool (const std::string& token)> tokenFunction;
 
 
@@ -102,6 +102,7 @@ private:
     int m_startState;
     std::map<std::pair<int, int>, tokenFunction> m_tokenFunctions;
 };
+#endif
 
 
 #endif /* parser_hpp */
