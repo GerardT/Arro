@@ -6,3 +6,4 @@
 *.xml
 *.py~
 
+/bower_components
