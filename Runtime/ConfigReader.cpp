@@ -164,6 +164,8 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
             sfcNode->registerInput("_action", true);
 
+            sfcNode->registerOutput("_step"); // experimental
+
             // EXTRA Create an _action and _step pad in every module
             // If processNode != nullptr then we know a 'leaf' node is being added
             if(!processNode) {
@@ -293,6 +295,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
     // Maybe in future host system can do this check. Or we can use protobuf enum.
     if(parentSfc && sfcNode) parentSfc->registerSfc(instanceName, sfcNode);
     //if(sfcNode) sfcNode->test();
+    if(sfcNode) sfcNode->finishConstruction();
 }
 
 

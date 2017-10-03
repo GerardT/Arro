@@ -234,6 +234,7 @@ static void server()
                         nodeDb->start();
                         SendToConsole("run successful");
                     } catch ( const std::runtime_error& e ) {
+                        SendToConsole(e.what());
                         trace.println(string("Runtime error ") + e.what());
 
                         cleanup();

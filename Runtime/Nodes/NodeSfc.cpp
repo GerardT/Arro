@@ -4,6 +4,7 @@
 
 #include "arro.pb.h"
 #include "NodeSfc.h"
+#include "lemon/CodeGenerator.h"
 
 
 using namespace std;
@@ -63,6 +64,15 @@ NodeSfc::NodeSfc(AbstractNode* device, const string& /*name*/, StringMap& /*para
 }
 
 void
+NodeSfc::finishConstruction() {
+    m_trace.println("finishConstruction");
+    for(auto it = m_transitions.begin(); it != m_transitions.end(); ++it) {
+        (*it)->parseExpression();
+    }
+}
+
+
+void
 NodeSfc::test() {
     m_trace.println("Testing expressions");
     for(auto it = m_transitions.begin(); it != m_transitions.end(); ++it) {
@@ -97,98 +107,52 @@ NodeSfc::runCycle() {
     if(true /*actual_mode == "Active"*/) {
         //trace.println(string("NodeSfc output = ") + to_string((long double)output));
         m_trace.println("One cycle ");
+
+        std::set<std::string> newSteps{};
         for(auto it = m_transitions.begin(); it != m_transitions.end(); ++it) {
-            (*it)->runTransitions(m_activeSteps);
+            (*it)->runTransition(m_activeSteps, newSteps);
         }
+        m_activeSteps = newSteps;
     }
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define START        1
-#define IN           2
-#define LIST_BEGIN   3
-#define SINGLE_STATE 5
-#define LIST_END     6
-#define AND          7
-#define OR           8
-#define DONE         9
-#define END          10
-
 
 SfcTransition::SfcTransition(const std::string& condition, const std::string& from, const std::string& to, NodeSfc& parent):
+        CodeGenInterface(condition),
     m_trace{"SfcTransition", true},
     m_parent{parent},
     m_expression{condition},
     m_from{from},
-    m_to{to},
-    m_parser{START, END}
-{
-Interpreter::Interpreter(std::string condition, ParserModel* pm):
-m_expression{condition},
-m_pm{pm},
-m_parser{START, END}
+    m_to{to}
 {
 
-#if 0
-SfcTransition::SfcTransition(const std::string& condition, const std::string& from, const std::string& to, NodeSfc& parent):
-    m_trace{"SfcTransition", true},
-    m_parent{parent},
-    m_expression{condition},
-    m_from{from},
-    m_to{to},
-    m_parser{START, END}
-{
-    m_parser.addRule(START,         'n', IN,           [this](const std::string& token){ m_context.node = token; return true; });
-    m_parser.addRule(IN,            'i', LIST_BEGIN,   [this](const std::string&      ){ return true; });
-    m_parser.addRule(LIST_BEGIN,    '(', SINGLE_STATE, [this](const std::string&      ){ return true; });
-    m_parser.addRule(SINGLE_STATE,  'n', LIST_END,     [this](const std::string& token){
-                                                                                         bool ret = m_parent.hasStep(m_context.node, token);
-                                                                                         if(ret) {
-                                                                                             //ret = m_parent.nodeAtStep(m_context.node, token);
-                                                                                             m_trace.println("Node at step ", ret);
-                                                                                             m_context.expValue = ret;
-                                                                                         }
-                                                                                         return ret; });
+}
 
-    m_parser.addRule(SINGLE_STATE,  'n', SINGLE_STATE, [this](const std::string& token){
-                                                                                         bool ret = m_parent.hasStep(m_context.node, token);
-                                                                                         if(ret) {
-                                                                                             // ret = m_parent.nodeAtStep(m_context.node, token);
-                                                                                             m_trace.println("Node at step ", ret);
-                                                                                             m_context.expValue = ret;
-                                                                                         }
-                                                                                         return true; });
-
-    m_parser.addRule(LIST_END,      ')', DONE,         [this](const std::string&      ){ return true; });
-
-    m_parser.addRule(DONE,          'a', START,        [this](const std::string&      ){ return true; });  // AND
-    m_parser.addRule(DONE,          'o', START,        [this](const std::string&      ){ return true; });  // OR
-    m_parser.addRule(DONE,          '$', END,          [this](const std::string&      ){ if(m_context.expValue) {
-                                                                                             sendActions();
-                                                                                             m_parent.updateActiveStep(m_from, m_to);
-                                                                                         }
-                                                                                         return true; });
-
+/**
+ * Done separately since cannot check if nodes and states are available
+ * before they are all declared.
+ */
+void SfcTransition::parseExpression() {
     //Tokenizer tokens("node IN(step step)AND node IN(step)");
-    Tokenizer tokens(m_expression);
-    if(m_parser.parse(tokens, m_instrList)) {
+    if(parse()) {
         m_trace.println("Parsing condition succeeded");
     }
     else {
         SendToConsole(string("Parsing condition failed for ") + this->m_parent.getProcess()->getName() + ": \'" + m_expression + "\'");
         throw std::runtime_error("Parsing condition failed: \'" + m_expression + "\'");
     }
-#endif
 }
 
 void
-SfcTransition::runTransitions(std::set<std::string>& m_currentSteps) {
+SfcTransition::runTransition(std::set<std::string>& currentSteps, std::set<std::string>& newSteps) {
     m_trace.println("runTransition step-from= " + m_from);
-    if(m_currentSteps.find(m_from) != m_currentSteps.end()) {
-        Tokenizer tokens(m_expression);
-        m_parser.runCode(tokens);
+    if(currentSteps.find(m_from) != currentSteps.end()) {
+        if(runCode() == true /* expression returned true, change state */) {
+            newSteps.insert(m_to);
+        }
     }
 }
 
@@ -205,4 +169,20 @@ SfcTransition::sendActions() {
         p->setOutputData(p->getOutput(string("_action_") + it->first), action);
     }
 }
+
+bool
+SfcTransition::hasNode(const std::string& node)
+{
+    return m_parent.hasNode(node);
+};
+bool
+SfcTransition::hasState(const std::string& node, const std::string& state)
+{
+    return m_parent.hasState(node, state);
+};
+bool
+SfcTransition::nodeAtStep(const std::string& node, const std::string& token)
+{
+    return m_parent.nodeAtStep(node, token);
+};
 

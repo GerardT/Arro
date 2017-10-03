@@ -21,6 +21,8 @@ namespace Arro {
 
         virtual void test() {};
 
+        virtual void finishConstruction() {};
+
         /**
          * Handle a message that is sent to this node.
          *

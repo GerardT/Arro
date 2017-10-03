@@ -4,8 +4,10 @@
 #include "arro.pb.h"
 #include "Trace.h"
 #include "AbstractNode.h"
+#include <list>
+#include <string>
 
-#include "Parser.hpp"
+#include "lemon/CodeGenerator.h"
 
 
 namespace Arro {
@@ -40,7 +42,7 @@ namespace Arro {
     // CONDITION :== SINGLE_COND
 
 
-    class SfcTransition {
+    class SfcTransition: CodeGenInterface {
     public:
         SfcTransition(const std::string& condition, const std::string& from, const std::string& to, NodeSfc& parent);
 
@@ -50,7 +52,7 @@ namespace Arro {
          *
          * @param m_currentSteps
          */
-        void runTransitions(std::set<std::string>& m_currentSteps);
+        void runTransition(std::set<std::string>& m_currentSteps, std::set<std::string>& m_newSteps);
 
         void sendActions();
 
@@ -60,21 +62,20 @@ namespace Arro {
             m_actions[nodeName] = actionString;
         }
 
+        void parseExpression();
+
+        virtual bool hasNode(const std::string& node);
+        virtual bool hasState(const std::string& node, const std::string& state);
+        virtual bool nodeAtStep(const std::string& node, const std::string& token);
+
 
     private:
         Trace m_trace;
         NodeSfc& m_parent;
         std::string m_expression;
         std::map<std::string, std::string> m_actions;
-        std::list<Instruction> m_instrList;
-        std::string m_from;
-        std::string m_to;
-        Parser m_parser;
-
-        struct Context {
-            std::string node;
-            bool expValue;
-        } m_context;
+        const std::string m_from;
+        const std::string m_to;
     };
 
 
@@ -92,9 +93,16 @@ namespace Arro {
         NodeSfc(AbstractNode* d, const std::string& name, StringMap& params, TiXmlElement* elt);
         virtual ~NodeSfc() {};
 
+        virtual void finishConstruction();
+
         // Copy and assignment is not supported.
         NodeSfc(const NodeSfc&) = delete;
         NodeSfc& operator=(const NodeSfc& other) = delete;
+
+        bool hasNode(const std::string& node) { return sfcHasNode(node); };
+        bool hasState(const std::string& node, const std::string& state) { return sfcHasState(node, state); };
+        bool nodeAtStep(const std::string& node, const std::string& token) { return sfcNodeAtStep(node, token); };
+
 
         /**
          * Setup steps and conditions
@@ -131,8 +139,8 @@ namespace Arro {
          * @param step
          * @return
          */
-        bool hasStep(const std::string& nodeName, const std::string& stepName) const {
-            m_trace.println("checking node " + nodeName);
+        bool sfcHasState(const std::string& nodeName, const std::string& stepName) const {
+            m_trace.println("sfcHasState - checking node " + nodeName);
             try {
                 if(nodeName == "request") {
                     for(auto it = m_steps.begin(); it != m_steps.end(); ++it) {
@@ -144,6 +152,7 @@ namespace Arro {
                 } else {
                     NodeSfc* sfc = m_childSfc.at(nodeName);
                     for(auto it = sfc->m_steps.begin(); it != sfc->m_steps.end(); ++it) {
+                        m_trace.println("Check state " + (*it)->getName());
                         if((*it)->getName() == stepName) {
                             m_trace.println("good " + nodeName);
                             return true;
@@ -151,7 +160,7 @@ namespace Arro {
                     }
                 }
             }
-            catch (std::out_of_range) {
+            catch (std::out_of_range&) {
                 m_trace.println("Node in expression not found: " + nodeName);
                 throw std::runtime_error("Node in expression not found: " + nodeName);
             }
@@ -161,7 +170,32 @@ namespace Arro {
             return false;
         }
 
-        bool nodeAtStep(const std::string& node, const std::string& step) const {
+        bool sfcHasNode(const std::string& nodeName) const {
+            m_trace.println("sfcHasNode - checking node " + nodeName);
+            try {
+                if(nodeName == "request") {
+                    return true;
+                } else {
+                    for(auto it = m_childSfc.begin(); it != m_childSfc.end(); ++it) {
+                        m_trace.println("Check state " + it->first);
+                    }
+
+//                    NodeSfc* sfc = m_childSfc.at(nodeName);
+//                    if(sfc != nullptr) {
+//                        return true;
+//                    }
+                }
+            }
+            catch (std::out_of_range&) {
+                m_trace.println("Node in expression not found: " + nodeName);
+                throw std::runtime_error("Node in expression not found: " + nodeName);
+            }
+
+            return false;
+        }
+
+        bool sfcNodeAtStep(const std::string& node, const std::string& step) const {
+            m_trace.println("sfcNodeAtStep - checking step " + step);
             if(node == "request") {
                 return (m_activeSteps.find(step) != m_activeSteps.end());
             } else {

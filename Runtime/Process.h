@@ -34,6 +34,10 @@ namespace Arro
         // Copy and assignment is not supported.
         Process(const Process&) = delete;
         Process& operator=(const Process& other) = delete;
+        virtual void finishConstruction() {
+            m_device->finishConstruction();
+        };
+
 
         void sendParameters(StringMap& params);
 
