@@ -6,4 +6,4 @@
 *.xml
 *.py~
 
-/WebServer/bower_components
+/bower_components
