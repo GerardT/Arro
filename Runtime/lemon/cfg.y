@@ -4,8 +4,8 @@
 %token_prefix TOK_
 %token_type {Token}
 %extra_argument {CodeGenerator *cg}
-%syntax_error  {cg->printError(); }
-%parse_failure {cg->printFailure(); }
+%syntax_error  {cg->lemonError(); }
+%parse_failure {cg->lemonFailure(); }
 %left OR.
 %left AND.
 

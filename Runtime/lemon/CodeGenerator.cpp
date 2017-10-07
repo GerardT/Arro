@@ -1,5 +1,6 @@
-#include "CodeGenerator.h"
 
+#include <lemon/CodeGenInterface.h>
+#include "Trace.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +12,7 @@
 #include <iostream>
 #include <functional>
 
+#include "AbstractNode.h"
 
 
 /* lemon token struct */
@@ -19,6 +21,7 @@ struct Token {
     int value;
 };
 
+using namespace Arro;
 
 
 /**
@@ -28,18 +31,32 @@ class Tokenizer {
 public:
     Tokenizer(std::string i):
     m_input(i),
-    m_currentToken(0) {
+    m_currentToken(0),
+    m_trace{"Tokenizer", true}
+    {
         
         m_it = m_input.begin();
         m_itEnd = m_input.end();
         
     }
+    void lemonError() {
+        m_trace.println(std::string("Syntax error at ") + m_currentName + " in " + m_input);
+        Arro::SendToConsole(std::string("Syntax error at ") + m_currentName + " in " + m_input);
+    }
+
+    void lemonFailure() {
+        m_trace.println("Failure parsing syntax " + m_input);
+        throw std::runtime_error("Failure parsing syntax" + m_input);
+    }
+
     void printError() {
-        printf("Error at %s in %s\n", m_currentName.c_str(), m_input.c_str());
+        m_trace.println(std::string("Symbol error at ") + m_currentName + " in " + m_input);
+        Arro::SendToConsole(std::string("Symbol error at ") + m_currentName + " in " + m_input);
     }
     
     void printFailure() {
-        printf("Failure parsing %s\n", m_input.c_str());
+        m_trace.println("Failure parsing " + m_input);
+        throw std::runtime_error("Failure parsing " + m_input);
     }
     
     // Return one of TOK_ token types and token itself as parameter.
@@ -62,7 +79,6 @@ public:
         m_currentToken = ret;
         m_currentName = token;
         
-        //printf("Token %s ret %i\n", token.c_str(), ret);
         return ret;
     }
 private:
@@ -109,6 +125,7 @@ private:
     std::string::iterator m_itEnd;
     int m_currentToken;
     std::string m_currentName;
+    Trace m_trace;
 
     
 };
@@ -127,12 +144,8 @@ class CodeGenerator {
 public:
     // Constructor - sets up and runs Lemon in order to generate a list of
     // lambda functions that serve as 'compiled' code.
-    CodeGenerator(const std::string& expression, CodeGenInterface* cg):
-        m_t{expression},
-        m_cg{cg} {};
+    CodeGenerator(const std::string& expression, CodeGenInterface* cg);
 
-    bool parse();
-    
     int storeInstr(tokenInstr func) {
         m_code.push_back(func);
         int nr = m_code.end() - m_code.begin() - 1;
@@ -169,7 +182,7 @@ public:
     }
     //    states(L) ::= states(A) COMMA NAME(B).
     int rule6(Token& A, Token& B) {
-        if(!m_cg->hasState(B.z)) {
+        if(!m_cg->hasState(""/* TODO */, B.z)) {
             printError();
         }
         return storeInstr([this, A, B](const char* node){
@@ -179,12 +192,20 @@ public:
     }
     //    states(L) ::= NAME(A).
     int rule7(Token& A) {
-        if(!m_cg->hasState(A.z)) {
+        if(!m_cg->hasState(""/* TODO */, A.z)) {
             printError();
         }
         return storeInstr([this, A](const char* node){
             return m_cg->nodeInState(node, A.z);
         });
+    }
+
+    void lemonError() {
+        m_t.lemonError();
+    }
+
+    void lemonFailure() {
+        m_t.lemonFailure();
     }
 
     void printError() {
@@ -217,8 +238,11 @@ private:
 #include "cfg.c"
 
 
-bool
-CodeGenerator::parse() {
+CodeGenerator::CodeGenerator(const std::string& expression, CodeGenInterface* cg):
+    m_t{expression},
+    m_cg{cg}
+{
+
     char tmp[100][100];
     int tok;
     int i = 0;
@@ -231,51 +255,25 @@ CodeGenerator::parse() {
         strncpy(tmp[i], symbol.c_str(), 99);
         t.z = (tmp[i]);
         
+        // Parse does not care what is in third parameter (t) or fourth parameter (this)
         Parse(pParser, tok, t, this);
         i++;
     }
     Parse(pParser, 0, t, this);
     ParseFree(pParser, free );
-
-    return true;
 };
 
+CodeGenerator* CodeGenInterface::getInstance(const std::string& expression, CodeGenInterface* caller) {
+    return new CodeGenerator(expression, caller);
 
-CodeGenInterface::CodeGenInterface(const std::string& expression) {
-    m_cg = new CodeGenerator(expression, this);
 }
-CodeGenInterface::~CodeGenInterface() {
-    delete m_cg;
-}
-
-
-// ============== test below this point ==============
-
-bool CodeGenInterface::hasNode(const char* /*node*/) {
-    return true;
-};
-bool CodeGenInterface::hasState(const char* /*state*/) {
-    return true;
-};
-bool CodeGenInterface::nodeInState(const char* node, const char* state) {
-    if(node[0] == 'd' && state[0] == 'e') return true;
-    return false;
-};
-bool CodeGenInterface::parse() {
-    return m_cg->parse();
+void
+CodeGenInterface::delInstance(CodeGenerator* instance) {
+    delete instance;
 }
 
-bool CodeGenInterface::runCode() {
-    return m_cg->run();
+bool
+CodeGenInterface::run(CodeGenerator *cg) {
+    return cg->run();
 }
 
-
-/*
-
-int main(int argc, char *argv[]) {
-    std::string exp("a IN (b, c) AND d IN (e)");
-    CodeGenerator cg(exp);
-    
-    cg.run();
-}
-*/

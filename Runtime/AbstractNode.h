@@ -4,6 +4,7 @@
 #include <memory>
 #include <functional>
 #include <string>
+#include <map>
 #include "IDevice.h"
 #include <tinyxml.h>
 #include <google/protobuf/message.h>

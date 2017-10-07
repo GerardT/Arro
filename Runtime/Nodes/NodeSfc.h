@@ -7,7 +7,7 @@
 #include <list>
 #include <string>
 
-#include "lemon/CodeGenerator.h"
+#include "../lemon/CodeGenInterface.h"
 
 
 namespace Arro {
@@ -45,6 +45,7 @@ namespace Arro {
     class SfcTransition: CodeGenInterface {
     public:
         SfcTransition(const std::string& condition, const std::string& from, const std::string& to, NodeSfc& parent);
+        virtual ~SfcTransition();
 
         /**
          * Check if any of the transitions in this SFC can fire.
@@ -64,9 +65,9 @@ namespace Arro {
 
         void parseExpression();
 
-        virtual bool hasNode(const std::string& node);
-        virtual bool hasState(const std::string& node, const std::string& state);
-        virtual bool nodeAtStep(const std::string& node, const std::string& token);
+        virtual bool hasNode(const char* node);
+        virtual bool hasState(const char* node, const char* state);
+        virtual bool nodeInState(const char* node, const char* state);
 
 
     private:
@@ -76,6 +77,7 @@ namespace Arro {
         std::map<std::string, std::string> m_actions;
         const std::string m_from;
         const std::string m_to;
+        CodeGenerator* m_cg;
     };
 
 
@@ -99,9 +101,6 @@ namespace Arro {
         NodeSfc(const NodeSfc&) = delete;
         NodeSfc& operator=(const NodeSfc& other) = delete;
 
-        bool hasNode(const std::string& node) { return sfcHasNode(node); };
-        bool hasState(const std::string& node, const std::string& state) { return sfcHasState(node, state); };
-        bool nodeAtStep(const std::string& node, const std::string& token) { return sfcNodeAtStep(node, token); };
 
 
         /**
@@ -178,12 +177,10 @@ namespace Arro {
                 } else {
                     for(auto it = m_childSfc.begin(); it != m_childSfc.end(); ++it) {
                         m_trace.println("Check state " + it->first);
+                        if(nodeName == it->first) {
+                            return true;
+                        }
                     }
-
-//                    NodeSfc* sfc = m_childSfc.at(nodeName);
-//                    if(sfc != nullptr) {
-//                        return true;
-//                    }
                 }
             }
             catch (std::out_of_range&) {

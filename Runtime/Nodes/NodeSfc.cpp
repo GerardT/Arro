@@ -1,10 +1,10 @@
+#include <lemon/CodeGenInterface.h>
 #include <iostream>
 #include <vector>
 #include <exception>
 
 #include "arro.pb.h"
 #include "NodeSfc.h"
-#include "lemon/CodeGenerator.h"
 
 
 using namespace std;
@@ -120,15 +120,19 @@ NodeSfc::runCycle() {
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-SfcTransition::SfcTransition(const std::string& condition, const std::string& from, const std::string& to, NodeSfc& parent):
-        CodeGenInterface(condition),
+SfcTransition::SfcTransition(const std::string& expression, const std::string& from, const std::string& to, NodeSfc& parent):
     m_trace{"SfcTransition", true},
     m_parent{parent},
-    m_expression{condition},
+    m_expression{expression},
     m_from{from},
-    m_to{to}
+    m_to{to},
+    m_cg{nullptr}
 {
+}
 
+SfcTransition::~SfcTransition() {
+    CodeGenInterface::delInstance(m_cg);
+    m_cg = nullptr;
 }
 
 /**
@@ -136,21 +140,14 @@ SfcTransition::SfcTransition(const std::string& condition, const std::string& fr
  * before they are all declared.
  */
 void SfcTransition::parseExpression() {
-    //Tokenizer tokens("node IN(step step)AND node IN(step)");
-    if(parse()) {
-        m_trace.println("Parsing condition succeeded");
-    }
-    else {
-        SendToConsole(string("Parsing condition failed for ") + this->m_parent.getProcess()->getName() + ": \'" + m_expression + "\'");
-        throw std::runtime_error("Parsing condition failed: \'" + m_expression + "\'");
-    }
+    if(!m_cg) m_cg = CodeGenInterface::getInstance(m_expression, this);
 }
 
 void
 SfcTransition::runTransition(std::set<std::string>& currentSteps, std::set<std::string>& newSteps) {
     m_trace.println("runTransition step-from= " + m_from);
     if(currentSteps.find(m_from) != currentSteps.end()) {
-        if(runCode() == true /* expression returned true, change state */) {
+        if(CodeGenInterface::run(m_cg) == true /* expression returned true, change state */) {
             newSteps.insert(m_to);
         }
     }
@@ -171,18 +168,17 @@ SfcTransition::sendActions() {
 }
 
 bool
-SfcTransition::hasNode(const std::string& node)
-{
-    return m_parent.hasNode(node);
+SfcTransition::hasNode(const char* node){
+    return m_parent.sfcHasNode(std::string(node));
 };
 bool
-SfcTransition::hasState(const std::string& node, const std::string& state)
-{
-    return m_parent.hasState(node, state);
+SfcTransition::hasState(const char* node, const char* state){
+    return true; /* TODO cannot check yet m_parent.sfcHasState(std::string(node), std::string(state));*/
 };
+
 bool
-SfcTransition::nodeAtStep(const std::string& node, const std::string& token)
-{
-    return m_parent.nodeAtStep(node, token);
+SfcTransition::nodeInState(const char* node, const char* state){
+    return m_parent.sfcNodeAtStep(std::string(node), std::string(state));
 };
+
 
