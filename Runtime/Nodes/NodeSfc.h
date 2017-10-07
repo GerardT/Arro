@@ -6,6 +6,7 @@
 #include "AbstractNode.h"
 #include <list>
 #include <string>
+#include <iostream>
 
 #include "../lemon/CodeGenInterface.h"
 
@@ -65,9 +66,9 @@ namespace Arro {
 
         void parseExpression();
 
-        virtual bool hasNode(const char* node);
-        virtual bool hasState(const char* node, const char* state);
-        virtual bool nodeInState(const char* node, const char* state);
+        virtual bool hasNode(const std::string& node);
+        virtual bool hasStates(const std::string& node, const std::string& states);
+        virtual bool nodeInState(const std::string& node, const std::string& state);
 
 
     private:
@@ -138,35 +139,45 @@ namespace Arro {
          * @param step
          * @return
          */
-        bool sfcHasState(const std::string& nodeName, const std::string& stepName) const {
-            m_trace.println("sfcHasState - checking node " + nodeName);
-            try {
-                if(nodeName == "request") {
-                    for(auto it = m_steps.begin(); it != m_steps.end(); ++it) {
-                        if((*it)->getName() == stepName) {
-                            m_trace.println("good " + nodeName);
-                            return true;
+        bool sfcHasStates(const std::string& nodeName, const std::string& states) const {
+            // std::istringstream by design reads to next space in inputstream
+            std::istringstream iis(states);
+            std::vector<std::string> stateList((std::istream_iterator<std::string>(iis)),
+                                                std::istream_iterator<std::string>());
+
+            m_trace.println("sfcHasStates - checking node " + nodeName + " for states " + states);
+            for(std::string state: stateList) {
+                bool found = false;
+                try {
+                    if(nodeName == "request") {
+                        for(auto it = m_steps.begin(); it != m_steps.end(); ++it) {
+                            if((*it)->getName() == state) {
+                                m_trace.println("good " + nodeName);
+                                found = true;
+                            }
                         }
-                    }
-                } else {
-                    NodeSfc* sfc = m_childSfc.at(nodeName);
-                    for(auto it = sfc->m_steps.begin(); it != sfc->m_steps.end(); ++it) {
-                        m_trace.println("Check state " + (*it)->getName());
-                        if((*it)->getName() == stepName) {
-                            m_trace.println("good " + nodeName);
-                            return true;
+                    } else {
+                        NodeSfc* sfc = m_childSfc.at(nodeName);
+                        for(auto it = sfc->m_steps.begin(); it != sfc->m_steps.end(); ++it) {
+                            m_trace.println("Check state " + (*it)->getName());
+                            if((*it)->getName() == state) {
+                                m_trace.println("good " + nodeName);
+                                found = true;
+                            }
                         }
                     }
                 }
+                catch (std::out_of_range&) {
+                    m_trace.println("Node in expression not found: " + nodeName);
+                    throw std::runtime_error("Node in expression not found: " + nodeName);
+                }
+                if(!found) {
+                    m_trace.println(std::string("state not found: ") + state + " for node: " + nodeName);
+                    throw std::runtime_error(std::string("state not found: ") + state + " for node: " + nodeName);
+                    return false;
+                }
             }
-            catch (std::out_of_range&) {
-                m_trace.println("Node in expression not found: " + nodeName);
-                throw std::runtime_error("Node in expression not found: " + nodeName);
-            }
-
-            m_trace.println(std::string("step not found: ") + stepName + " for node: " + nodeName);
-            throw std::runtime_error(std::string("step not found: ") + stepName + " for node: " + nodeName);
-            return false;
+            return true;
         }
 
         bool sfcHasNode(const std::string& nodeName) const {

@@ -168,17 +168,17 @@ SfcTransition::sendActions() {
 }
 
 bool
-SfcTransition::hasNode(const char* node){
-    return m_parent.sfcHasNode(std::string(node));
+SfcTransition::hasNode(const std::string& node){
+    return m_parent.sfcHasNode(node);
 };
 bool
-SfcTransition::hasState(const char* node, const char* state){
-    return true; /* TODO cannot check yet m_parent.sfcHasState(std::string(node), std::string(state));*/
+SfcTransition::hasStates(const std::string& node, const std::string& states){
+    return m_parent.sfcHasStates(node, states);
 };
 
 bool
-SfcTransition::nodeInState(const char* node, const char* state){
-    return m_parent.sfcNodeAtStep(std::string(node), std::string(state));
+SfcTransition::nodeInState(const std::string& node, const std::string& state){
+    return m_parent.sfcNodeAtStep(node, state);
 };
 
 

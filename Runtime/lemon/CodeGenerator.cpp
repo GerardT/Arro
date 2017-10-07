@@ -15,9 +15,10 @@
 #include "AbstractNode.h"
 
 
-/* lemon token struct */
+// lemon token struct
+// Can't declare e.g. string as class since Token is used in union by Lemon.
 struct Token {
-    const char* z;
+    std::string* text;
     int value;
 };
 
@@ -131,7 +132,7 @@ private:
 };
 
 // Lambda function declaration. Lambda is used as container for 'compiled' code.
-typedef std::function<bool (const char*)> tokenInstr;
+typedef std::function<bool (const std::string&)> tokenInstr;
 
 /**
  * Class implements a method for each of the production rules of the language.
@@ -153,50 +154,51 @@ public:
     }
     
     //    line(L) ::= expr(A).
-    int rule1(Token& A) {
-        return storeInstr([this,A](const char*){
+    int rule1(Token&, Token& A) {
+        return storeInstr([this,A](const std::string&){
             return m_code[A.value](NULL);
         });
     }
     //    expr(L) ::= expr(A) AND expr(B).
-    int rule2(Token& A, Token& B) {
-        return storeInstr([this,A,B](const char*){
+    int rule2(Token&, Token& A, Token& B) {
+        return storeInstr([this,A,B](const std::string&){
             return m_code[A.value](NULL) && m_code[B.value](NULL);
         });
     }
     //    expr(L) ::= expr(A) OR expr(B).
-    int rule3(Token& A, Token& B) {
-        return storeInstr([this,A,B](const char*){
+    int rule3(Token&, Token& A, Token& B) {
+        return storeInstr([this,A,B](const std::string&){
             return m_code[A.value](NULL) || m_code[B.value](NULL);
         });
     }
     //    expr(L) ::= NAME(A) IN LPAREN states(B) RPAREN.
-    int rule5(Token& A, Token& B) {
-        if(!m_cg->hasNode(A.z)) {
+    int rule5(Token&, Token& A, Token& B) {
+        if(!m_cg->hasStates(*(A.text), *(B.text))) {
             printError();
         }
-        return storeInstr([this, A, B](const char*){
+        if(!m_cg->hasNode(*(A.text))) {
+            printError();
+        }
+        return storeInstr([this, A, B](const std::string&){
             // check if this node in m_states;
-            return m_code[B.value](A.z);
+            return m_code[B.value](*(A.text));
         });
     }
     //    states(L) ::= states(A) COMMA NAME(B).
-    int rule6(Token& A, Token& B) {
-        if(!m_cg->hasState(""/* TODO */, B.z)) {
-            printError();
-        }
-        return storeInstr([this, A, B](const char* node){
+    int rule6(Token& L, Token& A, Token& B) {
+        L.text = &(m_pool[m_poolIndex++]);
+        *(L.text) = *(A.text) + " " + *(B.text);
+        return storeInstr([this, A, B](const std::string& node){
             // Build list of state names
-            return m_cg->nodeInState(node, B.z) || m_code[A.value](node);
+            return m_cg->nodeInState(node, *(B.text)) || m_code[A.value](node);
         });
     }
     //    states(L) ::= NAME(A).
-    int rule7(Token& A) {
-        if(!m_cg->hasState(""/* TODO */, A.z)) {
-            printError();
-        }
-        return storeInstr([this, A](const char* node){
-            return m_cg->nodeInState(node, A.z);
+    int rule7(Token& L, Token& A) {
+        L.text = &(m_pool[m_poolIndex++]);
+        *(L.text) = *(A.text);
+        return storeInstr([this, A](const std::string& node){
+            return m_cg->nodeInState(node, *(A.text));
         });
     }
 
@@ -233,6 +235,8 @@ private:
     std::string N_exprs;
     std::string N_line;
     CodeGenInterface* m_cg;
+    std::string m_pool[100];
+    int m_poolIndex;
 };
 
 #include "cfg.c"
@@ -240,24 +244,23 @@ private:
 
 CodeGenerator::CodeGenerator(const std::string& expression, CodeGenInterface* cg):
     m_t{expression},
-    m_cg{cg}
+    m_cg{cg},
+    m_poolIndex{0}
 {
 
-    char tmp[100][100];
     int tok;
-    int i = 0;
     Token t;
     
     std::string symbol;
     
     void* pParser = ParseAlloc( malloc );
     while( (tok = m_t.getToken(symbol)) != -1 ){
-        strncpy(tmp[i], symbol.c_str(), 99);
-        t.z = (tmp[i]);
+        // take empty string from pool and fill it. Having string object inside Token does not work.
+        t.text = &(m_pool[m_poolIndex++]);
+        *(t.text) = symbol;
         
         // Parse does not care what is in third parameter (t) or fourth parameter (this)
         Parse(pParser, tok, t, this);
-        i++;
     }
     Parse(pParser, 0, t, this);
     ParseFree(pParser, free );
