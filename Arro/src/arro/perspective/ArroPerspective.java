@@ -43,7 +43,8 @@ public class ArroPerspective implements IPerspectiveFactory {
 	 * org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui
 	 * .IPageLayout)
 	 */
-	public void createInitialLayout(IPageLayout layout) {
+	@Override
+    public void createInitialLayout(IPageLayout layout) {
 		defineActions(layout);
 		defineLayout(layout);
 	}
@@ -100,7 +101,7 @@ public class ArroPerspective implements IPerspectiveFactory {
 			bottomLeft.addView(IPageLayout.ID_OUTLINE);
 		}
 		if (isViewAvailable(ThumbNailView.VIEW_ID)) {
-			bottomLeft.addView(ThumbNailView.VIEW_ID); //$NON-NLS-1$
+			bottomLeft.addView(ThumbNailView.VIEW_ID); 
 		}
 
 		// Bottom right.

@@ -2,6 +2,7 @@ package arro.editors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -33,9 +34,9 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import arro.Constants;
-import arro.domain.ResourceCache;
-import util.ArroZipFile;
-import util.PathUtil;
+import util.Logger;
+import workspace.ArroModuleContainer;
+import workspace.ResourceCache;
 
 /**
  * An example showing how to create a multi-page editor. This example has 3
@@ -51,11 +52,12 @@ public class MultiPageEditor extends MultiPageEditorPart implements
 
     /** The text editor used in page 0. */
     // private TextEditor editor;
-    private FunctionDiagramEditor functionEditor;
-    private StateDiagramEditor stateEditor;
-    private TextEditor pythonEditor;
+    private FunctionDiagramEditor functionEditor = null;
+    private StateDiagramEditor stateEditor = null;
+    private TextEditor pythonEditor = null;
+    private TextEditor htmlEditor = null;
     
-    private ArroZipFile zip = null;
+    private ArroModuleContainer zip = null;
 
 	private int documentType = Constants.FunctionBlock;
 
@@ -76,13 +78,12 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Creates page 0 of the multi-page editor, which contains the function diagram.
      */
-    void createPage0(String fileName, ArroZipFile zip) {
+    void createPage0(String fileName, ArroModuleContainer zip) {
 
-        IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + fileName);
+        IFile file = zip.getFile(Constants.FUNCTION_FILE_NAME);
         if(file != null) {
         	FileEditorInput fei2 = new FileEditorInput(file);
         	
-
             try {
             	// pass the file so later it knows where to store the .xml file.
                 functionEditor = new FunctionDiagramEditor(zip, documentType);
@@ -99,15 +100,15 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Creates page 1 of the multi-page editor, which shows the Python code.
      */
-    void createPage1(String fileName, ArroZipFile zip) {
-        IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + fileName + ".py");
+    void createPage1(String fileName, ArroModuleContainer zip) {
+        IFile file = zip.getFile(Constants.PYTHON_FILE_NAME);
         if(file != null) {
-        	FileEditorInput fei2 = new FileEditorInput(file);
-        	
-    		if(zip.getMETA("type").equals(Constants.CODE_BLOCK)) {
-    			
+            FileEditorInput fei2 = new FileEditorInput(file);
+            
+            if(zip.getMETA("type").equals(Constants.CODE_BLOCK)) {
+                
                 try {
-                	// pass the file so later it knows where to store the .py file.
+                    // pass the file so later it knows where to store the .py file.
                     pythonEditor = new TextEditor();
                     
                     int index = addPage(pythonEditor, fei2);
@@ -116,26 +117,50 @@ public class MultiPageEditor extends MultiPageEditorPart implements
                     ErrorDialog.openError(getSite().getShell(),
                             "Error creating nested text editor", null, e.getStatus());
                 }
-    		}
+            }
+        }
+    }
+
+    /**
+     * Creates page 1 of the multi-page editor, which shows the Python code.
+     */
+    void createPageHtml(String fileName, ArroModuleContainer zip) {
+        IFile file = zip.getFile(Constants.UI_FILE_NAME);
+        if(file != null) {
+            FileEditorInput fei2 = new FileEditorInput(file);
+            
+            if(zip.getMETA("type").equals(Constants.UI_BLOCK)) {
+                
+                try {
+                    // pass the file so later it knows where to store the .py file.
+                    htmlEditor = new TextEditor();
+                    
+                    int index = addPage(htmlEditor, fei2);
+                    setPageText(index, "HTML Code");
+                } catch (PartInitException e) {
+                    ErrorDialog.openError(getSite().getShell(),
+                            "Error creating nested text editor", null, e.getStatus());
+                }
+            }
         }
     }
 
     /**
      * Creates page 2 of the multi-page editor, which contains the sequence diagram.
      */
-    void createPage2(String fileName, ArroZipFile zip) {
+    void createPage2(String fileName, ArroModuleContainer zip) {
 
-        //IFile file = zip.getFile(Constants.HIDDEN_RESOURCE + fileName);
         IFile file = zip.getFile(Constants.SFC_FILE_NAME);
         if(file != null) {
         	FileEditorInput fei2 = new FileEditorInput(file);
         	
-
             try {
             	// pass the file so later it knows where to store the .xml file.
                 stateEditor = new StateDiagramEditor(zip);
                 
                 int index = addPage(stateEditor, fei2);
+                
+                // can we do: e = old.getEditor(1); addPage(e)??
                 setPageText(index, "Sequence Diagram");
             } catch (PartInitException e) {
                 ErrorDialog.openError(getSite().getShell(),
@@ -162,6 +187,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         fontButton.setText("Change Font...");
 
         fontButton.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 setFont();
             }
@@ -174,46 +200,77 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Creates the pages of the multi-page editor.
      */
+    @Override
     protected void createPages() {
     	// Open the ZIP file and create unzipped files
     	
         // let's here unzip the file and create a FileEditorInput for each of the subfiles.
         FileEditorInput fei = (FileEditorInput) getEditorInput();
         
-        // Make this call to do some init inside ResourceCache. It's a bit ugly..
-        ResourceCache.getInstance().getDiagramFolder(fei);
-        
         String fileName = fei.getFile().getName();
         
         // Unzip Function Diagram file and load domain data in cache.
-        zip = ResourceCache.getInstance().getZip(PathUtil.truncExtension(fileName));
+        zip = ResourceCache.getInstance().getZipByFile(fei.getFile());
         
-        if(zip.getMETA("type").equals(Constants.FUNCTION_BLOCK)) {
-			documentType = Constants.FunctionBlock;
-		} else if(zip.getMETA("type").equals(Constants.CODE_BLOCK)){
-	        if(zip.getMETA("language").equals(Constants.NODE_PYTHON)) {
-	        	documentType = Constants.CodeBlockPython;
-	        } else if(zip.getMETA("language").equals(Constants.NODE_NATIVE)) {
-		        documentType = Constants.CodeBlockNative;
-	        }
-        }
+        Logger.out.trace(Logger.MPE, "Opening new file " + fileName);
+        
+        zip.setEditor(this);
+        
+        if(zip != null) {
+            if(zip.getMETA("type").equals(Constants.FUNCTION_BLOCK)) {
+                documentType = Constants.FunctionBlock;
+            } else if(zip.getMETA("type").equals(Constants.CODE_BLOCK)){
+                if(zip.getMETA("language").equals(Constants.NODE_PYTHON)) {
+                    documentType = Constants.CodeBlockPython;
+                } else if(zip.getMETA("language").equals(Constants.NODE_NATIVE)) {
+                    documentType = Constants.CodeBlockNative;
+                }
+            } else if(zip.getMETA("type").equals(Constants.UI_BLOCK)){
+                documentType = Constants.CodeBlockHtml;
+            }
 
-        // Create page 0 containing Graphiti editor. File was just unzipped in ResourceCache.
-        createPage0(fei.getName(), zip);
-        createPage2(fei.getName(), zip);
-        if(documentType == Constants.CodeBlockPython) {
-            createPage1(fei.getName(), zip);
-        }
+            // Create page 0 containing Graphiti editor. File was just unzipped in ResourceCache.
+            if(documentType == Constants.CodeBlockHtml) {
+                createPage0(fei.getName(), zip);
+                createPageHtml(fei.getName(), zip);
+            } else {
+                createPage0(fei.getName(), zip);
+                createPage2(fei.getName(), zip);
+                if(documentType == Constants.CodeBlockPython) {
+                    createPage1(fei.getName(), zip);
+                }
+            }
 
-        //createPage2();
+            //createPage2();
+        } else {
+            Logger.out.trace(Logger.MPE, "File " + fileName + " could not be opened");
+        }
+        
     }
 
+
+    /**
+     * After a rename of the resource this method is called.
+     * @param res
+     */
+    public void changeInput(IResource res) {
+        final FileEditorInput fei = new FileEditorInput((IFile) res);
+        setInput(fei);
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                setPartName(fei.getName());
+            }
+        });
+    }
     
+
     /**
      * The <code>MultiPageEditorPart</code> implementation of this
      * <code>IWorkbenchPart</code> method disposes all nested editors.
      * Subclasses may extend.
      */
+    @Override
     public void dispose() {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
         
@@ -223,19 +280,15 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Saves the multi-page editor's document.
      */
+    @Override
     public void doSave(IProgressMonitor monitor) {
-        int i = 0;
-        getEditor(i++).doSave(monitor);
-        getEditor(i++).doSave(monitor);
-        if(documentType == Constants.CodeBlockPython) {
-            getEditor(i++).doSave(monitor);
+        int count = getPageCount();
+        for(int i = 0; i < count; i++) {
+            getEditor(i).doSave(monitor);
         }
         
-		ResourceCache.getInstance().storeDomainDiagram(zip);
+		zip.storeDomainDiagram();
         
-        // then zip the whole thing again
-        //FileEditorInput fei = (FileEditorInput) getEditorInput();
-		
         zip.save();
     }
 
@@ -244,6 +297,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
      * text for page 0's tab, and updates this multi-page editor's input to
      * correspond to the nested editor's.
      */
+    @Override
     public void doSaveAs() {
 		MessageDialog.openInformation(null, "Arro", "SaveAs is not supported");
     	
@@ -265,6 +319,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
      * The <code>MultiPageEditor</code> implementation of this method
      * checks that the input is an instance of <code>IFileEditorInput</code>.
      */
+    @Override
     public void init(IEditorSite site, IEditorInput editorInput)
             throws PartInitException {
         if (!(editorInput instanceof IFileEditorInput)
@@ -274,19 +329,20 @@ public class MultiPageEditor extends MultiPageEditorPart implements
         super.init(site, editorInput);
         
 		setPartName(editorInput.getName());
-
     }
 
     /*
      * (non-Javadoc) Method declared on IEditorPart.
      */
+    @Override
     public boolean isSaveAsAllowed() {
-        return true;
+        return false;
     }
 
     /**
      * Calculates the contents of page 2 when the it is activated.
      */
+    @Override
     protected void pageChange(int newPageIndex) {
         super.pageChange(newPageIndex);
         // if (newPageIndex == 2) {
@@ -297,9 +353,11 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Closes all project files on project close.
      */
+    @Override
     public void resourceChanged(final IResourceChangeEvent event) {
         if (event.getType() == IResourceChangeEvent.PRE_CLOSE) {
             Display.getDefault().asyncExec(new Runnable() {
+                @Override
                 public void run() {
                     IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
                             .getPages();
@@ -331,8 +389,5 @@ public class MultiPageEditor extends MultiPageEditorPart implements
             text.setFont(font);
         }
     }
-    
-    
-
 
 }

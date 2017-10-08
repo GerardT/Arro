@@ -1,0 +1,46 @@
+
+<!-- Imports polymer -->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/paper-slider/paper-slider.html">
+
+<!-- Defines element markup -->
+<dom-module id="arro-slider">
+    <template>
+        <p><strong>{{name}}</strong></p>
+        <paper-slider id="slider" min="0" max='100' ></paper-slider>
+    </template>
+</dom-module>
+
+<!-- Registers custom element -->
+<script>
+    Polymer({
+        is: 'arro-slider',
+        properties: {
+            name: {
+                type: String,
+                value: 'myname'
+            },
+            id: {
+                type: String,
+                value: 'myaddress'
+            }
+        },
+        // add a callback to the element's prototype
+        ready: function() {
+            var myaddr = this.id;
+            var slider = this.$.slider;
+            slider.addEventListener('value-change', function() {
+                object = {
+                    "address": myaddr, 
+                    "data": {
+                               value: slider.value
+                            }
+                  };
+                  mySocket.send(JSON.stringify(object) + "\n");
+            })
+
+        }
+
+    });
+</script>
+

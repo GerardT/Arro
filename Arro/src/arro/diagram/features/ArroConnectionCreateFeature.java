@@ -5,20 +5,19 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.features.impl.AbstractCreateConnectionFeature;
-import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 
-import util.Logger;
-import util.WidgetUtil;
 import arro.Constants;
 import arro.domain.ArroNode;
 import arro.domain.ArroPad;
 import arro.domain.NonEmfDomainObject;
 import arro.domain.POJOIndependenceSolver;
+import util.Logger;
+import util.WidgetUtil;
 
 public class ArroConnectionCreateFeature extends AbstractCreateConnectionFeature
 		implements ICreateConnectionFeature {
@@ -27,7 +26,8 @@ public class ArroConnectionCreateFeature extends AbstractCreateConnectionFeature
 		super(fp, "Create Connection", "Creates a new connection between two pads");
 	}
 
-	public boolean canStartConnection(ICreateConnectionContext context) {
+	@Override
+    public boolean canStartConnection(ICreateConnectionContext context) {
 		// TODO: check for right domain object instance below
 		// return getBusinessObjectForPictogramElement(context.getSourcePictogramElement()) instanceof <DomainObject>;
 
@@ -91,7 +91,8 @@ public class ArroConnectionCreateFeature extends AbstractCreateConnectionFeature
 	/**
 	 * check if connection allowed while hovering over anchors.
 	 */
-	public boolean canCreate(ICreateConnectionContext context) {
+	@Override
+    public boolean canCreate(ICreateConnectionContext context) {
 		StringParam ref = new StringParam();
 		ArroPad source = fetchPad(context.getSourcePictogramElement(), ref);
 		ArroPad target = fetchPad(context.getTargetPictogramElement(), ref);
@@ -103,9 +104,11 @@ public class ArroConnectionCreateFeature extends AbstractCreateConnectionFeature
 		return false;
 	}
 
-	public Connection create(ICreateConnectionContext context) {
+	@Override
+    public Connection create(ICreateConnectionContext context) {
 		Connection newConnection = null;
 
+        // TODO see also ArroTransitionCreateFeature -> model object created, which is better?
 		Object newDomainObjectConnection = null;
 
         AddConnectionContext addContext = new AddConnectionContext(context.getSourceAnchor(), context.getTargetAnchor());

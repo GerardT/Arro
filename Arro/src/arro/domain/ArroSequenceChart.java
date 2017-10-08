@@ -19,7 +19,8 @@ public class ArroSequenceChart extends NonEmfDomainObject {
     private ArrayList<ArroRequest> publishedActions = new ArrayList<ArroRequest>();;
 	private ArroModule parent;
 	
-	@SuppressWarnings("unchecked")
+	@Override
+    @SuppressWarnings("unchecked")
 	public ArroSequenceChart clone() {
 		ArroSequenceChart diag = new ArroSequenceChart();
 		diag.steps = (HashMap<String, ArroStep>) steps.clone();
@@ -93,11 +94,11 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 			
 			transition.xmlWrite(doc, sub);
 		}
-        for(ArroRequest action: publishedActions) {
-            
-            Element sub = doc.createElement("published-action");
-            elt.appendChild(sub);
-        }
+//        for(ArroRequest action: publishedActions) {
+//            
+//            Element sub = doc.createElement("published-action");
+//            elt.appendChild(sub);
+//        }
 	}
 	public void xmlRead(Node nNode) {
 		Element eElement = (Element) nNode;

@@ -15,25 +15,16 @@ public class StepCreateFeature extends AbstractCreateFeature implements
 		super(fp, "Step", "Creates a new Step");
 	}
 
-	public boolean canCreate(ICreateContext context) {
+	@Override
+    public boolean canCreate(ICreateContext context) {
 		return context.getTargetContainer() instanceof Diagram;
 	}
 
-	public Object[] create(ICreateContext context) {
-		
-		// TODO: in case of an EMF object add the new object to a suitable resource
-		// getDiagram().eResource().getContents().add(newDomainObject);
-		
-	    // create EClass
+	@Override
+    public Object[] create(ICreateContext context) {
+	    // Create a model element and add it to the resource of the diagram.
 		ArroStep newClass = new ArroStep();
-        // Add model element to resource.
-        // We add the model element to the resource of the diagram for
-        // simplicity's sake. Normally, a customer would use its own
-        // model persistence layer for storing the business model separately.
-        //getDiagram().eResource().getContents().add(newClass);
-        //newClass.setName(newClassName);
- 
-        // do the add
+
 		addGraphicalRepresentation(context, newClass);
 		return new Object[] { newClass };
 	}

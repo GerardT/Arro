@@ -23,11 +23,11 @@ import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
-import util.Logger;
 import arro.Constants;
-import arro.domain.ArroPad;
 import arro.domain.ArroModule;
+import arro.domain.ArroPad;
 import arro.editors.FunctionDiagramEditor;
+import util.Logger;
 
 
 public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature, ICustomUndoRedoFeature {
@@ -36,7 +36,8 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 		super(fp);
 	}
 
-	public boolean canAdd(IAddContext context) {
+	@Override
+    public boolean canAdd(IAddContext context) {
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
         if(!(dc instanceof FunctionDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");
@@ -58,7 +59,8 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 	 * Called when a Node is added to the diagram, both for adding and 
 	 * drag and drop (DND).
 	 */
-	public PictogramElement add(IAddContext context) {
+	@Override
+    public PictogramElement add(IAddContext context) {
 		
 		// Can't make it a object attribute since this code is called from different
 		// contexts (so different object instances)!
@@ -69,17 +71,21 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
         String instanceName = "aPad";
         String className = "";
         
-        IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
-        if(!(dc instanceof FunctionDiagramEditor)) {
-        	Logger.out.trace(Logger.EDITOR, "not an editor");
-        	return null;
-        }
-        ArroModule domainModule =  ((FunctionDiagramEditor)dc).getDomainModule();
 
+        ArroModule domainModule;
+        boolean isInput = true;
+        int docType;
         Object obj = context.getNewObject();
         if(obj instanceof IFile) {
         	// Since we don't invoke the Create feature when dragging a 'file' on the diagram,
         	// no object had been created yet. So we do it here.
+            IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
+            if(!(dc instanceof FunctionDiagramEditor)) {
+                Logger.out.trace(Logger.EDITOR, "not an editor");
+                return null;
+            }
+            docType = ((FunctionDiagramEditor)dc).getDocumentType();
+            domainModule =  ((FunctionDiagramEditor)dc).getDomainModule();
             ArroPad newPad = new ArroPad();
             
             // Set 'class' to the name of the file. During refresh the system will
@@ -91,22 +97,33 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
             }
             
             className = className.substring(0, index);
-            newPad.setType(className);
             instanceName = "a" + className;
             while(domainModule.getPadByName(instanceName) != null) {
             	instanceName += "1";
             }
             obj = newPad;
+        } else {
+            domainModule = (ArroModule) context.getProperty(Constants.PROP_CONTEXT_MOD_KEY);
+            docType = Constants.CodeBlockHtml;
+            instanceName = (String) context.getProperty(Constants.PROP_CONTEXT_NAME_KEY);
+            className = "Json";
+            if(instanceName.equals("input")) {
+                isInput = true;
+            } else {
+                isInput = false;
+            }
+
         }
         if(!(obj instanceof ArroPad)) {
         	return null;
         }
         ArroPad addedDomainObject = (ArroPad)obj;
         
+        addedDomainObject.setType(className);
         addedDomainObject.setName(instanceName);
 
 
-		ContainerShape targetDiagram = (ContainerShape) context.getTargetContainer();
+		ContainerShape targetDiagram = context.getTargetContainer();
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		IGaService gaService = Graphiti.getGaService();
 		
@@ -121,9 +138,13 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 		{
 			gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), width, height);
 			roundedRectangle.setFilled(true);
-			
-	        roundedRectangle.setForeground(manageColor(Constants.PAD_FOREGROUND_INPUT));
-	        roundedRectangle.setBackground(manageColor(Constants.PAD_BACKGROUND_INPUT));
+			if(isInput) {
+	            roundedRectangle.setForeground(manageColor(Constants.PAD_FOREGROUND_INPUT));
+	            roundedRectangle.setBackground(manageColor(Constants.PAD_BACKGROUND_INPUT));
+			} else {
+	            roundedRectangle.setForeground(manageColor(Constants.PAD_FOREGROUND_OUTPUT));
+	            roundedRectangle.setBackground(manageColor(Constants.PAD_BACKGROUND_OUTPUT));
+			}
 	        roundedRectangle.setLineWidth(2);
 		}
 		
@@ -144,31 +165,8 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
         }
-        
-        ///////////////////////
-// 		final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);                 		
-//		boxAnchor.setReferencedGraphicsAlgorithm(containerShape.getGraphicsAlgorithm());
-//		
-//		
-////		if(leftSide) {
-////    		boxAnchor.setRelativeWidth(0.0);
-////		} else {
-////    		boxAnchor.setRelativeWidth(0.0);
-////		}
-//		boxAnchor.setRelativeHeight(0.0/*0.38*/); // Use golden section
-//        
-//        //Graphiti.getPeService().setPropertyValue(shape, Constants.PROP_PAD_NAME_KEY, padName);
-//
-//        RoundedRectangle anch = gaService.createRoundedRectangle(boxAnchor, 5, 5);
-//        anch.setFilled(true);
-//        anch.setForeground(manageColor(Constants.ANCHOR_FG));
-//        anch.setBackground(manageColor(Constants.ANCHOR_BG));
-//        anch.setLineWidth(2);
-//        
-        ///////////////////////
 
-        int docType = ((FunctionDiagramEditor)dc).getDocumentType();
-        if(docType != Constants.CodeBlockPython && docType != Constants.CodeBlockNative) {
+        if(docType != Constants.CodeBlockPython && docType != Constants.CodeBlockNative && docType != Constants.CodeBlockHtml) {
         	/////// anchor ///////
     		// create an additional box relative anchor at middle-right
     		final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
@@ -200,7 +198,6 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
         
 	    // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
 		link(containerShape, addedDomainObject);
-		//POJOIndependenceSolver.getInstance().RegisterPOJOObject(addedDomainObject);
 		
 		return containerShape;
 	}

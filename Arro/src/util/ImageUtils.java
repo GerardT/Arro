@@ -3,13 +3,12 @@ package util;
 import java.io.IOException;
 import java.net.URL;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * Since for deployed app the icons have to be part of the bundle, this

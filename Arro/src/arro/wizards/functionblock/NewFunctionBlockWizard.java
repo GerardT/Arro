@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -46,6 +47,7 @@ import arro.domain.ArroModule;
 import arro.domain.ArroSequenceChart;
 import arro.domain.ArroStep;
 import arro.wizards.FileService;
+import workspace.ResourceCache;
 
 /**
  * This is a sample new wizard. Its role is to create a new file 
@@ -64,6 +66,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 	private ArroModule nodeDiagram;
     private ArroSequenceChart stateNode;
     private ArroStep readyStep;
+    private ArroStep termStep;
 
 
 
@@ -79,7 +82,8 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 	 * Adding the page to the wizard.
 	 */
 
-	public void addPages() {
+	@Override
+    public void addPages() {
 		page = new NewFunctionBlockWizardPage(selection);
 		addPage(page);
 	}
@@ -89,12 +93,14 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 	 * the wizard. We will create an operation and run it
 	 * using wizard as execution context.
 	 */
-	public boolean performFinish() {
+	@Override
+    public boolean performFinish() {
 		final String containerName = page.getContainerName();
 		final String fileName = page.getFileName();
 
 		IRunnableWithProgress op = new IRunnableWithProgress() {
-			public void run(IProgressMonitor monitor) throws InvocationTargetException {
+			@Override
+            public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
 					doFinish(containerName, fileName, monitor);
 				} catch (CoreException e) {
@@ -148,13 +154,21 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
         stateNode = new ArroSequenceChart();
         nodeDiagram.setStateDiagram(stateNode);
         readyStep = new ArroStep();
+        termStep = new ArroStep();
+        readyStep.setName(Constants.PROP_CONTEXT_READY_STEP);
+        termStep.setName(Constants.PROP_CONTEXT_TERM_STEP);
+        
         try {
             stateNode.addState(readyStep);
+            stateNode.addState(termStep);
         } catch (ExecutionException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
 
+        // Since the zip file is being created already, it will trigger resource updates
+        // that are incomplete and cause issues such as missing META.
+        ResourceCache.getInstance().lock();
 		final IFile file = f.getFile(new Path(fileName));
 		try {
 			// Create a zip file...
@@ -183,7 +197,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 			{
 		        
 				// name the diagram file inside the zip file 
-		        out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName));
+		        out.putNextEntry(new ZipEntry(Constants.FUNCTION_FILE_NAME));
 		        
 		        // fill with initial data
 		        // Not very nice: we borrow the file for temporarily writing the diagram data into.
@@ -218,7 +232,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 			}
 			{
 				// name the xml file inside the zip file 
-		        out.putNextEntry(new ZipEntry(Constants.HIDDEN_RESOURCE + fileName + ".xml"));
+		        out.putNextEntry(new ZipEntry(Constants.MODULE_FILE_NAME));
 		        
 		        // fill with initial data
 		        // Not very nice: we borrow the file for temporarily writing the diagram data into.
@@ -244,6 +258,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 			}
 			
 			bao.close();
+	        ResourceCache.getInstance().unlock();
 
 			
 		} catch (IOException e) {
@@ -253,7 +268,8 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 		monitor.worked(1);
 		monitor.setTaskName("Opening file for editing...");
 		getShell().getDisplay().asyncExec(new Runnable() {
-			public void run() {
+			@Override
+            public void run() {
 				IWorkbenchPage page =
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try {
@@ -277,6 +293,7 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 							"	<entry key=\"name\" value=\"" + diagramName + "\"/>\n" +
 							"	<entry key=\"type\" value=\"" + Constants.FUNCTION_BLOCK + "\"/>\n" +
 							"	<entry key=\"version\" value=\"0.90\"/>\n" +
+                            "   <entry key=\"UUID\" value=\"" + UUID.randomUUID().toString() + "\"/>\n" +
 							"</metadata>\n";
 		return new ByteArrayInputStream(contents.getBytes());
 	}
@@ -324,7 +341,16 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
         context = new AddContext();  
         context.setNewObject(readyStep);
         context.setTargetContainer(diagram);
-        context.putProperty(Constants.PROP_CONTEXT_KEY, Constants.PROP_CONTEXT_READY_STEP);
+        context.putProperty(Constants.PROP_CONTEXT_NAME_KEY, Constants.PROP_CONTEXT_READY_STEP);
+        
+        f = dtp.getFeatureProvider().getAddFeature(context);
+        f.add(context);
+
+        // Create '_terminated' step in diagram, calling .
+        context = new AddContext();  
+        context.setNewObject(termStep);
+        context.setTargetContainer(diagram);
+        context.putProperty(Constants.PROP_CONTEXT_NAME_KEY, Constants.PROP_CONTEXT_TERM_STEP);
         
         f = dtp.getFeatureProvider().getAddFeature(context);
         f.add(context);
@@ -339,7 +365,8 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 		String contents = 	"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
 							"<module id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
 						    "    <sfc id=\"" + stateNode.getId() + "\" name=\"_sfc\" type=\"_Sfc\">\n" +
-					        "        <step id=\"" + readyStep.getId() + "\" name=\"_ready\"/>" +
+                            "        <step id=\"" + readyStep.getId() + "\" name=\"" + Constants.PROP_CONTEXT_READY_STEP + "\"/>" +
+                            "        <step id=\"" + termStep.getId() + "\" name=\"" + Constants.PROP_CONTEXT_TERM_STEP + "\"/>" +
                             "    </sfc>\n" +
 							"</module>\n";
 		return new ByteArrayInputStream(contents.getBytes());
@@ -356,7 +383,8 @@ public class NewFunctionBlockWizard extends Wizard implements INewWizard {
 	 * we can initialize from it.
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */
-	public void init(IWorkbench workbench, IStructuredSelection selection) {
+	@Override
+    public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.selection = selection;
 	}
 }

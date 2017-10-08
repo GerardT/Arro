@@ -13,36 +13,28 @@ import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.impl.LayoutContext;
 import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
-import org.eclipse.graphiti.mm.algorithms.Polyline;
-import org.eclipse.graphiti.mm.algorithms.Rectangle;
-import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
-import org.eclipse.graphiti.mm.algorithms.Text;
-import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.platform.IDiagramContainer;
-import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.services.IGaService;
-import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.jface.dialogs.ErrorDialog;
 
-import util.Logger;
 import arro.Constants;
-import arro.domain.ArroNode;
 import arro.domain.ArroModule;
+import arro.domain.ArroNode;
 import arro.editors.FunctionDiagramEditor;
+import util.Logger;
 
 
-public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeature, ICustomUndoRedoFeature {
+public class NodeAddFeature extends AbstractAddFeature implements IAddFeature, ICustomUndoRedoFeature {
 	
-	public ArroNodeAddFeature(IFeatureProvider fp) {
+	public NodeAddFeature(IFeatureProvider fp) {
 		super(fp);
 
 	}
 
-	public boolean canAdd(IAddContext context) {
+	@Override
+    public boolean canAdd(IAddContext context) {
 		// TODO: check for right domain object instance below
 		return (context.getNewObject() instanceof ArroNode && context.getTargetContainer() instanceof Diagram) ||
 		       (context.getNewObject() instanceof IFile && context.getTargetContainer() instanceof Diagram);
@@ -52,12 +44,11 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
 	 * Called when a Node is added to the diagram, both for adding and 
 	 * drag and drop (DND).
 	 */
-	public PictogramElement add(IAddContext context) {
+	@Override
+    public PictogramElement add(IAddContext context) {
 		
 		// Can't make it a object attribute since this code is called from different
 		// contexts (so different object instances)!
-        int width = 200;
-        int height = 50;
         
         
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
@@ -111,67 +102,11 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
         
         addedDomainObject.setName(instanceName);
 
+        // If getDiagram() does not work, then use below
+        // Diagram targetDiagram = (Diagram) context.getTargetContainer();
 
-		Diagram targetDiagram = (Diagram) context.getTargetContainer();
-		IPeCreateService peCreateService = Graphiti.getPeCreateService();  // widget?
-		IGaService gaService = Graphiti.getGaService(); // shape?
-		
+        ContainerShape containerShape = new NodeHelper(getDiagram()).create(context, addedDomainObject);
 
-		/////// CONTAINER ///////
-		ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
-		
-        Graphiti.getPeService().setPropertyValue(containerShape, Constants.PROP_PICT_KEY, Constants.PROP_PICT_NODE);
-
-        // create invisible outer rectangle expanded by
-        // the width needed for the anchor
-        Rectangle invisibleRectangle = gaService.createInvisibleRectangle(containerShape);
-        {
-            gaService.setLocationAndSize(invisibleRectangle, context.getX(), context.getY(),
-            												 width, height);
-     
-        }
-
-		{
-	        // Shape shape = peCreateService.createShape(containerShape, false);
-	        
-			RoundedRectangle roundedRectangle = gaService.createRoundedRectangle(invisibleRectangle, 5, 5);
-			
-			gaService.setLocationAndSize(roundedRectangle, Constants.HALF_PAD_SIZE, 0, width - Constants.PAD_SIZE, height);
-			roundedRectangle.setFilled(false);
-			
-	        roundedRectangle.setForeground(manageColor(Constants.CLASS_FOREGROUND));
-	        roundedRectangle.setBackground(manageColor(Constants.CLASS_BACKGROUND));
-	        roundedRectangle.setLineWidth(2);
-		}
-		
-		/////// horizontal divider line ///////
-		{
-	        // create and set graphics algorithm
-	        Polyline polyline =
-	            gaService.createPolyline(invisibleRectangle, new int[] { 0, 40, width, 40 });
-	        polyline.setForeground(manageColor(Constants.CLASS_FOREGROUND));
-	        polyline.setLineWidth(2);
-		}
- 
-		/////// class text ///////
-        {
-    		Shape shape = peCreateService.createShape(containerShape, false);
-			Text text = gaService.createText(shape, addedDomainObject.getType() + " :");
-	        text.setForeground(manageColor(Constants.CLASS_TEXT_FOREGROUND));
-			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-       }
-
-		/////// name text ///////
-        {
-			Shape shape = peCreateService.createShape(containerShape, false);
-			Text text = gaService.createText(shape, addedDomainObject.getName());
-	        text.setForeground(manageColor(Constants.CLASS_TEXT_FOREGROUND));
-			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-        }
-        
-		
         context.putProperty(Constants.PROP_UNDO_NODE_KEY, domainModule.cloneNodeList());
         context.putProperty(Constants.PROP_DOMAIN_MODULE_KEY, domainModule);
 
@@ -179,8 +114,6 @@ public class ArroNodeAddFeature extends AbstractAddFeature implements IAddFeatur
         
 	    // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
 		link(containerShape, addedDomainObject);
-		//POJOIndependenceSolver.getInstance().RegisterPOJOObject(addedDomainObject);
-		
 		
 		// After PE was linked to domain object..
 		

@@ -13,8 +13,8 @@ import org.eclipse.ui.PartInitException;
 
 import arro.Constants;
 import arro.domain.ArroModule;
-import util.ArroZipFile;
 import util.PathUtil;
+import workspace.ArroModuleContainer;
 
 /**
  * Subclass of DiagramEditor (Graphiti diagram editor), allows override some
@@ -28,10 +28,10 @@ public class FunctionDiagramEditor extends DiagramEditor {
 	
 	private String diagramName;
 	private ArroModule domainModule;
-	private ArroZipFile zip;
+	private ArroModuleContainer zip;
 	
 
-	public FunctionDiagramEditor(ArroZipFile zip, int documentType) {
+	public FunctionDiagramEditor(ArroModuleContainer zip, int documentType) {
 		super();
 		this.documentType = documentType;
 		this.zip = zip;
@@ -54,7 +54,7 @@ public class FunctionDiagramEditor extends DiagramEditor {
 		
 		ArroModule domainObject = (ArroModule)zip.getDomainDiagram();
 		if(domainObject != null && domainObject instanceof ArroModule) {
-			domainModule = (ArroModule)domainObject;
+			domainModule = domainObject;
 		} else {
 	    	// Then it must be that a new diagram is created...
 	    	domainModule = new ArroModule();

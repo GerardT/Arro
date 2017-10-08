@@ -9,6 +9,7 @@
 #include "NodeDb.h"
 #include "Pad.h"
 #include "Process.h"
+#include "SocketClient.h"
 
 
 using namespace std;
@@ -43,6 +44,8 @@ ConfigReader::ConfigReader(const string& filename, NodeDb& db):
 
     // Recursively process all modules, starting with "Main"
     makeNodeInstance("Main", "main", "", *params, nullptr);
+
+    SocketClient::getInstance()->generateWebUi();
 }
 
 ConfigReader::~ConfigReader() {
@@ -102,7 +105,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
     if(def == nullptr)
     {
-        ServerEngine::console("Element not found: " + typeName);
+        SendToConsole("Element not found: " + typeName);
         m_trace.println("Element not found: " + typeName);
         throw std::runtime_error("Element not found: " + typeName);
     }
@@ -125,6 +128,13 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
             // create Process object; inputs & outputs to be added later.
             processNode = new Process(m_nodeDb, *typeURL, instance, *params);
+
+            // register config not for parameter reception
+            processNode->registerInput("_config", true);
+
+            // TODO maybe find another place for this invocation..
+            processNode->sendParameters(*params);
+
 
             delete params;
         }
@@ -153,6 +163,8 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             sfcNode = new Process(m_nodeDb, "Sfc:", instanceSfc, *params, elt);
 
             sfcNode->registerInput("_action", true);
+
+            sfcNode->registerOutput("_step"); // experimental
 
             // EXTRA Create an _action and _step pad in every module
             // If processNode != nullptr then we know a 'leaf' node is being added
@@ -283,6 +295,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
     // Maybe in future host system can do this check. Or we can use protobuf enum.
     if(parentSfc && sfcNode) parentSfc->registerSfc(instanceName, sfcNode);
     //if(sfcNode) sfcNode->test();
+    if(sfcNode) sfcNode->finishConstruction();
 }
 
 

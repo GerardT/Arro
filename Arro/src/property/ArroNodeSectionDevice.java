@@ -95,7 +95,8 @@ public class ArroNodeSectionDevice extends GFPropertySection implements ITabbedP
 
 	    nameText.addModifyListener(new ModifyListener() {
 
-	    	public void modifyText(ModifyEvent e) {
+	    	@Override
+            public void modifyText(ModifyEvent e) {
 	    		currentUrl = nameText.getText();
 	    		if (currentUrl == null) {
 	    			currentUrl = "";//$NON-NLS-1$
@@ -109,10 +110,12 @@ public class ArroNodeSectionDevice extends GFPropertySection implements ITabbedP
 		final String typedValue = currentUrl;
 		IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
 				
-			public boolean canExecute(IContext context) {
+			@Override
+            public boolean canExecute(IContext context) {
 				return true;
 			}
-			public void execute(IContext context) {
+			@Override
+            public void execute(IContext context) {
 //				DomainModule n = null;
 //			    PictogramElement pe = getSelectedPictogramElement();
 //			    if(pe != null && pe.eContainer() instanceof Diagram) {
@@ -130,7 +133,8 @@ public class ArroNodeSectionDevice extends GFPropertySection implements ITabbedP
 				
 				TransactionalEditingDomain domain = TransactionUtil.getEditingDomain(getDiagram());
 				domain.getCommandStack().execute(new RecordingCommand(domain) {
-				    public void doExecute() {
+				    @Override
+                    public void doExecute() {
 
 		    			// update UI with new domain data
 				    	UpdateContext updateContext = new UpdateContext(diagram);

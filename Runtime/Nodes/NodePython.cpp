@@ -14,7 +14,7 @@ static RegisterMe<NodePython> registerMe("Python");
  * Will instantiate an object of class className inside Python that
  * will be used for the lifetime of the Process.
  */
-NodePython::NodePython(Process* d, const string& className, ConfigReader::StringMap& /*params*/, TiXmlElement*):
+NodePython::NodePython(AbstractNode* d, const string& className, StringMap& /*params*/, TiXmlElement*):
     m_trace("NodePython", true),
     m_device(d)
 {
@@ -48,7 +48,7 @@ NodePython::~NodePython() {
  * storing in temp queue.
  */
 void
-NodePython::handleMessage(MessageBuf* msg, const string& padName) {
+NodePython::handleMessage(const MessageBuf& msg, const string& padName) {
     PyObject* tuple = Py_BuildValue("s s", padName.c_str(), msg->c_str());  // Return value: New reference.
 
     m_messages.push(tuple);
@@ -91,11 +91,23 @@ NodePython::getMessage() {
 }
 
 /**
+ * Python -> C. Returns a message from input.
+ */
+PyObject*
+NodePython::getInputData(const string& pad) {
+    MessageBuf data = m_device->getInputData(m_device->getInput(pad));
+
+    PyObject* tuple = Py_BuildValue("s", data->c_str());  // Return value: New reference.
+
+    return tuple;
+}
+
+/**
  * Python -> C. Send message to output Pad of this Process.
  */
 PyObject*
 NodePython::sendMessage(char* padName, char* message) {
-    NodeDb::NodeMultiOutput* pad = m_device->getOutput(padName);
+    NodeMultiOutput* pad = m_device->getOutput(padName);
 
     if(pad) {
         pad->submitMessageBuffer(message);

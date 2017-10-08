@@ -47,8 +47,9 @@ public class ArroStepSection extends ArroGenericSection {
 
         listener = new ModifyListener() {
 
+            @Override
             public void modifyText(ModifyEvent e) {
-                if(!nameTextVal.getText().equals("_ready")) {
+                if(!(nameTextVal.getText().equals("_ready") || nameTextVal.getText().equals("_terminated"))) {
                     name = Misc.checkString(nameTextVal);
                     if(listenerFlag) {
                         if(!name.equals("") && updateDomainAndPE()) {
@@ -80,7 +81,7 @@ public class ArroStepSection extends ArroGenericSection {
                 // Temp disable listener; listener only needed if user does types new value.
                 listenerFlag = false;
                 
-                nameTextVal.setEnabled(name.equals("_ready") ? false : true);
+                nameTextVal.setEnabled((name.equals("_ready") || name.equals("_terminated")) ? false : true);
 
 
                 if(!(name.equals(nameTextVal))) {
@@ -141,9 +142,11 @@ public class ArroStepSection extends ArroGenericSection {
         
         IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
                 
+            @Override
             public boolean canExecute(IContext context) {
                 return true;
             }
+            @Override
             public void execute(IContext context) {
                 final PictogramElement pe = getSelectedPictogramElement();
                 ArroStep n = getState(pe);

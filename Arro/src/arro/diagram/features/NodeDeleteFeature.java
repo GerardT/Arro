@@ -7,23 +7,25 @@ import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 
-import util.Logger;
 import arro.Constants;
-import arro.domain.ArroNode;
 import arro.domain.ArroModule;
+import arro.domain.ArroNode;
 import arro.editors.FunctionDiagramEditor;
+import util.Logger;
 
-public class ArroNodeDeleteFeature extends DefaultDeleteFeature implements ICustomUndoRedoFeature {
+public class NodeDeleteFeature extends DefaultDeleteFeature implements ICustomUndoRedoFeature {
 
-	public ArroNodeDeleteFeature(IFeatureProvider fp) {
+	public NodeDeleteFeature(IFeatureProvider fp) {
 		super(fp);
 	}
 	
-	public boolean canDelete(IDeleteContext context) {
+	@Override
+    public boolean canDelete(IDeleteContext context) {
 		return true;
 	}
 	
-	public void delete(IDeleteContext context) {
+	@Override
+    public void delete(IDeleteContext context) {
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
         if(!(dc instanceof FunctionDiagramEditor)) {
         	Logger.out.trace(Logger.EDITOR, "not an editor");

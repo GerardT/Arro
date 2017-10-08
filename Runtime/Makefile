@@ -36,20 +36,22 @@ DEPS         := $(SRCS:.cpp=.d)
 SRCS         := main.cpp \
 		Trace.cpp \
 		ServerEngine.cpp \
+		SocketClient.cpp \
 		ConfigReader.cpp \
 		NodeDb.cpp \
 		arro.pb.cpp \
 		Pad.cpp \
 		Process.cpp \
 		PythonGlue.cpp \
-		Parser.cpp \
-		Tokenizer.cpp \
 		Nodes/NodeSfc.cpp \
 		Nodes/NodePid.cpp \
 		Nodes/NodePython.cpp \
 		Nodes/NodeTimer.cpp \
 		Nodes/NodeServo.cpp \
 		Nodes/NodeDCMotor.cpp \
+		Nodes/NodeUiOut.cpp \
+		Nodes/NodeUiUserInput.cpp \
+		Nodes/NodeUiUserDisplay.cpp \
 		tinyxmlparser.cpp \
 		tinyxmlerror.cpp \
 		tinyxml.cpp \
@@ -62,11 +64,24 @@ SRCS         := $(addprefix $(SRCDIR)/,$(SRCS))
 
 .PHONY: all clean
 
-all: $(OBJDIR)/arro.pb.o $(OBJS)
-	$(CXX) -o Arro $(LFLAGS) $(OBJS) $(LIBS) 
+all: $(OBJDIR)/arro.pb.o $(OBJDIR)/CodeGenerator.o $(OBJS)
+	$(CXX) -o Arro $(LFLAGS) $(OBJDIR)/CodeGenerator.o $(OBJS) $(LIBS) 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) -MMD -c $(CXXFLAGS) $(INCPATH) -o $@ $<
+	
+$(OBJDIR)/lemon: $(SRCDIR)/lemon/lemon.c
+	$(CC) -g $(INCPATH) -o $(OBJDIR)/lemon $(SRCDIR)/lemon/lemon.c
+
+$(OBJDIR)/CodeGenerator.o $(SRCDIR)/lemon/cfg.h:	$(OBJDIR)/lemon $(SRCDIR)/lemon/CodeGenerator.cpp $(SRCDIR)/lemon/cfg.y
+	cd lemon; \
+	../$(OBJDIR)/lemon ../$(SRCDIR)/lemon/cfg.y
+	$(CXX) -MMD -c $(CXXFLAGS) $(INCPATH) -o $(OBJDIR)/CodeGenerator.o $(SRCDIR)/lemon/CodeGenerator.cpp
+
+
+#doc: lemon_notes.txt
+#	asciidoc $<
+
 
 $(OBJDIR)/arro.pb.o: $(SRCDIR)/arro.proto
 	protoc --cpp_out=. arro.proto
@@ -74,5 +89,6 @@ $(OBJDIR)/arro.pb.o: $(SRCDIR)/arro.proto
 
 clean:
 	rm -rf debug
+	rm -f lemon/lemon lemon/cfg.c lemon/cfg.h lemon/cfg.out
 
 

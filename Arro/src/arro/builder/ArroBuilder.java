@@ -32,12 +32,12 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import arro.Constants;
 import util.Logger;
 import util.Misc;
 import util.PathUtil;
 import util.PbScalarTypes;
-import util.ArroZipFile;
-import arro.Constants;
+import workspace.ArroModuleContainer;
 
 public class ArroBuilder extends IncrementalProjectBuilder {
 
@@ -56,7 +56,8 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 		 * 
 		 * @see org.eclipse.core.resources.IResourceDeltaVisitor#visit(org.eclipse.core.resources.IResourceDelta)
 		 */
-		public boolean visit(IResourceDelta delta) throws CoreException {
+		@Override
+        public boolean visit(IResourceDelta delta) throws CoreException {
 			IResource resource = delta.getResource();
 			switch (delta.getKind()) {
 			case IResourceDelta.ADDED:
@@ -89,9 +90,10 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			this.buildInfo = buildInfo;
 		}
 
-		public boolean visit(IResource resource) {
+		@Override
+        public boolean visit(IResource resource) {
 			Logger.out.trace(Logger.BUILDER, "Try checking resource " + resource.getName());
-			checkXML(resource);
+			//checkXML(resource);
 			processResource(resource, buildInfo);
 			//return true to continue visiting children.
 			return true;
@@ -111,7 +113,8 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			this.buildInfo = buildInfo;
 		}
 
-		public boolean visit(IResource resource) {
+		@Override
+        public boolean visit(IResource resource) {
 			Logger.out.trace(Logger.BUILDER, "Try adding resource " + resource.getName());
 			if (resource instanceof IFile && resource.getName().endsWith("." + Constants.MESSAGE_EXT)) {
 				buildInfo.add(resource.getName());
@@ -138,15 +141,18 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 					.getLineNumber(), severity);
 		}
 
-		public void error(SAXParseException exception) throws SAXException {
+		@Override
+        public void error(SAXParseException exception) throws SAXException {
 			addMarker(exception, IMarker.SEVERITY_ERROR);
 		}
 
-		public void fatalError(SAXParseException exception) throws SAXException {
+		@Override
+        public void fatalError(SAXParseException exception) throws SAXException {
 			addMarker(exception, IMarker.SEVERITY_ERROR);
 		}
 
-		public void warning(SAXParseException exception) throws SAXException {
+		@Override
+        public void warning(SAXParseException exception) throws SAXException {
 			addMarker(exception, IMarker.SEVERITY_WARNING);
 		}
 	}
@@ -206,15 +212,18 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 	 * Entry point for the build process. It should depend on kind if full or incremental
 	 * build is done. We always do full build.
 	 * 
-	 * First create 2 files with skeleton info:
+	 * First create 4 files with skeleton info:
 	 * arro.proto - for messages
 	 * arro.xml- for function diagrams.
+	 * arro.html - for webcomponents UI
+	 * arro_pgm.py - for.. 
 	 * 
 	 * Then run sort of a fake build, one that just collects file names in the project. These are
 	 * collected in BuildInfo.
 	 * 
 	 */
-	@SuppressWarnings("unused")
+	@Override
+    @SuppressWarnings("unused")
 	protected IProject[] build(int kind, @SuppressWarnings("rawtypes") Map args, IProgressMonitor monitor)
 			throws CoreException {
 		
@@ -238,18 +247,48 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			baos.close();
 			
             // Write prolog for arro.xml
-			baos = new ByteArrayOutputStream();
-			baos.write(("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n" +
-						"<modules>\n").getBytes());
-	    	
-			IFile resultFileNodes = folder.getFile("arro.xml");
+            baos = new ByteArrayOutputStream();
+            baos.write(("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n" +
+                        "<modules>\n").getBytes());
+            
+            IFile resultFileNodes = folder.getFile("arro.xml");
 
-			if (resultFileNodes.exists()) {
-				resultFileNodes.setContents(new ByteArrayInputStream(baos.toByteArray()), true, true, null);
-			} else {
-				resultFileNodes.create(new ByteArrayInputStream(baos.toByteArray()), true, null);
-			}
-			baos.close();
+            if (resultFileNodes.exists()) {
+                resultFileNodes.setContents(new ByteArrayInputStream(baos.toByteArray()), true, true, null);
+            } else {
+                resultFileNodes.create(new ByteArrayInputStream(baos.toByteArray()), true, null);
+            }
+            baos.close();
+
+            // Write prolog for arro.html
+            baos = new ByteArrayOutputStream();
+            baos.write((
+"<!DOCTYPE html>\n" +
+"<meta charset=\"UTF-8\"> \n" +
+"<html lang=\"en\">\n" +
+"  <head>\n" +
+"    <script src=\"https://polygit.org/components/webcomponentsjs/webcomponents-loader.js\"></script>\n" +
+"    <link rel=\"import\" href=\"bower_components/paper-button/paper-button.html\">\n" +
+"    <link rel=\"import\" href=\"bower_components/paper-checkbox/paper-checkbox.html\">\n" +
+"    <link rel=\"import\" href=\"bower_components/paper-slider/paper-slider.html\">\n" +
+"    <link rel=\"import\" href=\"bower_components/paper-progress/paper-progress.html\">\n" +
+"    <!-- Import all elements here -->\n" +
+"    <link rel=\"import\" href=\"arro-slider.html\">\n" +
+"    <link rel=\"import\" href=\"arro-progress.html\">\n" +
+"    <style>\n" +
+"    </style>\n" +
+"  </head>\n" +
+"  <body>\n" +
+"      <!-- Instantiate all elements here -->\n\n").getBytes());
+            
+            IFile resultFileHtml = folder.getFile("arro.html");
+
+            if (resultFileHtml.exists()) {
+                resultFileHtml.setContents(new ByteArrayInputStream(baos.toByteArray()), true, true, null);
+            } else {
+                resultFileHtml.create(new ByteArrayInputStream(baos.toByteArray()), true, null);
+            }
+            baos.close();
 
             // Write prolog for arro_pgm.py
 			baos = new ByteArrayOutputStream();
@@ -284,6 +323,27 @@ public class ArroBuilder extends IncrementalProjectBuilder {
             // Write epilog for arro.xml
 			resultFileNodes.appendContents(new ByteArrayInputStream("</modules>\n".getBytes()), true, true, null);
 
+            // Write epilog for arro.html
+            resultFileHtml.appendContents(new ByteArrayInputStream((
+"    <script type=\"text/javascript\">\n" +
+"    // use vanilla JS because why not\n" +
+"    mySocket = 0; \n" +
+"    window.addEventListener(\"load\", function() {\n" +
+"        // create websocket instance\n" +
+"        mySocket = new WebSocket(\"ws://\" + location.host + \"/ws\");\n" +
+"        // Display output\n" +
+"        // add event listener reacting when message is received\n" +
+"        mySocket.onmessage = function (event) {\n" +
+"            json = JSON.parse(event.data);\n" +
+"            address = json.address;\n" +
+"            var web_component = document.getElementById(address);\n" +
+"            web_component.value = json.data.value;\n" +
+"        };\n" +
+"    });\n" +
+"    </script>\n" +
+"  </body>\n" +
+"</html>\n").getBytes()), true, true, null);
+
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	        //return false /* no file */;
@@ -292,7 +352,8 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 		return null;
 	}
 
-	protected void clean(IProgressMonitor monitor) throws CoreException {
+	@Override
+    protected void clean(IProgressMonitor monitor) throws CoreException {
 		// delete markers set and files created
 		getProject().deleteMarkers(MARKER_TYPE, true, IResource.DEPTH_INFINITE);
 	}
@@ -382,11 +443,11 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 			
 			if(!(file.getName().startsWith(Constants.HIDDEN_RESOURCE))) {
 				Logger.out.trace(Logger.BUILDER, "Node to check " + file.getName());
-		        ArroZipFile.unzipAndConcatenateBody(buildInfo.folder, file, Constants.HIDDEN_RESOURCE + resource.getName() + ".xml", buildInfo.resultFileNodes, true);
+				ArroModuleContainer.unzipAndConcatenateBody(buildInfo.folder, file, Constants.MODULE_FILE_NAME, buildInfo.resultFileNodes, true);
 			}
 
 			// Stage .py files
-			if(ArroZipFile.unzipAndStage(buildInfo.folder, file, Constants.HIDDEN_RESOURCE + resource.getName() + ".py")) {
+			if(ArroModuleContainer.unzipAndStage(buildInfo.folder, file, Constants.PYTHON_FILE_NAME)) {
 				Logger.out.trace(Logger.BUILDER, "Node to check " + file.getName());
 
 				try {

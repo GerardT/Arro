@@ -1,0 +1,9 @@
+*.pyc
+*.py
+/Arro
+*.d
+*.o
+*.xml
+*.py~
+
+/bower_components

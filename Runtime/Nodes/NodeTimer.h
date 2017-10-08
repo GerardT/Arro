@@ -2,8 +2,8 @@
 #define ARRO_NODE_TIMER_H
 
 #include "arro.pb.h"
-#include "ConfigReader.h"
-#include "Process.h"
+#include "Trace.h"
+#include "AbstractNode.h"
 
 namespace Arro
 {
@@ -16,7 +16,7 @@ namespace Arro
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodeTimer(Process* d, const std::string& name, ConfigReader::StringMap& params, TiXmlElement*);
+        NodeTimer(AbstractNode* d, const std::string& name, StringMap& params, TiXmlElement*);
         virtual ~NodeTimer();
 
         // Copy and assignment is not supported.
@@ -29,7 +29,7 @@ namespace Arro
          * \param msg Message sent to this node.
          * \param padName name of pad that message was sent to.
          */
-        void handleMessage(MessageBuf* msg, const std::string& padName);
+        void handleMessage(const MessageBuf& msg, const std::string& padName);
 
         /**
          * Make the node execute a processing cycle.
@@ -44,7 +44,7 @@ namespace Arro
     private:
         Trace m_trace;
         int m_ticks;
-        Process* m_device;
+        AbstractNode* m_device;
         std::string m_actual_mode;
     };
 }

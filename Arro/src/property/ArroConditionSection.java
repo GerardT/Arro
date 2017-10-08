@@ -9,7 +9,6 @@ import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -54,6 +53,7 @@ public class ArroConditionSection extends ArroGenericSection {
 
         nameTextVal.addModifyListener(new ModifyListener() {
 
+            @Override
             public void modifyText(ModifyEvent e) {
                 //name = Misc.checkString(nameTextVal);
                 name = nameTextVal.getText();
@@ -173,9 +173,11 @@ public class ArroConditionSection extends ArroGenericSection {
         
         IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
                 
+            @Override
             public boolean canExecute(IContext context) {
                 return true;
             }
+            @Override
             public void execute(IContext context) {
                 ArroTransition n = getTransition();
 

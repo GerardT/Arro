@@ -2,10 +2,9 @@ package arro.diagram.features;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.features.context.IAddContext;
-import org.eclipse.graphiti.features.context.ILayoutContext;
+import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
-import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Color;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
@@ -28,17 +27,21 @@ public class StepHelper {
 	
 	private ContainerShape containerShape;  // this will be the PictogramElement: (ContainerShape) pictogramElement
 	private Rectangle invisibleRectangle;
-	private RoundedRectangle roundedRectangle;
+	private Ellipse roundedRectangle;
 	private Text text;
 	private GraphicsAlgorithm anch1, anch2;
+    private Diagram diagram;	
 	
-	
+    public StepHelper(Diagram d) {
+        diagram = d;
+    }
+    
 	// Can't make it a object attribute since this code is called from different
 	// contexts (so different object instances)!
 	
-	public ContainerShape create(IAddContext context, ArroStep addedDomainObject, Color fg, Color bg) {
-	    final int width = 200;
-	    final int height = 50;
+	public ContainerShape create(IAddContext context, ArroStep addedDomainObject) {
+	    final int width = 100;
+	    final int height = 100;
 
 	    Diagram targetDiagram = (Diagram) context.getTargetContainer();
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
@@ -53,11 +56,15 @@ public class StepHelper {
         // the width needed for the anchor
         invisibleRectangle = gaService.createInvisibleRectangle(containerShape);
         {
-            gaService.setLocationAndSize(invisibleRectangle, context.getX(), context.getY(), width, height);
+            if(addedDomainObject.getName().equalsIgnoreCase(Constants.PROP_CONTEXT_TERM_STEP)) {
+                gaService.setLocationAndSize(invisibleRectangle, context.getX(), context.getY() + 200, width, height);
+            } else {
+                gaService.setLocationAndSize(invisibleRectangle, context.getX(), context.getY(), width, height);
+            }
         }
 
 		{
-			roundedRectangle = gaService.createRoundedRectangle(invisibleRectangle, 5, 5);
+            roundedRectangle = gaService.createEllipse(invisibleRectangle);
 			
 		}
 		
@@ -65,42 +72,34 @@ public class StepHelper {
         {
         	Shape textShape = peCreateService.createShape(containerShape, false);
 			text = gaService.createText(textShape, addedDomainObject.getName());
+	        Color fg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_FOREGROUND);
 	        text.setForeground(fg);
 			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
         }
         
         {
-     		final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);                 		
-	
-    		boxAnchor.setRelativeWidth(0.0);
-    		boxAnchor.setRelativeHeight(0.0/*0.38*/); // Use golden section
-            
-            Graphiti.getPeService().setPropertyValue(boxAnchor, Constants.PROP_PAD_NAME_KEY, Constants.PROP_PAD_NAME_STEP_IN);
-
-            anch1 = gaService.createRoundedRectangle(boxAnchor, 50, 50);
-        }
-
-        {
-     		final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);                 		
-	
-    		boxAnchor.setRelativeWidth(0.0);
-    		boxAnchor.setRelativeHeight(0.0/*0.38*/); // Use golden section
-            
-            Graphiti.getPeService().setPropertyValue(boxAnchor, Constants.PROP_PAD_NAME_KEY, Constants.PROP_PAD_NAME_STEP_OUT);
-
-            anch2 = gaService.createRoundedRectangle(boxAnchor, 50, 50);
+            peCreateService.createChopboxAnchor(containerShape);
         }
         
-        layout(fg, bg);
+        redraw();
         
         return containerShape;
        
 	}
-	public void read(ILayoutContext context, ContainerShape cs, Color fg, Color bg) {
+	
+    public void layout(ContainerShape cs) {
+        read(cs); 
+        redraw();
+    }
+    
+
+	// Retrieve all the text and anchor objects so they can be updated in layout function.
+	// Just rewriting the diagram would break e.g. connections that the anchors may have.
+	private void read(ContainerShape cs) {
 		containerShape = cs;
 		invisibleRectangle = WidgetUtil.getInvisibleRectangle(containerShape);
-		roundedRectangle = WidgetUtil.getRoundedRectangle(containerShape);
+		roundedRectangle = WidgetUtil.getEllipse(containerShape);
 		
 	    for (Shape shape : containerShape.getChildren()) {
 	    	if(!(shape instanceof ContainerShape)) {
@@ -112,7 +111,7 @@ public class StepHelper {
 		    	}
 	    	}
 	    }
-		AnchorContainer anchorList = (AnchorContainer) containerShape;
+		AnchorContainer anchorList = containerShape;
 		EList<Anchor>anchors = anchorList.getAnchors();
 		for(Anchor anchor: anchors) {
 			Logger.out.trace(Logger.EDITOR, anchor.toString());
@@ -123,36 +122,22 @@ public class StepHelper {
 				anch2 = ((BoxRelativeAnchor)anchor).getGraphicsAlgorithm();
 			}
 		}
-        layout(fg, bg);
 	    
 	}
-	private void layout(Color fg, Color bg) {
+	private void redraw() {
 	    final int width = invisibleRectangle.getWidth();
 	    final int height = invisibleRectangle.getHeight();
 		IGaService gaService = Graphiti.getGaService();
 		
-		gaService.setLocationAndSize(roundedRectangle,
-				Constants.HALF_PAD_SIZE, Constants.HALF_PAD_SIZE,
-				width - Constants.PAD_SIZE, height - Constants.PAD_SIZE);
+        Color fg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_FOREGROUND);
+        Color bg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_BACKGROUND);
+        
+		gaService.setLocationAndSize(roundedRectangle, 0, 0, width, height);
 		roundedRectangle.setFilled(false);
         roundedRectangle.setForeground(fg);
         roundedRectangle.setBackground(bg);
         roundedRectangle.setLineWidth(2);
 
-        Graphiti.getGaLayoutService().setLocationAndSize(text, 0, 20, roundedRectangle.getWidth(), 20);
-        
-        anch1.setFilled(true);
-        anch1.setForeground(fg);
-        anch1.setBackground(bg);
-        anch1.setLineWidth(2);
-        gaService.setLocationAndSize(anch1, width / 2 - Constants.HALF_PAD_SIZE, 0,
-        		                            Constants.PAD_SIZE, Constants.PAD_SIZE);
-
-        anch2.setFilled(true);
-        anch2.setForeground(fg);
-        anch2.setBackground(bg);
-        anch2.setLineWidth(2);
-        gaService.setLocationAndSize(anch2, width / 2 - Constants.HALF_PAD_SIZE, height - Constants.PAD_SIZE,
-        		                            Constants.PAD_SIZE, Constants.PAD_SIZE);
+        Graphiti.getGaLayoutService().setLocationAndSize(text, 0, height / 2 - 10, roundedRectangle.getWidth(), 20);
 	}
 }

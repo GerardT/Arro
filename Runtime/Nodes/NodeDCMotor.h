@@ -8,10 +8,8 @@
 #include <map>
 
 #include "arro.pb.h"
-#include "ConfigReader.h"
-#include "Process.h"
-#include "NodeDb.h"
-#include "ServerEngine.h"
+#include "Trace.h"
+#include "AbstractNode.h"
 
 namespace Arro {
     class NodeDCMotor: public IDevice {
@@ -24,7 +22,7 @@ namespace Arro {
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodeDCMotor(Arro::Process* d, const std::string& name, Arro::ConfigReader::StringMap& params, TiXmlElement*);
+        NodeDCMotor(AbstractNode* d, const std::string& name, Arro::StringMap& params, TiXmlElement*);
         virtual ~NodeDCMotor() {};
 
         // Copy and assignment is not supported.
@@ -37,7 +35,7 @@ namespace Arro {
          * \param msg Message sent to this node.
          * \param padName name of pad that message was sent to.
          */
-        void handleMessage(MessageBuf* msg, const std::string& padName);
+        void handleMessage(const MessageBuf& msg, const std::string& padName);
 
         /**
          * Make the node execute a processing cycle.
@@ -116,12 +114,12 @@ namespace Arro {
 
 
         Trace m_trace;
-        Process* m_device;
+        AbstractNode* m_device;
         int m_PWMpin;
         int m_IN1pin;
         int m_IN2pin;
         int m_Ch;
-        ConfigReader::StringMap m_params;
+        StringMap m_params;
 
         static MotorHAT* m_pMotorHAT;
 

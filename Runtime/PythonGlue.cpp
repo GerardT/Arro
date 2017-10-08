@@ -36,6 +36,8 @@ PythonGlue::PythonGlue():
 
     if(loadModule() == nullptr) {
         instance = nullptr;
+        // Finish the Python interpreter since destructor is not called after throwing exception.
+        Py_Finalize();
         throw std::runtime_error("Failed to load");
     }
 
@@ -59,6 +61,7 @@ PythonGlue::~PythonGlue() {
      * Cleanup for C -> Python.
      */
     // Don't Py_DECREF pDict, pDictApi.
+    Py_DECREF(m_pModuleApi);
     Py_DECREF(m_pModule);
 
     // Finish the Python Interpreter
@@ -79,6 +82,28 @@ PythonGlue::getMessage(PyObject * /*self*/, PyObject *args)
         return nullptr; // FIXME: do i need to set an error?
     } else {
         return np->getMessage();
+    }
+}
+
+
+PyObject*
+PythonGlue::getInput(PyObject * /*self*/, PyObject *args)
+{
+    PyObject *obj;
+    const char* pad;
+
+    if(!PyArg_ParseTuple(args, "Os", &obj, &pad))  // Return value: int
+        return nullptr;
+
+    instance->m_trace.println(string("parameter padname: ") + pad);
+
+    NodePython* np = instance->m_instanceMap[obj];
+    if(!np) {
+        Py_INCREF(Py_None);
+        return Py_None;
+        //return nullptr; // FIXME: do i need to set an error?
+    } else {
+        return np->getInputData(pad);
     }
 }
 
@@ -109,7 +134,8 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
  */
 static PyMethodDef ArroMethods[] = {
     {"getMessage",  PythonGlue::getMessage, METH_VARARGS, "Get a message from the queue."},
-    {"sendMessage",  PythonGlue::sendMessage, METH_VARARGS, "Send a message into the queue."},
+    {"getInput",    PythonGlue::getInput, METH_VARARGS, "Get a message from the pad."},
+    {"sendMessage", PythonGlue::sendMessage, METH_VARARGS, "Send a message into the queue."},
     {nullptr, nullptr, 0, nullptr}        /* Sentinel */
 };
 
@@ -199,9 +225,9 @@ PythonGlue::captureError() {
         PyObject *item = PyList_GetItem(list, i);  // Return value: Borrowed reference.
 
 #if 0 /* Python3 */
-        ServerEngine::console(string("Python ") + PyUnicode_AsUTF8(item));
+        SendToConsole(string("Python ") + PyUnicode_AsUTF8(item));
 #else
-        ServerEngine::console(string("Python ") + PyString_AsString(item));
+        SendToConsole(string("Python ") + PyString_AsString(item));
 #endif
     }
 

@@ -9,6 +9,7 @@
 #include <sys/sendfile.h>  /*for sendfile()*/
 #include <fcntl.h>  /*for O_RDONLY*/
 
+#include "SocketClient.h"
 #include "ServerEngine.h"
 #include "ConfigReader.h"
 #include "NodeDb.h"
@@ -25,70 +26,10 @@ static int newsockfd = -1;
 static NodeDb* nodeDb = nullptr;
 static PythonGlue* pg = nullptr;
 static Trace trace("ServerEngine", true);
-static std::map<std::string, ServerEngine::Factory > m_deviceRegister;
+static std::map<std::string, Factory > m_deviceRegister;
 
 
 
-/**
- * Blocking read from socket until '\n' received. If socket is closed
- * then 'terminate' is returned in string buffer.
- *
- * \param sockfd File descriptor for IP socket.
- * \param buffer Buffer to return string into. May contain "terminate" if socket closed or EOF received.
- * \param n Max nr of characters to read.
- *
- * \return Actual nr of characters read.
- */
-static int readln(int sockfd, char* buffer, size_t n/*size*/) {
-    ssize_t numRead;                    /* # of bytes fetched by last read() */
-    size_t totRead;                     /* Total bytes read so far */
-    char *buf;
-    char ch;
-
-    if (n <= 0 || buffer == nullptr) {
-        errno = EINVAL;
-        return -1;
-    }
-
-    buf = buffer;
-
-    totRead = 0;
-    for (;;) {
-        numRead = read(sockfd, &ch, 1);
-
-        if (numRead == -1) {
-            if (errno == EINTR)         /* Interrupted --> restart read() */
-                continue;
-            else {
-                // Make losing socket to terminate process.
-                trace.println("ServerEngine losing socket, terminated!");
-                strcpy(buffer, "terminate");
-                return strlen("terminate");
-            }
-
-        } else if (numRead == 0) {      /* EOF */
-            if (totRead == 0) {         /* No bytes read */
-                trace.println("ServerEngine terminated!\n");
-                strcpy(buffer, "terminate");
-                return strlen("terminate");
-            }
-            else
-                break;
-
-        } else {                        /* 'numRead' must be 1 if we get here */
-            if (totRead < n - 1) {      /* Discard > (n - 1) bytes */
-                totRead++;
-                *buf++ = ch;
-            }
-
-            if (ch == '\n')
-                break;
-        }
-    }
-
-    *buf = '\0';
-    return totRead;
-}
 
 /**
  * Cleanup after exception of terminate command.
@@ -97,20 +38,25 @@ static void cleanup()
 {
     trace.println("Cleanup");
 
-    // send "terminate" message.
-    auto act = new arro::Action();
-    act->set_action("_terminated");
-    string s = act->SerializeAsString();
-    MessageBuf msg(s);
-    free(act);
-    nodeDb->getInput(".main._action")->handleMessage(&msg);
-
-    // FIXME Now sleep 1 sec
-    std::chrono::milliseconds timespan(10000);
-    std::this_thread::sleep_for(timespan);
 
 
     if(nodeDb) {
+        /* 1: request change to _terminated */
+        auto input = nodeDb->getInput(".main._action");
+        if(input) {
+            // send "terminate" message.
+            auto act = new arro::Action();
+            act->set_action("_terminated");
+            MessageBuf msg(new string(act->SerializeAsString()));
+            free(act);
+
+            input->handleMessage(msg);
+
+            // FIXME Now sleep 1 sec
+            std::chrono::milliseconds timespan(10000);
+            std::this_thread::sleep_for(timespan);
+        }
+
         /* 1: stop message flow */
         trace.println("-- nodeDb");
         nodeDb->stop();
@@ -133,6 +79,7 @@ static void cleanup()
         close(newsockfd);
         newsockfd = -1;
     }
+    trace.println("Cleanup done");
 }
 
 /**
@@ -209,11 +156,11 @@ static void server()
             trace.fatal("ERROR on accept");
         }
 
-        ServerEngine::console("========================");
+        SendToConsole("========================");
 
         /* If connection is established then start communicating */
-        bzero(buffer,ARRO_BUFFER_SIZE);
-        while ((n = readln( newsockfd,buffer, ARRO_BUFFER_SIZE - 1 )) != 0)
+        bzero(buffer, ARRO_BUFFER_SIZE);
+        while ((n = SocketClient::readln( newsockfd, buffer, ARRO_BUFFER_SIZE - 1 )) != 0)
         {
             trace.println(string("command: ") + buffer);
 
@@ -225,7 +172,7 @@ static void server()
             if(!strcmp(command, "echo"))
             {
                 trace.println(string("got line ") + buffer);
-                ServerEngine::console("ServerEngine::console echo\n");
+                SendToConsole("ServerEngine::console echo\n");
                 break;
             }
             else if(!strcmp(command, "ls"))
@@ -257,23 +204,23 @@ static void server()
                 free(f);
                 if(c != -1)
                 {
-                    ServerEngine::console("put successful");
+                    SendToConsole("put successful");
                 }
                 else
                 {
-                    ServerEngine::console("put failed");
+                    SendToConsole("put failed");
                 }
             }
             else if(!strcmp(command, "protobuf"))
             {
                 syswrap(string("protoc --python_out=") + ARRO_FOLDER + " arro.proto");
-                ServerEngine::console("protobuf successful");
+                SendToConsole("protobuf successful");
             }
             else if(!strcmp(command, "run"))
             {
                 if(nodeDb)
                 {
-                    ServerEngine::console("run failed, engine running, terminate first");
+                    SendToConsole("run failed, engine running, terminate first");
                 }
                 else
                 {
@@ -282,11 +229,12 @@ static void server()
                         pg = new PythonGlue();
 
                         ConfigReader reader(ARRO_CONFIG_FILE, *nodeDb);
-                        ServerEngine::console("loading successful");
+                        SendToConsole("loading successful");
 
                         nodeDb->start();
-                        ServerEngine::console("run successful");
+                        SendToConsole("run successful");
                     } catch ( const std::runtime_error& e ) {
+                        SendToConsole(e.what());
                         trace.println(string("Runtime error ") + e.what());
 
                         cleanup();
@@ -334,7 +282,7 @@ void ServerEngine::stop()
     trace.println("server completed.");
 }
 
-void ServerEngine::console(string s)
+void Arro::SendToConsole(string s)
 {
     if(newsockfd >= 0) {
         s += "\n";
@@ -342,11 +290,11 @@ void ServerEngine::console(string s)
     }
 }
 
-void ServerEngine::registerFactory(const std::string& name, ServerEngine::Factory factory) {
+void Arro::registerFactory(const std::string& name, Factory factory) {
     m_deviceRegister[name] = factory;
 }
 
-bool ServerEngine::getFactory(const std::string& name, ServerEngine::Factory& factory) {
+bool ServerEngine::getFactory(const std::string& name, Factory& factory) {
     if(m_deviceRegister.find(name) != m_deviceRegister.end()) {
         factory =  m_deviceRegister.at(name);
         return true;

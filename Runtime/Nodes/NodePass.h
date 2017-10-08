@@ -2,6 +2,7 @@
 #define ARRO_NODE_PASS_H
 
 #include "Trace.h"
+#include "AbstractNode.h"
 
 namespace Arro {
     class NodePass: public IDevice {
@@ -25,7 +26,7 @@ namespace Arro {
          * \param msg Message sent to this node.
          * \param padName name of pad that message was sent to.
          */
-        void handleMessage(MessageBuf* msg, const std::string& padName);
+        void handleMessage(const MessageBuf* msg, const std::string& padName);
 
         /**
          * Make the node execute a processing cycle.
@@ -34,7 +35,7 @@ namespace Arro {
         void runCycle();
     private:
         Trace m_trace;
-        NodeDb::NodeMultiOutput* m_result;
+        NodeMultiOutput* m_result;
     };
 }
 

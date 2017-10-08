@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "NodeDb.h"
 #include "NodeServo.h"
 
 using namespace std;
@@ -135,7 +134,7 @@ NodeServo::Servo::start(int ch, int val) {
 NodeServo::Servo* NodeServo::m_pServo = nullptr;
 
 
-NodeServo::NodeServo(Process* d, const string& /*name*/, ConfigReader::StringMap& params, TiXmlElement*):
+NodeServo::NodeServo(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodeServo", true),
     m_device(d),
     m_previous_position(0),
@@ -157,7 +156,7 @@ NodeServo::NodeServo(Process* d, const string& /*name*/, ConfigReader::StringMap
 }
 
 void
-NodeServo::handleMessage(MessageBuf* m, const std::string& padName) {
+NodeServo::handleMessage(const MessageBuf& m, const std::string& padName) {
     if(padName == "sub1") {
         auto msg = new Value();
         msg->ParseFromString(m->c_str());

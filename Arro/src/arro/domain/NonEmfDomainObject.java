@@ -2,6 +2,8 @@ package arro.domain;
 
 import java.util.UUID;
 
+import workspace.ArroModuleContainer;
+
 public class NonEmfDomainObject {
 
 	private String id;
@@ -29,6 +31,10 @@ public class NonEmfDomainObject {
 	public void setId(String id) {
 		this.id = id;
 		POJOIndependenceSolver.getInstance().RegisterPOJOObject(this);
+	}
+	
+	public ArroModuleContainer update() {
+	    return null;
 	}
 
 }

@@ -12,7 +12,6 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 
-import arro.messageeditor.EditingSupportForDesc.DeltaInfoOperation;
 import arro.messageeditor.MessageEditor.Message;
 
 
@@ -31,17 +30,20 @@ public class EditingSupportForName extends EditingSupport {
 			this.selectedMessage = message;
 			this.newName = name;
 		}
-		public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
 			undoName = selectedMessage.getName();
 			selectedMessage.setName(newName);
 			return Status.OK_STATUS;
 		}
-		public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
 			redoName = selectedMessage.getName();
 			selectedMessage.setName(undoName);
 			return Status.OK_STATUS;
 		}
-		public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
 			undoName = selectedMessage.getName();
 			selectedMessage.setName(redoName);
 			return Status.OK_STATUS;

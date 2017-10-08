@@ -31,8 +31,8 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
-import util.Misc;
 import arro.domain.ArroPad;
+import util.Misc;
 
 public class ArroPadSection extends GFPropertySection implements ITabbedPropertyConstants {
 
@@ -140,7 +140,8 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
 	
 	    nameText.addModifyListener(new ModifyListener() {
 
-	    	public void modifyText(ModifyEvent e) {
+	    	@Override
+            public void modifyText(ModifyEvent e) {
     			currentName = Misc.checkString(nameText);
     			
     			if(!currentName.equals("") && updateDialog()) {
@@ -205,10 +206,12 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
 		final X x = new X();
 		IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
 				
-			public boolean canExecute(IContext context) {
+			@Override
+            public boolean canExecute(IContext context) {
 				return true;
 			}
-			public void execute(IContext context) {
+			@Override
+            public void execute(IContext context) {
 				final PictogramElement pe = getSelectedPictogramElement();
 				ArroPad n = getPad(pe);
 
@@ -223,7 +226,8 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
 						
 						TransactionalEditingDomain domain = TransactionUtil.getEditingDomain(getDiagram());
 						domain.getCommandStack().execute(new RecordingCommand(domain) {
-							public void doExecute() {
+							@Override
+                            public void doExecute() {
 				    			// update UI with new domain data
 							    UpdateContext updateContext = new UpdateContext(pe);
 							    IUpdateFeature updateFeature = getFeatureProvider().getUpdateFeature(updateContext);

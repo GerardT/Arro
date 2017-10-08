@@ -5,7 +5,7 @@
 #include <map>
 #include <functional>
 
-//#include "Process.h"
+#include "AbstractNode.h"
 
 #define ARRO_PROGRAM_FILE    "arro_pgm"
 #define ARRO_API_FILE        "arro_api"
@@ -29,7 +29,6 @@ class IDevice;
     class ServerEngine {
 
     public:
-        typedef std::function<IDevice* (Process* d, const std::string& instance, std::map<std::string, std::string>& params, TiXmlElement* elt)> Factory;
         /**
          * This class is not for instantiation.
          */
@@ -47,32 +46,9 @@ class IDevice;
          */
         static void stop();
 
-        /**
-         * Send text message to Eclipse client. Client will filter for these
-         * message in order to determine success or failure of command sent.
-         *
-         * \param s String to send to Eclipse console.
-         */
-        static void console(std::string s);
-
-        static void registerFactory(const std::string& name, Factory factory);
 
         static bool getFactory(const std::string& name, Factory& factory);
 
-    };
-
-    // RegisterMe creates a factory class for T. In each Node source file one instance
-    // is created from this class; upon instantiation it registers the factory (itself)
-    // using ServerEngine::registerFactory.
-    // So instances of T can be created and registered in the NodeDb when needed.
-    template<typename T>
-    class RegisterMe {
-    public:
-        RegisterMe(const std::string& name) {
-            ServerEngine::registerFactory(name, [](Process* d, const std::string& instance, std::map<std::string, std::string>& params, TiXmlElement* elt) ->IDevice* {
-                return new T(d, instance, params, elt);
-            });
-        };
     };
 
 

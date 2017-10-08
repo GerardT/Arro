@@ -11,7 +11,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import arro.Constants;
 import arro.domain.ArroStep;
 
-
+// Ready steps are standard steps _ready and _terminated.
 public class ReadyAddFeature extends AbstractAddFeature implements
 		IAddFeature {
 
@@ -19,12 +19,14 @@ public class ReadyAddFeature extends AbstractAddFeature implements
 		super(fp);
 	}
 
-	public boolean canAdd(IAddContext context) {
+	@Override
+    public boolean canAdd(IAddContext context) {
 		// TODO: check for right domain object instance below
 		return /* context.getNewObject() instanceof DomainObject && */ context.getTargetContainer() instanceof Diagram;
 	}
 
-	public PictogramElement add(IAddContext context) {
+	@Override
+    public PictogramElement add(IAddContext context) {
 		
         Object obj = context.getNewObject();
         
@@ -34,9 +36,15 @@ public class ReadyAddFeature extends AbstractAddFeature implements
         
         ArroStep addedDomainObject = (ArroStep)obj;
         
-        addedDomainObject.setName("_ready");
+        if(context.getProperty(Constants.PROP_CONTEXT_NAME_KEY) == null) {
+            return null;
+        }
+                
+        String name = (String) context.getProperty(Constants.PROP_CONTEXT_NAME_KEY);
+        
+        addedDomainObject.setName(name);
 
-        ContainerShape containerShape = new StepHelper().create(context, addedDomainObject, manageColor(Constants.CLASS_FOREGROUND), manageColor(Constants.CLASS_BACKGROUND));
+        ContainerShape containerShape = new StepHelper(getDiagram()).create(context, addedDomainObject);
 
         // Now link PE (containerShape) to domain object and register diagram in POJOIndependencySolver
         link(containerShape, addedDomainObject);

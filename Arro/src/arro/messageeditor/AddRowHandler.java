@@ -1,30 +1,18 @@
 package arro.messageeditor;
 
-import java.util.Collection;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.commands.operations.IUndoableOperation;
-import org.eclipse.core.commands.operations.IOperationHistory;
-import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.core.commands.operations.IUndoableOperation;
-import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.ISources;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.e4.core.commands.ExpressionContext;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 import util.Logger;
 
@@ -43,7 +31,8 @@ public class AddRowHandler extends AbstractHandler {
 		super();
 	}
 	
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	@Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
 		//IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		IEditorPart activeEditor = HandlerUtil.getActiveEditor(event);
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
@@ -76,7 +65,8 @@ public class AddRowHandler extends AbstractHandler {
 			this.me = me;
 			this.selection = selection;
 		}
-		public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
 			StructuredSelection s = (StructuredSelection) selection;
 			undoList = me.cloneMessageList();
 			if(s.isEmpty()) {
@@ -86,7 +76,8 @@ public class AddRowHandler extends AbstractHandler {
 			}
 			return Status.OK_STATUS;
 		}
-		public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
 			redoList = me.cloneMessageList();
 	        // Build the string buffer "buf"
 //	        MessageDialog.openInformation(shell,
@@ -96,7 +87,8 @@ public class AddRowHandler extends AbstractHandler {
 
 			return Status.OK_STATUS;
 		}
-		public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
 			undoList = me.cloneMessageList();
 	        // Build the string buffer "buf"
 	        // simply re-calculate the delta

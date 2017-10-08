@@ -1,0 +1,3 @@
+Create a symbolic link to bower_components from here:
+ln -s ../../bower_components .
+

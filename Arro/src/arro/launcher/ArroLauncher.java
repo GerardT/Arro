@@ -1,6 +1,5 @@
 package arro.launcher;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -13,9 +12,8 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 
-import util.Logger;
 import arro.Constants;
-import arro.launcher.TCPClient.Result;
+import util.Logger;
 
 public class ArroLauncher implements ILaunchConfigurationDelegate {
 

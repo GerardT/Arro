@@ -2,11 +2,13 @@
 #define ARRO_NODE_SFC_H
 
 #include "arro.pb.h"
-#include "ConfigReader.h"
-#include "NodeDb.h"
-#include "Process.h"
+#include "Trace.h"
+#include "AbstractNode.h"
+#include <list>
+#include <string>
+#include <iostream>
 
-#include "Parser.hpp"
+#include "../lemon/CodeGenInterface.h"
 
 
 namespace Arro {
@@ -41,9 +43,10 @@ namespace Arro {
     // CONDITION :== SINGLE_COND
 
 
-    class SfcTransition {
+    class SfcTransition: CodeGenInterface {
     public:
         SfcTransition(const std::string& condition, const std::string& from, const std::string& to, NodeSfc& parent);
+        virtual ~SfcTransition();
 
         /**
          * Check if any of the transitions in this SFC can fire.
@@ -51,7 +54,7 @@ namespace Arro {
          *
          * @param m_currentSteps
          */
-        void runTransitions(std::set<std::string>& m_currentSteps);
+        void runTransition(std::set<std::string>& m_currentSteps, std::set<std::string>& m_newSteps);
 
         void sendActions();
 
@@ -61,21 +64,21 @@ namespace Arro {
             m_actions[nodeName] = actionString;
         }
 
+        void parseExpression();
+
+        virtual bool hasNode(const std::string& node);
+        virtual bool hasStates(const std::string& node, const std::string& states);
+        virtual bool nodeInState(const std::string& node, const std::string& state);
+
 
     private:
         Trace m_trace;
         NodeSfc& m_parent;
         std::string m_expression;
         std::map<std::string, std::string> m_actions;
-        std::list<Instruction> m_instrList;
-        std::string m_from;
-        std::string m_to;
-        Parser m_parser;
-
-        struct Context {
-            std::string node;
-            bool expValue;
-        } m_context;
+        const std::string m_from;
+        const std::string m_to;
+        CodeGenerator* m_cg;
     };
 
 
@@ -90,12 +93,16 @@ namespace Arro {
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodeSfc(Process* d, const std::string& name, ConfigReader::StringMap& params, TiXmlElement* elt);
+        NodeSfc(AbstractNode* d, const std::string& name, StringMap& params, TiXmlElement* elt);
         virtual ~NodeSfc() {};
+
+        virtual void finishConstruction();
 
         // Copy and assignment is not supported.
         NodeSfc(const NodeSfc&) = delete;
         NodeSfc& operator=(const NodeSfc& other) = delete;
+
+
 
         /**
          * Setup steps and conditions
@@ -108,7 +115,7 @@ namespace Arro {
          * \param msg Message sent to this node.
          * \param padName name of pad that message was sent to.
          */
-        void handleMessage(MessageBuf* msg, const std::string& padName);
+        void handleMessage(const MessageBuf& msg, const std::string& padName);
 
         /**
          * Make the node execute a processing cycle.
@@ -132,37 +139,71 @@ namespace Arro {
          * @param step
          * @return
          */
-        bool hasStep(const std::string& nodeName, const std::string& stepName) const {
-            m_trace.println("checking node " + nodeName);
-            try {
-                if(nodeName == "request") {
-                    for(auto it = m_steps.begin(); it != m_steps.end(); ++it) {
-                        if((*it)->getName() == stepName) {
-                            m_trace.println("good " + nodeName);
-                            return true;
+        bool sfcHasStates(const std::string& nodeName, const std::string& states) const {
+            // std::istringstream by design reads to next space in inputstream
+            std::istringstream iis(states);
+            std::vector<std::string> stateList((std::istream_iterator<std::string>(iis)),
+                                                std::istream_iterator<std::string>());
+
+            m_trace.println("sfcHasStates - checking node " + nodeName + " for states " + states);
+            for(std::string state: stateList) {
+                bool found = false;
+                try {
+                    if(nodeName == "request") {
+                        for(auto it = m_steps.begin(); it != m_steps.end(); ++it) {
+                            if((*it)->getName() == state) {
+                                m_trace.println("good " + nodeName);
+                                found = true;
+                            }
+                        }
+                    } else {
+                        NodeSfc* sfc = m_childSfc.at(nodeName);
+                        for(auto it = sfc->m_steps.begin(); it != sfc->m_steps.end(); ++it) {
+                            m_trace.println("Check state " + (*it)->getName());
+                            if((*it)->getName() == state) {
+                                m_trace.println("good " + nodeName);
+                                found = true;
+                            }
                         }
                     }
+                }
+                catch (std::out_of_range&) {
+                    m_trace.println("Node in expression not found: " + nodeName);
+                    throw std::runtime_error("Node in expression not found: " + nodeName);
+                }
+                if(!found) {
+                    m_trace.println(std::string("state not found: ") + state + " for node: " + nodeName);
+                    throw std::runtime_error(std::string("state not found: ") + state + " for node: " + nodeName);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        bool sfcHasNode(const std::string& nodeName) const {
+            m_trace.println("sfcHasNode - checking node " + nodeName);
+            try {
+                if(nodeName == "request") {
+                    return true;
                 } else {
-                    NodeSfc* sfc = m_childSfc.at(nodeName);
-                    for(auto it = sfc->m_steps.begin(); it != sfc->m_steps.end(); ++it) {
-                        if((*it)->getName() == stepName) {
-                            m_trace.println("good " + nodeName);
+                    for(auto it = m_childSfc.begin(); it != m_childSfc.end(); ++it) {
+                        m_trace.println("Check state " + it->first);
+                        if(nodeName == it->first) {
                             return true;
                         }
                     }
                 }
             }
-            catch (std::out_of_range) {
+            catch (std::out_of_range&) {
                 m_trace.println("Node in expression not found: " + nodeName);
                 throw std::runtime_error("Node in expression not found: " + nodeName);
             }
 
-            m_trace.println(std::string("step not found: ") + stepName + " for node: " + nodeName);
-            throw std::runtime_error(std::string("step not found: ") + stepName + " for node: " + nodeName);
             return false;
         }
 
-        bool nodeAtStep(const std::string& node, const std::string& step) const {
+        bool sfcNodeAtStep(const std::string& node, const std::string& step) const {
+            m_trace.println("sfcNodeAtStep - checking step " + step);
             if(node == "request") {
                 return (m_activeSteps.find(step) != m_activeSteps.end());
             } else {
@@ -187,7 +228,7 @@ namespace Arro {
 
         }
 
-        const Process* getProcess() const {
+        const AbstractNode* getProcess() const {
             return m_process;
         }
 
@@ -198,7 +239,7 @@ namespace Arro {
 
     private:
         Trace m_trace;
-        Process* m_process;
+        AbstractNode* m_process;
         // List of steps for this SFC
         std::list<std::unique_ptr<SfcStep> > m_steps;
         // List of transitions for this SFC

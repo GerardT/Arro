@@ -11,6 +11,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import util.Logger;
+import workspace.ArroModuleContainer;
+import workspace.ResourceCache;
 
 /**
  * This class represents a node as shown in a diagram, the diagram
@@ -20,6 +22,7 @@ import util.Logger;
 public class ArroNode extends NonEmfDomainObject {
 		
 	private String nodeType;
+    private String uuid;
 	private ArroModule parent = null;
 	private ArrayList<ArroParameter> parameterList = new ArrayList<ArroParameter>();
 	private boolean needsUpdate;
@@ -51,66 +54,53 @@ public class ArroNode extends NonEmfDomainObject {
 		return domainObject.getPadByName(name);
 	}
 	
-	
-	public void xmlWrite(Document doc, Element elt) {
-		Attr attr = null;
-		
-		attr = doc.createAttribute("id");
-		attr.setValue(getId());
-		elt.setAttributeNode(attr);
-		
-		attr = doc.createAttribute("name");
-		attr.setValue(getName());
-		elt.setAttributeNode(attr);
-		
-		attr = doc.createAttribute("type");
-		attr.setValue(getType());
-		elt.setAttributeNode(attr);
-		
-		int count = parameterList.size();
-		for(int i = 0; i < count; i++) {
-			ArroParameter parm = parameterList.get(i);
-			
-			Element sub = doc.createElement("param");
-			elt.appendChild(sub);
-			
-			attr = doc.createAttribute("key");
-			attr.setValue(parm.getFormalKey());
-			sub.setAttributeNode(attr);
-			
-			attr = doc.createAttribute("subst");
-			attr.setValue(parm.getSubstitute());
-			sub.setAttributeNode(attr);
-			
-			attr = doc.createAttribute("value");
-			attr.setValue(parm.getValue());
-			sub.setAttributeNode(attr);
-		}
+    /**
+     * 
+     */
+    @Override
+    public ArroModuleContainer update() {
+        ArroModuleContainer moduleByName = ResourceCache.getInstance().getZip(nodeType);
+        if(moduleByName != null) {
+            if(moduleByName.getUuid().equals(uuid)) {
+                // all OK, do nothing
+                return moduleByName;
+            } else {
+                // search for UUID
+                ArroModuleContainer moduleByUuid = ResourceCache.getInstance().getZipByUuid(uuid);
+                if(moduleByUuid != null) {
+                    // update name
+                    nodeType = moduleByUuid.getName();
+                    Logger.out.trace(Logger.WS, "Rename to " + nodeType);
+                    needsUpdate = true;
+                    return moduleByUuid;
+                } else {
+                    // update UUID
+                    uuid = moduleByName.getUuid();
+                    Logger.out.trace(Logger.WS, "Reconnecting to " + uuid);
+                    return moduleByName;
+                }
+            }
+        } else {
+            // search for UUID
+            ArroModuleContainer moduleByUuid = ResourceCache.getInstance().getZipByUuid(uuid);
+            if(moduleByUuid != null) {
+                // update name
+                nodeType = moduleByUuid.getName();
+                int ix = nodeType.indexOf(".anod");
+                if(ix != -1) {
+                    nodeType = nodeType.substring(0, ix);
+                }
+                Logger.out.trace(Logger.WS, "Rename to " + nodeType);
+                needsUpdate = true;
+                return moduleByUuid;
+            } else {
+                // really really not found!
+                Logger.out.trace(Logger.WS, "Reference broken for " + nodeType);
+                return null;
+            }
+        }
+    }
 
-		
-	}
-	public void xmlRead(Node nNode) {
-		Element eElement = (Element) nNode;
-    	setId(eElement.getAttribute("id"));
-    	setName(eElement.getAttribute("name"));
-    	setType(eElement.getAttribute("type"));
-    	
-    	NodeList nList = nNode.getChildNodes();
-    	for (int temp = 0; temp < nList.getLength(); temp++) {
-    		Node sub = nList.item(temp);
-    		
-			if(sub.getNodeName().equals("param")) {
-	    		Element eSubElement = (Element) sub;
-	    		
-	    		parameterList.add(new ArroParameter(
-	    				eSubElement.getAttribute("key"),
-	    				eSubElement.getAttribute("subst"),
-	    				eSubElement.getAttribute("value"),
-	    				""));
-			}
-    	}
-
-   	}
 
 	/**
 	 * Get module that defines this node. This method will load
@@ -119,7 +109,13 @@ public class ArroNode extends NonEmfDomainObject {
 	 * @return
 	 */
 	public ArroModule getAssociatedModule() {
-        return (ArroModule)ResourceCache.getInstance().getZip(getType()).getDomainDiagram();
+	    ArroModuleContainer m = update();
+	    if(m != null) {
+	        return (ArroModule) update().getDomainDiagram();
+	    } else {
+	        return null;
+	    }
+        //return (ArroModule)ResourceCache.getInstance().getZip(getType()).getDomainDiagram();
 	}
 	
 	/**
@@ -192,6 +188,7 @@ public class ArroNode extends NonEmfDomainObject {
 		}
 		parameterList = allParameters;
 	}
+	
 	private ArroParameter findParameter(String subst) {
 		for(ArroParameter p: parameterList) {
 			if((!subst.equals("")) && p.getFormalKey().equals(subst)) {
@@ -201,6 +198,78 @@ public class ArroNode extends NonEmfDomainObject {
 		return null;
 	}
 
+    
+    public void xmlWrite(Document doc, Element elt) {
+        Attr attr = null;
+        
+        attr = doc.createAttribute("id");
+        attr.setValue(getId());
+        elt.setAttributeNode(attr);
+        
+        attr = doc.createAttribute("name");
+        attr.setValue(getName());
+        elt.setAttributeNode(attr);
+        
+        attr = doc.createAttribute("type");
+        attr.setValue(getType());
+        elt.setAttributeNode(attr);
+        
+        attr = doc.createAttribute("uuid");
+        attr.setValue(getUuid());
+        elt.setAttributeNode(attr);
+        
+        int count = parameterList.size();
+        for(int i = 0; i < count; i++) {
+            ArroParameter parm = parameterList.get(i);
+            
+            Element sub = doc.createElement("param");
+            elt.appendChild(sub);
+            
+            attr = doc.createAttribute("key");
+            attr.setValue(parm.getFormalKey());
+            sub.setAttributeNode(attr);
+            
+            attr = doc.createAttribute("subst");
+            attr.setValue(parm.getSubstitute());
+            sub.setAttributeNode(attr);
+            
+            attr = doc.createAttribute("value");
+            attr.setValue(parm.getValue());
+            sub.setAttributeNode(attr);
+        }
+    }
+    
+    private String getUuid() {
+        return uuid;
+    }
+
+    public void xmlRead(Node nNode) {
+        Element eElement = (Element) nNode;
+        setId(eElement.getAttribute("id"));
+        setName(eElement.getAttribute("name"));
+        setType(eElement.getAttribute("type"));
+        setUuid(eElement.getAttribute("uuid"));
+        
+        NodeList nList = nNode.getChildNodes();
+        for (int temp = 0; temp < nList.getLength(); temp++) {
+            Node sub = nList.item(temp);
+            
+            if(sub.getNodeName().equals("param")) {
+                Element eSubElement = (Element) sub;
+                
+                parameterList.add(new ArroParameter(
+                        eSubElement.getAttribute("key"),
+                        eSubElement.getAttribute("subst"),
+                        eSubElement.getAttribute("value"),
+                        ""));
+            }
+        }
+    }
+
+    private void setUuid(String uuid) {
+        this.uuid = uuid;
+        
+    }
 
 
 }

@@ -83,7 +83,8 @@ public class ArroNodeSectionStandard extends GFPropertySection implements ITabbe
 	    
 	    nameText.addModifyListener(new ModifyListener() {
 
-	    	public void modifyText(ModifyEvent e) {
+	    	@Override
+            public void modifyText(ModifyEvent e) {
     			currentName = Misc.checkString(nameText);
     			
     			if(!currentName.equals("") && updateDialog()) {
@@ -109,10 +110,12 @@ public class ArroNodeSectionStandard extends GFPropertySection implements ITabbe
 		final X x = new X();
 		IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
 				
-			public boolean canExecute(IContext context) {
+			@Override
+            public boolean canExecute(IContext context) {
 				return true;
 			}
-			public void execute(IContext context) {
+			@Override
+            public void execute(IContext context) {
 				final PictogramElement pe = getSelectedPictogramElement();
 				ArroNode n = getNode(pe);
 
@@ -124,7 +127,8 @@ public class ArroNodeSectionStandard extends GFPropertySection implements ITabbe
 						
 						TransactionalEditingDomain domain = TransactionUtil.getEditingDomain(getDiagram());
 						domain.getCommandStack().execute(new RecordingCommand(domain) {
-						    public void doExecute() {
+						    @Override
+                            public void doExecute() {
 
 				    			// update UI with new domain data
 						    	UpdateContext updateContext = new UpdateContext(pe);

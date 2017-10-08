@@ -22,7 +22,6 @@ import org.eclipse.core.commands.operations.OperationHistoryFactory;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.graphiti.tb.ImageDecorator;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -73,12 +72,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import arro.Constants;
 import util.ImageUtils;
 import util.Logger;
 import util.PathUtil;
 import util.PbScalarTypes;
-import arro.ArroImageProvider;
-import arro.Constants;
 
 
 
@@ -378,7 +376,8 @@ public class MessageEditor extends EditorPart {
 
 	private void hookDoubleClickAction() {
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
+			@Override
+            public void doubleClick(DoubleClickEvent event) {
 				doubleClickAction.run();
 			}
 		});
@@ -387,7 +386,8 @@ public class MessageEditor extends EditorPart {
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
-	public void setFocus() {
+	@Override
+    public void setFocus() {
 		viewer.getControl().setFocus();
 		
 	    setUndoRedoActionHandlers();

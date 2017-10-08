@@ -24,6 +24,11 @@
             type="ArroSfcLeafDiagram"
             id="Arro.ArroSfcLeafDiagramType">
          </diagramType>
+         <diagramType
+            name="Arro UI Diagram Type"
+            type="ArroUiBlockDiagram"
+            id="Arro.ArroUiBlockDiagram">
+         </diagramType>
     </extension>
     <extension
          point="org.eclipse.graphiti.ui.diagramTypeProviders">
@@ -64,6 +69,14 @@
                id="Arro.ArroFunctionLeafDiagram">
             </diagramType>
        </diagramTypeProvider>
+       <diagramTypeProvider
+            name="Arro UI Diagram Type Provider"
+            class="arro.diagram.types.UiBlockDiagramTypeProvider"
+            id="Arro.UiBlockDiagramTypeProvider">
+            <diagramType
+               id="Arro.ArroUiBlockDiagram">
+            </diagramType>
+       </diagramTypeProvider>
     </extension>
    
    
@@ -80,10 +93,16 @@
            <propertyCategory category="Graphiti"> 
            </propertyCategory> 
         </propertyContributor> 
+        <propertyContributor contributorId="ArroUiBlockDiagram.PropertyContributor"> 
+           <propertyCategory category="Graphiti"> 
+           </propertyCategory> 
+        </propertyContributor> 
     </extension>
        
+    <!-- Define tabs -->
     <extension
       point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <!-- A block per ContributorId, define 5 tabs for composite diagrams -->
       <propertyTabs
           contributorId="Arro.PropertyContributor">
           <propertyTab
@@ -114,8 +133,9 @@
              id="arro.set-actions.tab"
              label="Send Requests">
           </propertyTab>
-      </propertyTabs>
-      <propertyTabs
+       </propertyTabs>
+       <!-- Define 5 tabs for device diagrams -->
+       <propertyTabs
           contributorId="ArroFunctionLeafDiagram.PropertyContributor">
           <propertyTab
              category="Graphiti"
@@ -146,8 +166,24 @@
              label="Send Requests">
           </propertyTab>
       </propertyTabs>
+       <!-- Define 2 tabs for UI diagrams -->
+       <propertyTabs
+          contributorId="ArroUiBlockDiagram.PropertyContributor">
+          <propertyTab
+             category="Graphiti"
+             id="arro.main.tab"
+             label="Main">
+          </propertyTab>
+          <propertyTab
+             afterTab="arro.main.tab"
+             category="Graphiti"
+             id="arro.param.tab"
+             label="Parameters">
+          </propertyTab>
+      </propertyTabs>
     </extension>
      
+    <!-- A block per ContributorId, declare section that feeds each tab -->
     <extension
       point="org.eclipse.ui.views.properties.tabbed.propertySections">
       <propertySections
@@ -252,6 +288,21 @@
               tab="arro.modedef.tab">
           </propertySection>
       </propertySections>
+      <propertySections
+          contributorId="ArroUiBlockDiagram.PropertyContributor">
+          <propertySection
+              class="property.ArroNodeSectionDevice"
+              filter="property.ArroNodeFilterDevice"
+              id="arro.node.section"
+              tab="arro.main.tab">
+          </propertySection>
+          <propertySection
+              class="property.ArroParamSectionDevice"
+              filter="property.ArroParamFilterDevice"
+              id="arro.param.section.device"
+              tab="arro.param.tab">
+          </propertySection>
+      </propertySections>
     </extension>
    
     
@@ -261,7 +312,7 @@
              class="arro.messageeditor.MessageEditor"
              contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
              extensions="amsg"
-             icon="icons/sample.gif"
+             icon="icons/icon_interface.png"
              id="arro.editors.MessageEditor"
              name="Message Type Editor">
        </editor>
@@ -269,11 +320,10 @@
              class="arro.editors.MultiPageEditor"
              contributorClass="arro.editors.MultiPageEditorContributor"
              extensions="anod"
-             icon="icons/sample.gif"
+             icon="icons/icon_composite.png"
              id="arro.editors.MultiPageEditor"
              name="Function Diagram Editor">
-       </editor>
-       
+       </editor>    
     </extension>
     
     
@@ -298,32 +348,7 @@
          </with>
       </definition>
     </extension>
- 
-    
-    <extension
-        point="org.eclipse.ui.commands">
-        <category
-              id="Arro.sampleNature.category"
-              name="Sample Project Nature commands">
-        </category>
-        <command
-              categoryId="Arro.sampleNature.category"
-              defaultHandler="arro.builder.AddRemoveSampleNatureHandler"
-              id="Arro.addRemoveSampleNature"
-              name="Add/RemoveSample Project Nature">
-        </command>
-        <command
-              categoryId="Arro.sampleNature.category"
-              id="arro.append"
-              name="Add a row to the table.">
-        </command>
-        <command
-              categoryId="Arro.sampleNature.category"
-              id="org.eclipse.ui.edit.delete"
-              name="Delete a row from the table.">
-        </command>
-    </extension>
-    
+     
     <extension
         point="org.eclipse.ui.handlers">
         <handler
@@ -349,8 +374,7 @@
             commandId="arro.append">
         </handler>
      </extension>
-     
-     <extension
+    <extension
        point="org.eclipse.ui.bindings">
        <key
           commandId="org.eclipse.ui.edit.delete"
@@ -359,86 +383,7 @@
           sequence="M1+6">
       </key>
     </extension>
-    
-    <extension
-       point="org.eclipse.ui.menus">
-       <menuContribution
-          locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-          <toolbar
-             id="Arro.toolbars.sampleToolbar">
-             <command
-                commandId="org.eclipse.ui.edit.delete"
-                icon="icons/sample.gif"
-                id="Arro.toolbars.deleteItemCommand"
-                tooltip="Remove selected item">
-             </command>
-             <command
-                commandId="arro.append"
-                icon="icons/sample.gif"
-                id="Arro.toolbars.append"
-                tooltip="Add new item">
-             </command>
-          </toolbar>
-       </menuContribution>
-       <menuContribution
-          locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
-          <command
-             commandId="Arro.addRemoveSampleNature"
-             label="Disable Sample builder"
-             style="push">
-             <visibleWhen
-                checkEnabled="false">
-                <with
-                   variable="selection">
-                   <count
-                      value="1">
-                   </count>
-                   <iterate>
-                      <adapt
-                         type="org.eclipse.core.resources.IProject">
-                         <test
-                            property="org.eclipse.core.resources.projectNature"
-                            value="Arro.sampleNature">
-                         </test>
-                      </adapt>
-                   </iterate>
-                </with>
-             </visibleWhen>
-          </command>
-          <command
-             commandId="Arro.addRemoveSampleNature"
-             label="Enable Sample builder"
-             style="push">
-             <visibleWhen
-                checkEnabled="false">
-                <with
-                   variable="selection">
-                   <count
-                      value="1">
-                   </count>
-                   <iterate>
-                      <adapt
-                         type="org.eclipse.core.resources.IProject">
-                         <not>
-                            <test
-                               property="org.eclipse.core.resources.projectNature"
-                               value="Arro.sampleNature">
-                            </test>
-                         </not>
-                      </adapt>
-                   </iterate>
-                </with>
-             </visibleWhen>
-          </command>
-       </menuContribution>
-       </extension>
-       <extension
-          point="org.eclipse.help.contexts">
-          <contexts
-             file="contexts.xml">
-          </contexts>
-       </extension>
-    
+        
        <extension
          point="org.eclipse.ui.perspectives">
          <perspective
@@ -448,8 +393,8 @@
             id="arro.perspective.ArroPerspective"
             name="Arro"/>
        </extension>
-    
-       <extension
+
+    <extension
         point = "org.eclipse.ui.newWizards">
         <category
             id="Arro"
@@ -472,23 +417,37 @@
         <wizard
             category="Arro"
             class="arro.wizards.message.NewMessageWizard"
-            icon="icons/sample.gif"
+            icon="icons/icon_interface.png"
             id="arro.wizards.SampleNewWizard"
             name="Message Definition">
         </wizard>
         <wizard
               category="Arro"
               class="arro.wizards.functionblock.NewFunctionBlockWizard"
-              icon="icons/sample.gif"
+              icon="icons/icon_composite.png"
               id="arro.wizards.SampleNewWizard"
               name="Function Block">
         </wizard>
         <wizard
               category="Arro"
               class="arro.wizards.codeblock.NewCodeBlockWizard"
-              icon="icons/sample.gif"
+              icon="icons/icon_composite.png"
               id="arro.wizards.NewDeviceWizard"
               name="Code Block">
+        </wizard>
+        <wizard
+              category="Arro"
+              class="arro.wizards.uiinputblock.NewUiInputBlockWizard"
+              icon="icons/icon_composite.png"
+              id="arro.wizards.NewUiInputDeviceWizard"
+              name="UI Input Device">
+        </wizard>
+        <wizard
+              category="Arro"
+              class="arro.wizards.uioutputblock.NewUiOutputBlockWizard"
+              icon="icons/icon_composite.png"
+              id="arro.wizards.NewUiOutputDeviceWizard"
+              name="UI Output Device">
         </wizard>
     </extension>
     

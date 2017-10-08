@@ -20,50 +20,49 @@ public class TransitionHelper {
 	private Connection connection;
 	private Polyline polyline, bar;
 	private ConnectionDecorator cd;
+    private Diagram diagram;    
+    
+    public TransitionHelper(Diagram d) {
+        diagram = d;
+    }
+    	
 	
-	
-	public Connection create(IAddContext context, ArroTransition addedDomainObject, Color fg, Color bg, Diagram targetDiagram) {
+	public Connection create(IAddContext context, ArroTransition addedDomainObject, Diagram targetDiagram) {
 		IAddConnectionContext addConContext = (IAddConnectionContext) context;
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		IGaService gaService = Graphiti.getGaService();
 		
-		connection = peCreateService.createFreeFormConnection(targetDiagram);
-		connection.setStart(addConContext.getSourceAnchor());
-		connection.setEnd(addConContext.getTargetAnchor());
+		Anchor start = addConContext.getSourceAnchor();
+		Anchor end = addConContext.getTargetAnchor();
 		
-		Anchor start = connection.getStart();
-		Anchor end = connection.getEnd();
-		
-        String startType = Graphiti.getPeService().getPropertyValue(start, Constants.PROP_PAD_NAME_KEY);
-        String endType = Graphiti.getPeService().getPropertyValue(end, Constants.PROP_PAD_NAME_KEY);
+        Color fg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_FOREGROUND);
         
-        assert(startType != null);
-        assert(endType != null);
-        
-		// The following combinations are allowed:
-//        if((
-//        		(startType.equals(Constants.PROP_PAD_NAME_SYNC_START_OUT) && endType.equals(Constants.PROP_PAD_NAME_STEP_IN)) ||
-//        		(startType.equals(Constants.PROP_PAD_NAME_STEP_OUT) && endType.equals(Constants.PROP_PAD_NAME_SYNC_STOP_IN))
-//        		
-//        		)) {
-//            Graphiti.getPeService().setPropertyValue(connection, Constants.PROP_PICT_KEY, Constants.PROP_PICT_NULL_TRANSITION);
-//    		polyline = gaService.createPlainPolyline(connection);
-//			
-//			polyline.setForeground(fg);
-//        } else {
+		if(start != end) {
+	        connection = peCreateService.createFreeFormConnection(targetDiagram);
+	        connection.setStart(addConContext.getSourceAnchor());
+	        connection.setEnd(addConContext.getTargetAnchor());
+	        
             Graphiti.getPeService().setPropertyValue(connection, Constants.PROP_PICT_KEY, Constants.PROP_PICT_TRANSITION);
-    		polyline = gaService.createPlainPolyline(connection);
-    		
-   	        // add static graphical decorator (composition and navigable)
-   	        cd = peCreateService.createConnectionDecorator(connection, false, 0.5, true);
-   	        // Coordinates relative to line!
-   	        bar = gaService.createPolyline(cd, new int[] { 0, -20, 0, 20 });
-			
-			polyline.setForeground(fg);
-			bar.setForeground(fg);
-	        bar.setLineWidth(2);	     
-//        }
+            polyline = gaService.createPlainPolyline(connection);
+            
+            // add static graphical decorator (composition and navigable)
+            cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
+            // Coordinates relative to line!
+            bar = gaService.createPolyline(cd, new int[] { -15, 10, 0, 0, -15, -10 });
+            
+            polyline.setForeground(fg);
+            bar.setForeground(fg);
+            bar.setLineWidth(2);         
+		} else {
+		    connection = null;
+		}
         return connection;
        
 	}
+	
+//    public void layout(ContainerShape cs, IFeatureProvider fp) {
+//        read(cs, fp); 
+//        redraw();
+//    }
+    
 }

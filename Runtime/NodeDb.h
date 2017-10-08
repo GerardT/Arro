@@ -21,8 +21,99 @@
 #include "Trace.h"
 #include "IDevice.h"
 
+
 namespace Arro
 {
+class NodeDb;
+
+class NodeSingleInput {
+public:
+    /**
+     * Constructor for NodeSingleInput. Can set only one listener to node input.
+     *
+     * \param l Listener
+     * \param n Node to which this input is attached.
+     */
+    NodeSingleInput(const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> l, AbstractNode* n):
+        m_callback(l), m_node(n), m_msg(new std::string()), m_interfaceName(interfaceName) { };
+    virtual ~NodeSingleInput() {};
+
+    // Copy and assignment is not supported.
+    NodeSingleInput(const NodeSingleInput&) = delete;
+    NodeSingleInput& operator=(const NodeSingleInput& other) = delete;
+
+    /**
+     * Passes the message on to the listener.
+     *
+     * \param msg Message to pass on.
+     */
+    void handleMessage(const MessageBuf& msg);
+
+    const MessageBuf& getData() const { return m_msg; };
+
+private:
+    std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> m_callback;
+    AbstractNode* m_node;
+    MessageBuf m_msg;
+public:
+    std::string m_interfaceName;
+
+};
+
+/**
+ * \brief Class instance represents one output for a node.
+ *
+ * NodeSingleOutputRef is created when calling registerNodeOutput for a node.
+ * It keeps a list 'inputs' that contains all connected inputs.
+ * Connect multiple NodeSingleInput objects to one NodeMultiOutput.
+ */
+class NodeMultiOutput {
+public:
+    /**
+     * Constructor for NodeMultiOutput.
+     *
+     * \param db Node database.
+     */
+    NodeMultiOutput(NodeDb* db);
+    virtual ~NodeMultiOutput() {};
+
+    // Copy and assignment is not supported.
+    NodeMultiOutput(const NodeMultiOutput&) = delete;
+    NodeMultiOutput& operator=(const NodeMultiOutput& other) = delete;
+
+    /**
+     * Connect this output to an input.
+     *
+     * \param i Input node to connect to.
+     */
+    void connectInput(NodeSingleInput *i);
+
+    /**
+     * Forward a message.
+     *
+     * \param msg Message to forward.
+     */
+    void forwardMessage(const MessageBuf& msg);
+
+    /**
+     * Submit a Protobuf buffer into msg queue.
+     *
+     * \param msg Buffer to submit.
+     */
+    void submitMessage(google::protobuf::MessageLite* msg);
+
+    /**
+     * Fill a MessageBuf from string and submit Protobuf buffer into queue.
+     *
+     * \param msg String to submit.
+     */
+    void submitMessageBuffer(const char* msg);
+
+private:
+    NodeDb* m_nm;
+    std::vector<NodeSingleInput*> m_inputs;
+};
+
 
     /**
      * \brief Node database.
@@ -30,6 +121,8 @@ namespace Arro
      * Node database into which to store all nodes.
      */
     class NodeDb {
+    friend class NodeMultiOutput;
+    friend class NodeSingleInput;
 
     public:
 
@@ -39,90 +132,6 @@ namespace Arro
          * NodeSingleInput is created when calling registerNodeInput for a node.
          * Connect multiple NodeSingleInput objects to one NodeMultiOutput.
          */
-        class NodeSingleInput {
-        public:
-            /**
-             * Constructor for NodeSingleInput. Can set only one listener to node input.
-             *
-             * \param l Listener
-             * \param n Node to which this input is attached.
-             */
-            NodeSingleInput(const std::string& interfaceName, std::function<void (MessageBuf* m_msg, const std::string& interfaceName)> l, AbstractNode* n):
-                m_callback(l), m_node(n), m_interfaceName(interfaceName) { };
-            virtual ~NodeSingleInput() {};
-
-            // Copy and assignment is not supported.
-            NodeSingleInput(const NodeSingleInput&) = delete;
-            NodeSingleInput& operator=(const NodeSingleInput& other) = delete;
-
-            /**
-             * Passes the message on to the listener.
-             *
-             * \param msg Message to pass on.
-             */
-            void handleMessage(MessageBuf* msg);
-
-        private:
-            std::function<void (MessageBuf* m_msg, const std::string& interfaceName)> m_callback;
-            AbstractNode* m_node;
-        public:
-            std::string m_interfaceName;
-
-        };
-
-        /**
-         * \brief Class instance represents one output for a node.
-         *
-         * NodeSingleOutputRef is created when calling registerNodeOutput for a node.
-         * It keeps a list 'inputs' that contains all connected inputs.
-         * Connect multiple NodeSingleInput objects to one NodeMultiOutput.
-         */
-        class NodeMultiOutput {
-        public:
-            /**
-             * Constructor for NodeMultiOutput.
-             *
-             * \param db Node database.
-             */
-            NodeMultiOutput(NodeDb* db);
-            virtual ~NodeMultiOutput() {};
-
-            // Copy and assignment is not supported.
-            NodeMultiOutput(const NodeMultiOutput&) = delete;
-            NodeMultiOutput& operator=(const NodeMultiOutput& other) = delete;
-
-            /**
-             * Connect this output to an input.
-             *
-             * \param i Input node to connect to.
-             */
-            void connectInput(NodeSingleInput *i);
-
-            /**
-             * Forward a message.
-             *
-             * \param msg Message to forward.
-             */
-            void forwardMessage(MessageBuf* msg);
-
-            /**
-             * Submit a Protobuf buffer into msg queue.
-             *
-             * \param msg Buffer to submit.
-             */
-            void submitMessage(google::protobuf::MessageLite* msg);
-
-            /**
-             * Fill a MessageBuf from string and submit Protobuf buffer into queue.
-             *
-             * \param msg String to submit.
-             */
-            void submitMessageBuffer(const char* msg);
-
-        private:
-            NodeDb* m_nm;
-            std::vector<NodeSingleInput*> m_inputs;
-        };
 
         class FullMsg {
         public:
@@ -132,7 +141,7 @@ namespace Arro
              * \param o NodeMultiOutput instance where to send this message to.
              * \param s Message buffer to send.
              */
-            FullMsg(NodeMultiOutput* o, MessageBuf* s);
+            FullMsg(NodeMultiOutput* o, MessageBuf& s);
             virtual ~FullMsg() {};
 
             // Copy and assignment is not supported.
@@ -141,7 +150,7 @@ namespace Arro
 
         // FIXME Should be private
             NodeMultiOutput* m_output;
-            std::string* m_msg;
+            MessageBuf m_msg;
         };
 
     public:
@@ -180,7 +189,7 @@ namespace Arro
          * \param name Name of the interface as "node.node.interface".
          * \param n The instance of the node.
          */
-        NodeSingleInput* registerNodeInput(AbstractNode* node, const std::string& interfaceName, std::function<void (MessageBuf* m_msg, const std::string& interfaceName)> listen);
+        NodeSingleInput* registerNodeInput(AbstractNode* node, const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> listen);
 
         /**
          * Register an output with the node.

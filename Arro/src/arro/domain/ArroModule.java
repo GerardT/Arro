@@ -12,6 +12,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import util.Logger;
+import workspace.ArroModuleContainer;
 
 /**
  * Represents a function diagram, consisting of Nodes (=composite), Pads,
@@ -31,6 +32,16 @@ public class ArroModule extends NonEmfDomainObject  {
 		super();
 		// should only be one state diagram.
 		stateDiagram = null;
+	}
+	
+	@Override
+    public ArroModuleContainer update() {
+	    // update all nodes
+	    Collection<ArroNode> v = nodes.values();
+	    for(ArroNode n : v) {
+	        n.update();
+	    }
+	    return null;
 	}
 	
 	/*

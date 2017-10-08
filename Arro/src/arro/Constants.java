@@ -13,7 +13,11 @@ public class Constants {
 	public final static String MESSAGE_EXT = "amsg";
 	
 	// temp file name after unzip
-	public final static String SFC_FILE_NAME = Constants.HIDDEN_RESOURCE + Constants.STATE_NODE_DIAGRAM_TYPE;
+    public final static String SFC_FILE_NAME = Constants.HIDDEN_RESOURCE + "SfcDiagram.xml";
+    public final static String FUNCTION_FILE_NAME = Constants.HIDDEN_RESOURCE + "FunctionDiagram.xml";
+    public final static String MODULE_FILE_NAME = Constants.HIDDEN_RESOURCE + "Module.xml";
+    public final static String PYTHON_FILE_NAME = Constants.HIDDEN_RESOURCE + "Module.py";
+    public final static String UI_FILE_NAME = Constants.HIDDEN_RESOURCE + "Module.html";
 	
 	// Editor types - Diagram.getDiagramTypeId() will return:
     public final static String FUNCTION_NODE_DIAGRAM_TYPE = "Arro"; // must match with plugin.xml
@@ -28,15 +32,21 @@ public class Constants {
     public final static String STATE_LEAF_DIAGRAM_TYPE = "ArroSfcLeafDiagram"; // must match with plugin.xml
     public final static String STATE_LEAF_DIAGRAM_TYPE_PROVIDER = "Arro.SfcLeafTypeProvider"; // must match with plugin.xml
     // Provider = Handler object that handles e.g. doc type.
+
+    public final static String UI_BLOCK_DIAGRAM_TYPE = "ArroUiBlockDiagram"; // must match with plugin.xml
+    public final static String UI_BLOCK_DIAGRAM_TYPE_PROVIDER = "Arro.UiBlockDiagramTypeProvider"; // must match with plugin.xml
+    
 	
 	// Document types - defined in META file
 	public final static String FUNCTION_BLOCK = "Function";
-	public final static String CODE_BLOCK = "Code";
+    public final static String CODE_BLOCK = "Code";
+    public final static String UI_BLOCK = "UI";
 	
 	// Document types - derived from META
 	public static final int FunctionBlock = 1;
 	public static final int CodeBlockPython = 2;
-	public static final int CodeBlockNative = 3;
+    public static final int CodeBlockNative = 3;
+    public static final int CodeBlockHtml = 4;
 	
 	// Document types - messages
 	public static final int MessageDiagram = 4;
@@ -47,10 +57,13 @@ public class Constants {
 	public final static String PROP_PAD_INPUT_KEY = "pad_input";
 	
     // Context types - Key
-    public final static String PROP_CONTEXT_KEY = "context";
+    public final static String PROP_CONTEXT_NAME_KEY = "context_name";
+    
+    public final static String PROP_CONTEXT_MOD_KEY = "context_module";
     
     // Pictogram types - Values
-    public final static String PROP_CONTEXT_READY_STEP = "_ready_step";
+    public final static String PROP_CONTEXT_READY_STEP = "_ready";
+    public final static String PROP_CONTEXT_TERM_STEP = "_terminated";
     
     // Pictogram types - Key
     public final static String PROP_PICT_KEY = "pictogram";

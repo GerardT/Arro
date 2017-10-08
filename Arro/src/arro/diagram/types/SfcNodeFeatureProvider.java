@@ -43,9 +43,8 @@ import arro.diagram.features.TransitionCreateFeature;
 import arro.diagram.features.TransitionDeleteFeature;
 import arro.diagram.features.TransitionUpdateFeature;
 import arro.domain.ArroModule;
-import arro.domain.ArroStep;
 import arro.domain.ArroSequenceChart;
-import arro.domain.ArroSynchronization;
+import arro.domain.ArroStep;
 import arro.domain.ArroTransition;
 import arro.domain.POJOIndependenceSolver;
 import util.Logger;
@@ -81,7 +80,7 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 				(context.getNewObject() instanceof ArroModule || context.getNewObject() instanceof ArroSequenceChart)) {
 			return new ArroIDAddFeature(this);
         } else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep &&
-                context.getProperty(Constants.PROP_CONTEXT_KEY).equals(Constants.PROP_CONTEXT_READY_STEP)) {
+                context.getProperty(Constants.PROP_CONTEXT_NAME_KEY) != null) {
             return new ReadyAddFeature(this);
 		} else if (context instanceof IAddContext && context.getNewObject() instanceof ArroStep) {
 			return new StepAddFeature(this);
@@ -93,7 +92,8 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 	}
 	
 
-	public IRemoveFeature getRemoveFeature(IRemoveContext context) {
+	@Override
+    public IRemoveFeature getRemoveFeature(IRemoveContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
 		if (pictogramElement instanceof ContainerShape) {
 			Logger.out.trace(Logger.EDITOR, " ");
@@ -171,7 +171,8 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 		return super.getUpdateFeature(context);
 	}
 	
-	public IMoveAnchorFeature getMoveAnchorFeature(IMoveAnchorContext context) {
+	@Override
+    public IMoveAnchorFeature getMoveAnchorFeature(IMoveAnchorContext context) {
 		return null;
 	}
 	

@@ -1,5 +1,4 @@
 #include "NodePass.h"
-#include "NodeDb.h"
 
 static RegisterMe<NodePass> registerMe("Pass");
 

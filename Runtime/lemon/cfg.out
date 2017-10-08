@@ -1,0 +1,111 @@
+State 0:
+          line ::= * expr
+          expr ::= * expr AND expr
+          expr ::= * expr OR expr
+          expr ::= * NAME IN LPAREN states RPAREN
+
+                          NAME shift  7
+                          line accept
+                          expr shift  4
+
+State 1:
+          expr ::= * expr AND expr
+          expr ::= expr AND * expr
+          expr ::= * expr OR expr
+          expr ::= * NAME IN LPAREN states RPAREN
+
+                          NAME shift  7
+                          expr shift  10
+
+State 2:
+          expr ::= * expr AND expr
+          expr ::= * expr OR expr
+          expr ::= expr OR * expr
+          expr ::= * NAME IN LPAREN states RPAREN
+
+                          NAME shift  7
+                          expr shift  6
+
+State 3:
+          expr ::= NAME IN LPAREN * states RPAREN
+          states ::= * states COMMA NAME
+          states ::= * NAME
+
+                          NAME shift  13
+                        states shift  5
+
+State 4:
+      (0) line ::= expr *
+          expr ::= expr * AND expr
+          expr ::= expr * OR expr
+
+                             $ reduce 0
+                            OR shift  2
+                           AND shift  1
+
+State 5:
+          expr ::= NAME IN LPAREN states * RPAREN
+          states ::= states * COMMA NAME
+
+                        RPAREN shift  11
+                         COMMA shift  9
+
+State 6:
+          expr ::= expr * AND expr
+          expr ::= expr * OR expr
+      (2) expr ::= expr OR expr *
+
+                           AND shift  1
+                     {default} reduce 2
+
+State 7:
+          expr ::= NAME * IN LPAREN states RPAREN
+
+                            IN shift  8
+
+State 8:
+          expr ::= NAME IN * LPAREN states RPAREN
+
+                        LPAREN shift  3
+
+State 9:
+          states ::= states COMMA * NAME
+
+                          NAME shift  12
+
+State 10:
+          expr ::= expr * AND expr
+      (1) expr ::= expr AND expr *
+          expr ::= expr * OR expr
+
+                     {default} reduce 1
+
+State 11:
+      (3) expr ::= NAME IN LPAREN states RPAREN *
+
+                     {default} reduce 3
+
+State 12:
+      (4) states ::= states COMMA NAME *
+
+                     {default} reduce 4
+
+State 13:
+      (5) states ::= NAME *
+
+                     {default} reduce 5
+
+----------------------------------------------------
+Symbols:
+    0: $:
+    1: OR
+    2: AND
+    3: NAME
+    4: IN
+    5: LPAREN
+    6: RPAREN
+    7: COMMA
+    8: error:
+    9: line: NAME
+   10: expr: NAME
+   11: states: NAME

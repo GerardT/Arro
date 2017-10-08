@@ -4,7 +4,6 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -14,9 +13,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import util.Logger;
 import arro.editors.MultiPageEditor;
-import arro.messageeditor.MessageEditor;
+import util.Logger;
 
 
 
@@ -36,8 +34,8 @@ public class AddRowHandler extends AbstractHandler {
 		Logger.out.trace(Logger.EDITOR, "selection " + selection.toString());
 
 		if(activeEditor instanceof MultiPageEditor) {
-			MultiPageEditor me = (MultiPageEditor) activeEditor;
-	        IUndoableOperation operation = new DeltaInfoOperation(me, selection);
+			//MultiPageEditor me = (MultiPageEditor) activeEditor;
+	        //IUndoableOperation operation = new DeltaInfoOperation(me, selection);
 	    	//operation.addContext(me.getUndoContext());
         	//me.getOperationHistory().execute(operation, null, null);
 		}
@@ -59,7 +57,8 @@ public class AddRowHandler extends AbstractHandler {
 			this.me = me;
 			this.selection = selection;
 		}
-		public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
 			StructuredSelection s = (StructuredSelection) selection;
 			//undoList = me.cloneMessageList();
 			if(s.isEmpty()) {
@@ -69,13 +68,15 @@ public class AddRowHandler extends AbstractHandler {
 			}
 			return Status.OK_STATUS;
 		}
-		public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
 			//redoList = me.cloneMessageList();
 			//me.setMessageList(undoList);
 
 			return Status.OK_STATUS;
 		}
-		public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
+		@Override
+        public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
 			//undoList = me.cloneMessageList();
 			//me.setMessageList(redoList);
 
