@@ -1,4 +1,4 @@
-
+#!/usr/bin/python
 
 import sys
 from twisted.web.static import File
