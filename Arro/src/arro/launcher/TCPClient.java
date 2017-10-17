@@ -109,7 +109,11 @@ class TCPClient
 	 * @throws IOException 
 	 */
 	private String readln() throws IOException {
-		return inFromServer.readLine();
+		String s = inFromServer.readLine();
+		if(s == null) {
+            throw new IOException("Lost socket", null);
+		}
+		return s;
 	}
 	
 	class SocketReader implements Runnable {
