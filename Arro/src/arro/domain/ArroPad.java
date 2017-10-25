@@ -82,4 +82,8 @@ public class ArroPad extends NonEmfDomainObject {
 		return input;
 	}
 
+    public boolean hasConnection() {
+        return parent.hasConnection(this);
+    }
+
 }

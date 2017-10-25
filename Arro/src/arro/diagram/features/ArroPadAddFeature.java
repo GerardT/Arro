@@ -122,6 +122,8 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
         addedDomainObject.setType(className);
         addedDomainObject.setName(instanceName);
 
+        //ContainerShape containerShape = new Helper(getDiagram()).create(context, addedDomainObject);
+
 
 		ContainerShape targetDiagram = context.getTargetContainer();
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();

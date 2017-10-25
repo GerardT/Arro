@@ -267,6 +267,7 @@ public class NodeHelper {
         
         Color fg = Graphiti.getGaService().manageColor(diagram, Constants.ANCHOR_FG);
         Color bg = Graphiti.getGaService().manageColor(diagram, Constants.ANCHOR_BG);
+        Color tx = Graphiti.getGaService().manageColor(diagram, Constants.TEXT_BG);
         
         boxAnchor.setRelativeWidth(0.0);
         boxAnchor.setRelativeHeight(0.0/*0.38*/); // Use golden section
@@ -284,7 +285,7 @@ public class NodeHelper {
         // NOTE: it seems this is necessary to make the BoxRelativeAnchor work!
         Text text = gaService.createText(invs, padName);
         text.setFont(font);
-        text.setBackground(bg);
+        text.setBackground(tx);
         text.setFilled(false);
         Graphiti.getPeService().setPropertyValue(text, Constants.PROP_PICT_KEY, Constants.PROP_PICT_PASSIVE);
 
@@ -338,13 +339,15 @@ public class NodeHelper {
         IGaService gaService = Graphiti.getGaService();
         
         Color fg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_FOREGROUND);
-        Color bg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_FOREGROUND);
+        Color bg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_BACKGROUND);
+        Color tx = Graphiti.getGaService().manageColor(diagram, Constants.TEXT_BG);
         
-        rectangle.setFilled(false);
+        rectangle.setFilled(true);
+        rectangle.setTransparency(0.1);
         
-        rectangle.setForeground(fg);
+        rectangle.setForeground(bg);
         rectangle.setBackground(bg);
-        rectangle.setLineWidth(2);
+        rectangle.setLineWidth(0);
         
         gaService.setLocationAndSize(rectangle, Constants.HALF_PAD_SIZE, 0, width - Constants.PAD_SIZE, height);
         
@@ -357,10 +360,10 @@ public class NodeHelper {
         Graphiti.getGaLayoutService().setLocationAndSize(nodeNameText, 0, 20, rectangle.getWidth(), 20);
         Graphiti.getGaLayoutService().setLocationAndSize(nodeTypeText, 0, 0, rectangle.getWidth(), 20);
         
-        nodeTypeText.setForeground(fg);
+        nodeTypeText.setForeground(tx);
         nodeTypeText.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
         nodeTypeText.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-        nodeNameText.setForeground(fg);
+        nodeNameText.setForeground(tx);
         nodeNameText.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
         nodeNameText.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
 

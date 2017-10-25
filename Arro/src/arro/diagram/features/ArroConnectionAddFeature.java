@@ -55,7 +55,7 @@ public class ArroConnectionAddFeature extends AbstractAddFeature implements
 		connection.setEnd(addConContext.getTargetAnchor());
 
 		Polyline polyline = gaService.createPlainPolyline(connection);
-		polyline.setForeground(manageColor(IColorConstant.BLACK));
+		polyline.setForeground(manageColor(Constants.CONNECTOR));
 
         Graphiti.getPeService().setPropertyValue(connection, Constants.PROP_PICT_KEY, Constants.PROP_PICT_CONNECTION);
 		

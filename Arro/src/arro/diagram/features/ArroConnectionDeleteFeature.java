@@ -19,6 +19,11 @@ public class ArroConnectionDeleteFeature extends DefaultDeleteFeature implements
 		super(fp);
 	}
 	
+    @Override
+    public boolean canDelete(IDeleteContext context) {
+        return true;
+    }
+
 	@Override
     public void delete(IDeleteContext context) {
         IDiagramContainer dc = getDiagramBehavior().getDiagramContainer();
@@ -32,12 +37,11 @@ public class ArroConnectionDeleteFeature extends DefaultDeleteFeature implements
 		super.delete(context);
 	}
 
-
 	@Override
 	protected void deleteBusinessObjects(Object[] businessObjects) {
 		super.deleteBusinessObjects(businessObjects);
 	}
-
+	
 	@Override
 	protected void deleteBusinessObject(Object bo) {
 		if(bo instanceof ArroConnection) {

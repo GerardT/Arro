@@ -8,7 +8,10 @@ import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 import arro.Constants;
 
 public class ArroPadFilter extends AbstractPropertySectionFilter {
-	 
+
+    /**
+     * Only accept if ContainerShape with (key,value) = (PROP_PICT_KEY, PROP_PICT_PAD)
+     */
     @Override
     protected boolean accept(PictogramElement pe) {
 		if(pe instanceof ContainerShape) {
