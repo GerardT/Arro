@@ -105,13 +105,14 @@ public class FunctionNodeDiagramFeatureProvider extends DefaultFeatureProvider {
 		PictogramElement pictogramElement = context.getPictogramElement();
 		if (pictogramElement instanceof ContainerShape) {
 			Logger.out.trace(Logger.EDITOR, " ");
-			//ContainerShape cs = (ContainerShape)pictogramElement;
-			
-			//String pict = Graphiti.getPeService().getPropertyValue(cs, Constants.PROP_PICT_KEY);
-			return new NullRemoveFeature(this);				
-		} else if(pictogramElement instanceof BoxRelativeAnchor) {
-			return null;
-		}
+			return new NullRemoveFeature(this);
+        } else if (pictogramElement instanceof FreeFormConnection) {
+            Logger.out.trace(Logger.EDITOR, " ");
+            return new NullRemoveFeature(this);
+            //return super.getRemoveFeature(context);
+        } else if(pictogramElement instanceof BoxRelativeAnchor) {
+            return null;
+        }
 		return super.getRemoveFeature(context);
 
 	}

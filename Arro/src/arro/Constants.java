@@ -108,11 +108,6 @@ public class Constants {
 	// Pre-defined pad names used in SFCs
 	public static final String PROP_PAD_NAME_STEP_IN = "Step-in";
 	public static final String PROP_PAD_NAME_STEP_OUT = "Step-out";
-//	public static final String PROP_PAD_NAME_SYNC_START_IN = "Sync-start-in";
-//	public static final String PROP_PAD_NAME_SYNC_START_OUT = "Sync-start-out";
-//	public static final String PROP_PAD_NAME_SYNC_STOP_IN = "Sync-stop-in";
-//	public static final String PROP_PAD_NAME_SYNC_STOP_OUT = "Sync-stop-out";
-
 	
 	public static final IColorConstant PAD_TEXT_FOREGROUND = new ColorConstant(51, 51, 153);
          
@@ -126,15 +121,19 @@ public class Constants {
 
 	public static final IColorConstant ANCHOR_FG = new ColorConstant(0, 0, 0);
 
-	public static final IColorConstant ANCHOR_BG = new ColorConstant(200, 200, 200);
+    public static final IColorConstant ANCHOR_BG = new ColorConstant(200, 200, 200);
+
+    public static final IColorConstant TEXT_BG = new ColorConstant(70, 70, 70);
 
     public static final IColorConstant MODULE_GONE = new ColorConstant(200, 0, 0);
 
     public static final IColorConstant CLASS_TEXT_FOREGROUND = new ColorConstant(51, 51, 153);
          
-	public static final IColorConstant CLASS_FOREGROUND = new ColorConstant(255, 102, 0);
+    public static final IColorConstant CLASS_FOREGROUND = new ColorConstant(255, 242, 0);
      
-	public static final IColorConstant CLASS_BACKGROUND = new ColorConstant(255, 204, 153);
+    public static final IColorConstant CLASS_BACKGROUND = new ColorConstant(255, 249, 174);
+
+    public static final IColorConstant CONNECTOR = new ColorConstant(200, 200, 200);
 
 	public static final String PLUGIN_ID = "arro";
 

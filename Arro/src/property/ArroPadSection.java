@@ -1,6 +1,8 @@
 package property;
 
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.transaction.util.TransactionUtil;
@@ -13,6 +15,7 @@ import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
@@ -43,6 +46,8 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
     private String currentName = "";
     private boolean currentAsInput = true;
     private boolean currentRunCycle = true;
+    private boolean hasConnection = false;
+    private boolean updateSuccess = false;
 	
 	
 	@Override
@@ -61,6 +66,9 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
 	    handleProperty(parent, composite, nameTextVal);
 	}
 	
+	/**
+	 * Update the controls to match the values in the model
+	 */
 	@Override
 	public void refresh() {
 	    PictogramElement pe = getSelectedPictogramElement();
@@ -72,19 +80,12 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
 		        currentName = n.getName();
 		        currentAsInput = n.getInput();
 		        currentRunCycle = n.getRun();
+		        hasConnection = n.hasConnection();
 		        
 		        nameTextVal.setText(currentName == null ? "" : currentName);
 	        	bIn.setSelection(currentAsInput);
 	        	bOut.setSelection(!currentAsInput);
 		        bRunCycle.setSelection(currentRunCycle);
-		        
-//		        if(currentAsInput == true) {
-//		        	bIn.setSelection(true);
-//		        	bOut.setSelection(false);
-//		        } else {
-//		        	bIn.setSelection(false);
-//		        	bOut.setSelection(true);
-//		        }
 	        }
 	    }
 	}
@@ -144,7 +145,8 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
             public void modifyText(ModifyEvent e) {
     			currentName = Misc.checkString(nameText);
     			
-    			if(!currentName.equals("") && updateDialog()) {
+    			updateModel();
+    			if(!currentName.equals("") && updateSuccess) {
 	    			nameText.setBackground(null);
     			} else {
 	    			// show error indication
@@ -159,8 +161,15 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				currentAsInput = true;
-				updateDialog();
+			    if(currentAsInput == false && hasConnection) {
+			        IStatus status = new Status(IStatus.ERROR, "Arro", /*reason*/"Remove connection first");
+	                ErrorDialog.openError(null, "Changing Pad", "Cannot change from output to input", status);
+	                bIn.setSelection(false);
+	                bOut.setSelection(true);
+			    } else {
+		             currentAsInput = true;
+		             updateModel();
+			    }
 			}
 
 			@Override
@@ -171,8 +180,15 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				currentAsInput = false;
-				updateDialog();
+                if(currentAsInput == true && hasConnection) {
+                    IStatus status = new Status(IStatus.ERROR, "Arro", /*reason*/"Remove connection first");
+                    ErrorDialog.openError(null, "Changing Pad", "Cannot change from input to output", status);
+                    bIn.setSelection(true);
+                    bOut.setSelection(false);
+                } else {
+        			currentAsInput = false;
+        			updateModel();
+                }
 			}
 
 			@Override
@@ -184,7 +200,7 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				currentRunCycle = bRunCycle.getSelection();
-				updateDialog();
+				updateModel();
 			}
 
 			@Override
@@ -194,16 +210,13 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
 	}
 	
 	
-	// Use a class so we can declare it as final and use as closure.
-	class X {
-		public boolean success = false;
-	}
-
-	private boolean updateDialog() {
+	/**
+	 * Update the ArroPad that this property dialog is connected to
+	 */
+	private void updateModel() {
 		final String typedValue = currentName;
 		final boolean typedValue2 = currentAsInput;
 		final boolean typedValue3 = currentRunCycle;
-		final X x = new X();
 		IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
 				
 			@Override
@@ -214,11 +227,12 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
             public void execute(IContext context) {
 				final PictogramElement pe = getSelectedPictogramElement();
 				ArroPad n = getPad(pe);
+				updateSuccess = false;
 
 				if (n != null) {
 					ArroPad m = n.getParent().getPadByName(typedValue);
 					if(m == null || m == n) {
-						x.success = true;
+						updateSuccess = true;
 						n.setName(typedValue);
 						n.setInput(typedValue2);
 						n.setRun(typedValue3);
@@ -232,11 +246,6 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
 							    UpdateContext updateContext = new UpdateContext(pe);
 							    IUpdateFeature updateFeature = getFeatureProvider().getUpdateFeature(updateContext);
 							    updateFeature.update(updateContext);
-							    
-//							    // revisit layout if necessary
-//							    LayoutContext layoutContext = new LayoutContext(pe);
-//							    ILayoutFeature layoutFeature = getFeatureProvider().getLayoutFeature(layoutContext);
-//							    layoutFeature.layout(layoutContext);
 						   }
 						});
 					}
@@ -246,9 +255,14 @@ public class ArroPadSection extends GFPropertySection implements ITabbedProperty
 		};
 		CustomContext context = new CustomContext();
 		execute(feature, context);
-		return x.success;
 	}
 	
+	/**
+	 * Get model object: ArroPad
+	 * 
+	 * @param pe Pictogram element that this property dialog is connected to.
+	 * @return
+	 */
 	public ArroPad getPad(PictogramElement pe) {
 	    if (pe != null) {
 	       	IFeatureProvider fp = getDiagramTypeProvider().getFeatureProvider();

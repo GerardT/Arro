@@ -441,4 +441,17 @@ public class ArroModule extends NonEmfDomainObject  {
 		return type;
 	}
 
+    public boolean hasConnection(ArroPad arroPad) {
+        Collection<ArroConnection> c = connections.values();
+        for(ArroConnection connection: c) {
+            if(connection.getSource().equals(arroPad.getName())) {
+                return true;
+            }
+            if(connection.getTarget().equals(arroPad.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
