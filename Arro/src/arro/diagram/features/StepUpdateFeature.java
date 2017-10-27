@@ -70,6 +70,7 @@ public class StepUpdateFeature  extends DefaultUpdateDiagramFeature {
         	ArroStep state = (ArroStep) bo;
         	String name = state.getName();
             ContainerShape cs = (ContainerShape) pictogramElement;
+            //return new NodeHelper(getDiagram()).update(context, cs, font, getFeatureProvider());
             for (Shape shape : cs.getChildren()) {
             	GraphicsAlgorithm graphicsAlgorithm = shape.getGraphicsAlgorithm();
 
