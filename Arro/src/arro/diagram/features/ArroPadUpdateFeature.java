@@ -4,14 +4,9 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.impl.DefaultUpdateDiagramFeature;
-import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
-import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.mm.pictograms.Shape;
-import org.eclipse.graphiti.services.Graphiti;
 
-import arro.Constants;
 import arro.domain.ArroPad;
 import arro.domain.NonEmfDomainObject;
 import arro.domain.POJOIndependenceSolver;
@@ -46,41 +41,8 @@ public class ArroPadUpdateFeature  extends DefaultUpdateDiagramFeature {
             // Set name in pictogram
             if (pictogramElement instanceof ContainerShape) {
                 ContainerShape cs = (ContainerShape) pictogramElement;
-                
-    	        Graphiti.getPeService().setPropertyValue(cs, Constants.PROP_PAD_INPUT_KEY,
-    	        										input?Constants.PROP_TRUE_VALUE : Constants.PROP_FALSE_VALUE);
+                return new ArroPadHelper(getDiagram()).update(cs, getFeatureProvider(), input, name);
 
-                
-                int i = 0;
-                for (Shape shape : cs.getChildren()) {
-                	GraphicsAlgorithm graphicsAlgorithm = shape.getGraphicsAlgorithm();
-
-                    if (graphicsAlgorithm instanceof org.eclipse.graphiti.mm.algorithms.Text && i == 0) {
-//                        Text text = (Text) shape.getGraphicsAlgorithm();
-//                        text.setValue(type + " :");
-                        i++;
-                	}
-                	else if(graphicsAlgorithm instanceof org.eclipse.graphiti.mm.algorithms.Text && i == 1) {
-                        org.eclipse.graphiti.mm.algorithms.Text text = (org.eclipse.graphiti.mm.algorithms.Text) shape.getGraphicsAlgorithm();
-                        text.setValue(name);
-     				}
-                }
-        		ContainerShape containerShape = (ContainerShape) pictogramElement;
-        		GraphicsAlgorithm graphicsAlgorithm = containerShape.getGraphicsAlgorithm();
-        
-        		if (graphicsAlgorithm instanceof RoundedRectangle) {
-        			RoundedRectangle rr = (RoundedRectangle) graphicsAlgorithm;
-        	        
-        	        if(input) {
-        	        	rr.setForeground(manageColor(Constants.PAD_FOREGROUND_INPUT));
-        	        	rr.setBackground(manageColor(Constants.PAD_BACKGROUND_INPUT));
-        	        } else {
-        	        	rr.setForeground(manageColor(Constants.PAD_FOREGROUND_OUTPUT));
-        	        	rr.setBackground(manageColor(Constants.PAD_BACKGROUND_OUTPUT));
-        	        }
-        		}
-
-                return true;
             }
             return false;
         }

@@ -65,9 +65,6 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
 		// Can't make it a object attribute since this code is called from different
 		// contexts (so different object instances)!
 
-        int width = 120;
-        int height = 42;
-        
         String instanceName = "aPad";
         String className = "";
         
@@ -122,70 +119,7 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
         addedDomainObject.setType(className);
         addedDomainObject.setName(instanceName);
 
-        //ContainerShape containerShape = new Helper(getDiagram()).create(context, addedDomainObject);
-
-
-		ContainerShape targetDiagram = context.getTargetContainer();
-		IPeCreateService peCreateService = Graphiti.getPeCreateService();
-		IGaService gaService = Graphiti.getGaService();
-		
-
-		/////// CONTAINER ///////
-		ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
-        Graphiti.getPeService().setPropertyValue(containerShape, Constants.PROP_PICT_KEY, Constants.PROP_PICT_PAD);
-        Graphiti.getPeService().setPropertyValue(containerShape, Constants.PROP_PAD_INPUT_KEY, Constants.PROP_TRUE_VALUE);
-
-        
-		RoundedRectangle roundedRectangle = gaService.createRoundedRectangle(containerShape, 36, 36 /*5, 5*/);
-		{
-			gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), width, height);
-			roundedRectangle.setFilled(true);
-			if(isInput) {
-	            roundedRectangle.setForeground(manageColor(Constants.PAD_FOREGROUND_INPUT));
-	            roundedRectangle.setBackground(manageColor(Constants.PAD_BACKGROUND_INPUT));
-			} else {
-	            roundedRectangle.setForeground(manageColor(Constants.PAD_FOREGROUND_OUTPUT));
-	            roundedRectangle.setBackground(manageColor(Constants.PAD_BACKGROUND_OUTPUT));
-			}
-	        roundedRectangle.setLineWidth(2);
-		}
-		
-		/////// class text ///////
-        {
-			Shape shape = peCreateService.createShape(containerShape, false);
-			Text text = gaService.createText(shape, addedDomainObject.getType() + " :");
-	        text.setForeground(manageColor(Constants.PAD_TEXT_FOREGROUND));
-			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-        }
-
-		/////// name text ///////
-        {
-			Shape shape = peCreateService.createShape(containerShape, false);
-			Text text = gaService.createText(shape, addedDomainObject.getName());
-	        text.setForeground(manageColor(Constants.PAD_TEXT_FOREGROUND));
-			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-        }
-
-        if(docType != Constants.CodeBlockPython && docType != Constants.CodeBlockNative && docType != Constants.CodeBlockHtml) {
-        	/////// anchor ///////
-    		// create an additional box relative anchor at middle-right
-    		final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
-           
-    		boxAnchor.setRelativeWidth(1.0);
-    		boxAnchor.setRelativeHeight(0.38); // Use golden section
-            boxAnchor.setReferencedGraphicsAlgorithm(roundedRectangle);
-
-            // assign a rectangle graphics algorithm for the box relative anchor
-            // note, that the rectangle is inside the border of the rectangle shape
-            // NOTE: it seems this is necessary to make the BoxRelativeAnchor work!
-            final Ellipse ellipse = gaService.createEllipse(boxAnchor);
-            ellipse.setForeground(manageColor(Constants.ANCHOR_FG));
-            ellipse.setBackground(manageColor(Constants.ANCHOR_BG));
-            ellipse.setLineWidth(2);
-            gaService.setLocationAndSize(ellipse, - Constants.PAD_SIZE, 0, Constants.PAD_SIZE, Constants.PAD_SIZE);
-        }
+        ContainerShape containerShape = new ArroPadHelper(getDiagram()).create(context, addedDomainObject, docType, isInput);
 
         // To set location and size.
 	    LayoutContext layoutContext = new LayoutContext(containerShape);
