@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
+import arro.Constants;
 import arro.domain.ArroStep;
 import util.Misc;
 
@@ -49,7 +50,7 @@ public class ArroStepSection extends ArroGenericSection {
 
             @Override
             public void modifyText(ModifyEvent e) {
-                if(!(nameTextVal.getText().equals("_ready") || nameTextVal.getText().equals("_terminated"))) {
+                if(!(nameTextVal.getText().equals(Constants.PROP_CONTEXT_READY_STEP) || nameTextVal.getText().equals(Constants.PROP_CONTEXT_TERM_STEP))) {
                     name = Misc.checkString(nameTextVal);
                     if(listenerFlag) {
                         if(!name.equals("") && updateDomainAndPE()) {
@@ -81,7 +82,7 @@ public class ArroStepSection extends ArroGenericSection {
                 // Temp disable listener; listener only needed if user does types new value.
                 listenerFlag = false;
                 
-                nameTextVal.setEnabled((name.equals("_ready") || name.equals("_terminated")) ? false : true);
+                nameTextVal.setEnabled((name.equals(Constants.PROP_CONTEXT_READY_STEP) || name.equals(Constants.PROP_CONTEXT_TERM_STEP)) ? false : true);
 
 
                 if(!(name.equals(nameTextVal))) {

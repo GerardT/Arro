@@ -35,7 +35,7 @@ public class TransitionHelper {
 		Anchor start = addConContext.getSourceAnchor();
 		Anchor end = addConContext.getTargetAnchor();
 		
-        Color fg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_FOREGROUND);
+        Color fg = Graphiti.getGaService().manageColor(diagram, Constants.CONNECTOR);
         
 		if(start != end) {
 	        connection = peCreateService.createFreeFormConnection(targetDiagram);
