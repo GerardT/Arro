@@ -345,9 +345,9 @@ public class NodeHelper {
         rectangle.setFilled(true);
         rectangle.setTransparency(0.1);
         
-        rectangle.setForeground(bg);
+        rectangle.setForeground(fg);
         rectangle.setBackground(bg);
-        rectangle.setLineWidth(0);
+        rectangle.setLineWidth(2);
         
         gaService.setLocationAndSize(rectangle, Constants.HALF_PAD_SIZE, 0, width - Constants.PAD_SIZE, height);
         

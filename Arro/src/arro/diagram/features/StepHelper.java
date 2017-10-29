@@ -56,8 +56,10 @@ public class StepHelper {
         // the width needed for the anchor
         invisibleRectangle = gaService.createInvisibleRectangle(containerShape);
         {
-            if(addedDomainObject.getName().equalsIgnoreCase(Constants.PROP_CONTEXT_TERM_STEP)) {
-                gaService.setLocationAndSize(invisibleRectangle, context.getX(), context.getY() + 200, width, height);
+            if(addedDomainObject.getName().equalsIgnoreCase(Constants.PROP_CONTEXT_READY_STEP)) {
+                gaService.setLocationAndSize(invisibleRectangle, context.getX() + 50, context.getY() + 50, width, height);
+            } else if(addedDomainObject.getName().equalsIgnoreCase(Constants.PROP_CONTEXT_TERM_STEP)) {
+                gaService.setLocationAndSize(invisibleRectangle, context.getX() + 50, context.getY() + 250, width, height);
             } else {
                 gaService.setLocationAndSize(invisibleRectangle, context.getX(), context.getY(), width, height);
             }
@@ -72,7 +74,7 @@ public class StepHelper {
         {
         	Shape textShape = peCreateService.createShape(containerShape, false);
 			text = gaService.createText(textShape, addedDomainObject.getName());
-	        Color fg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_FOREGROUND);
+	        Color fg = Graphiti.getGaService().manageColor(diagram, Constants.TEXT_BG);
 	        text.setForeground(fg);
 			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
@@ -129,11 +131,13 @@ public class StepHelper {
 	    final int height = invisibleRectangle.getHeight();
 		IGaService gaService = Graphiti.getGaService();
 		
-        Color fg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_FOREGROUND);
-        Color bg = Graphiti.getGaService().manageColor(diagram, Constants.CLASS_BACKGROUND);
+        Color fg = Graphiti.getGaService().manageColor(diagram, Constants.STEP_FOREGROUND);
+        Color bg = Graphiti.getGaService().manageColor(diagram, Constants.STEP_BACKGROUND);
         
 		gaService.setLocationAndSize(roundedRectangle, 0, 0, width, height);
-		roundedRectangle.setFilled(false);
+		roundedRectangle.setFilled(true);
+		roundedRectangle.setTransparency(0.1);
+
         roundedRectangle.setForeground(fg);
         roundedRectangle.setBackground(bg);
         roundedRectangle.setLineWidth(2);

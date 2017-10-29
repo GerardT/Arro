@@ -35,6 +35,7 @@ public class ArroNodeSectionStandard extends GFPropertySection implements ITabbe
 	private Text nameTextVal;
 	
     private String currentName = "";
+    private boolean updateSuccessful = false;
     
     
 	
@@ -99,15 +100,10 @@ public class ArroNodeSectionStandard extends GFPropertySection implements ITabbe
 	    });
 	}
 	
-	// Use a class so we can declare it as final and use as closure.
-	class X {
-		public boolean success = false;
-	}
-
 	
 	private boolean updateDialog() {
 		final String typedValue = currentName;
-		final X x = new X();
+		updateSuccessful = false;
 		IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
 				
 			@Override
@@ -122,7 +118,7 @@ public class ArroNodeSectionStandard extends GFPropertySection implements ITabbe
 				if (n != null) {
 					ArroNode m = n.getParent().getNodeByName(typedValue);
 					if(m == null || m == n) {
-						x.success = true;
+						updateSuccessful = true;
 						n.setName(typedValue);
 						
 						TransactionalEditingDomain domain = TransactionUtil.getEditingDomain(getDiagram());
@@ -143,7 +139,7 @@ public class ArroNodeSectionStandard extends GFPropertySection implements ITabbe
 		};
 		CustomContext context = new CustomContext();
 		execute(feature, context);
-		return x.success;
+		return updateSuccessful;
 	}
 	
 	

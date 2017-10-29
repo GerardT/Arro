@@ -98,9 +98,11 @@ public class SfcNodeFeatureProvider extends DefaultFeatureProvider {
 		if (pictogramElement instanceof ContainerShape) {
 			Logger.out.trace(Logger.EDITOR, " ");
 			return new NullRemoveFeature(this);				
+        } else if (pictogramElement instanceof FreeFormConnection) {
+			Logger.out.trace(Logger.EDITOR, " ");
+			return new NullRemoveFeature(this);
 		}
 		return super.getRemoveFeature(context);
-
 	}
 	
 	@Override

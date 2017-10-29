@@ -119,7 +119,7 @@ public class Constants {
 
 	public static final IColorConstant PAD_BACKGROUND_OUTPUT = new ColorConstant(255, 249, 174);
 
-	public static final IColorConstant ANCHOR_FG = new ColorConstant(0, 0, 0);
+	public static final IColorConstant ANCHOR_FG = new ColorConstant(70, 70, 70);
 
     public static final IColorConstant ANCHOR_BG = new ColorConstant(200, 200, 200);
 
@@ -130,8 +130,12 @@ public class Constants {
     public static final IColorConstant CLASS_TEXT_FOREGROUND = new ColorConstant(51, 51, 153);
          
     public static final IColorConstant CLASS_FOREGROUND = new ColorConstant(255, 242, 0);
-     
+    
     public static final IColorConstant CLASS_BACKGROUND = new ColorConstant(255, 249, 174);
+
+    public static final IColorConstant STEP_FOREGROUND = new ColorConstant(27, 117, 188);
+    
+    public static final IColorConstant STEP_BACKGROUND = new ColorConstant(173, 197, 231);
 
     public static final IColorConstant CONNECTOR = new ColorConstant(200, 200, 200);
 

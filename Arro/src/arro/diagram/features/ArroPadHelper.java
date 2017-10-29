@@ -178,7 +178,7 @@ public class ArroPadHelper {
                         
                         GraphicsAlgorithm graphicsAlgorithm = boxAnchor.getGraphicsAlgorithm();
                         IGaService gaService = Graphiti.getGaService();
-                        gaService.setLocationAndSize(graphicsAlgorithm, input? - Constants.PAD_SIZE : 0, 0, Constants.PAD_SIZE, Constants.PAD_SIZE);                
+                        gaService.setLocationAndSize(graphicsAlgorithm, input? - (Constants.PAD_SIZE + 4) : 4, 0, Constants.PAD_SIZE, Constants.PAD_SIZE);                
                     }
                 }
             }
