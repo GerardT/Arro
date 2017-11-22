@@ -21,6 +21,8 @@ NodeDb::NodeDb():
     m_allOutputs{},
     m_allNodes{},
     m_inQueue{},
+    m_outQueue{},
+    m_pOutQueue{&m_outQueue},
     m_pInQueue{&m_inQueue},
     m_running{false},
     m_thrd{nullptr} {
@@ -30,6 +32,11 @@ NodeDb::~NodeDb() {
     while(m_inQueue.empty() != true) {
         auto fm = m_inQueue.front();
         m_inQueue.pop();
+        delete fm;
+    }
+    while(m_outQueue.empty() != true) {
+        auto fm = m_outQueue.front();
+        m_outQueue.pop();
         delete fm;
     }
 }
@@ -147,6 +154,13 @@ NodeDb::FullMsg::FullMsg(NodeMultiOutput* o /*string s*/, MessageBuf& m) {
     m_msg = m;
 }
 
+void
+NodeDb::toggleQueue() {
+    queue<FullMsg*>* tmp = m_pOutQueue;
+    m_pOutQueue = m_pInQueue;
+    m_pInQueue = tmp;
+}
+
 
 
 void
@@ -159,10 +173,10 @@ NodeDb::runCycle(NodeDb* nm) {
             {
                 std::unique_lock<std::mutex> lock(nm->m_mutex);
 
-                while(!(nm->m_pInQueue->empty())) {
-                    FullMsg* fm = nm->m_pInQueue->front();
+                while(!(nm->m_pOutQueue->empty())) {
+                    FullMsg* fm = nm->m_pOutQueue->front();
                     nm->m_trace.println("new msg");
-                    nm->m_pInQueue->pop();
+                    nm->m_pOutQueue->pop();
                     if(fm != nullptr) {
                         //MessageBuf msg = fm->m_msg;
                         fm->m_output->forwardMessage(fm->m_msg);
@@ -179,6 +193,9 @@ NodeDb::runCycle(NodeDb* nm) {
 
                 //it->second->runCycle();
             }
+
+            /* And switch the queues */
+            nm->toggleQueue();
 
             {
                 std::unique_lock<std::mutex> lock(nm->m_mutex);

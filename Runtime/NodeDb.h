@@ -260,6 +260,7 @@ private:
         std::map<std::string, std::unique_ptr<NodeMultiOutput> > m_allOutputs;
         std::map<std::string, std::unique_ptr<AbstractNode> > m_allNodes;
         std::queue<FullMsg*> m_inQueue, *m_pInQueue;
+        std::queue<FullMsg*> m_outQueue, *m_pOutQueue;
         bool m_running;
         std::thread* m_thrd;
         std::mutex m_mutex;
