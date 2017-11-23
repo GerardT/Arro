@@ -197,7 +197,7 @@ NodeDb::runCycle(NodeDb* nm) {
             /* And switch the queues */
             nm->toggleQueue();
 
-            {
+            if(nm->m_pOutQueue->empty()) {
                 std::unique_lock<std::mutex> lock(nm->m_mutex);
 
                 // And wait until new message arrive in queue
