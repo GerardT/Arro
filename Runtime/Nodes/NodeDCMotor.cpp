@@ -288,7 +288,7 @@ NodeDCMotor::run(NodeDCMotor::MotorHAT::dir command) {
 
 void
 NodeDCMotor::setSpeed(int speed) {
-    m_trace.println("NodeDCMotor::setSpeed");
+    m_trace.println(std::string("NodeDCMotor::setSpeed ") + to_string(speed));
     if (speed < 0) {
         speed = 0;
     }

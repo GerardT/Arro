@@ -135,6 +135,7 @@ Process::getInput(const string& name) const {
         return in;
     } else {
         m_trace.println("no such input registered: " + getName() + "." + name);
+        SendToConsole(string("Program uses unknown input: ") + getName() + "." + name);
         throw std::runtime_error("No such input registered: " + getName() + "." + name);
     }
 }
@@ -146,6 +147,7 @@ Process::getOutput(const string& name) const {
         return out;
     } else {
         m_trace.println("no such output registered: " + getName() + "." + name);
+        SendToConsole(string("Program uses unknown output: ") + getName() + "." + name);
         throw std::runtime_error("No such output registered: " + getName() + "." + name);
     }
 }
