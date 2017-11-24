@@ -9,7 +9,7 @@
 # Description:       Enable service provided by daemon.
 ### END INIT INFO
 
-dir="/home/pi/git/Arro/Runtime"
+dir="/home/pi/git/Arro/WebServer"
 cmd="python /home/pi/git/Arro/WebServer/server.py"
 user="pi"
 
