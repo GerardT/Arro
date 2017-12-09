@@ -103,7 +103,13 @@ PythonGlue::getInput(PyObject * /*self*/, PyObject *args)
         return Py_None;
         //return nullptr; // FIXME: do i need to set an error?
     } else {
-        return np->getInputData(pad);
+        PyObject* obj = np->getInputData(pad);
+        if(obj == nullptr) {
+            Py_INCREF(Py_None);
+            return Py_None;
+        } else {
+            return obj;
+        }
     }
 }
 
