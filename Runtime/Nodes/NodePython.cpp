@@ -51,6 +51,7 @@ void
 NodePython::handleMessage(const MessageBuf& msg, const string& padName) {
     PyObject* tuple = Py_BuildValue("s s", padName.c_str(), msg->c_str());  // Return value: New reference.
 
+    // TODO: better to store one MessageBuf per padName - move this to Process
     m_messages.push(tuple);
 }
 
@@ -97,9 +98,15 @@ PyObject*
 NodePython::getInputData(const string& pad) {
     MessageBuf data = m_device->getInputData(m_device->getInput(pad));
 
-    PyObject* tuple = Py_BuildValue("s", data->c_str());  // Return value: New reference.
+    if(data->length() == 0 /* MessageBuf may not be initialized */) {
+        // insert None object
+        Py_INCREF(Py_None);
+        return Py_None;
+    } else {
+        PyObject* tuple = Py_BuildValue("s", data->c_str());  // Return value: New reference.
 
-    return tuple;
+        return tuple;
+    }
 }
 
 /**
