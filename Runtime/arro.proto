@@ -10,6 +10,10 @@ message ParameterBlock {
     repeated KeyValuePair kv = 1;
 }
 
+message _Config {
+    map<string, string> value = 1;
+}
+    
 message Token {
     int32 value = 1;
 }

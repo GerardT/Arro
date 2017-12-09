@@ -77,19 +77,30 @@ void
 Process::sendParameters(StringMap& params) {
     std::map<std::string, std::string>::iterator iter;
 
-    auto block = new arro::ParameterBlock();
+//    auto block = new arro::ParameterBlock();
+//
+//    for (iter = params.begin(); iter != params.end(); ++iter) {
+//        m_trace.println("    parameter " + iter->first + " " + iter->second);
+//
+//        auto kv = block->add_kv();
+//
+//        kv->set_key(iter->first.c_str());
+//        kv->set_value(iter->second.c_str());
+//    }
+//
+    auto config = new arro::_Config();
 
     for (iter = params.begin(); iter != params.end(); ++iter) {
         m_trace.println("    parameter " + iter->first + " " + iter->second);
 
-        auto kv = block->add_kv();
-
-        kv->set_key(iter->first.c_str());
-        kv->set_value(iter->second.c_str());
+        auto elt = config->value();
+        elt[iter->first] = iter->second;
     }
 
-    MessageBuf msg(new string(block->SerializeAsString()));
-    free(block);
+    //MessageBuf msg(new string(block->SerializeAsString()));
+    //free(block);
+    MessageBuf msg(new string(config->SerializeAsString()));
+    free(config);
 
     // get _config input and send a message to it.
     auto input = getInput("_config");
@@ -121,7 +132,12 @@ Process::registerOutput(const string& interfaceName) {
     m_nodeDb.registerNodeOutput(this, interfaceName);
 }
 
-
+/**
+ *
+ * @param input
+ * @return Shared pointer to message. Note: if not initialized then
+ * pointer may be nullptr.
+ */
 MessageBuf
 Process::getInputData(NodeSingleInput* input) const {
     return input->getData();
