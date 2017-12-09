@@ -21,9 +21,9 @@ NodeDb::NodeDb():
     m_allOutputs{},
     m_allNodes{},
     m_inQueue{},
+    m_pInQueue{&m_inQueue},
     m_outQueue{},
     m_pOutQueue{&m_outQueue},
-    m_pInQueue{&m_inQueue},
     m_running{false},
     m_thrd{nullptr} {
 }
@@ -44,6 +44,7 @@ NodeDb::~NodeDb() {
 void
 NodeSingleInput::handleMessage(const MessageBuf& msg) {
     m_msg = msg;
+    // TODO remove sending message (handlemessage)
     m_callback(msg, m_interfaceName);
 }
 
