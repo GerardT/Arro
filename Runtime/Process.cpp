@@ -90,11 +90,11 @@ Process::sendParameters(StringMap& params) {
 //
     auto config = new arro::_Config();
 
+    auto map = config->value();
     for (iter = params.begin(); iter != params.end(); ++iter) {
         m_trace.println("    parameter " + iter->first + " " + iter->second);
 
-        auto elt = config->value();
-        elt[iter->first] = iter->second;
+        map[iter->first] = iter->second;
     }
 
     //MessageBuf msg(new string(block->SerializeAsString()));
