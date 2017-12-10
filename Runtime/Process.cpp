@@ -77,28 +77,15 @@ void
 Process::sendParameters(StringMap& params) {
     std::map<std::string, std::string>::iterator iter;
 
-//    auto block = new arro::ParameterBlock();
-//
-//    for (iter = params.begin(); iter != params.end(); ++iter) {
-//        m_trace.println("    parameter " + iter->first + " " + iter->second);
-//
-//        auto kv = block->add_kv();
-//
-//        kv->set_key(iter->first.c_str());
-//        kv->set_value(iter->second.c_str());
-//    }
-//
     auto config = new arro::_Config();
 
     auto map = config->value();
     for (iter = params.begin(); iter != params.end(); ++iter) {
         m_trace.println("    parameter " + iter->first + " " + iter->second);
 
-        map[iter->first] = iter->second;
+        (*config->mutable_value())[iter->first] = iter->second;
     }
 
-    //MessageBuf msg(new string(block->SerializeAsString()));
-    //free(block);
     MessageBuf msg(new string(config->SerializeAsString()));
     free(config);
 
