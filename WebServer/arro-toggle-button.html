@@ -1,0 +1,46 @@
+
+<!-- Imports polymer -->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
+
+<!-- Defines element markup -->
+<dom-module id="arro-toggle-button">
+    <template>
+        <p><strong>{{name}}</strong></p>
+        <paper-toggle-button id="button" min="0" max='100' ></paper-toggle-button>
+    </template>
+</dom-module>
+
+<!-- Registers custom element -->
+<script>
+    Polymer({
+        is: 'arro-toggle-button',
+        properties: {
+            name: {
+                type: String,
+                value: 'myname'
+            },
+            id: {
+                type: String,
+                value: 'myaddress'
+            }
+        },
+        // add a callback to the element's prototype
+        ready: function() {
+            var myaddr = this.id;
+            var button = this.$.button;
+            button.addEventListener('value-change', function() {
+                object = {
+                    "address": myaddr, 
+                    "data": {
+                               value: button.value
+                            }
+                  };
+                  mySocket.send(JSON.stringify(object) + "\n");
+            })
+
+        }
+
+    });
+</script>
+

@@ -1,0 +1,46 @@
+
+<!-- Imports polymer -->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/paper-checkbox/paper-checkbox.html">
+
+<!-- Defines element markup -->
+<dom-module id="arro-checkbox">
+    <template>
+        <p><strong>{{name}}</strong></p>
+        <paper-checkbox id="checkbox" min="0" max='100' ></paper-checkbox>
+    </template>
+</dom-module>
+
+<!-- Registers custom element -->
+<script>
+    Polymer({
+        is: 'arro-checkbox',
+        properties: {
+            name: {
+                type: String,
+                value: 'myname'
+            },
+            id: {
+                type: String,
+                value: 'myaddress'
+            }
+        },
+        // add a callback to the element's prototype
+        ready: function() {
+            var myaddr = this.id;
+            var checkbox = this.$.checkbox;
+            checkbox.addEventListener('value-change', function() {
+                object = {
+                    "address": myaddr, 
+                    "data": {
+                               value: checkbox.value
+                            }
+                  };
+                  mySocket.send(JSON.stringify(object) + "\n");
+            })
+
+        }
+
+    });
+</script>
+
