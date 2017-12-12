@@ -177,22 +177,34 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
             throw std::runtime_error("Invalid URL for Python node " + url);
         }
     } else if(url.find("UiIn:") == 0) {
-        m_trace.println("new NodeUiIn(" + instance + ")");
         try {
-            if(ServerEngine::getFactory("_UiUserInput", factory)) {
+            string className = url.substr(5);
+
+            if(ServerEngine::getFactory(className, factory)) {
+                m_trace.println("new " + className + "(" + instance + ")");
                 m_device = factory(this, "", params, elt);
             }
+            else {
+                m_trace.println("unknown node" + instance );
+                SendToConsole(string("unknown node ") + className);
+            }
         } catch(out_of_range &) {
-            throw std::runtime_error("Invalid URL for SFC node " + url);
+            m_trace.println("UiIn node not found");
         }
     } else if(url.find("UiOut:") == 0) {
-        m_trace.println("new NodeUiOut(" + instance + ")");
         try {
-            if(ServerEngine::getFactory("_UiUserDisplay", factory)) {
+            string className = url.substr(6);
+
+            if(ServerEngine::getFactory(className, factory)) {
+                m_trace.println("new " + className + "(" + instance + ")");
                 m_device = factory(this, "", params, elt);
             }
+            else {
+                m_trace.println("unknown node" + instance );
+                SendToConsole(string("unknown node ") + className);
+            }
         } catch(out_of_range &) {
-            throw std::runtime_error("Invalid URL for SFC node " + url);
+            m_trace.println("UiOut node not found");
         }
     } else if(url.find("Sfc:") == 0) {
         StringMap params{};

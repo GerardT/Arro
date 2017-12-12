@@ -7,7 +7,7 @@
 namespace Arro {
 
 class NodeRef;
-class NodeUiUserInput: public IDevice {
+class NodeUiRadioButton: public IDevice {
 public:
     /**
      * Constructor
@@ -16,9 +16,9 @@ public:
      * \param name Name of this node.
      * \param params List of parameters passed to this node.
      */
-    NodeUiUserInput(AbstractNode* d, const std::string& name, StringMap& params, TiXmlElement*);
+    NodeUiRadioButton(AbstractNode* d, const std::string& name, StringMap& params, TiXmlElement*);
 
-    virtual ~NodeUiUserInput();
+    virtual ~NodeUiRadioButton();
 
     /**
      * Handle a message that is sent to this node.
@@ -48,10 +48,10 @@ using namespace std;
 using namespace Arro;
 using namespace arro;
 
-static RegisterMe<NodeUiUserInput> registerMe("SliderInput");
+static RegisterMe<NodeUiRadioButton> registerMe("RadioButton");
 
-NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
-    m_trace("NodeUiReceiveNumber", true),
+NodeUiRadioButton::NodeUiRadioButton(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+    m_trace("NodeUiRadioButton", true),
     m_device(d) {
 
     // TODO should get i/o here
@@ -66,7 +66,7 @@ NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, String
         name = iter->second;
         params.erase(iter);
     }
-    std::string inst = std::string("<arro-slider id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-slider>";
+    std::string inst = std::string("<arro-radio-button id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-radio-button>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
         m_output = m_device->getOutput("output");
@@ -80,13 +80,13 @@ NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, String
 
 }
 
-NodeUiUserInput::~NodeUiUserInput() {
+NodeUiRadioButton::~NodeUiRadioButton() {
     SocketClient::getInstance()->unsubscribe(m_uiClient);
 }
 
-void NodeUiUserInput::handleMessage(const MessageBuf& /*m*/, const std::string& /*padName*/) {
+void NodeUiRadioButton::handleMessage(const MessageBuf& /*m*/, const std::string& /*padName*/) {
 }
 
-void NodeUiUserInput::runCycle() {
+void NodeUiRadioButton::runCycle() {
 }
 

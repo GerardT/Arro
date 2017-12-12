@@ -49,7 +49,9 @@ SRCS         := main.cpp \
 		Nodes/NodeTimer.cpp \
 		Nodes/NodeServo.cpp \
 		Nodes/NodeDCMotor.cpp \
-		Nodes/NodeUiOut.cpp \
+		Nodes/NodeUiCheckBox.cpp \
+		Nodes/NodeUiRadioButton.cpp \
+		Nodes/NodeUiToggleButton.cpp \
 		Nodes/NodeUiUserInput.cpp \
 		Nodes/NodeUiUserDisplay.cpp \
 		tinyxmlparser.cpp \
