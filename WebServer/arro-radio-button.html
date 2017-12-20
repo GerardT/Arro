@@ -2,13 +2,18 @@
 <!-- Imports polymer -->
 <link rel="import" href="/bower_components/polymer/polymer.html">
 <link rel="import" href="bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="bower_components/paper-radio-group/paper-radio-group.html">
 
 <!-- Defines element markup -->
-<dom-module id="arro-radio-button">
-    <template>
-        <p><strong>{{name}}</strong></p>
-        <paper-radio-button id="button" min="0" max='100' ></paper-radio-button>
-    </template>
+<dom-module id="arro-radio-button" selected="small">
+  <template>
+    <p><strong>{{name}}</strong></p>
+    <paper-radio-group id="button" attr-for-selected="name">
+      <template is="dom-repeat" items="{{data}}">
+          <paper-radio-button name={{item.name}}> {{item.label}} </paper-radio-button>
+      </template>
+    </paper-radio-group>
+  </template>
 </dom-module>
 
 <!-- Registers custom element -->
@@ -23,22 +28,31 @@
             id: {
                 type: String,
                 value: 'myaddress'
+            },
+            data: {
+              type: Object, // Available property types are String, Number, Boolean, Array, and Object
+              value: function () { return {}; } // Default value
             }
         },
         // add a callback to the element's prototype
         ready: function() {
             var myaddr = this.id;
             var button = this.$.button;
-            button.addEventListener('value-change', function() {
-                object = {
-                    "address": myaddr, 
-                    "data": {
-                               value: button.value
-                            }
-                  };
-                  mySocket.send(JSON.stringify(object) + "\n");
+            
+            this.addEventListener('click', function() {
+                for(var i = 0; i < button.children.length; i++){
+                   if(button.children[i].checked) {
+                       object = {
+                         "address": myaddr, 
+                         "data": {
+                                    value: button.children[i].name
+                                 }
+                       };
+                       mySocket.send(JSON.stringify(object) + "\n");
+                       console.log(object);
+                   }
+                }
             })
-
         }
 
     });

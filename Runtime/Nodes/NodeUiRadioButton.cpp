@@ -66,8 +66,33 @@ NodeUiRadioButton::NodeUiRadioButton(AbstractNode* d, const string& /*name*/, St
         name = iter->second;
         params.erase(iter);
     }
-    std::string inst = std::string("<arro-radio-button id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-radio-button>";
 
+    std::string data;
+    auto iter2 = params.find(std::string("data"));
+    if(iter2 != params.end()) {
+        data = iter2->second;
+        // ? params.erase(iter);
+
+    }
+
+    //    <arro-radio-button id=".main.aComposite.aRadioButton" name="No Name" data='[
+    //         {"name":"small","label":"Small"},{"name":"medium","label":"Medium"}
+    //         ]'>
+    //    </arro-radio-button>
+
+    std::istringstream l(data);
+    std::string s;
+    int i = 0;
+    std::string inst = std::string("<arro-radio-button id=\"") + d->getName() + "\" name=\"" + name + "\" data=\'[";
+    while(getline(l, s, '|')) {
+        // add s as radio button
+        if(i++ != 0) {
+            inst += ",";
+        }
+        inst += "{\"name\":\"" + s + "\",\"label\":\"" + s + "\"}";
+
+    }
+    inst += "]\'>  </arro-radio-button>";
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
         m_output = m_device->getOutput("output");
 

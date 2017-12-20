@@ -66,6 +66,9 @@ NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, String
         name = iter->second;
         params.erase(iter);
     }
+
+    //    <arro-slider id=".main.aComposite.aInput1.aSliderInput" name="speed"></arro-slider>
+
     std::string inst = std::string("<arro-slider id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-slider>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
