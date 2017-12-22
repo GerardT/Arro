@@ -274,6 +274,9 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 "    <link rel=\"import\" href=\"bower_components/paper-progress/paper-progress.html\">\n" +
 "    <!-- Import all elements here -->\n" +
 "    <link rel=\"import\" href=\"arro-slider.html\">\n" +
+"    <link rel=\"import\" href=\"arro-toggle-button.html\">\n" +
+"    <link rel=\"import\" href=\"arro-radio-button.html\">\n" +
+"    <link rel=\"import\" href=\"arro-check-box.html\">\n" +
 "    <link rel=\"import\" href=\"arro-progress.html\">\n" +
 "    <style>\n" +
 "    </style>\n" +
