@@ -38,6 +38,10 @@ message Value {
     int32 value = 1;
 }
 
+message Selection {
+    string value = 1;
+}
+
 message Json {
     string data = 1;
 }

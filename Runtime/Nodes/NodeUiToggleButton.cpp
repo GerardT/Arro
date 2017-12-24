@@ -3,6 +3,9 @@
 #include "arro.pb.h"
 #include "Trace.h"
 #include "AbstractNode.h"
+#include "json.hpp"
+
+using namespace nlohmann;
 
 namespace Arro {
 
@@ -37,7 +40,7 @@ private:
     Trace m_trace;
     AbstractNode* m_device;
     NodeRef* m_uiClient;
-    NodeMultiOutput* m_output;
+    NodeMultiOutput* m_value;
 
 };
 
@@ -54,10 +57,6 @@ NodeUiToggleButton::NodeUiToggleButton(AbstractNode* d, const string& /*name*/, 
     m_trace("NodeUiUserInput.cpp", true),
     m_device(d) {
 
-    // TODO should get i/o here
-    //m_output = m_device->getOutput("output");
-
-    //     <arro-slider id=".main.aUiUserInput" name="Test input"></arro-slider>
     std::string name;
     auto iter = params.find(std::string("name"));
     if(iter == params.end()) {
@@ -69,13 +68,12 @@ NodeUiToggleButton::NodeUiToggleButton(AbstractNode* d, const string& /*name*/, 
     std::string inst = std::string("<arro-toggle-button id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-toggle-button>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
-        m_output = m_device->getOutput("output");
+        m_value = m_device->getOutput("value");
 
-        Json* value = new Json();
-
-        value->set_data(data);
-
-        m_device->setOutputData(m_output, value);
+        Selection* sel = new Selection();
+        auto info = json::parse(data.c_str());
+        sel->set_value(info["value"]);
+        m_device->setOutputData(m_value, sel);
                     });
 
 }
