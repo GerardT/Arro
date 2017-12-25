@@ -5,8 +5,6 @@
 #include "AbstractNode.h"
 #include "json.hpp"
 
-using namespace nlohmann;
-
 namespace Arro {
 
 class NodeRef;
@@ -74,7 +72,7 @@ NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, String
         m_value = m_device->getOutput("value");
 
         Value* sel = new Value();
-        auto info = json::parse(data.c_str());
+        auto info = nlohmann::json::parse(data.c_str());
         int value = info["value"];
         sel->set_value(value);
         m_device->setOutputData(m_value, sel);

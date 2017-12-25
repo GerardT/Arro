@@ -38,6 +38,7 @@
         ready: function() {
             var myaddr = this.id;
             var button = this.$.button;
+            button.customStyle = {};
             
             this.addEventListener('click', function() {
                 for(var i = 0; i < button.children.length; i++){

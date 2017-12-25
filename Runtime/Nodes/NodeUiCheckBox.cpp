@@ -5,8 +5,6 @@
 #include "AbstractNode.h"
 #include "json.hpp"
 
-using namespace nlohmann;
-
 namespace Arro {
 
 class NodeRef;
@@ -71,7 +69,7 @@ NodeUiCheckBox::NodeUiCheckBox(AbstractNode* d, const string& /*name*/, StringMa
         m_value = m_device->getOutput("value");
 
         Selection* sel = new Selection();
-        auto info = json::parse(data.c_str());
+        auto info = nlohmann::json::parse(data.c_str());
         sel->set_value(info["value"]);
         m_device->setOutputData(m_value, sel);
                     });

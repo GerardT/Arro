@@ -303,10 +303,11 @@ NodeDCMotor::setSpeed(int speed) {
 void
 NodeDCMotor::handleMessage(const MessageBuf& m, const std::string& padName) {
     m_trace.println("NodeDCMotor::handleMessage");
-    m_trace.println(padName);
     if(m_running && padName == "speed") {
         auto msg = new Value();
         msg->ParseFromString(m->c_str());
+
+        m_trace.println("Speed " + padName + " value " + std::to_string(((Value*)msg)->value()));
 
         assert(msg->GetTypeName() == "arro.Value");
 
@@ -315,6 +316,8 @@ NodeDCMotor::handleMessage(const MessageBuf& m, const std::string& padName) {
     } else if(m_running && padName == "direction") {
         auto msg = new Value();
         msg->ParseFromString(m->c_str());
+
+        m_trace.println(std::string("Dir (1, 2, 4) ") + padName + " value " + std::to_string(((Value*)msg)->value()));
 
         int dir = ((Value*)msg)->value();
         if(dir >= 0 && dir <= 4) {
