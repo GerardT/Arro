@@ -38,6 +38,7 @@ private:
     AbstractNode* m_device;
     NodeRef* m_uiClient;
     NodeSingleInput* m_input;
+    NodeSingleInput* m_value;
 
 };
 
@@ -48,7 +49,7 @@ using namespace std;
 using namespace Arro;
 using namespace arro;
 
-static RegisterMe<NodeUiUserDisplay> registerMe("_UiUserDisplay");
+static RegisterMe<NodeUiUserDisplay> registerMe("ProgressOutput");
 
 NodeUiUserDisplay::NodeUiUserDisplay(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodeUiReceiveNumber", true),
@@ -64,7 +65,7 @@ NodeUiUserDisplay::NodeUiUserDisplay(AbstractNode* d, const string& /*name*/, St
         params.erase(iter);
     }
     std::string inst = std::string("<arro-progress id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-progress>";
-    m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
+    m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& /*data*/) {
                         // SocketClient::getInstance()->sendMessage(m_uiClient, data);
                     });
 
@@ -78,16 +79,19 @@ void NodeUiUserDisplay::handleMessage(const MessageBuf& /*m*/, const std::string
 }
 
 void NodeUiUserDisplay::runCycle() {
-    m_input = m_device->getInput("input");
+    m_value = m_device->getInput("value");
 
-    MessageBuf buf = m_device->getInputData(m_input);
+    MessageBuf buf2 = m_device->getInputData(m_value);
 
-    Json* msg = new Json();
-    msg->ParseFromString((*buf).c_str());
+    Value* msg2 = new Value();
+    msg2->ParseFromString((*buf2).c_str());
 
+    // output { "value": "<val>" }
+    std::string json_string = "{ \"value\": " + std::to_string(msg2->value()) + " }";
 
-    if(buf != nullptr) {
-        SocketClient::getInstance()->sendMessage(m_uiClient, msg->data());
+    if(buf2 != nullptr) {
+        SocketClient::getInstance()->sendMessage(m_uiClient, json_string);
     }
+
 }
 
