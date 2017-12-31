@@ -35,7 +35,7 @@ namespace Arro
          * Make the node execute a processing cycle.
          */
         void runCycle();
-    
+
         void timer ();
         static void init ();
         static void start ();

@@ -1,3 +1,4 @@
+#include <ElemBlock/NodeTimer.h>
 #include <tinyxml.h>
 #include <iostream>
 #include <sstream>
@@ -9,7 +10,6 @@
 #include "ServerEngine.h"
 #include "NodeDb.h"
 #include "RealNode.h"
-#include "NodeTimer.h"
 
 
 using namespace Arro;

@@ -1,3 +1,4 @@
+
 // hack, see http://stackoverflow.com/questions/12523122/what-is-glibcxx-use-nanosleep-all-about
 #define _GLIBCXX_USE_NANOSLEEP 1
 #include <chrono>
@@ -5,7 +6,7 @@
 #include <list>
 #include <algorithm>
 
-#include "NodeTimer.h"
+#include <ElemBlock/NodeTimer.h>
 
 using namespace std;
 using namespace Arro;

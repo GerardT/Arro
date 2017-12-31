@@ -1,4 +1,4 @@
-#include "NodePass.h"
+#include "../ElemBlock/NodePass.h"
 
 static RegisterMe<NodePass> registerMe("Pass");
 

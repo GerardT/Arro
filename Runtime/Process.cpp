@@ -1,16 +1,10 @@
+#include <ElemBlock/NodeSfc.h>
 #include <iostream>
 #include <vector>
 #include <exception>
 
 #include "Trace.h"
 #include "ServerEngine.h"
-#include "NodeSfc.h"
-#include "NodeDCMotor.h"
-#include "NodePid.h"
-#include "NodePython.h"
-#include "NodePass.h"
-#include "NodeTimer.h"
-#include "NodeServo.h"
 #include "ConfigReader.h"
 #include "NodeDb.h"
 #include "Process.h"

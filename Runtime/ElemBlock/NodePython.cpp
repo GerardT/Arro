@@ -1,7 +1,7 @@
 #include <arro.pb.h>
+#include <ElemBlock/NodePython.h>
 #include <NodeDb.h>
 #include <PythonGlue.h>
-#include <NodePython.h>
 #include <ServerEngine.h>
 
 using namespace std;
