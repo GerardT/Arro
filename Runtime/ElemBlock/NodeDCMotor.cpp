@@ -421,7 +421,7 @@ NodeDCMotor::setSpeed(int speed) {
     if (speed > 255) {
         speed = 255;
     }
-    m_pMotorHAT->setPWM(m_Ch, 0, speed * 16);
+    m_pMotorHAT->setPWM(m_PWMpin, 0, speed * 16);
 }
 
 
