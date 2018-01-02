@@ -20,7 +20,71 @@
 #include "AbstractNode.h"
 
 namespace Arro {
-    class NodeDCMotor: public IDevice {
+class MotorHAT {
+public:
+    enum dir {
+        FORWARD = 1,
+        BACKWARD = 2,
+        BRAKE = 3,
+        RELEASE = 4
+    };
+    enum step {
+        SINGLE = 1,
+        DOUBLE = 2,
+        INTERLEAVE = 3,
+        MICROSTEP = 4
+    };
+
+    MotorHAT(int address = 0x60, const char* filename = "/dev/i2c-1", int freq = 1600);
+    ~MotorHAT() {};
+    void setPin(int pin, int value);
+
+private:
+    /**
+     * Read 1 byte from specified register.
+     *
+     * \param command Register to read from.
+     */
+    unsigned char i2c_readU8(unsigned char command);
+
+    /**
+     * Write 1 byte to register.
+     *
+     * \param command Register to write to.
+     */
+    void i2c_write8(unsigned char command, unsigned short value);
+
+public:
+
+    /**
+     * Sets a single PWM channel
+     *
+     * \param channel PWM channel
+     * \param on  On?
+     * \param off Offset?
+     */
+    void setPWM(int channel, int on, int off);
+
+    void setAllPWM(int on, int off);
+    /**
+     * Sets the PWM frequency.
+     *
+     * \param freq Frequency.
+     */
+    void setPWMFreq(double freq);
+
+
+private:
+    Trace m_trace;
+    double m_prescaleval;
+    char m_filename[40];
+    int m_i2caddr;           // The I2C address
+    int m_frequency;           // default @1600Hz PWM freq
+    int m_file;
+};
+
+
+class NodeDCMotor: public IDevice {
     public:
 
         /**
@@ -49,69 +113,6 @@ namespace Arro {
          * Make the node execute a processing cycle.
          */
         void runCycle();
-
-        class MotorHAT {
-        public:
-            enum dir {
-                FORWARD = 1,
-                BACKWARD = 2,
-                BRAKE = 3,
-                RELEASE = 4
-            };
-            enum step {
-                SINGLE = 1,
-                DOUBLE = 2,
-                INTERLEAVE = 3,
-                MICROSTEP = 4
-            };
-
-            MotorHAT(int address = 0x60, const char* filename = "/dev/i2c-1", int freq = 1600);
-            ~MotorHAT() {};
-            void setPin(int pin, int value);
-
-        private:
-            /**
-             * Read 1 byte from specified register.
-             *
-             * \param command Register to read from.
-             */
-            unsigned char i2c_readU8(unsigned char command);
-
-            /**
-             * Write 1 byte to register.
-             *
-             * \param command Register to write to.
-             */
-            void i2c_write8(unsigned char command, unsigned short value);
-
-        public:
-
-            /**
-             * Sets a single PWM channel
-             *
-             * \param channel PWM channel
-             * \param on  On?
-             * \param off Offset?
-             */
-            void setPWM(int channel, int on, int off);
-
-            void setAllPWM(int on, int off);
-            /**
-             * Sets the PWM frequency.
-             *
-             * \param freq Frequency.
-             */
-            void setPWMFreq(double freq);
-
-
-        private:
-            Trace m_trace;
-            double m_prescaleval;
-            char m_filename[40];
-            int m_i2caddr;           // The I2C address
-            int m_frequency;           // default @1600Hz PWM freq
-            int m_file;
-        };
 
         void run(MotorHAT::dir command);
 
@@ -202,7 +203,7 @@ static RegisterMe<NodeDCMotor> registerMe("DCMotor");
 
 
 unsigned char
-NodeDCMotor::MotorHAT::i2c_readU8(unsigned char command) {
+MotorHAT::i2c_readU8(unsigned char command) {
     // Using I2C Read, equivalent of i2c_smbus_read_byte(file)
     // if (read(file, buf, 1) != 1) {
     __s32 ret  = i2c_smbus_read_byte_data(m_file, command);
@@ -216,7 +217,7 @@ NodeDCMotor::MotorHAT::i2c_readU8(unsigned char command) {
 }
 
 void
-NodeDCMotor::MotorHAT::i2c_write8(unsigned char command, unsigned short value) {
+MotorHAT::i2c_write8(unsigned char command, unsigned short value) {
     // Using I2C Write, equivalent of
     // i2c_smbus_write_word_data(file, register, 0x6543)
 
@@ -236,7 +237,7 @@ NodeDCMotor::MotorHAT::i2c_write8(unsigned char command, unsigned short value) {
 }
 
 void
-NodeDCMotor::MotorHAT::setAllPWM(int on, int off) {
+MotorHAT::setAllPWM(int on, int off) {
     i2c_write8(__ALL_LED_ON_L, on & 0xFF);
     i2c_write8(__ALL_LED_ON_H, on >> 8);
     i2c_write8(__ALL_LED_OFF_L, off & 0xFF);
@@ -245,7 +246,7 @@ NodeDCMotor::MotorHAT::setAllPWM(int on, int off) {
 
 
 void
-NodeDCMotor::MotorHAT::setPWM(int channel, int on, int off) {
+MotorHAT::setPWM(int channel, int on, int off) {
     i2c_write8(__LED0_ON_L+4*channel, on & 0xFF);
     i2c_write8(__LED0_ON_H+4*channel, on >> 8);
     i2c_write8(__LED0_OFF_L+4*channel, off & 0xFF);
@@ -253,7 +254,7 @@ NodeDCMotor::MotorHAT::setPWM(int channel, int on, int off) {
 }
 
 void
-NodeDCMotor::MotorHAT::setPWMFreq(double freq) {
+MotorHAT::setPWMFreq(double freq) {
     m_prescaleval = 25000000.0;   // 25MHz
     m_prescaleval /= 4096.0;      // 12-bit
     m_prescaleval /= float(freq);
@@ -276,7 +277,7 @@ NodeDCMotor::MotorHAT::setPWMFreq(double freq) {
     i2c_write8(__MODE1, oldmode | 0x80);
 }
 
-NodeDCMotor::MotorHAT::MotorHAT(int address, const char* filename, int freq):
+MotorHAT::MotorHAT(int address, const char* filename, int freq):
     m_trace("DCMotor", false),
     m_prescaleval(0),
     m_i2caddr(address),
@@ -314,10 +315,11 @@ NodeDCMotor::MotorHAT::MotorHAT(int address, const char* filename, int freq):
     //    self._pwm =  PWM(addr, debug=False)
 
 
+    setPWMFreq(m_frequency);
 }
 
 void
-NodeDCMotor::MotorHAT::setPin(int pin, int value) {
+MotorHAT::setPin(int pin, int value) {
     m_trace.println("NodeDCMotor::MotorHAT::setPin");
 
     if ((pin < 0) or (pin > 15)) {
@@ -335,7 +337,7 @@ NodeDCMotor::MotorHAT::setPin(int pin, int value) {
 }
 
 
-NodeDCMotor::MotorHAT* NodeDCMotor::m_pMotorHAT = nullptr;
+MotorHAT* NodeDCMotor::m_pMotorHAT = nullptr;
 
 
 NodeDCMotor::NodeDCMotor(AbstractNode* d, const string& /*name*/, Arro::StringMap& params, TiXmlElement*):
@@ -392,7 +394,7 @@ NodeDCMotor::NodeDCMotor(AbstractNode* d, const string& /*name*/, Arro::StringMa
 }
 
 void
-NodeDCMotor::run(NodeDCMotor::MotorHAT::dir command) {
+NodeDCMotor::run(MotorHAT::dir command) {
     m_trace.println("NodeDCMotor::run");
     if(m_pMotorHAT) {
         if (command == MotorHAT::FORWARD) {
