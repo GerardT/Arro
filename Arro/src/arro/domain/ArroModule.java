@@ -409,8 +409,8 @@ public class ArroModule extends NonEmfDomainObject  {
 			try {
                 Collection<ArroPad> p = node.getAssociatedModule().getPads();
                 for(ArroPad pad: p) {
-                	allPadNames.add(node.getName() + "." + pad.getName());
-                	Logger.out.trace(Logger.STD, "pad list " + node.getName() + "." + pad.getName());
+                	allPadNames.add(node.getName() + "#" + pad.getName());
+                	Logger.out.trace(Logger.STD, "pad list " + node.getName() + "#" + pad.getName());
                 }
             } catch (Exception e) {
                 // TODO Auto-generated catch block

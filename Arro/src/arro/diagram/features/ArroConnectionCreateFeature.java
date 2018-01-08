@@ -66,7 +66,7 @@ public class ArroConnectionCreateFeature extends AbstractCreateConnectionFeature
 		        Logger.out.trace(Logger.EDITOR, "parent " + anchor + " name " + name);
 		        pad = ((ArroNode)domainObject).getPadByName(name);
 		        if(pad != null) {
-		        	ref.s = domainObject.getName() + "." + pad.getName();
+		        	ref.s = domainObject.getName() + "#" + pad.getName();
 		        	Logger.out.trace(Logger.EDITOR, "found pad on Node" + pad.getName() + " type " + pad.getType());
 		        }
 	        } else if(domainObject instanceof ArroPad) {
