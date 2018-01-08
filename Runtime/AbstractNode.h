@@ -12,6 +12,7 @@
 
 
 #define ARRO_NAME_SEPARATOR "."
+#define ARRO_PAD_SEPARATOR "#"
 
 namespace Arro
 {

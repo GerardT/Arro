@@ -207,7 +207,7 @@ namespace Arro {
             if(node == "request") {
                 return (m_activeSteps.find(step) != m_activeSteps.end());
             } else {
-                std::string nodeName = /*this->m_process->getName() + ARRO_NAME_SEPARATOR +*/ "_step_" + node;
+                std::string nodeName = /*this->m_process->getName() + ARRO_PAD_SEPARATOR +*/ "_step_" + node;
 
                 if(m_currentInputs.find(nodeName) != m_currentInputs.end()) {
                     const std::string& value = m_currentInputs.at(nodeName);
@@ -233,7 +233,7 @@ namespace Arro {
         }
 
 //        void inputHasValue(const std::string& input, const std::string& value) {
-//            std::string action_input = this->m_process->getName() + ARRO_NAME_SEPARATOR + "_action";
+//            std::string action_input = this->m_process->getName() + ARRO_PAD_SEPARATOR + "_action";
 //
 //        }
 

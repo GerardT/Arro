@@ -83,7 +83,7 @@ NodeSfc::test() {
 
 void
 NodeSfc::handleMessage(const MessageBuf& m, const std::string& padName) {
-    string action_input = this->m_process->getName() + ARRO_NAME_SEPARATOR + "_action";
+    string action_input = this->m_process->getName() + ARRO_PAD_SEPARATOR + "_action";
 
     auto msg = new arro::Step();
     msg->ParseFromString((m)->c_str());

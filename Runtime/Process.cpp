@@ -127,25 +127,25 @@ Process::getInputData(NodeSingleInput* input) const {
 
 NodeSingleInput*
 Process::getInput(const string& name) const {
-    auto in = m_nodeDb.getInput(getName() + "." + name);
+    auto in = m_nodeDb.getInput(getName() + ARRO_PAD_SEPARATOR + name);
     if(in) {
         return in;
     } else {
-        m_trace.println("no such input registered: " + getName() + "." + name);
-        SendToConsole(string("Program uses unknown input: ") + getName() + "." + name);
-        throw std::runtime_error("No such input registered: " + getName() + "." + name);
+        m_trace.println("no such input registered: " + getName() + ARRO_PAD_SEPARATOR + name);
+        SendToConsole(string("Program uses unknown input: ") + getName() + ARRO_PAD_SEPARATOR + name);
+        throw std::runtime_error("No such input registered: " + getName() + ARRO_PAD_SEPARATOR + name);
     }
 }
 
 NodeMultiOutput*
 Process::getOutput(const string& name) const {
-    auto out = m_nodeDb.getOutput(getName() + "." + name);
+    auto out = m_nodeDb.getOutput(getName() + ARRO_PAD_SEPARATOR + name);
     if(out) {
         return out;
     } else {
-        m_trace.println("no such output registered: " + getName() + "." + name);
-        SendToConsole(string("Program uses unknown output: ") + getName() + "." + name);
-        throw std::runtime_error("No such output registered: " + getName() + "." + name);
+        m_trace.println("no such output registered: " + getName() + ARRO_PAD_SEPARATOR + name);
+        SendToConsole(string("Program uses unknown output: ") + getName() + ARRO_PAD_SEPARATOR + name);
+        throw std::runtime_error("No such output registered: " + getName() + ARRO_PAD_SEPARATOR + name);
     }
 }
 

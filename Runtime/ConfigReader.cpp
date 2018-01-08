@@ -169,23 +169,23 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             // EXTRA Create an _action and _step pad in every module
             // If processNode != nullptr then we know a 'leaf' node is being added
             if(!processNode) {
-                new Pad(m_nodeDb, "Action", instance + ARRO_NAME_SEPARATOR + "_action");
-                new Pad(m_nodeDb, "Mode", instance + ARRO_NAME_SEPARATOR + "_step");
+                new Pad(m_nodeDb, "Action", instance + ARRO_PAD_SEPARATOR + "_action");
+                new Pad(m_nodeDb, "Mode", instance + ARRO_PAD_SEPARATOR + "_step");
 
                 // connect Pad to Sfc
                 {
-                    string from = instance + ARRO_NAME_SEPARATOR + "_action";
+                    string from = instance + ARRO_PAD_SEPARATOR + "_action";
 
-                    string to = instanceSfc + ARRO_NAME_SEPARATOR + "_action";
+                    string to = instanceSfc + ARRO_PAD_SEPARATOR + "_action";
 
                     m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
                     m_nodeDb.connect(from, to);
                 }
                 // connect Sfc to Pad
                 {
-                    string from = instanceSfc + ARRO_NAME_SEPARATOR + "_step";
+                    string from = instanceSfc + ARRO_PAD_SEPARATOR + "_step";
 
-                    string to = instance + ARRO_NAME_SEPARATOR + "_step";
+                    string to = instance + ARRO_PAD_SEPARATOR + "_step";
 
                     m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
                     m_nodeDb.connect(from, to);
@@ -222,17 +222,17 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
                 sfcNode->registerInput("_step_" + *idAttr, true);
 
                 // Connect from sfc to just created node (in makeNodeInstance).
-                from = instance + ARRO_SFC_INSTANCE + ARRO_NAME_SEPARATOR + "_action_" + *idAttr;
+                from = instance + ARRO_SFC_INSTANCE + ARRO_PAD_SEPARATOR + "_action_" + *idAttr;
 
-                to = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_NAME_SEPARATOR + "_action";
+                to = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_PAD_SEPARATOR + "_action";
 
                 m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
                 m_nodeDb.connect(from, to);
 
                 // Connect from just created node (in makeNodeInstance) to sfc.
-                to = instance + ARRO_SFC_INSTANCE + ARRO_NAME_SEPARATOR + "_step_" + *idAttr;
+                to = instance + ARRO_SFC_INSTANCE + ARRO_PAD_SEPARATOR + "_step_" + *idAttr;
 
-                from = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_NAME_SEPARATOR + "_step";
+                from = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_PAD_SEPARATOR + "_step";
 
                 m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
                 m_nodeDb.connect(from, to);
@@ -252,7 +252,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
         const string* runAttr = elt->Attribute(string("run"));
 
         if(datatypeAttr != nullptr && idAttr != nullptr) {
-            string inst = instance + ARRO_NAME_SEPARATOR + *idAttr;
+            string inst = instance + ARRO_PAD_SEPARATOR + *idAttr;
 
             // If processNode != nullptr then we know a 'leaf' node is being added
             if(processNode) {

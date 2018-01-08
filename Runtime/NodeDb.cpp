@@ -116,8 +116,8 @@ NodeDb::registerNodeInput(AbstractNode* node, const string& interfaceName,
         m_trace.println(string("registering input ") + node->getName());
         return (NodeSingleInput*)n;
     } else {
-        m_allInputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = unique_ptr<NodeSingleInput>(n);
-        m_trace.println(("registering input ") + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
+        m_allInputs[node->getName() + ARRO_PAD_SEPARATOR + interfaceName] = unique_ptr<NodeSingleInput>(n);
+        m_trace.println(("registering input ") + node->getName() + ARRO_PAD_SEPARATOR + interfaceName);
         return (NodeSingleInput*)n;
     }
 }
@@ -132,8 +132,8 @@ NodeDb::registerNodeOutput(AbstractNode* node, const string& interfaceName) {
         m_trace.println("registering output " + node->getName());
         return (NodeMultiOutput*)n;
     } else {
-        m_allOutputs[node->getName() + ARRO_NAME_SEPARATOR + interfaceName] = unique_ptr<NodeMultiOutput>(n);
-        m_trace.println("registering output " + node->getName() + ARRO_NAME_SEPARATOR + interfaceName);
+        m_allOutputs[node->getName() + ARRO_PAD_SEPARATOR + interfaceName] = unique_ptr<NodeMultiOutput>(n);
+        m_trace.println("registering output " + node->getName() + ARRO_PAD_SEPARATOR + interfaceName);
         return (NodeMultiOutput*)n;
     }
 }
