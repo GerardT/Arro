@@ -281,9 +281,18 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
         const string* fromAttr = elt->Attribute(string("source"));
         const string* toAttr = elt->Attribute(string("target"));
         if(fromAttr != nullptr && toAttr != nullptr) {
-            string from = instance + ARRO_NAME_SEPARATOR + *fromAttr;
-
-            string to = instance + ARRO_NAME_SEPARATOR + *toAttr;
+            string from = instance;
+            if(fromAttr->find(ARRO_PAD_SEPARATOR) == fromAttr->npos) {
+                from += ARRO_PAD_SEPARATOR + *fromAttr;
+            } else {
+                from += ARRO_NAME_SEPARATOR + *fromAttr;
+            }
+            string to = instance;
+            if(toAttr->find(ARRO_PAD_SEPARATOR) == toAttr->npos) {
+                to += ARRO_PAD_SEPARATOR + *toAttr;
+            } else {
+                to += ARRO_NAME_SEPARATOR + *toAttr;
+            }
 
             m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
             m_nodeDb.connect(from, to);
