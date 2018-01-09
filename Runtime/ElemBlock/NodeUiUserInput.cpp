@@ -8,7 +8,7 @@
 namespace Arro {
 
 class NodeRef;
-class NodeUiUserInput: public IDevice {
+class NodeUiUserInput: public IElemBlock {
 public:
     /**
      * Constructor
@@ -36,7 +36,7 @@ public:
 
 private:
     Trace m_trace;
-    AbstractNode* m_device;
+    AbstractNode* m_elemBlock;
     NodeRef* m_uiClient;
     NodeMultiOutput* m_value;
 
@@ -53,7 +53,7 @@ static RegisterMe<NodeUiUserInput> registerMe("SliderInput");
 
 NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodeUiReceiveNumber", true),
-    m_device(d) {
+    m_elemBlock(d) {
 
     std::string name;
     auto iter = params.find(std::string("name"));
@@ -69,13 +69,13 @@ NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, String
     std::string inst = std::string("<arro-slider id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-slider>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
-        m_value = m_device->getOutput("value");
+        m_value = m_elemBlock->getOutput("value");
 
         Value* sel = new Value();
         auto info = nlohmann::json::parse(data.c_str());
         int value = info["value"];
         sel->set_value(value);
-        m_device->setOutputData(m_value, sel);
+        m_elemBlock->setOutputData(m_value, sel);
                     });
 
 }

@@ -16,7 +16,7 @@ static RegisterMe<NodePython> registerMe("Python");
  */
 NodePython::NodePython(AbstractNode* d, const string& className, StringMap& /*params*/, TiXmlElement*):
     m_trace("NodePython", true),
-    m_device(d)
+    m_elemBlock(d)
 {
     PyObject *pDict = PythonGlue::getDict();
 
@@ -96,7 +96,7 @@ NodePython::getMessage() {
  */
 PyObject*
 NodePython::getInputData(const string& pad) {
-    MessageBuf data = m_device->getInputData(m_device->getInput(pad));
+    MessageBuf data = m_elemBlock->getInputData(m_elemBlock->getInput(pad));
 
     if(data->length() == 0 /* MessageBuf may not be initialized */) {
         // insert None object
@@ -114,7 +114,7 @@ NodePython::getInputData(const string& pad) {
  */
 PyObject*
 NodePython::sendMessage(char* padName, char* message) {
-    NodeMultiOutput* pad = m_device->getOutput(padName);
+    NodeMultiOutput* pad = m_elemBlock->getOutput(padName);
 
     if(pad) {
         pad->submitMessageBuffer(message);

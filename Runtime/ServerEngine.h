@@ -18,7 +18,7 @@ namespace Arro {
 
 
 class Process;
-class IDevice;
+class IElemBlock;
 
 
     /**

@@ -26,7 +26,7 @@ static int newsockfd = -1;
 static NodeDb* nodeDb = nullptr;
 static PythonGlue* pg = nullptr;
 static Trace trace("ServerEngine", true);
-static std::map<std::string, Factory > m_deviceRegister;
+static std::map<std::string, Factory > m_elemBlockRegister;
 
 
 
@@ -291,12 +291,12 @@ void Arro::SendToConsole(string s)
 }
 
 void Arro::registerFactory(const std::string& name, Factory factory) {
-    m_deviceRegister[name] = factory;
+    m_elemBlockRegister[name] = factory;
 }
 
 bool ServerEngine::getFactory(const std::string& name, Factory& factory) {
-    if(m_deviceRegister.find(name) != m_deviceRegister.end()) {
-        factory =  m_deviceRegister.at(name);
+    if(m_elemBlockRegister.find(name) != m_elemBlockRegister.end()) {
+        factory =  m_elemBlockRegister.at(name);
         return true;
     }
     return false;

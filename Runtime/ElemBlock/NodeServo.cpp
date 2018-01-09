@@ -20,7 +20,7 @@
 #include "AbstractNode.h"
 
 namespace Arro {
-    class NodeServo: public IDevice {
+    class NodeServo: public IElemBlock {
     public:
 
         /**
@@ -97,7 +97,7 @@ namespace Arro {
         };
 
         Trace m_trace;
-        AbstractNode* m_device;
+        AbstractNode* m_elemBlock;
         double m_previous_position;
         double m_actual_position;
         int m_ms_elapsed;
@@ -234,7 +234,7 @@ NodeServo::Servo* NodeServo::m_pServo = nullptr;
 
 NodeServo::NodeServo(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodeServo", true),
-    m_device(d),
+    m_elemBlock(d),
     m_previous_position(0),
     m_actual_position(0),
     m_ms_elapsed(0),

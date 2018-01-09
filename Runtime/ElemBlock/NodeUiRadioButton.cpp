@@ -8,7 +8,7 @@
 namespace Arro {
 
 class NodeRef;
-class NodeUiRadioButton: public IDevice {
+class NodeUiRadioButton: public IElemBlock {
 public:
     /**
      * Constructor
@@ -36,7 +36,7 @@ public:
 
 private:
     Trace m_trace;
-    AbstractNode* m_device;
+    AbstractNode* m_elemBlock;
     NodeRef* m_uiClient;
     NodeMultiOutput* m_value;
 
@@ -53,7 +53,7 @@ static RegisterMe<NodeUiRadioButton> registerMe("RadioButton");
 
 NodeUiRadioButton::NodeUiRadioButton(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodeUiRadioButton", true),
-    m_device(d) {
+    m_elemBlock(d) {
 
     std::string name;
     auto iter = params.find(std::string("name"));
@@ -91,12 +91,12 @@ NodeUiRadioButton::NodeUiRadioButton(AbstractNode* d, const string& /*name*/, St
     }
     inst += "]\'>  </arro-radio-button>";
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
-        m_value = m_device->getOutput("value");
+        m_value = m_elemBlock->getOutput("value");
 
         Selection* sel = new Selection();
         auto info = nlohmann::json::parse(data.c_str());
         sel->set_value(info["value"]);
-        m_device->setOutputData(m_value, sel);
+        m_elemBlock->setOutputData(m_value, sel);
 
                     });
 

@@ -23,7 +23,7 @@ static RegisterMe<NodeTimer> registerMe("Timer");
 
 NodeTimer::NodeTimer(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodePid", true),
-    m_device(d) {
+    m_elemBlock(d) {
 
     try {
         m_ticks = stoi(params.at("ms"));
@@ -61,7 +61,7 @@ void NodeTimer::timer () {
     tick->set_ms(ARRO_TIMEOUT /* elapsed time in ms */);
 
     try {
-        m_device->setOutputData(m_device->getOutput("aTick"), tick);
+        m_elemBlock->setOutputData(m_elemBlock->getOutput("aTick"), tick);
     }
     catch(runtime_error&) {
         m_trace.println("Timer failed to update");

@@ -3,16 +3,16 @@
 #include "AbstractNode.h"
 
 namespace Arro {
-    class NodePid: public IDevice {
+    class NodePid: public IElemBlock {
     public:
         /**
          * Constructor
          *
-         * \param device The Process node instance.
+         * \param elemBlock The Process node instance.
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodePid(AbstractNode* device, const std::string& name, StringMap& params, TiXmlElement*);
+        NodePid(AbstractNode* elemBlock, const std::string& name, StringMap& params, TiXmlElement*);
         virtual ~NodePid() {};
 
         // Copy and assignment is not supported.
@@ -45,7 +45,7 @@ namespace Arro {
         double m_Ki;    // factor for "integral" control
         double m_Kd;    // factor for "derivative" control
         StringMap m_params;
-        AbstractNode* m_device;
+        AbstractNode* m_elemBlock;
     };
 }
 #include "arro.pb.h"
@@ -58,7 +58,7 @@ static RegisterMe<NodePid> registerMe("pid");
 
 NodePid::NodePid(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodePid", true),
-    m_device(d) {
+    m_elemBlock(d) {
 
     m_previous_error = 0;
     m_integral = 0;
@@ -140,6 +140,6 @@ NodePid::runCycle() {
 
         value->set_value(output);
 
-        m_device->setOutputData(m_device->getOutput("output"), value);
+        m_elemBlock->setOutputData(m_elemBlock->getOutput("output"), value);
     }
 }

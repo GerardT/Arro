@@ -7,7 +7,7 @@
 
 namespace Arro
 {
-    class NodeTimer: public IDevice {
+    class NodeTimer: public IElemBlock {
     public:
         /**
          * Constructor
@@ -44,7 +44,7 @@ namespace Arro
     private:
         Trace m_trace;
         int m_ticks;
-        AbstractNode* m_device;
+        AbstractNode* m_elemBlock;
         std::string m_actual_mode;
     };
 }

@@ -8,7 +8,7 @@
 namespace Arro {
 
 class NodeRef;
-class NodeUiToggleButton: public IDevice {
+class NodeUiToggleButton: public IElemBlock {
 public:
     /**
      * Constructor
@@ -36,7 +36,7 @@ public:
 
 private:
     Trace m_trace;
-    AbstractNode* m_device;
+    AbstractNode* m_elemBlock;
     NodeRef* m_uiClient;
     NodeMultiOutput* m_value;
 
@@ -53,7 +53,7 @@ static RegisterMe<NodeUiToggleButton> registerMe("ToggleButton");
 
 NodeUiToggleButton::NodeUiToggleButton(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodeUiUserInput.cpp", true),
-    m_device(d) {
+    m_elemBlock(d) {
 
     std::string name;
     auto iter = params.find(std::string("name"));
@@ -66,12 +66,12 @@ NodeUiToggleButton::NodeUiToggleButton(AbstractNode* d, const string& /*name*/, 
     std::string inst = std::string("<arro-toggle-button id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-toggle-button>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
-        m_value = m_device->getOutput("value");
+        m_value = m_elemBlock->getOutput("value");
 
         Selection* sel = new Selection();
         auto info = nlohmann::json::parse(data.c_str());
         sel->set_value(info["value"]);
-        m_device->setOutputData(m_value, sel);
+        m_elemBlock->setOutputData(m_value, sel);
                     });
 
 }

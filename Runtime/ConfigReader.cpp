@@ -100,7 +100,7 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
 void
 ConfigReader::makeNodeInstance(const string& typeName, const string& instanceName, const string& instancePrefix, StringMap& import_params, Process* parentSfc) {
     Definition* def = m_definitions[typeName];
-    Process* processNode = nullptr;  // Note: if there is a process node (=device) there will be only one in module.
+    Process* processNode = nullptr;  // Note: if there is a process node (=elemBlock) there will be only one in module.
     Process* sfcNode = nullptr;
 
     if(def == nullptr)
@@ -116,7 +116,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
     TiXmlElement* elt;
 
 
-    // Read devices (the leaves in the tree)
+    // Read elemBlocks (the leaves in the tree)
     elt = def->m_node->FirstChildElement("device");
     while(elt) {
         const string* typeURL = elt->Attribute(string("url"));
@@ -140,7 +140,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
         }
         elt = elt->NextSiblingElement("device");
     }
-    // Read devices (the leaves in the tree) There should be only one sfc node.
+    // Read elemBlocks (the leaves in the tree) There should be only one sfc node.
     elt = def->m_node->FirstChildElement("sfc");
     while(elt) {
         StringMap* params = new StringMap();

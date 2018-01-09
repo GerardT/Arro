@@ -84,12 +84,12 @@ namespace Arro {
 
 
 
-    class NodeSfc: public IDevice {
+    class NodeSfc: public IElemBlock {
     public:
         /**
          * Constructor
          *
-         * \param device The Process node instance.
+         * \param elemBlock The Process node instance.
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */

@@ -19,7 +19,7 @@ using namespace std;
 //    RealNode{},
 //    m_trace{"Process", true},
 //    m_nodeDb{db},
-//    m_device{nullptr},
+//    m_elemBlock{nullptr},
 //    m_doRunCycle{false},
 //    m_name{instance},
 //    m_webComponents(nullptr) {
@@ -36,7 +36,7 @@ Process::Process(NodeDb& db, const string& url, const string& instance, StringMa
     RealNode{},
     m_trace{"Process", true},
     m_nodeDb{db},
-    m_device{nullptr},
+    m_elemBlock{nullptr},
     m_doRunCycle{false},
     m_name{instance} {
 
@@ -55,7 +55,7 @@ Process::Process(NodeDb& db, const string& url, const string& instance, StringMa
         kv->set_value(iter->second.c_str());
         MessageBuf msg(new string(kv->SerializeAsString()));
         free(kv);
-        m_device->handleMessage(msg, "config");
+        m_elemBlock->handleMessage(msg, "config");
     }
 
     db.registerNode(this, instance);
@@ -64,7 +64,7 @@ Process::Process(NodeDb& db, const string& url, const string& instance, StringMa
 }
 
 Process::~Process() {
-    if(m_device) delete m_device;
+    if(m_elemBlock) delete m_elemBlock;
 }
 
 void
@@ -92,7 +92,7 @@ Process::sendParameters(StringMap& params) {
 void
 Process::runCycle() {
     if(m_doRunCycle) {
-        m_device->runCycle();
+        m_elemBlock->runCycle();
         m_doRunCycle = false;
     }
 }
@@ -104,7 +104,7 @@ Process::registerInput(const string& interfName, bool enableRunCycle) {
         if(enableRunCycle) {
             m_doRunCycle = true;
         }
-        m_device->handleMessage(msg, interfaceName);
+        m_elemBlock->handleMessage(msg, interfaceName);
     });
 }
 
@@ -157,7 +157,7 @@ Process::setOutputData(NodeMultiOutput* output, google::protobuf::MessageLite* v
 
 void
 Process::getPrimitive(const string& url, const string& instance, StringMap& params, TiXmlElement* elt) {
-    m_device = nullptr;
+    m_elemBlock = nullptr;
     Factory factory;
 
     if(url.find("Python:") == 0) {
@@ -165,7 +165,7 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
         try {
             string className = url.substr(7);
             if(ServerEngine::getFactory("Python", factory)) {
-                m_device = factory(this, className, params, nullptr);
+                m_elemBlock = factory(this, className, params, nullptr);
             }
         } catch(out_of_range &) {
             throw std::runtime_error("Invalid URL for Python node " + url);
@@ -176,7 +176,7 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
 
             if(ServerEngine::getFactory(className, factory)) {
                 m_trace.println("new " + className + "(" + instance + ")");
-                m_device = factory(this, "", params, elt);
+                m_elemBlock = factory(this, "", params, elt);
             }
             else {
                 m_trace.println("unknown node" + instance );
@@ -191,7 +191,7 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
 
             if(ServerEngine::getFactory(className, factory)) {
                 m_trace.println("new " + className + "(" + instance + ")");
-                m_device = factory(this, "", params, elt);
+                m_elemBlock = factory(this, "", params, elt);
             }
             else {
                 m_trace.println("unknown node" + instance );
@@ -205,7 +205,7 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
         m_trace.println("new NodeSfc(" + instance + ")");
         try {
             if(ServerEngine::getFactory("_SFC", factory)) {
-                m_device = factory(this, "", params, elt);
+                m_elemBlock = factory(this, "", params, elt);
             }
         } catch(out_of_range &) {
             throw std::runtime_error("Invalid URL for SFC node " + url);
@@ -219,7 +219,7 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
             }
             else if(ServerEngine::getFactory(className, factory)) {
                 m_trace.println("new " + className + "(" + instance + ")");
-                m_device = factory(this, instance, params, nullptr);
+                m_elemBlock = factory(this, instance, params, nullptr);
             }
             else {
                 m_trace.println("unknown node" + instance );
@@ -229,7 +229,7 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
             m_trace.println("native node not found");
         }
     }
-    if(m_device == nullptr) {
+    if(m_elemBlock == nullptr) {
         m_trace.println("Node module not found " + url);
         throw std::runtime_error("Node module not found " + url);
     }
@@ -241,7 +241,7 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
  */
 void
 Process::registerSfc(const std::string& name, Process* sfc) {
-    ((NodeSfc*)m_device)->registerSfc(name, (NodeSfc*)(sfc->m_device));
+    ((NodeSfc*)m_elemBlock)->registerSfc(name, (NodeSfc*)(sfc->m_elemBlock));
 }
 
 

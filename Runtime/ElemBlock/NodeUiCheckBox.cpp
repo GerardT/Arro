@@ -8,7 +8,7 @@
 namespace Arro {
 
 class NodeRef;
-class NodeUiCheckBox: public IDevice {
+class NodeUiCheckBox: public IElemBlock {
 public:
     /**
      * Constructor
@@ -36,7 +36,7 @@ public:
 
 private:
     Trace m_trace;
-    AbstractNode* m_device;
+    AbstractNode* m_elemBlock;
     NodeRef* m_uiClient;
     NodeMultiOutput* m_value;
 
@@ -53,7 +53,7 @@ static RegisterMe<NodeUiCheckBox> registerMe("CheckBox");
 
 NodeUiCheckBox::NodeUiCheckBox(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodeUiReceiveNumber", true),
-    m_device(d) {
+    m_elemBlock(d) {
 
     std::string name;
     auto iter = params.find(std::string("name"));
@@ -66,12 +66,12 @@ NodeUiCheckBox::NodeUiCheckBox(AbstractNode* d, const string& /*name*/, StringMa
     std::string inst = std::string("<arro-check-box id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-check-box>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
-        m_value = m_device->getOutput("value");
+        m_value = m_elemBlock->getOutput("value");
 
         Selection* sel = new Selection();
         auto info = nlohmann::json::parse(data.c_str());
         sel->set_value(info["value"]);
-        m_device->setOutputData(m_value, sel);
+        m_elemBlock->setOutputData(m_value, sel);
                     });
 
 }

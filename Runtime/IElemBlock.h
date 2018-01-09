@@ -9,15 +9,15 @@ namespace Arro {
 
 
     /**
-     * \brief Interface to be implemented by all devices.
+     * \brief Interface to be implemented by all elemBlocks.
      *
-     * This interface is for implementing device instances:
-     * - handleMessage will pass data to the device.
+     * This interface is for implementing elemBlock instances:
+     * - handleMessage will pass data to the elemBlock.
      * - runCycle will trigger running one execution cycle.
      */
-    class IDevice {
+    class IElemBlock {
     public:
-        virtual ~IDevice() {};
+        virtual ~IElemBlock() {};
 
         virtual void test() {};
 

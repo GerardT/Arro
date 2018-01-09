@@ -18,8 +18,8 @@
 #include <functional>
 
 #include "AbstractNode.h"
+#include "IElemBlock.h"
 #include "Trace.h"
-#include "IDevice.h"
 
 
 namespace Arro

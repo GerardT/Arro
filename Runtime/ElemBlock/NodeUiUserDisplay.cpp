@@ -7,7 +7,7 @@
 namespace Arro {
 
 class NodeRef;
-class NodeUiUserDisplay: public IDevice {
+class NodeUiUserDisplay: public IElemBlock {
 public:
     /**
      * Constructor
@@ -35,7 +35,7 @@ public:
 
 private:
     Trace m_trace;
-    AbstractNode* m_device;
+    AbstractNode* m_elemBlock;
     NodeRef* m_uiClient;
     NodeSingleInput* m_input;
     NodeSingleInput* m_value;
@@ -53,7 +53,7 @@ static RegisterMe<NodeUiUserDisplay> registerMe("ProgressOutput");
 
 NodeUiUserDisplay::NodeUiUserDisplay(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodeUiReceiveNumber", true),
-    m_device(d) {
+    m_elemBlock(d) {
 
     //     <arro-progress id=".main.aUiUserOutput" name="Test output"></arro-progress>
     std::string name;
@@ -79,9 +79,9 @@ void NodeUiUserDisplay::handleMessage(const MessageBuf& /*m*/, const std::string
 }
 
 void NodeUiUserDisplay::runCycle() {
-    m_value = m_device->getInput("value");
+    m_value = m_elemBlock->getInput("value");
 
-    MessageBuf buf2 = m_device->getInputData(m_value);
+    MessageBuf buf2 = m_elemBlock->getInputData(m_value);
 
     Value* msg2 = new Value();
     msg2->ParseFromString((*buf2).c_str());

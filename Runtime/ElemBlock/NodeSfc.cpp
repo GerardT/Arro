@@ -14,9 +14,9 @@ using namespace arro;
 
 static RegisterMe<NodeSfc> registerMe("_SFC");
 
-NodeSfc::NodeSfc(AbstractNode* device, const string& /*name*/, StringMap& /*params*/, TiXmlElement* elt):
+NodeSfc::NodeSfc(AbstractNode* elemBlock, const string& /*name*/, StringMap& /*params*/, TiXmlElement* elt):
     m_trace{"NodeSfc", true},
-    m_process{device} {
+    m_process{elemBlock} {
 
     // Define "start" as initial step
     m_activeSteps.insert("_ready");

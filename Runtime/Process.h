@@ -35,14 +35,14 @@ namespace Arro
         Process(const Process&) = delete;
         Process& operator=(const Process& other) = delete;
         virtual void finishConstruction() {
-            m_device->finishConstruction();
+            m_elemBlock->finishConstruction();
         };
 
 
         void sendParameters(StringMap& params);
 
         void test() {
-            m_device->test();
+            m_elemBlock->test();
         }
 
         /**
@@ -111,7 +111,7 @@ namespace Arro
     private:
         Trace m_trace;
         NodeDb& m_nodeDb;
-        IDevice* m_device;
+        IElemBlock* m_elemBlock;
         bool m_doRunCycle;
         std::string m_name;
     };

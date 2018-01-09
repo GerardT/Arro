@@ -84,7 +84,7 @@ private:
 };
 
 
-class NodeDCMotor: public IDevice {
+class NodeDCMotor: public IElemBlock {
     public:
 
         /**
@@ -123,7 +123,7 @@ class NodeDCMotor: public IDevice {
 
 
         Trace m_trace;
-        AbstractNode* m_device;
+        AbstractNode* m_elemBlock;
         int m_PWMpin;
         int m_IN1pin;
         int m_IN2pin;
@@ -342,7 +342,7 @@ MotorHAT* NodeDCMotor::m_pMotorHAT = nullptr;
 
 NodeDCMotor::NodeDCMotor(AbstractNode* d, const string& /*name*/, Arro::StringMap& params, TiXmlElement*):
     m_trace("NodeDCMotor", true),
-    m_device(d),
+    m_elemBlock(d),
     m_Ch(0),
     m_running(true) {
 

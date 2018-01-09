@@ -10,16 +10,16 @@
 
 
 namespace Arro {
-    class NodePython: public IDevice {
+    class NodePython: public IElemBlock {
     public:
         /**
          * Constructor
          *
-         * \param device The Process node instance.
+         * \param elemBlock The Process node instance.
          * \param className Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodePython(AbstractNode* device, const std::string& className, StringMap& params, TiXmlElement*);
+        NodePython(AbstractNode* elemBlock, const std::string& className, StringMap& params, TiXmlElement*);
         virtual ~NodePython();
 
         // Copy and assignment is not supported.
@@ -45,7 +45,7 @@ namespace Arro {
     private:
         Trace m_trace;
         StringMap m_params;
-        AbstractNode* m_device;
+        AbstractNode* m_elemBlock;
         PyObject *m_pFunc, *m_pValue, *m_pArgs, *m_pClass, *m_pInstance;
         std::queue<PyObject*> m_messages;
     };

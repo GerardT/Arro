@@ -5,9 +5,9 @@
 #include <functional>
 #include <string>
 #include <map>
-#include "IDevice.h"
 #include <tinyxml.h>
 #include <google/protobuf/message.h>
+#include "IElemBlock.h"
 
 
 
@@ -73,7 +73,7 @@ namespace Arro
 
 
 
-    typedef std::function<IDevice* (AbstractNode* d, const std::string& instance, std::map<std::string, std::string>& params, TiXmlElement* elt)> Factory;
+    typedef std::function<IElemBlock* (AbstractNode* d, const std::string& instance, std::map<std::string, std::string>& params, TiXmlElement* elt)> Factory;
 
     void registerFactory(const std::string& name, Factory factory);
 
@@ -86,7 +86,7 @@ namespace Arro
     class RegisterMe {
     public:
         RegisterMe(const std::string& name) {
-            registerFactory(name, [](AbstractNode* d, const std::string& instance, std::map<std::string, std::string>& params, TiXmlElement* elt) ->IDevice* {
+            registerFactory(name, [](AbstractNode* d, const std::string& instance, std::map<std::string, std::string>& params, TiXmlElement* elt) ->IElemBlock* {
                 return new T(d, instance, params, elt);
             });
         };
