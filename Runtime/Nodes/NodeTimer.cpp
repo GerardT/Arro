@@ -6,7 +6,7 @@
 #include <list>
 #include <algorithm>
 
-#include <ElemBlock/NodeTimer.h>
+#include <Nodes/NodeTimer.h>
 
 using namespace std;
 using namespace Arro;
@@ -21,7 +21,7 @@ static RegisterMe<NodeTimer> registerMe("Timer");
 
 
 
-NodeTimer::NodeTimer(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+NodeTimer::NodeTimer(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodePid", true),
     m_elemBlock(d) {
 

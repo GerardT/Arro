@@ -5,7 +5,7 @@
 #include <map>
 #include <functional>
 
-#include "AbstractNode.h"
+#include "INodeContext.h"
 
 #define ARRO_PROGRAM_FILE    "arro_pgm"
 #define ARRO_API_FILE        "arro_api"
@@ -18,7 +18,7 @@ namespace Arro {
 
 
 class Process;
-class IElemBlock;
+class INodeDefinition;
 
 
     /**

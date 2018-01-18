@@ -7,7 +7,7 @@ using namespace Arro;
 
 
 /**
- * Pad, like Process, implements interface AbstractNode.
+ * Pad, like Process, implements interface INodeContext.
  * Pad is for non-functional connection pads.
  * Basically it just installs a listener that forwards incoming messages.
  * TODO: maybe we could remove Pads and connect Process outputs directly to Process inputs.

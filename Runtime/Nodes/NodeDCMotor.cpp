@@ -17,7 +17,7 @@
 
 #include "arro.pb.h"
 #include "Trace.h"
-#include "AbstractNode.h"
+#include "INodeContext.h"
 
 namespace Arro {
 class MotorHAT {
@@ -84,7 +84,7 @@ private:
 };
 
 
-class NodeDCMotor: public IElemBlock {
+class NodeDCMotor: public INodeDefinition {
     public:
 
         /**
@@ -94,7 +94,7 @@ class NodeDCMotor: public IElemBlock {
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodeDCMotor(AbstractNode* d, const std::string& name, Arro::StringMap& params, TiXmlElement*);
+        NodeDCMotor(INodeContext* d, const std::string& name, Arro::StringMap& params, TiXmlElement*);
         virtual ~NodeDCMotor() {};
 
         // Copy and assignment is not supported.
@@ -123,7 +123,7 @@ class NodeDCMotor: public IElemBlock {
 
 
         Trace m_trace;
-        AbstractNode* m_elemBlock;
+        INodeContext* m_elemBlock;
         int m_PWMpin;
         int m_IN1pin;
         int m_IN2pin;
@@ -340,7 +340,7 @@ MotorHAT::setPin(int pin, int value) {
 MotorHAT* NodeDCMotor::m_pMotorHAT = nullptr;
 
 
-NodeDCMotor::NodeDCMotor(AbstractNode* d, const string& /*name*/, Arro::StringMap& params, TiXmlElement*):
+NodeDCMotor::NodeDCMotor(INodeContext* d, const string& /*name*/, Arro::StringMap& params, TiXmlElement*):
     m_trace("NodeDCMotor", true),
     m_elemBlock(d),
     m_Ch(0),

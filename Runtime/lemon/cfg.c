@@ -640,33 +640,33 @@ static void yy_reduce(
   **     break;
   */
       case 0: /* line ::= expr */
-#line 15 "../../Runtime/lemon/cfg.y"
-{ yygotominor.yy0.value = cg->rule1(yymsp[0].minor.yy0); }
+#line 16 "../../Runtime/lemon/cfg.y"
+{ yygotominor.yy0.value = cg->rule1(yygotominor.yy0,yymsp[0].minor.yy0); }
 #line 646 "../../Runtime/lemon/cfg.c"
         break;
       case 1: /* expr ::= expr AND expr */
-#line 16 "../../Runtime/lemon/cfg.y"
-{yygotominor.yy0.value =  cg->rule2(yymsp[-2].minor.yy0,yymsp[0].minor.yy0); }
+#line 17 "../../Runtime/lemon/cfg.y"
+{yygotominor.yy0.value =  cg->rule2(yygotominor.yy0,yymsp[-2].minor.yy0,yymsp[0].minor.yy0); }
 #line 651 "../../Runtime/lemon/cfg.c"
         break;
       case 2: /* expr ::= expr OR expr */
-#line 17 "../../Runtime/lemon/cfg.y"
-{ yygotominor.yy0.value = cg->rule3(yymsp[-2].minor.yy0,yymsp[0].minor.yy0); }
+#line 18 "../../Runtime/lemon/cfg.y"
+{ yygotominor.yy0.value = cg->rule3(yygotominor.yy0,yymsp[-2].minor.yy0,yymsp[0].minor.yy0); }
 #line 656 "../../Runtime/lemon/cfg.c"
         break;
       case 3: /* expr ::= NAME IN LPAREN states RPAREN */
-#line 18 "../../Runtime/lemon/cfg.y"
-{ yygotominor.yy0.value = cg->rule5(yymsp[-4].minor.yy0,yymsp[-1].minor.yy0); }
+#line 19 "../../Runtime/lemon/cfg.y"
+{ yygotominor.yy0.value = cg->rule5(yygotominor.yy0,yymsp[-4].minor.yy0,yymsp[-1].minor.yy0); }
 #line 661 "../../Runtime/lemon/cfg.c"
         break;
       case 4: /* states ::= states COMMA NAME */
-#line 19 "../../Runtime/lemon/cfg.y"
-{ yygotominor.yy0.value = cg->rule6(yymsp[-2].minor.yy0,yymsp[0].minor.yy0); }
+#line 20 "../../Runtime/lemon/cfg.y"
+{ yygotominor.yy0.value = cg->rule6(yygotominor.yy0,yymsp[-2].minor.yy0,yymsp[0].minor.yy0); }
 #line 666 "../../Runtime/lemon/cfg.c"
         break;
       case 5: /* states ::= NAME */
-#line 20 "../../Runtime/lemon/cfg.y"
-{ yygotominor.yy0.value = cg->rule7(yymsp[0].minor.yy0);  }
+#line 21 "../../Runtime/lemon/cfg.y"
+{ yygotominor.yy0.value = cg->rule7(yygotominor.yy0,yymsp[0].minor.yy0);  }
 #line 671 "../../Runtime/lemon/cfg.c"
         break;
       default:
@@ -715,8 +715,8 @@ static void yy_parse_failed(
   while( yypParser->yyidx>=0 ) yy_pop_parser_stack(yypParser);
   /* Here code is inserted which will be executed whenever the
   ** parser fails */
-#line 8 "../../Runtime/lemon/cfg.y"
-cg->printFailure(); 
+#line 9 "../../Runtime/lemon/cfg.y"
+cg->lemonFailure(); 
 #line 721 "../../Runtime/lemon/cfg.c"
   ParseARG_STORE; /* Suppress warning about unused %extra_argument variable */
 }
@@ -732,8 +732,8 @@ static void yy_syntax_error(
 ){
   ParseARG_FETCH;
 #define TOKEN (yyminor.yy0)
-#line 7 "../../Runtime/lemon/cfg.y"
-cg->printError(); 
+#line 8 "../../Runtime/lemon/cfg.y"
+cg->lemonError(); 
 #line 738 "../../Runtime/lemon/cfg.c"
   ParseARG_STORE; /* Suppress warning about unused %extra_argument variable */
 }

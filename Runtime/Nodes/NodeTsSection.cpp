@@ -1,6 +1,3 @@
-#ifndef NODE_TS_SECTION_H
-#define NODE_TS_SECTION_H
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -16,7 +13,7 @@ import com.example.tutorial.AddressBookProtos.TsHeader;
 import com.google.protobuf.MessageLite;
 
 
-public class NodeTsSection: public IDevice {
+public class NodeTsSection: INodeDefinition {
     Trace trace = new Trace("NodeTsSection", true);
 
     String actual_mode = "Idle";
@@ -26,6 +23,16 @@ public class NodeTsSection: public IDevice {
     int pid = 0;
 
     IPadOutput result;
+
+    void NodeTsSection::handleMessage(MessageBuf* msg, std::string padName) {
+
+    }
+
+    void NodeTsSection::runCycle() {
+
+    }
+
+
 
     public NodeTsSection(String name, HashMap<String, String> p_params) {
         params = p_params;

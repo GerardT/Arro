@@ -18,7 +18,7 @@ endif
 CFLAGS        = -pipe -Wall -Wextra $(DEFINES) `python2.7-config --cflags`
 CXXFLAGS      = -pipe -std=c++0x -g -frtti -Wall -Wextra -fexceptions $(DEFINES) `python2.7-config --cflags`
 # INCPATH       = -I"." -I"../../protobuf-2.5.0/src"
-INCPATH       = -I"." -I"ElemBlock" -I"/usr/local/include"
+INCPATH       = -I"." -I"NodesBlock" -I"/usr/local/include"
 LINKER        = g++
 # LFLAGS        = -g -Wl,-subsystem		--> -Wl,-subsystem is MinGW stuff, results in no symbols.
 LFLAGS        = -g
@@ -28,7 +28,7 @@ OBJDIR       := debug
 SRCDIR       := ../Runtime
 MKDIR_P      := mkdir -p
 _dummy1      := $(shell mkdir -p debug)
-_dummy2      := $(shell mkdir -p debug/ElemBlock)
+_dummy2      := $(shell mkdir -p debug/Nodes)
 
 DEPS         := $(SRCS:.cpp=.d)
 -include $(DEPS)
@@ -43,17 +43,17 @@ SRCS         := main.cpp \
 		Pad.cpp \
 		Process.cpp \
 		PythonGlue.cpp \
-		ElemBlock/NodeSfc.cpp \
-		ElemBlock/NodePid.cpp \
-		ElemBlock/NodePython.cpp \
-		ElemBlock/NodeTimer.cpp \
-		ElemBlock/NodeServo.cpp \
-		ElemBlock/NodeDCMotor.cpp \
-		ElemBlock/NodeUiCheckBox.cpp \
-		ElemBlock/NodeUiRadioButton.cpp \
-		ElemBlock/NodeUiToggleButton.cpp \
-		ElemBlock/NodeUiUserInput.cpp \
-		ElemBlock/NodeUiUserDisplay.cpp \
+		Nodes/NodeSfc.cpp \
+		Nodes/NodePid.cpp \
+		Nodes/NodePython.cpp \
+		Nodes/NodeTimer.cpp \
+		Nodes/NodeServo.cpp \
+		Nodes/NodeDCMotor.cpp \
+		Nodes/NodeUiCheckBox.cpp \
+		Nodes/NodeUiRadioButton.cpp \
+		Nodes/NodeUiToggleButton.cpp \
+		Nodes/NodeUiUserInput.cpp \
+		Nodes/NodeUiUserDisplay.cpp \
 		tinyxmlparser.cpp \
 		tinyxmlerror.cpp \
 		tinyxml.cpp \

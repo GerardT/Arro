@@ -6,11 +6,11 @@
 
 #include "arro.pb.h"
 #include "Trace.h"
-#include "AbstractNode.h"
+#include "INodeContext.h"
 
 
 namespace Arro {
-    class NodePython: public IElemBlock {
+    class NodePython: public INodeDefinition {
     public:
         /**
          * Constructor
@@ -19,7 +19,7 @@ namespace Arro {
          * \param className Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodePython(AbstractNode* elemBlock, const std::string& className, StringMap& params, TiXmlElement*);
+        NodePython(INodeContext* elemBlock, const std::string& className, StringMap& params, TiXmlElement*);
         virtual ~NodePython();
 
         // Copy and assignment is not supported.
@@ -45,7 +45,7 @@ namespace Arro {
     private:
         Trace m_trace;
         StringMap m_params;
-        AbstractNode* m_elemBlock;
+        INodeContext* m_elemBlock;
         PyObject *m_pFunc, *m_pValue, *m_pArgs, *m_pClass, *m_pInstance;
         std::queue<PyObject*> m_messages;
     };

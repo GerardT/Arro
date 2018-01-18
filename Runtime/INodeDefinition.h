@@ -1,5 +1,5 @@
-#ifndef ARRO_IDEVICE
-#define ARRO_IDEVICE
+#ifndef ARRO_I_NODE_DEFINITION_H
+#define ARRO_I_NODE_DEFINITION_H
 
 #include <string>
 #include <memory>
@@ -9,15 +9,17 @@ namespace Arro {
 
 
     /**
-     * \brief Interface to be implemented by all elemBlocks.
+     * \brief Interface to be implemented by all Nodes.
      *
-     * This interface is for implementing elemBlock instances:
-     * - handleMessage will pass data to the elemBlock.
+     * An ElemBlock is named 'Node' in this Runtime code.
+     *
+     * This interface is for implementing node instances:
+     * - handleMessage -> obsolete
      * - runCycle will trigger running one execution cycle.
      */
-    class IElemBlock {
+    class INodeDefinition {
     public:
-        virtual ~IElemBlock() {};
+        virtual ~INodeDefinition() {};
 
         virtual void test() {};
 

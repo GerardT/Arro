@@ -11,10 +11,10 @@ namespace Arro
     class NodeSfc;
 
     /**
-     * \brief Process, like Pad, implements AbstractNode.
+     * \brief Process, like Pad, implements INodeContext.
      *
      * Process is for functional process nodes, Pad is for non-functional connection pads.
-     * This constructor creates (depending on url) one associated IDevice derived instance.
+     * This constructor creates (depending on url) one associated INodeDefinition derived instance.
      */
     class Process: public RealNode {
 
@@ -111,7 +111,7 @@ namespace Arro
     private:
         Trace m_trace;
         NodeDb& m_nodeDb;
-        IElemBlock* m_elemBlock;
+        INodeDefinition* m_elemBlock;
         bool m_doRunCycle;
         std::string m_name;
     };

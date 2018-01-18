@@ -1,5 +1,5 @@
-#include <ElemBlock/NodeSfc.h>
 #include <lemon/CodeGenInterface.h>
+#include <Nodes/NodeSfc.h>
 #include <iostream>
 #include <vector>
 #include <exception>
@@ -14,7 +14,7 @@ using namespace arro;
 
 static RegisterMe<NodeSfc> registerMe("_SFC");
 
-NodeSfc::NodeSfc(AbstractNode* elemBlock, const string& /*name*/, StringMap& /*params*/, TiXmlElement* elt):
+NodeSfc::NodeSfc(INodeContext* elemBlock, const string& /*name*/, StringMap& /*params*/, TiXmlElement* elt):
     m_trace{"NodeSfc", true},
     m_process{elemBlock} {
 

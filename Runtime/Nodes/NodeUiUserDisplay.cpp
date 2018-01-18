@@ -2,12 +2,12 @@
 
 #include "arro.pb.h"
 #include "Trace.h"
-#include "AbstractNode.h"
+#include "INodeContext.h"
 
 namespace Arro {
 
 class NodeRef;
-class NodeUiUserDisplay: public IElemBlock {
+class NodeUiUserDisplay: public INodeDefinition {
 public:
     /**
      * Constructor
@@ -16,7 +16,7 @@ public:
      * \param name Name of this node.
      * \param params List of parameters passed to this node.
      */
-    NodeUiUserDisplay(AbstractNode* d, const std::string& name, StringMap& params, TiXmlElement*);
+    NodeUiUserDisplay(INodeContext* d, const std::string& name, StringMap& params, TiXmlElement*);
 
     virtual ~NodeUiUserDisplay();
 
@@ -35,7 +35,7 @@ public:
 
 private:
     Trace m_trace;
-    AbstractNode* m_elemBlock;
+    INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
     NodeSingleInput* m_input;
     NodeSingleInput* m_value;
@@ -51,7 +51,7 @@ using namespace arro;
 
 static RegisterMe<NodeUiUserDisplay> registerMe("ProgressOutput");
 
-NodeUiUserDisplay::NodeUiUserDisplay(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+NodeUiUserDisplay::NodeUiUserDisplay(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodeUiReceiveNumber", true),
     m_elemBlock(d) {
 

@@ -1,7 +1,7 @@
 #ifndef ARRO_REAL_NODE_H
 #define ARRO_REAL_NODE_H
 
-#include "AbstractNode.h"
+#include "INodeContext.h"
 
 
 namespace Arro
@@ -11,7 +11,7 @@ namespace Arro
      *
      * The name is the instance name: ".node.subnode.subnode"
      *
-     * AbstractNode is the NodeDb-internal representation of a Node.
+     * INodeContext is the NodeDb-internal representation of a Node.
      *
      * A typical Eclipse diagram consists of nodes and pads. The pads are the
      * connection points to other nodes in parent diagrams.
@@ -19,7 +19,7 @@ namespace Arro
      * to each other. The use NodeSingleInput and NodeMultiOutput objects to connect
      * to each other.
      */
-    class RealNode : public AbstractNode {
+    class RealNode : public INodeContext {
     public:
         /**
          * Constructor.

@@ -3,11 +3,11 @@
 
 #include "arro.pb.h"
 #include "Trace.h"
-#include "AbstractNode.h"
+#include "INodeContext.h"
 
 namespace Arro
 {
-    class NodeTimer: public IElemBlock {
+    class NodeTimer: public INodeDefinition {
     public:
         /**
          * Constructor
@@ -16,7 +16,7 @@ namespace Arro
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodeTimer(AbstractNode* d, const std::string& name, StringMap& params, TiXmlElement*);
+        NodeTimer(INodeContext* d, const std::string& name, StringMap& params, TiXmlElement*);
         virtual ~NodeTimer();
 
         // Copy and assignment is not supported.
@@ -44,7 +44,7 @@ namespace Arro
     private:
         Trace m_trace;
         int m_ticks;
-        AbstractNode* m_elemBlock;
+        INodeContext* m_elemBlock;
         std::string m_actual_mode;
     };
 }

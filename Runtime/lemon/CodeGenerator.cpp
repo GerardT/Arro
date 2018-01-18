@@ -1,4 +1,5 @@
 
+#include <INodeContext.h>
 #include <lemon/CodeGenInterface.h>
 #include "Trace.h"
 #include <stdio.h>
@@ -12,7 +13,6 @@
 #include <iostream>
 #include <functional>
 
-#include "AbstractNode.h"
 
 
 // lemon token struct

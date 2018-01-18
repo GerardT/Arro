@@ -1,6 +1,6 @@
 #include <arro.pb.h>
-#include <ElemBlock/NodePython.h>
 #include <NodeDb.h>
+#include <Nodes/NodePython.h>
 #include <PythonGlue.h>
 #include <ServerEngine.h>
 
@@ -14,7 +14,7 @@ static RegisterMe<NodePython> registerMe("Python");
  * Will instantiate an object of class className inside Python that
  * will be used for the lifetime of the Process.
  */
-NodePython::NodePython(AbstractNode* d, const string& className, StringMap& /*params*/, TiXmlElement*):
+NodePython::NodePython(INodeContext* d, const string& className, StringMap& /*params*/, TiXmlElement*):
     m_trace("NodePython", true),
     m_elemBlock(d)
 {

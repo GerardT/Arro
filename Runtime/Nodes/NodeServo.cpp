@@ -17,10 +17,10 @@
 
 #include "arro.pb.h"
 #include "Trace.h"
-#include "AbstractNode.h"
+#include "INodeContext.h"
 
 namespace Arro {
-    class NodeServo: public IElemBlock {
+    class NodeServo: public INodeDefinition {
     public:
 
         /**
@@ -30,7 +30,7 @@ namespace Arro {
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodeServo(AbstractNode* d, const std::string& name, StringMap& params, TiXmlElement*);
+        NodeServo(INodeContext* d, const std::string& name, StringMap& params, TiXmlElement*);
         virtual ~NodeServo() {};
 
         // Copy and assignment is not supported.
@@ -97,7 +97,7 @@ namespace Arro {
         };
 
         Trace m_trace;
-        AbstractNode* m_elemBlock;
+        INodeContext* m_elemBlock;
         double m_previous_position;
         double m_actual_position;
         int m_ms_elapsed;
@@ -232,7 +232,7 @@ NodeServo::Servo::start(int ch, int val) {
 NodeServo::Servo* NodeServo::m_pServo = nullptr;
 
 
-NodeServo::NodeServo(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+NodeServo::NodeServo(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodeServo", true),
     m_elemBlock(d),
     m_previous_position(0),

@@ -2,13 +2,13 @@
 
 #include "arro.pb.h"
 #include "Trace.h"
-#include "AbstractNode.h"
+#include "INodeContext.h"
 #include "json.hpp"
 
 namespace Arro {
 
 class NodeRef;
-class NodeUiToggleButton: public IElemBlock {
+class NodeUiRadioButton: public INodeDefinition {
 public:
     /**
      * Constructor
@@ -17,9 +17,9 @@ public:
      * \param name Name of this node.
      * \param params List of parameters passed to this node.
      */
-    NodeUiToggleButton(AbstractNode* d, const std::string& name, StringMap& params, TiXmlElement*);
+    NodeUiRadioButton(INodeContext* d, const std::string& name, StringMap& params, TiXmlElement*);
 
-    virtual ~NodeUiToggleButton();
+    virtual ~NodeUiRadioButton();
 
     /**
      * Handle a message that is sent to this node.
@@ -36,7 +36,7 @@ public:
 
 private:
     Trace m_trace;
-    AbstractNode* m_elemBlock;
+    INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
     NodeMultiOutput* m_value;
 
@@ -49,10 +49,10 @@ using namespace std;
 using namespace Arro;
 using namespace arro;
 
-static RegisterMe<NodeUiToggleButton> registerMe("ToggleButton");
+static RegisterMe<NodeUiRadioButton> registerMe("RadioButton");
 
-NodeUiToggleButton::NodeUiToggleButton(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
-    m_trace("NodeUiUserInput.cpp", true),
+NodeUiRadioButton::NodeUiRadioButton(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+    m_trace("NodeUiRadioButton", true),
     m_elemBlock(d) {
 
     std::string name;
@@ -63,8 +63,33 @@ NodeUiToggleButton::NodeUiToggleButton(AbstractNode* d, const string& /*name*/, 
         name = iter->second;
         params.erase(iter);
     }
-    std::string inst = std::string("<arro-toggle-button id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-toggle-button>";
 
+    std::string data;
+    auto iter2 = params.find(std::string("data"));
+    if(iter2 != params.end()) {
+        data = iter2->second;
+        // ? params.erase(iter);
+
+    }
+
+    //    <arro-radio-button id=".main.aComposite.aRadioButton" name="No Name" data='[
+    //         {"name":"small","label":"Small"},{"name":"medium","label":"Medium"}
+    //         ]'>
+    //    </arro-radio-button>
+
+    std::istringstream l(data);
+    std::string s;
+    int i = 0;
+    std::string inst = std::string("<arro-radio-button id=\"") + d->getName() + "\" name=\"" + name + "\" data=\'[";
+    while(getline(l, s, '|')) {
+        // add s as radio button
+        if(i++ != 0) {
+            inst += ",";
+        }
+        inst += "{\"name\":\"" + s + "\",\"label\":\"" + s + "\"}";
+
+    }
+    inst += "]\'>  </arro-radio-button>";
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
         m_value = m_elemBlock->getOutput("value");
 
@@ -72,17 +97,18 @@ NodeUiToggleButton::NodeUiToggleButton(AbstractNode* d, const string& /*name*/, 
         auto info = nlohmann::json::parse(data.c_str());
         sel->set_value(info["value"]);
         m_elemBlock->setOutputData(m_value, sel);
+
                     });
 
 }
 
-NodeUiToggleButton::~NodeUiToggleButton() {
+NodeUiRadioButton::~NodeUiRadioButton() {
     SocketClient::getInstance()->unsubscribe(m_uiClient);
 }
 
-void NodeUiToggleButton::handleMessage(const MessageBuf& /*m*/, const std::string& /*padName*/) {
+void NodeUiRadioButton::handleMessage(const MessageBuf& /*m*/, const std::string& /*padName*/) {
 }
 
-void NodeUiToggleButton::runCycle() {
+void NodeUiRadioButton::runCycle() {
 }
 

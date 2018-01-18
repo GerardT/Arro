@@ -2,13 +2,13 @@
 
 #include "arro.pb.h"
 #include "Trace.h"
-#include "AbstractNode.h"
+#include "INodeContext.h"
 #include "json.hpp"
 
 namespace Arro {
 
 class NodeRef;
-class NodeUiCheckBox: public IElemBlock {
+class NodeUiUserInput: public INodeDefinition {
 public:
     /**
      * Constructor
@@ -17,9 +17,9 @@ public:
      * \param name Name of this node.
      * \param params List of parameters passed to this node.
      */
-    NodeUiCheckBox(AbstractNode* d, const std::string& name, StringMap& params, TiXmlElement*);
+    NodeUiUserInput(INodeContext* d, const std::string& name, StringMap& params, TiXmlElement*);
 
-    virtual ~NodeUiCheckBox();
+    virtual ~NodeUiUserInput();
 
     /**
      * Handle a message that is sent to this node.
@@ -36,7 +36,7 @@ public:
 
 private:
     Trace m_trace;
-    AbstractNode* m_elemBlock;
+    INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
     NodeMultiOutput* m_value;
 
@@ -49,9 +49,9 @@ using namespace std;
 using namespace Arro;
 using namespace arro;
 
-static RegisterMe<NodeUiCheckBox> registerMe("CheckBox");
+static RegisterMe<NodeUiUserInput> registerMe("SliderInput");
 
-NodeUiCheckBox::NodeUiCheckBox(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+NodeUiUserInput::NodeUiUserInput(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodeUiReceiveNumber", true),
     m_elemBlock(d) {
 
@@ -63,26 +63,30 @@ NodeUiCheckBox::NodeUiCheckBox(AbstractNode* d, const string& /*name*/, StringMa
         name = iter->second;
         params.erase(iter);
     }
-    std::string inst = std::string("<arro-check-box id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-check-box>";
+
+    //    <arro-slider id=".main.aComposite.aInput1.aSliderInput" name="speed"></arro-slider>
+
+    std::string inst = std::string("<arro-slider id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-slider>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
         m_value = m_elemBlock->getOutput("value");
 
-        Selection* sel = new Selection();
+        Value* sel = new Value();
         auto info = nlohmann::json::parse(data.c_str());
-        sel->set_value(info["value"]);
+        int value = info["value"];
+        sel->set_value(value);
         m_elemBlock->setOutputData(m_value, sel);
                     });
 
 }
 
-NodeUiCheckBox::~NodeUiCheckBox() {
+NodeUiUserInput::~NodeUiUserInput() {
     SocketClient::getInstance()->unsubscribe(m_uiClient);
 }
 
-void NodeUiCheckBox::handleMessage(const MessageBuf& /*m*/, const std::string& /*padName*/) {
+void NodeUiUserInput::handleMessage(const MessageBuf& /*m*/, const std::string& /*padName*/) {
 }
 
-void NodeUiCheckBox::runCycle() {
+void NodeUiUserInput::runCycle() {
 }
 

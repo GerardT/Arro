@@ -1,4 +1,4 @@
-#include <ElemBlock/NodeTimer.h>
+#include <Nodes/NodeTimer.h>
 #include <tinyxml.h>
 #include <iostream>
 #include <sstream>
@@ -88,7 +88,7 @@ NodeMultiOutput::submitMessageBuffer(const char* msg) {
 
 
 
-AbstractNode*
+INodeContext*
 NodeDb::getNode(const string& name) {
     try {
         auto n = &(*(m_allNodes[name]));
@@ -100,14 +100,14 @@ NodeDb::getNode(const string& name) {
     }
 }
 
-AbstractNode*
-NodeDb::registerNode(AbstractNode* node, const string& name) {
-     m_allNodes[name] = std::unique_ptr<AbstractNode>(node);
+INodeContext*
+NodeDb::registerNode(INodeContext* node, const string& name) {
+     m_allNodes[name] = std::unique_ptr<INodeContext>(node);
      return node;
 }
 
 NodeSingleInput*
-NodeDb::registerNodeInput(AbstractNode* node, const string& interfaceName,
+NodeDb::registerNodeInput(INodeContext* node, const string& interfaceName,
                           std::function<void (const MessageBuf& msg, const std::string& interfaceName)> listen) {
     auto n = new NodeSingleInput(interfaceName, listen, node);
     // If NodePass don't use interfaceName
@@ -123,7 +123,7 @@ NodeDb::registerNodeInput(AbstractNode* node, const string& interfaceName,
 }
 
 NodeMultiOutput*
-NodeDb::registerNodeOutput(AbstractNode* node, const string& interfaceName) {
+NodeDb::registerNodeOutput(INodeContext* node, const string& interfaceName) {
     auto n = new NodeMultiOutput(this);
 
     // If NodePass don't use interfaceName
@@ -189,7 +189,7 @@ NodeDb::runCycle(NodeDb* nm) {
 
             /* Then trigger all runCycle methods on nodes */
             for(auto it = nm->m_allNodes.begin(); it != nm->m_allNodes.end(); ++it) {
-                AbstractNode* an = &(*(it->second));
+                INodeContext* an = &(*(it->second));
                 ((RealNode*)(an))->runCycle();
 
                 //it->second->runCycle();

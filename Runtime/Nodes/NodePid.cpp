@@ -1,9 +1,9 @@
 #include "arro.pb.h"
 #include "Trace.h"
-#include "AbstractNode.h"
+#include "INodeContext.h"
 
 namespace Arro {
-    class NodePid: public IElemBlock {
+    class NodePid: public INodeDefinition {
     public:
         /**
          * Constructor
@@ -12,7 +12,7 @@ namespace Arro {
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodePid(AbstractNode* elemBlock, const std::string& name, StringMap& params, TiXmlElement*);
+        NodePid(INodeContext* elemBlock, const std::string& name, StringMap& params, TiXmlElement*);
         virtual ~NodePid() {};
 
         // Copy and assignment is not supported.
@@ -45,7 +45,7 @@ namespace Arro {
         double m_Ki;    // factor for "integral" control
         double m_Kd;    // factor for "derivative" control
         StringMap m_params;
-        AbstractNode* m_elemBlock;
+        INodeContext* m_elemBlock;
     };
 }
 #include "arro.pb.h"
@@ -56,7 +56,7 @@ using namespace arro;
 
 static RegisterMe<NodePid> registerMe("pid");
 
-NodePid::NodePid(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+NodePid::NodePid(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
     m_trace("NodePid", true),
     m_elemBlock(d) {
 

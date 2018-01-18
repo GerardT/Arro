@@ -6,7 +6,7 @@
 #include <sstream>
 #include <map>
 
-#include "AbstractNode.h"
+#include "INodeContext.h"
 #include "Trace.h"
 
 #define ARRO_SFC_INSTANCE   "._Sfc"
@@ -44,7 +44,7 @@ namespace Arro
         /*
          * \brief Class that contains XML chunk for one node definition.
          *
-         * Each Definition contains the XML chunk between <nodedefinition> and </nodedefinition>.
+         * Each Definition contains the XML chunk between <INodeDefinitioninition> and </INodeDefinitioninition>.
          * This class doesn't do a lot, mainly for future extension and wrapping of TiXml.
          */
         class Definition {
@@ -59,10 +59,10 @@ namespace Arro
 
         /**
          * Store a node definition in 'definitions' maps with its type as key.
-         * A nodedefinition for example:
-         * <nodedefinition id="c02854c7-2cbc-4c30-9cb2-76872b3186b0" type="NewNode">
+         * A INodeDefinitioninition for example:
+         * <INodeDefinitioninition id="c02854c7-2cbc-4c30-9cb2-76872b3186b0" type="NewNode">
          *    :
-         * </nodedefinition>
+         * </INodeDefinitioninition>
          *
          * \param node The node to be stored.
          */
@@ -71,12 +71,12 @@ namespace Arro
         /**
          * Process parameters for a node in a diagram.
          * For example:
-         * <nodedefinition id="c02854c7-2cbc-4c30-9cb2-76872b3186b0" type="NewNode">
+         * <INodeDefinitioninition id="c02854c7-2cbc-4c30-9cb2-76872b3186b0" type="NewNode">
          *     <node id="609bb62b-8f4c-4708-b168-7de11c6826e3" name="aNewDevice" type="NewDevice"/>
          *     <pad id="02b7ccf9-fe1f-43fe-8441-0da0b8a04b8d" input="true" name="afixed32" type="fixed32"/>
          *     <pad id="955c676e-d808-4aad-836b-2d376afa352c" input="true" name="abool" type="bool"/>
          *     <param key="P1" subst="Motor1" value="1"/>
-         * </nodedefinition>
+         * </INodeDefinitioninition>
          *
          * If a parameter in importParams has a key equal to the 'subst' value in the param element,then
          * use the value of importParams to replace value in param element.
@@ -91,14 +91,14 @@ namespace Arro
         void getParamsAndSubstitute(TiXmlElement* node, StringMap& importParams, StringMap& params);
 
         /**
-         * In a recursive way, process nodedefinition XML blocks (node).
+         * In a recursive way, process INodeDefinitioninition XML blocks (node).
          * For example:
-         * <nodedefinition id="c02854c7-2cbc-4c30-9cb2-76872b3186b0" type="NewNode">
+         * <INodeDefinitioninition id="c02854c7-2cbc-4c30-9cb2-76872b3186b0" type="NewNode">
          *     <node id="609bb62b-8f4c-4708-b168-7de11c6826e3" name="aNewDevice" type="NewDevice"/>
          *     <pad id="02b7ccf9-fe1f-43fe-8441-0da0b8a04b8d" input="true" name="afixed32" type="fixed32"/>
          *     <pad id="955c676e-d808-4aad-836b-2d376afa352c" input="true" name="abool" type="bool"/>
          *     <param key="P1" subst="Motor1" value="1"/>
-         * </nodedefinition>
+         * </INodeDefinitioninition>
          *
          * If (definition) node has subnodes, instantiate them as well.
          * If (definition) node has no subnodes, then assumed to be primitive node.

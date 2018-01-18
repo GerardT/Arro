@@ -1,5 +1,5 @@
-#ifndef ARRO_ABSTRACT_NODE_H
-#define ARRO_ABSTRACT_NODE_H
+#ifndef ARRO_I_NODE_CONTEXT_H
+#define ARRO_I_NODE_CONTEXT_H
 
 #include <memory>
 #include <functional>
@@ -7,7 +7,7 @@
 #include <map>
 #include <tinyxml.h>
 #include <google/protobuf/message.h>
-#include "IElemBlock.h"
+#include "INodeDefinition.h"
 
 
 
@@ -31,13 +31,13 @@ namespace Arro
     void SendToConsole(std::string s);
 
 
-    class AbstractNode {
+    class INodeContext {
     public:
         /**
          * Constructor.
          */
-        AbstractNode() {};
-        virtual ~AbstractNode() {};
+        INodeContext() {};
+        virtual ~INodeContext() {};
 
         virtual void sendParameters(StringMap& params) = 0;
 
@@ -73,7 +73,7 @@ namespace Arro
 
 
 
-    typedef std::function<IElemBlock* (AbstractNode* d, const std::string& instance, std::map<std::string, std::string>& params, TiXmlElement* elt)> Factory;
+    typedef std::function<INodeDefinition* (INodeContext* d, const std::string& instance, std::map<std::string, std::string>& params, TiXmlElement* elt)> Factory;
 
     void registerFactory(const std::string& name, Factory factory);
 
@@ -86,7 +86,7 @@ namespace Arro
     class RegisterMe {
     public:
         RegisterMe(const std::string& name) {
-            registerFactory(name, [](AbstractNode* d, const std::string& instance, std::map<std::string, std::string>& params, TiXmlElement* elt) ->IElemBlock* {
+            registerFactory(name, [](INodeContext* d, const std::string& instance, std::map<std::string, std::string>& params, TiXmlElement* elt) ->INodeDefinition* {
                 return new T(d, instance, params, elt);
             });
         };

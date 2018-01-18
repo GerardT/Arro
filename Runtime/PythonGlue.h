@@ -11,8 +11,8 @@
 
 #include "arro.pb.h"
 #include "ConfigReader.h"
-#include "ElemBlock/NodePython.h"
 #include "NodeDb.h"
+#include "Nodes/NodePython.h"
 #include "Process.h"
 
 namespace Arro {

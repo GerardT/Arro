@@ -1,3 +1,5 @@
+#ifndef NODE_TS_READER_H
+#define NODE_TS_READER_H
 
 /*
 import com.example.tutorial.AddressBookProtos.Tick;
@@ -11,7 +13,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.MessageLite;
 */
 
-class NodeTsReader: IDevice {
+class NodeTsReader: public INodeDefinition {
 private:
     Trace trace = new Trace("", false);
 
@@ -24,14 +26,6 @@ private:
     IPadOutput result;
 
 public:
-    void NodeTsReader::handleMessage(MessageBuf* msg, std::string padName) {
-
-    }
-
-    void NodeTsReader::runCycle() {
-
-    }
-
 
     NodeTsReader(String name, HashMap<String, String> p_params) {
         params = p_params;
@@ -40,8 +34,7 @@ public:
 
         INode n;// = NodeDb.getRef().registerNode(name);
 
-        n.registerNodeInput("Tick", "timer", new IPadListener() {
-            @Override
+        n.registerNodeInput("Tick", "timer", new NodeDb.NodeInputListener() {
             public void handleMessage(MessageBuf msg, string padName) {
                 Tick* msg = new Tick();
                 msg->ParseFromString(m);
@@ -55,8 +48,7 @@ public:
             }
         });
 
-        n.registerNodeInput("Mode", "mode", new IPadListener() {
-            @Override
+        n.registerNodeInput("Mode", "mode", new NodeDb.NodeInputListener() {
             public void handleMessage(MessageBuf msg, string padName) {
                 Mode* msg = new Mode();
                 msg->ParseFromString(m);

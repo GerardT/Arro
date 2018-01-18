@@ -2,13 +2,13 @@
 
 #include "arro.pb.h"
 #include "Trace.h"
-#include "AbstractNode.h"
+#include "INodeContext.h"
 #include "json.hpp"
 
 namespace Arro {
 
 class NodeRef;
-class NodeUiUserInput: public IElemBlock {
+class NodeUiToggleButton: public INodeDefinition {
 public:
     /**
      * Constructor
@@ -17,9 +17,9 @@ public:
      * \param name Name of this node.
      * \param params List of parameters passed to this node.
      */
-    NodeUiUserInput(AbstractNode* d, const std::string& name, StringMap& params, TiXmlElement*);
+    NodeUiToggleButton(INodeContext* d, const std::string& name, StringMap& params, TiXmlElement*);
 
-    virtual ~NodeUiUserInput();
+    virtual ~NodeUiToggleButton();
 
     /**
      * Handle a message that is sent to this node.
@@ -36,7 +36,7 @@ public:
 
 private:
     Trace m_trace;
-    AbstractNode* m_elemBlock;
+    INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
     NodeMultiOutput* m_value;
 
@@ -49,10 +49,10 @@ using namespace std;
 using namespace Arro;
 using namespace arro;
 
-static RegisterMe<NodeUiUserInput> registerMe("SliderInput");
+static RegisterMe<NodeUiToggleButton> registerMe("ToggleButton");
 
-NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, StringMap& params, TiXmlElement*):
-    m_trace("NodeUiReceiveNumber", true),
+NodeUiToggleButton::NodeUiToggleButton(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+    m_trace("NodeUiUserInput.cpp", true),
     m_elemBlock(d) {
 
     std::string name;
@@ -63,30 +63,26 @@ NodeUiUserInput::NodeUiUserInput(AbstractNode* d, const string& /*name*/, String
         name = iter->second;
         params.erase(iter);
     }
-
-    //    <arro-slider id=".main.aComposite.aInput1.aSliderInput" name="speed"></arro-slider>
-
-    std::string inst = std::string("<arro-slider id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-slider>";
+    std::string inst = std::string("<arro-toggle-button id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-toggle-button>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
         m_value = m_elemBlock->getOutput("value");
 
-        Value* sel = new Value();
+        Selection* sel = new Selection();
         auto info = nlohmann::json::parse(data.c_str());
-        int value = info["value"];
-        sel->set_value(value);
+        sel->set_value(info["value"]);
         m_elemBlock->setOutputData(m_value, sel);
                     });
 
 }
 
-NodeUiUserInput::~NodeUiUserInput() {
+NodeUiToggleButton::~NodeUiToggleButton() {
     SocketClient::getInstance()->unsubscribe(m_uiClient);
 }
 
-void NodeUiUserInput::handleMessage(const MessageBuf& /*m*/, const std::string& /*padName*/) {
+void NodeUiToggleButton::handleMessage(const MessageBuf& /*m*/, const std::string& /*padName*/) {
 }
 
-void NodeUiUserInput::runCycle() {
+void NodeUiToggleButton::runCycle() {
 }
 

@@ -3,7 +3,7 @@
 
 #include "arro.pb.h"
 #include "Trace.h"
-#include "AbstractNode.h"
+#include "INodeContext.h"
 #include <list>
 #include <string>
 #include <iostream>
@@ -84,7 +84,7 @@ namespace Arro {
 
 
 
-    class NodeSfc: public IElemBlock {
+    class NodeSfc: public INodeDefinition {
     public:
         /**
          * Constructor
@@ -93,7 +93,7 @@ namespace Arro {
          * \param name Name of this node.
          * \param params List of parameters passed to this node.
          */
-        NodeSfc(AbstractNode* d, const std::string& name, StringMap& params, TiXmlElement* elt);
+        NodeSfc(INodeContext* d, const std::string& name, StringMap& params, TiXmlElement* elt);
         virtual ~NodeSfc() {};
 
         virtual void finishConstruction();
@@ -228,7 +228,7 @@ namespace Arro {
 
         }
 
-        const AbstractNode* getProcess() const {
+        const INodeContext* getProcess() const {
             return m_process;
         }
 
@@ -239,7 +239,7 @@ namespace Arro {
 
     private:
         Trace m_trace;
-        AbstractNode* m_process;
+        INodeContext* m_process;
         // List of steps for this SFC
         std::list<std::unique_ptr<SfcStep> > m_steps;
         // List of transitions for this SFC
