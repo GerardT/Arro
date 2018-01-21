@@ -1,5 +1,6 @@
 package arro.diagram.types;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
@@ -73,7 +74,13 @@ public class UiBlockDiagramFeatureProvider extends DefaultFeatureProvider {
             return new ArroIDAddFeature(this);
         } else if (context instanceof IAddContext && context.getNewObject() instanceof ArroDevice) {
             return new ArroBoxAddFeature(this);
-		}
+        } else if (context instanceof IAddContext && context.getNewObject() instanceof IFile) {
+            IFile file = (IFile)context.getNewObject();
+            if(file.getName().endsWith(".amsg")) {
+                // Add a Node even if a diagram was added...
+                return new ArroPadAddFeature(this);
+            }
+        }
 
 
 		return super.getAddFeature(context);

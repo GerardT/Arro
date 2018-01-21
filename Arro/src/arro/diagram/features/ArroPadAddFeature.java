@@ -44,7 +44,7 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
         	return false;
         }
         int docType = ((FunctionDiagramEditor)dc).getDocumentType();
-        if(docType == Constants.CodeBlockPython || docType == Constants.CodeBlockNative) {
+        if(docType == Constants.CodeBlockPython || docType == Constants.CodeBlockNative || docType == Constants.CodeBlockHtml) {
     		// If target diagram is device diagram then only allow dropping inside the box.
     		return context.getNewObject() instanceof IFile && !(context.getTargetContainer() instanceof Diagram);
         } else {
