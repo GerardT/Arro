@@ -117,7 +117,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
 
     // Read elemBlocks (the leaves in the tree)
-    elt = def->m_node->FirstChildElement("device");
+    elt = def->m_node->FirstChildElement("elem_block");
     while(elt) {
         const string* typeURL = elt->Attribute(string("url"));
 
@@ -138,7 +138,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
             delete params;
         }
-        elt = elt->NextSiblingElement("device");
+        elt = elt->NextSiblingElement("elem_block");
     }
     // Read elemBlocks (the leaves in the tree) There should be only one sfc node.
     elt = def->m_node->FirstChildElement("sfc");
@@ -149,7 +149,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
         {
             /*
             <module id="12...34" type="_Sfc">
-                <device id="12...34" url="Sfc:"/>
+                <sfc id="12...34" url="Sfc:"/>
                 <pad id="12...34" input="true" name="_action" run="true" type="Action"/>
                 <pad id="12...34" input="false" name="_action_nodeX" run="true" type="Action"/>
                 <pad id="12...34" input="false" name="_action_nodeY" run="true" type="Action"/>
