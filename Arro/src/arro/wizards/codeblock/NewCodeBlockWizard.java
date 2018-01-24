@@ -65,7 +65,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
     private NewCodeBlockWizardPage page;
     private ISelection selection;
     private ArroModule nodeDiagram;
-    private ArroDevice device;
+    private ArroDevice elemBlock;
     private ArroSequenceChart stateNode;
     private ArroStep readyStep;
     private ArroStep termStep;
@@ -321,7 +321,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
         
         URI uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
         
-        // Create 'ID' in device diagram, calling ArroIDAddFeature
+        // Create 'ID' in elemBlock diagram, calling ArroIDAddFeature
         AddContext context = new AddContext();
         context.setNewObject(nodeDiagram);
         context.setTargetContainer(diagram);
@@ -330,9 +330,9 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
         IAddFeature f = dtp.getFeatureProvider().getAddFeature(context);
         f.add(context);
 
-        // Create 'BOX' in device diagram
-        device = new ArroDevice();
-        context.setNewObject(device);
+        // Create 'BOX' in elemBlock diagram
+        elemBlock = new ArroDevice();
+        context.setNewObject(elemBlock);
 
         f = dtp.getFeatureProvider().getAddFeature(context);
         f.add(context);
@@ -387,7 +387,7 @@ public class NewCodeBlockWizard extends Wizard implements INewWizard {
     private InputStream openXmlStream(IFile file, String diagramName, String language) throws CoreException {
         String contents =   "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
                 "<module id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
-                "    <device id=\"" + device.getId() + "\" url=\"" + language + ":" + diagramName + "\"/>\n" +
+                "    <elem_block id=\"" + elemBlock.getId() + "\" url=\"" + language + ":" + diagramName + "\"/>\n" +
                 "    <sfc id=\"" + stateNode.getId() + "\" name=\"_sfc\" type=\"_Sfc\">\n" +
                 "        <step id=\"" + readyStep.getId() + "\" name=\"" + Constants.PROP_CONTEXT_READY_STEP + "\"/>" +
                 "        <step id=\"" + termStep.getId() + "\" name=\"" + Constants.PROP_CONTEXT_TERM_STEP + "\"/>" +

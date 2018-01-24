@@ -134,7 +134,7 @@
              label="Send Requests">
           </propertyTab>
        </propertyTabs>
-       <!-- Define 5 tabs for device diagrams -->
+       <!-- Define 5 tabs for elemBlock diagrams -->
        <propertyTabs
           contributorId="ArroFunctionLeafDiagram.PropertyContributor">
           <propertyTab
@@ -209,7 +209,7 @@
           <propertySection
               class="property.ArroParamSectionDevice"
               filter="property.ArroParamFilterDevice"
-              id="arro.param.section.device"
+              id="arro.param.section.elemBlock"
               tab="arro.param.tab">
           </propertySection>
           <propertySection
@@ -260,7 +260,7 @@
           <propertySection
               class="property.ArroParamSectionDevice"
               filter="property.ArroParamFilterDevice"
-              id="arro.param.section.device"
+              id="arro.param.section.elemBlock"
               tab="arro.param.tab">
           </propertySection>
           <propertySection
@@ -305,7 +305,7 @@
           <propertySection
               class="property.ArroParamSectionDevice"
               filter="property.ArroParamFilterDevice"
-              id="arro.param.section.device"
+              id="arro.param.section.elemBlock"
               tab="arro.param.tab">
           </propertySection>
       </propertySections>

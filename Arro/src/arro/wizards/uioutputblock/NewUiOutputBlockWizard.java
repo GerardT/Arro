@@ -63,7 +63,7 @@ public class NewUiOutputBlockWizard extends Wizard implements INewWizard {
     private NewUiOutputBlockWizardPage page;
     private ISelection selection;
     private ArroModule nodeDiagram;
-    private ArroDevice device;
+    private ArroDevice elemBlock;
     private ArroPad pad;
 
 
@@ -293,7 +293,7 @@ public class NewUiOutputBlockWizard extends Wizard implements INewWizard {
         
         URI uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
         
-        // Create 'ID' in device diagram, calling ArroIDAddFeature
+        // Create 'ID' in elemBlock diagram, calling ArroIDAddFeature
         AddContext context = new AddContext();
         context.setNewObject(nodeDiagram);
         context.setTargetContainer(diagram);
@@ -303,25 +303,25 @@ public class NewUiOutputBlockWizard extends Wizard implements INewWizard {
         IAddFeature f = dtp.getFeatureProvider().getAddFeature(context);
         f.add(context);
 
-        // Create 'BOX' in device diagram
-        device = new ArroDevice();
-        context.setNewObject(device);
+        // Create 'BOX' in elemBlock diagram
+        elemBlock = new ArroDevice();
+        context.setNewObject(elemBlock);
 
         f = dtp.getFeatureProvider().getAddFeature(context);
         f.add(context);
 
 
         // Create 'input' pad in diagram.
-        context = new AddContext();
-        context.setX(200);
-        context.setY(200);
-        context.setNewObject(pad);
-        context.setTargetContainer(diagram);
-        context.putProperty(Constants.PROP_CONTEXT_MOD_KEY, nodeDiagram);
-        context.putProperty(Constants.PROP_CONTEXT_NAME_KEY, "input");
-        
-        f = dtp.getFeatureProvider().getAddFeature(context);
-        f.add(context);
+//        context = new AddContext();
+//        context.setX(200);
+//        context.setY(200);
+//        context.setNewObject(pad);
+//        context.setTargetContainer(diagram);
+//        context.putProperty(Constants.PROP_CONTEXT_MOD_KEY, nodeDiagram);
+//        context.putProperty(Constants.PROP_CONTEXT_NAME_KEY, "input");
+//        
+//        f = dtp.getFeatureProvider().getAddFeature(context);
+//        f.add(context);
 
         FileService.createEmfFileForDiagram(uri, diagram);
         
@@ -332,8 +332,7 @@ public class NewUiOutputBlockWizard extends Wizard implements INewWizard {
     private InputStream openXmlStream(IFile file, String diagramName) throws CoreException {
         String contents =   "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
                 "<module id=\"" + nodeDiagram.getId() + "\" type=\"" + diagramName + "\">\n" +
-                "    <device id=\"" + device.getId() + "\" url=\"" + "UiOut:" + diagramName + "\"/>\n" +
-                "        <pad id=\"" + pad.getId() + "\" input=\"true\" name=\"input\" run=\"true\" type=\"Json\"/>" +
+                "    <elem_block id=\"" + elemBlock.getId() + "\" url=\"" + "UiOut:" + diagramName + "\"/>\n" +
                 "</module>\n";
         return new ByteArrayInputStream(contents.getBytes());
     }

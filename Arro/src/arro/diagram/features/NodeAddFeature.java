@@ -61,7 +61,7 @@ public class NodeAddFeature extends AbstractAddFeature implements IAddFeature, I
 
         int docType = ((FunctionDiagramEditor)dc).getDocumentType();
         if(docType == Constants.CodeBlockPython || docType == Constants.CodeBlockNative) {
-        	// cannot add nodes in device diagram.
+        	// cannot add nodes in elemBlock diagram.
 
         	IStatus status = new Status(IStatus.ERROR, "Arro", /*reason*/"Not allowed to drop Node into Device diagram");
 			ErrorDialog.openError(null, "Adding node", "Cannot add node to diagram", status);

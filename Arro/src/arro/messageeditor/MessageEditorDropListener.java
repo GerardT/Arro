@@ -45,7 +45,7 @@ public class MessageEditorDropListener extends ViewerDropAdapter {
 		}
 		
 		if(me.getDocumentType() == Constants.PrimitiveMessageDiagram) {
-        	// cannot add anything in device diagram.
+        	// cannot add anything in elemBlock diagram.
 
         	IStatus status = new Status(IStatus.ERROR, "Arro", /*reason*/"Not allowed to modify protocol buffer scalars types");
 			ErrorDialog.openError(null, "Adding element", "Cannot add to diagram", status);

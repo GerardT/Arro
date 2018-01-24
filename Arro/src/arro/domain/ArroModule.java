@@ -22,7 +22,7 @@ import workspace.ArroModuleContainer;
  */
 public class ArroModule extends NonEmfDomainObject  {
 	private HashMap<String, ArroNode> nodes = new HashMap<String, ArroNode>();
-	private ArroDevice device = null; // Note: either device is specified or one or more nodes. Not both.
+	private ArroDevice elemBlock = null; // Note: either elemBlock is specified or one or more nodes. Not both.
 	private HashMap<String, ArroPad> pads = new HashMap<String, ArroPad>();
 	private HashMap<String, ArroConnection> connections = new HashMap<String, ArroConnection>();
 	private String type;
@@ -61,7 +61,7 @@ public class ArroModule extends NonEmfDomainObject  {
 	public ArroNode getNodeByName(String name) throws RuntimeException {
 		ArroNode ret = findNodeByName(name);
 		if(ret == null) {
-			throw new RuntimeException("Node not found");
+			//throw new RuntimeException("Node not found");
 		}
 		return ret;
 	}
@@ -159,9 +159,9 @@ public class ArroModule extends NonEmfDomainObject  {
 	 * Device functions: add.
 	 */
 	
-	public void addDevice(ArroDevice device) {
-		this.device = device;
-		device.setParent(this);
+	public void addDevice(ArroDevice elemBlock) {
+		this.elemBlock = elemBlock;
+		elemBlock.setParent(this);
 	}
 	
 
@@ -218,9 +218,9 @@ public class ArroModule extends NonEmfDomainObject  {
 				}
 			}
 		}
-		if(device != null) {
-			Logger.out.trace(Logger.STD, "Inside " + getType() + " Checking for parameters in device ");
-			ArrayList<ArroParameter> params = device.getParameterList();
+		if(elemBlock != null) {
+			Logger.out.trace(Logger.STD, "Inside " + getType() + " Checking for parameters in elemBlock ");
+			ArrayList<ArroParameter> params = elemBlock.getParameterList();
 			
 			for(ArroParameter p: params) {
 				Logger.out.trace(Logger.STD, "Get parameter " + p.getSubstitute());
@@ -257,11 +257,11 @@ public class ArroModule extends NonEmfDomainObject  {
 			ref.xmlWrite(doc, sub);
 		}
 		
-		if(device != null) {
-			Element sub = doc.createElement("device");
+		if(elemBlock != null) {
+			Element sub = doc.createElement("elem_block");
 			elt.appendChild(sub);
 			
-			device.xmlWrite(doc, sub);
+			elemBlock.xmlWrite(doc, sub);
 		}
 		
 		if(stateDiagram != null) {
@@ -323,7 +323,7 @@ public class ArroModule extends NonEmfDomainObject  {
 	    			
 	    			setStateDiagram(stateDiagram);
 	    		}
-	    		if(sub.getNodeName().equals("device")) {
+	    		if(sub.getNodeName().equals("elem_block")) {
 	    			ArroDevice newDevice = new ArroDevice();
 
 	    			newDevice.xmlRead(sub);

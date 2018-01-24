@@ -45,7 +45,7 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
         }
         int docType = ((FunctionDiagramEditor)dc).getDocumentType();
         if(docType == Constants.CodeBlockPython || docType == Constants.CodeBlockNative || docType == Constants.CodeBlockHtml) {
-    		// If target diagram is device diagram then only allow dropping inside the box.
+    		// If target diagram is elemBlock diagram then only allow dropping inside the box.
     		return context.getNewObject() instanceof IFile && !(context.getTargetContainer() instanceof Diagram);
         } else {
     		// TODO: check for right domain object instance below
@@ -103,12 +103,12 @@ public class ArroPadAddFeature extends AbstractAddFeature implements IAddFeature
             domainModule = (ArroModule) context.getProperty(Constants.PROP_CONTEXT_MOD_KEY);
             docType = Constants.CodeBlockHtml;
             instanceName = (String) context.getProperty(Constants.PROP_CONTEXT_NAME_KEY);
-            className = "Json";
-            if(instanceName.equals("input")) {
-                isInput = true;
-            } else {
-                isInput = false;
-            }
+//            className = "Json";
+//            if(instanceName.equals("input")) {
+//                isInput = true;
+//            } else {
+//                isInput = false;
+//            }
 
         }
         if(!(obj instanceof ArroPad)) {

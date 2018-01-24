@@ -100,7 +100,7 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
 void
 ConfigReader::makeNodeInstance(const string& typeName, const string& instanceName, const string& instancePrefix, StringMap& import_params, Process* parentSfc) {
     Definition* def = m_definitions[typeName];
-    Process* processNode = nullptr;  // Note: if there is a process node (=elemBlock) there will be only one in module.
+    Process* processNode = nullptr;  // Note: if there is a process node (=elemBlockock) there will be only one in module.
     Process* sfcNode = nullptr;
 
     if(def == nullptr)
@@ -117,7 +117,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
 
     // Read elemBlocks (the leaves in the tree)
-    elt = def->m_node->FirstChildElement("device");
+    elt = def->m_node->FirstChildEleelemBlockdevice");
     while(elt) {
         const string* typeURL = elt->Attribute(string("url"));
 
@@ -138,7 +138,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
             delete params;
         }
-        elt = elt->NextSiblingElement("device");
+        elt = elt->NextSiblingEleelemBlockdevice");
     }
     // Read elemBlocks (the leaves in the tree) There should be only one sfc node.
     elt = def->m_node->FirstChildElement("sfc");
@@ -149,7 +149,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
         {
             /*
             <module id="12...34" type="_Sfc">
-                <device id="12...34" url="Sfc:"/>
+        elemBlock  <device id="12...34" url="Sfc:"/>
                 <pad id="12...34" input="true" name="_action" run="true" type="Action"/>
                 <pad id="12...34" input="false" name="_action_nodeX" run="true" type="Action"/>
                 <pad id="12...34" input="false" name="_action_nodeY" run="true" type="Action"/>
