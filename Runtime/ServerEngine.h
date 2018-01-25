@@ -9,8 +9,10 @@
 
 #define ARRO_PROGRAM_FILE    "arro_pgm"
 #define ARRO_API_FILE        "arro_api"
-#define ARRO_CONFIG_FILE     "download/arro.xml"
-#define ARRO_FOLDER          "download/"
+#define ARRO_CONFIG_FILE     "../../download/arro.xml"
+#define ARRO_TEMPLATE        "../../download/arro.html"
+#define ARRO_INDEX           "../../download/index.html"
+#define ARRO_FOLDER          "../../download/"
 
 struct TiXmlElement;
 
