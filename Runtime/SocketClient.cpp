@@ -10,6 +10,7 @@
 #include <fcntl.h>  /*for O_RDONLY*/
 #include <unistd.h> // read
 
+#include "ServerEngine.h"
 #include "SocketClient.h"
 
 
@@ -78,9 +79,9 @@ SocketClient::generateWebUi() {
     char* line = NULL;
     size_t len = 0;
     ssize_t read;
-    auto fp2 = fopen("index.html", "w");
+    auto fp2 = fopen(ARRO_INDEX, "w");
 
-    auto fp1 = fopen("download/arro.html", "r");
+    auto fp1 = fopen(ARRO_TEMPLATE, "r");
     while((read = getline(&line, &len, fp1)) != -1)
     {
         fprintf(fp2, "%s", line);

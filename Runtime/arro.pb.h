@@ -26,6 +26,8 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>
 #include <google/protobuf/extension_set.h>
+#include <google/protobuf/map.h>
+#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 
@@ -37,12 +39,16 @@ void protobuf_AssignDesc_arro_2eproto();
 void protobuf_ShutdownFile_arro_2eproto();
 
 class Action;
+class Json;
 class KeyValuePair;
 class Mode;
+class ParameterBlock;
+class Selection;
 class Step;
 class Tick;
 class Token;
 class Value;
+class _Config;
 
 // ===================================================================
 
@@ -138,6 +144,182 @@ class KeyValuePair : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static KeyValuePair* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class ParameterBlock : public ::google::protobuf::Message {
+ public:
+  ParameterBlock();
+  virtual ~ParameterBlock();
+
+  ParameterBlock(const ParameterBlock& from);
+
+  inline ParameterBlock& operator=(const ParameterBlock& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const ParameterBlock& default_instance();
+
+  void Swap(ParameterBlock* other);
+
+  // implements Message ----------------------------------------------
+
+  inline ParameterBlock* New() const { return New(NULL); }
+
+  ParameterBlock* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const ParameterBlock& from);
+  void MergeFrom(const ParameterBlock& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(ParameterBlock* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .arro.KeyValuePair kv = 1;
+  int kv_size() const;
+  void clear_kv();
+  static const int kKvFieldNumber = 1;
+  const ::arro::KeyValuePair& kv(int index) const;
+  ::arro::KeyValuePair* mutable_kv(int index);
+  ::arro::KeyValuePair* add_kv();
+  ::google::protobuf::RepeatedPtrField< ::arro::KeyValuePair >*
+      mutable_kv();
+  const ::google::protobuf::RepeatedPtrField< ::arro::KeyValuePair >&
+      kv() const;
+
+  // @@protoc_insertion_point(class_scope:arro.ParameterBlock)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  bool _is_default_instance_;
+  ::google::protobuf::RepeatedPtrField< ::arro::KeyValuePair > kv_;
+  mutable int _cached_size_;
+  friend void  protobuf_AddDesc_arro_2eproto();
+  friend void protobuf_AssignDesc_arro_2eproto();
+  friend void protobuf_ShutdownFile_arro_2eproto();
+
+  void InitAsDefaultInstance();
+  static ParameterBlock* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class _Config : public ::google::protobuf::Message {
+ public:
+  _Config();
+  virtual ~_Config();
+
+  _Config(const _Config& from);
+
+  inline _Config& operator=(const _Config& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const _Config& default_instance();
+
+  void Swap(_Config* other);
+
+  // implements Message ----------------------------------------------
+
+  inline _Config* New() const { return New(NULL); }
+
+  _Config* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const _Config& from);
+  void MergeFrom(const _Config& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(_Config* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+
+  // accessors -------------------------------------------------------
+
+  // map<string, string> value = 1;
+  int value_size() const;
+  void clear_value();
+  static const int kValueFieldNumber = 1;
+  const ::google::protobuf::Map< ::std::string, ::std::string >&
+      value() const;
+  ::google::protobuf::Map< ::std::string, ::std::string >*
+      mutable_value();
+
+  // @@protoc_insertion_point(class_scope:arro._Config)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  bool _is_default_instance_;
+  typedef ::google::protobuf::internal::MapEntryLite<
+      ::std::string, ::std::string,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      0 >
+      _Config_ValueEntry;
+  ::google::protobuf::internal::MapField<
+      ::std::string, ::std::string,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      0 > value_;
+  mutable int _cached_size_;
+  friend void  protobuf_AddDesc_arro_2eproto();
+  friend void protobuf_AssignDesc_arro_2eproto();
+  friend void protobuf_ShutdownFile_arro_2eproto();
+
+  void InitAsDefaultInstance();
+  static _Config* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -622,6 +804,172 @@ class Value : public ::google::protobuf::Message {
   void InitAsDefaultInstance();
   static Value* default_instance_;
 };
+// -------------------------------------------------------------------
+
+class Selection : public ::google::protobuf::Message {
+ public:
+  Selection();
+  virtual ~Selection();
+
+  Selection(const Selection& from);
+
+  inline Selection& operator=(const Selection& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Selection& default_instance();
+
+  void Swap(Selection* other);
+
+  // implements Message ----------------------------------------------
+
+  inline Selection* New() const { return New(NULL); }
+
+  Selection* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Selection& from);
+  void MergeFrom(const Selection& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(Selection* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional string value = 1;
+  void clear_value();
+  static const int kValueFieldNumber = 1;
+  const ::std::string& value() const;
+  void set_value(const ::std::string& value);
+  void set_value(const char* value);
+  void set_value(const char* value, size_t size);
+  ::std::string* mutable_value();
+  ::std::string* release_value();
+  void set_allocated_value(::std::string* value);
+
+  // @@protoc_insertion_point(class_scope:arro.Selection)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  bool _is_default_instance_;
+  ::google::protobuf::internal::ArenaStringPtr value_;
+  mutable int _cached_size_;
+  friend void  protobuf_AddDesc_arro_2eproto();
+  friend void protobuf_AssignDesc_arro_2eproto();
+  friend void protobuf_ShutdownFile_arro_2eproto();
+
+  void InitAsDefaultInstance();
+  static Selection* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Json : public ::google::protobuf::Message {
+ public:
+  Json();
+  virtual ~Json();
+
+  Json(const Json& from);
+
+  inline Json& operator=(const Json& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Json& default_instance();
+
+  void Swap(Json* other);
+
+  // implements Message ----------------------------------------------
+
+  inline Json* New() const { return New(NULL); }
+
+  Json* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Json& from);
+  void MergeFrom(const Json& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(Json* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional string data = 1;
+  void clear_data();
+  static const int kDataFieldNumber = 1;
+  const ::std::string& data() const;
+  void set_data(const ::std::string& value);
+  void set_data(const char* value);
+  void set_data(const char* value, size_t size);
+  ::std::string* mutable_data();
+  ::std::string* release_data();
+  void set_allocated_data(::std::string* data);
+
+  // @@protoc_insertion_point(class_scope:arro.Json)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  bool _is_default_instance_;
+  ::google::protobuf::internal::ArenaStringPtr data_;
+  mutable int _cached_size_;
+  friend void  protobuf_AddDesc_arro_2eproto();
+  friend void protobuf_AssignDesc_arro_2eproto();
+  friend void protobuf_ShutdownFile_arro_2eproto();
+
+  void InitAsDefaultInstance();
+  static Json* default_instance_;
+};
 // ===================================================================
 
 
@@ -716,6 +1064,62 @@ inline void KeyValuePair::set_allocated_value(::std::string* value) {
   }
   value_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set_allocated:arro.KeyValuePair.value)
+}
+
+// -------------------------------------------------------------------
+
+// ParameterBlock
+
+// repeated .arro.KeyValuePair kv = 1;
+inline int ParameterBlock::kv_size() const {
+  return kv_.size();
+}
+inline void ParameterBlock::clear_kv() {
+  kv_.Clear();
+}
+inline const ::arro::KeyValuePair& ParameterBlock::kv(int index) const {
+  // @@protoc_insertion_point(field_get:arro.ParameterBlock.kv)
+  return kv_.Get(index);
+}
+inline ::arro::KeyValuePair* ParameterBlock::mutable_kv(int index) {
+  // @@protoc_insertion_point(field_mutable:arro.ParameterBlock.kv)
+  return kv_.Mutable(index);
+}
+inline ::arro::KeyValuePair* ParameterBlock::add_kv() {
+  // @@protoc_insertion_point(field_add:arro.ParameterBlock.kv)
+  return kv_.Add();
+}
+inline ::google::protobuf::RepeatedPtrField< ::arro::KeyValuePair >*
+ParameterBlock::mutable_kv() {
+  // @@protoc_insertion_point(field_mutable_list:arro.ParameterBlock.kv)
+  return &kv_;
+}
+inline const ::google::protobuf::RepeatedPtrField< ::arro::KeyValuePair >&
+ParameterBlock::kv() const {
+  // @@protoc_insertion_point(field_list:arro.ParameterBlock.kv)
+  return kv_;
+}
+
+// -------------------------------------------------------------------
+
+// _Config
+
+// map<string, string> value = 1;
+inline int _Config::value_size() const {
+  return value_.size();
+}
+inline void _Config::clear_value() {
+  value_.Clear();
+}
+inline const ::google::protobuf::Map< ::std::string, ::std::string >&
+_Config::value() const {
+  // @@protoc_insertion_point(field_map:arro._Config.value)
+  return value_.GetMap();
+}
+inline ::google::protobuf::Map< ::std::string, ::std::string >*
+_Config::mutable_value() {
+  // @@protoc_insertion_point(field_mutable_map:arro._Config.value)
+  return value_.MutableMap();
 }
 
 // -------------------------------------------------------------------
@@ -916,7 +1320,111 @@ inline void Value::set_value(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:arro.Value.value)
 }
 
+// -------------------------------------------------------------------
+
+// Selection
+
+// optional string value = 1;
+inline void Selection::clear_value() {
+  value_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Selection::value() const {
+  // @@protoc_insertion_point(field_get:arro.Selection.value)
+  return value_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Selection::set_value(const ::std::string& value) {
+  
+  value_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:arro.Selection.value)
+}
+inline void Selection::set_value(const char* value) {
+  
+  value_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:arro.Selection.value)
+}
+inline void Selection::set_value(const char* value, size_t size) {
+  
+  value_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:arro.Selection.value)
+}
+inline ::std::string* Selection::mutable_value() {
+  
+  // @@protoc_insertion_point(field_mutable:arro.Selection.value)
+  return value_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Selection::release_value() {
+  // @@protoc_insertion_point(field_release:arro.Selection.value)
+  
+  return value_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Selection::set_allocated_value(::std::string* value) {
+  if (value != NULL) {
+    
+  } else {
+    
+  }
+  value_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set_allocated:arro.Selection.value)
+}
+
+// -------------------------------------------------------------------
+
+// Json
+
+// optional string data = 1;
+inline void Json::clear_data() {
+  data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Json::data() const {
+  // @@protoc_insertion_point(field_get:arro.Json.data)
+  return data_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Json::set_data(const ::std::string& value) {
+  
+  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:arro.Json.data)
+}
+inline void Json::set_data(const char* value) {
+  
+  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:arro.Json.data)
+}
+inline void Json::set_data(const char* value, size_t size) {
+  
+  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:arro.Json.data)
+}
+inline ::std::string* Json::mutable_data() {
+  
+  // @@protoc_insertion_point(field_mutable:arro.Json.data)
+  return data_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Json::release_data() {
+  // @@protoc_insertion_point(field_release:arro.Json.data)
+  
+  return data_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Json::set_allocated_data(::std::string* data) {
+  if (data != NULL) {
+    
+  } else {
+    
+  }
+  data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
+  // @@protoc_insertion_point(field_set_allocated:arro.Json.data)
+}
+
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
