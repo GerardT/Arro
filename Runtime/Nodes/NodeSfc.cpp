@@ -47,7 +47,7 @@ NodeSfc::NodeSfc(INodeContext* elemBlock, const string& /*name*/, StringMap& /*p
             // Read XML and register actions
             TiXmlElement* eltAction = eltTransition->FirstChildElement("action");
             while(eltAction) {
-                const string* nodeNameAttr = eltAction->Attribute(string("node"));
+                const string* nodeNameAttr = eltAction->Attribute(string("block"));
                 const string* actionAttr = eltAction->Attribute(string("action"));
 
                 if(nodeNameAttr && actionAttr) {

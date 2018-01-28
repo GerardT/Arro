@@ -201,8 +201,8 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
         elt = elt->NextSiblingElement("sfc");
     }
-    // Read nodes (the branches in the tree)
-    elt = def->m_node->FirstChildElement("node");
+    // Read function blocks (the branches in the tree)
+    elt = def->m_node->FirstChildElement("function_block");
     while(elt) {
         const string* typeAttr = elt->Attribute(string("type"));
         const string* idAttr = elt->Attribute(string("name"));
@@ -240,7 +240,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             delete params;
         }
 
-        elt = elt->NextSiblingElement("node");
+        elt = elt->NextSiblingElement("function_block");
     }
 
     // Read pads (other leaves in the tree)
