@@ -32,7 +32,7 @@ public class ArroAction {
 	public void xmlWrite(Document doc, Element elt) {
 		Attr attr = null;
 		
-		attr = doc.createAttribute("node");
+		attr = doc.createAttribute("block");
 		attr.setValue(name);
 		elt.setAttributeNode(attr);
 		
@@ -42,7 +42,7 @@ public class ArroAction {
 	}
 	public void xmlRead(Node nNode) {
 		Element eElement = (Element) nNode;
-    	name = (eElement.getAttribute("node"));
+    	name = (eElement.getAttribute("block"));
     	state = (eElement.getAttribute("action"));
 	}
 

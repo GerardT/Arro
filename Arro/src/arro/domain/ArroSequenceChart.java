@@ -180,9 +180,4 @@ public class ArroSequenceChart extends NonEmfDomainObject {
 		return list;
 	}
 
-	public void addSynchronization(ArroSynchronization addedDomainObject) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

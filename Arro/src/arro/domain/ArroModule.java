@@ -251,7 +251,7 @@ public class ArroModule extends NonEmfDomainObject  {
 		
 		Collection<ArroNode> col = nodes.values();
 		for(ArroNode ref: col) {
-			Element sub = doc.createElement("node");
+			Element sub = doc.createElement("function_block");
 			elt.appendChild(sub);
 
 			ref.xmlWrite(doc, sub);
@@ -309,7 +309,7 @@ public class ArroModule extends NonEmfDomainObject  {
 	    	for (int temp = 0; temp < nList.getLength(); temp++) {
 	    		Node sub = nList.item(temp);
 	    		
-	    		if(sub.getNodeName().equals("node")) {
+	    		if(sub.getNodeName().equals("function_block")) {
 	    			ArroNode newNode = new ArroNode();
 
 		    		newNode.xmlRead(sub);
