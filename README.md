@@ -7,8 +7,8 @@ System consists of
 
 Goal is to provide sort of a Soft PLC environment that has easy learning curve so might be used by anyone. Building blocks in this PLC are:
 - function blocks - those consists of other blocks (function / code blocks)
-- code blocks for native code - written in C / C++.
-- code blocks for Python code.
+- elementary blocks for native code - written in C / C++.
+- elementary blocks for Python code.
 - state/transition diagrams. This is not implemented yet, thinking is to add this to function blocks.
 - user interface blocks - plan is to provide HTML building blocks based on web components (Polymer).
 
