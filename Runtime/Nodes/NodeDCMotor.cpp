@@ -357,6 +357,8 @@ NodeDCMotor::NodeDCMotor(INodeContext* d, const string& /*name*/, Arro::StringMa
         m_trace.println("### param not found Ch ");
         m_Ch = 0;
     }
+    m_Ch--; // It's 0 based, but named M1, M2, M3, M4 on PCB.
+
     int pwm;
     int in1;
     int in2;
