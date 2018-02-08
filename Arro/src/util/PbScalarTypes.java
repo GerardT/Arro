@@ -4,12 +4,11 @@ public class PbScalarTypes {
 	private static PbScalarTypes me = null;
 	// - Reduced it to comply with SQL
 	// - 'bytes' which can be used for opaque data
-	// - 'json' is needed to connect to IO components
 	private static String scalars[] = {
 		//"bool",
 		"string",
-		//"int32",
-		"int64",
+		"int32",
+		//"int64",
 		//"uint32",
 		//"uint64",
 		//"sint32",
@@ -20,8 +19,7 @@ public class PbScalarTypes {
 		//"sfixed64",
 		"double",
 		//"float",
-		"bytes",
-		"json" };
+		"bytes"};
 	
 	public static PbScalarTypes getInstance() {
 		if(me == null) {
