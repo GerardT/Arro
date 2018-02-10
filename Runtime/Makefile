@@ -49,6 +49,8 @@ SRCS         := main.cpp \
 		Nodes/NodeTimer.cpp \
 		Nodes/NodeServo.cpp \
 		Nodes/NodeDCMotor.cpp \
+		Nodes/NodeStepperMotor.cpp \
+		Nodes/MotorHat.cpp \
 		Nodes/NodeUiCheckBox.cpp \
 		Nodes/NodeUiRadioButton.cpp \
 		Nodes/NodeUiToggleButton.cpp \
