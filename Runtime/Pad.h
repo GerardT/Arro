@@ -40,17 +40,17 @@ namespace Arro
         /**
          * More dummy implementations of virtual functions.
          */
-        virtual MessageBuf getInputData(NodeSingleInput* /*input*/) const { return MessageBuf{}; };
-        virtual NodeSingleInput* getInput(const std::string& /*name*/) const {return nullptr; };
-        virtual NodeMultiOutput* getOutput(const std::string& /*name*/) const {return nullptr; };
+        virtual MessageBuf getInputData(InputPad* /*input*/) const { return MessageBuf{}; };
+        virtual InputPad* getInputPad(const std::string& /*name*/) const {return nullptr; };
+        virtual OutputPad* getOutputPad(const std::string& /*name*/) const {return nullptr; };
         virtual void sendParameters(StringMap& /*params*/)  {};
-        virtual void setOutputData(NodeMultiOutput* /*output*/, google::protobuf::MessageLite* /*msg*/) const {};
+        virtual void setOutputData(OutputPad* /*output*/, google::protobuf::MessageLite* /*msg*/) const {};
 
     private:
         Trace trace;
-        NodeMultiOutput* m_result;
-        NodeSingleInput* m_in;
-        NodeMultiOutput* m_out;
+        OutputPad* m_result;
+        InputPad* m_in;
+        OutputPad* m_out;
         std::string m_name;
     };
 }

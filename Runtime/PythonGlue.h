@@ -74,7 +74,7 @@ namespace Arro {
          * \args Python arguments.
          */
         static PyObject* getMessage(PyObject *self, PyObject *args);
-        static PyObject* getInput(PyObject * /*self*/, PyObject *args);
+        static PyObject* getInputPad(PyObject * /*self*/, PyObject *args);
 
         /**
          * This function sendMessage is inserted in Python module and callable by

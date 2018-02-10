@@ -42,21 +42,21 @@ NodeDb::~NodeDb() {
 }
 
 void
-NodeSingleInput::handleMessage(const MessageBuf& msg) {
+InputPad::handleMessage(const MessageBuf& msg) {
     m_msg = msg;
     // TODO remove sending message (handlemessage)
     m_callback(msg, m_interfaceName);
 }
 
-NodeMultiOutput::NodeMultiOutput(NodeDb* n):
+OutputPad::OutputPad(NodeDb* n):
     m_nm{n},
     m_inputs{} {
 }
 
 void
-NodeMultiOutput::connectInput(NodeSingleInput* i) {
+OutputPad::connectInput(InputPad* i) {
     if(i) {
-        m_inputs.push_back((NodeSingleInput*)i);
+        m_inputs.push_back((InputPad*)i);
     }
     else {
         m_nm->m_trace.println("### cannot connect ");
@@ -64,18 +64,18 @@ NodeMultiOutput::connectInput(NodeSingleInput* i) {
 }
 
 void
-NodeMultiOutput::forwardMessage(const MessageBuf& msg) {
-    for_each(m_inputs.begin(), m_inputs.end(), [msg](NodeSingleInput* i) { i->handleMessage(msg); });
+OutputPad::forwardMessage(const MessageBuf& msg) {
+    for_each(m_inputs.begin(), m_inputs.end(), [msg](InputPad* i) { i->handleMessage(msg); });
 }
 void
-NodeMultiOutput::submitMessage(google::protobuf::MessageLite* msg) {
+OutputPad::submitMessage(google::protobuf::MessageLite* msg) {
     string s = msg->SerializeAsString();
     submitMessageBuffer(s.c_str());
     free(msg);
 }
 
 void
-NodeMultiOutput::submitMessageBuffer(const char* msg) {
+OutputPad::submitMessageBuffer(const char* msg) {
     MessageBuf s(new string(msg));
     auto fm = new NodeDb::FullMsg(this, s);
 
@@ -106,50 +106,50 @@ NodeDb::registerNode(INodeContext* node, const string& name) {
      return node;
 }
 
-NodeSingleInput*
+InputPad*
 NodeDb::registerNodeInput(INodeContext* node, const string& interfaceName,
                           std::function<void (const MessageBuf& msg, const std::string& interfaceName)> listen) {
-    auto n = new NodeSingleInput(interfaceName, listen, node);
+    auto n = new InputPad(interfaceName, listen, node);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
-        m_allInputs [node->getName()] = unique_ptr<NodeSingleInput>(n);
+        m_allInputs [node->getName()] = unique_ptr<InputPad>(n);
         m_trace.println(string("registering input ") + node->getName());
-        return (NodeSingleInput*)n;
+        return (InputPad*)n;
     } else {
-        m_allInputs[node->getName() + ARRO_PAD_SEPARATOR + interfaceName] = unique_ptr<NodeSingleInput>(n);
+        m_allInputs[node->getName() + ARRO_PAD_SEPARATOR + interfaceName] = unique_ptr<InputPad>(n);
         m_trace.println(("registering input ") + node->getName() + ARRO_PAD_SEPARATOR + interfaceName);
-        return (NodeSingleInput*)n;
+        return (InputPad*)n;
     }
 }
 
-NodeMultiOutput*
+OutputPad*
 NodeDb::registerNodeOutput(INodeContext* node, const string& interfaceName) {
-    auto n = new NodeMultiOutput(this);
+    auto n = new OutputPad(this);
 
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
-        m_allOutputs[node->getName()] = unique_ptr<NodeMultiOutput>(n);
+        m_allOutputs[node->getName()] = unique_ptr<OutputPad>(n);
         m_trace.println("registering output " + node->getName());
-        return (NodeMultiOutput*)n;
+        return (OutputPad*)n;
     } else {
-        m_allOutputs[node->getName() + ARRO_PAD_SEPARATOR + interfaceName] = unique_ptr<NodeMultiOutput>(n);
+        m_allOutputs[node->getName() + ARRO_PAD_SEPARATOR + interfaceName] = unique_ptr<OutputPad>(n);
         m_trace.println("registering output " + node->getName() + ARRO_PAD_SEPARATOR + interfaceName);
-        return (NodeMultiOutput*)n;
+        return (OutputPad*)n;
     }
 }
 
-NodeMultiOutput*
-NodeDb::getOutput(const string& name) {
-    return (NodeMultiOutput*)&(*((m_allOutputs[name])));
+OutputPad*
+NodeDb::getOutputPad(const string& name) {
+    return (OutputPad*)&(*((m_allOutputs[name])));
 }
 
-NodeSingleInput*
-NodeDb::getInput(const std::string& name) {
-    return (NodeSingleInput*)&(*(m_allInputs[name]));  // Since using unique_ptr, we have to get pointer first (*)
+InputPad*
+NodeDb::getInputPad(const std::string& name) {
+    return (InputPad*)&(*(m_allInputs[name]));  // Since using unique_ptr, we have to get pointer first (*)
 }
 
 
-NodeDb::FullMsg::FullMsg(NodeMultiOutput* o /*string s*/, MessageBuf& m) {
+NodeDb::FullMsg::FullMsg(OutputPad* o /*string s*/, MessageBuf& m) {
     //target = s;
     m_output = o;
     m_msg = m;
@@ -244,8 +244,8 @@ NodeDb::stop() {
 
 void
 NodeDb::connect(string& output, string& input) {
-    NodeMultiOutput* out = nullptr;
-    NodeSingleInput* in = nullptr;
+    OutputPad* out = nullptr;
+    InputPad* in = nullptr;
 
     try {
         out = &(*(m_allOutputs[output]));
@@ -269,7 +269,7 @@ NodeDb::connect(string& output, string& input) {
     }
     else
     {
-        out->connectInput((NodeSingleInput*)in);
+        out->connectInput((InputPad*)in);
     }
 }
 

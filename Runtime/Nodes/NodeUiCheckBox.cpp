@@ -38,7 +38,7 @@ private:
     Trace m_trace;
     INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
-    NodeMultiOutput* m_value;
+    OutputPad* m_value;
 
 };
 
@@ -66,7 +66,7 @@ NodeUiCheckBox::NodeUiCheckBox(INodeContext* d, const string& /*name*/, StringMa
     std::string inst = std::string("<arro-check-box id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-check-box>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
-        m_value = m_elemBlock->getOutput("value");
+        m_value = m_elemBlock->getOutputPad("value");
 
         Selection* sel = new Selection();
         auto info = nlohmann::json::parse(data.c_str());

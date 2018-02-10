@@ -87,7 +87,7 @@ PythonGlue::getMessage(PyObject * /*self*/, PyObject *args)
 
 
 PyObject*
-PythonGlue::getInput(PyObject * /*self*/, PyObject *args)
+PythonGlue::getInputPad(PyObject * /*self*/, PyObject *args)
 {
     PyObject *obj;
     const char* pad;
@@ -140,7 +140,7 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
  */
 static PyMethodDef ArroMethods[] = {
     {"getMessage",  PythonGlue::getMessage, METH_VARARGS, "Get a message from the queue."},
-    {"getInput",    PythonGlue::getInput, METH_VARARGS, "Get a message from the pad."},
+    {"getInputPad",    PythonGlue::getInputPad, METH_VARARGS, "Get a message from the pad."},
     {"sendMessage", PythonGlue::sendMessage, METH_VARARGS, "Send a message into the queue."},
     {nullptr, nullptr, 0, nullptr}        /* Sentinel */
 };

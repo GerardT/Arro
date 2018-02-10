@@ -140,6 +140,6 @@ NodePid::runCycle() {
 
         value->set_value(output);
 
-        m_elemBlock->setOutputData(m_elemBlock->getOutput("output"), value);
+        m_elemBlock->setOutputData(m_elemBlock->getOutputPad("output"), value);
     }
 }

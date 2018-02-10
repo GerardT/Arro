@@ -16,7 +16,7 @@ namespace Arro
      * A typical Eclipse diagram consists of nodes and pads. The pads are the
      * connection points to other nodes in parent diagrams.
      * Both pads and nodes are implemented as nodes that receive and send messages
-     * to each other. The use NodeSingleInput and NodeMultiOutput objects to connect
+     * to each other. The use InputPad and OutputPad objects to connect
      * to each other.
      */
     class RealNode : public INodeContext {

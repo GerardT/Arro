@@ -42,7 +42,7 @@ static void cleanup()
 
     if(nodeDb) {
         /* 1: request change to _terminated */
-        auto input = nodeDb->getInput(".main._action");
+        auto input = nodeDb->getInputPad(".main._action");
         if(input) {
             // send "terminate" message.
             auto act = new arro::Action();

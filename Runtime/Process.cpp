@@ -84,7 +84,7 @@ Process::sendParameters(StringMap& params) {
     free(config);
 
     // get _config input and send a message to it.
-    auto input = getInput("_config");
+    auto input = getInputPad("_config");
     input->handleMessage(msg);
 }
 
@@ -120,14 +120,14 @@ Process::registerOutput(const string& interfaceName) {
  * pointer may be nullptr.
  */
 MessageBuf
-Process::getInputData(NodeSingleInput* input) const {
+Process::getInputData(InputPad* input) const {
     return input->getData();
 }
 
 
-NodeSingleInput*
-Process::getInput(const string& name) const {
-    auto in = m_nodeDb.getInput(getName() + ARRO_PAD_SEPARATOR + name);
+InputPad*
+Process::getInputPad(const string& name) const {
+    auto in = m_nodeDb.getInputPad(getName() + ARRO_PAD_SEPARATOR + name);
     if(in) {
         return in;
     } else {
@@ -137,9 +137,9 @@ Process::getInput(const string& name) const {
     }
 }
 
-NodeMultiOutput*
-Process::getOutput(const string& name) const {
-    auto out = m_nodeDb.getOutput(getName() + ARRO_PAD_SEPARATOR + name);
+OutputPad*
+Process::getOutputPad(const string& name) const {
+    auto out = m_nodeDb.getOutputPad(getName() + ARRO_PAD_SEPARATOR + name);
     if(out) {
         return out;
     } else {
@@ -150,7 +150,7 @@ Process::getOutput(const string& name) const {
 }
 
 void
-Process::setOutputData(NodeMultiOutput* output, google::protobuf::MessageLite* value) const {
+Process::setOutputData(OutputPad* output, google::protobuf::MessageLite* value) const {
     output->submitMessage(value);
 }
 

@@ -61,7 +61,7 @@ void NodeTimer::timer () {
     tick->set_ms(ARRO_TIMEOUT /* elapsed time in ms */);
 
     try {
-        m_elemBlock->setOutputData(m_elemBlock->getOutput("aTick"), tick);
+        m_elemBlock->setOutputData(m_elemBlock->getOutputPad("aTick"), tick);
     }
     catch(runtime_error&) {
         m_trace.println("Timer failed to update");

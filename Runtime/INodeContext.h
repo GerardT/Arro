@@ -17,8 +17,8 @@
 namespace Arro
 {
 
-    class NodeSingleInput;
-    class NodeMultiOutput;
+    class InputPad;
+    class OutputPad;
 
     typedef std::map<std::string, std::string> StringMap;
 
@@ -42,22 +42,22 @@ namespace Arro
         virtual void sendParameters(StringMap& params) = 0;
 
         /**
-         * Lookup an input by its name, which is internally concatenated: "nodename.name".
+         * Lookup an input by its name, which is internally concatenated: "nodename#name".
          *
          * \param name Name of input.
          */
-        virtual NodeSingleInput*  getInput(const std::string& name) const = 0;
+        virtual InputPad*  getInputPad(const std::string& name) const = 0;
 
-        virtual MessageBuf getInputData(NodeSingleInput* input) const = 0;
+        virtual MessageBuf getInputData(InputPad* input) const = 0;
 
         /**
-         * Lookup an output by its name, which is concatenated: "procesname.name".
+         * Lookup an output by its name, which is concatenated: "procesname#name".
          *
          * \param name Name of output.
          */
-        virtual NodeMultiOutput* getOutput(const std::string& name) const = 0;
+        virtual OutputPad* getOutputPad(const std::string& name) const = 0;
 
-        virtual void setOutputData(NodeMultiOutput* output, google::protobuf::MessageLite* msg) const = 0;
+        virtual void setOutputData(OutputPad* output, google::protobuf::MessageLite* msg) const = 0;
 
         /**
          * Get name of the node.

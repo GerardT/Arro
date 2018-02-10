@@ -96,7 +96,7 @@ NodePython::getMessage() {
  */
 PyObject*
 NodePython::getInputData(const string& pad) {
-    MessageBuf data = m_elemBlock->getInputData(m_elemBlock->getInput(pad));
+    MessageBuf data = m_elemBlock->getInputData(m_elemBlock->getInputPad(pad));
 
     if(data->length() == 0 /* MessageBuf may not be initialized */) {
         // insert None object
@@ -114,7 +114,7 @@ NodePython::getInputData(const string& pad) {
  */
 PyObject*
 NodePython::sendMessage(char* padName, char* message) {
-    NodeMultiOutput* pad = m_elemBlock->getOutput(padName);
+    OutputPad* pad = m_elemBlock->getOutputPad(padName);
 
     if(pad) {
         pad->submitMessageBuffer(message);

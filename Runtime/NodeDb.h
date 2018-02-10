@@ -26,21 +26,21 @@ namespace Arro
 {
 class NodeDb;
 
-class NodeSingleInput {
+class InputPad {
 public:
     /**
-     * Constructor for NodeSingleInput. Can set only one listener to node input.
+     * Constructor for InputPad. Can set only one listener to node input.
      *
      * \param l Listener
      * \param n Node to which this input is attached.
      */
-    NodeSingleInput(const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> l, INodeContext* n):
+    InputPad(const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> l, INodeContext* n):
         m_callback(l), m_node(n), m_msg(new std::string()), m_interfaceName(interfaceName) { };
-    virtual ~NodeSingleInput() {};
+    virtual ~InputPad() {};
 
     // Copy and assignment is not supported.
-    NodeSingleInput(const NodeSingleInput&) = delete;
-    NodeSingleInput& operator=(const NodeSingleInput& other) = delete;
+    InputPad(const InputPad&) = delete;
+    InputPad& operator=(const InputPad& other) = delete;
 
     /**
      * Passes the message on to the listener.
@@ -65,28 +65,28 @@ public:
  *
  * NodeSingleOutputRef is created when calling registerNodeOutput for a node.
  * It keeps a list 'inputs' that contains all connected inputs.
- * Connect multiple NodeSingleInput objects to one NodeMultiOutput.
+ * Connect multiple InputPad objects to one OutputPad.
  */
-class NodeMultiOutput {
+class OutputPad {
 public:
     /**
-     * Constructor for NodeMultiOutput.
+     * Constructor for OutputPad.
      *
      * \param db Node database.
      */
-    NodeMultiOutput(NodeDb* db);
-    virtual ~NodeMultiOutput() {};
+    OutputPad(NodeDb* db);
+    virtual ~OutputPad() {};
 
     // Copy and assignment is not supported.
-    NodeMultiOutput(const NodeMultiOutput&) = delete;
-    NodeMultiOutput& operator=(const NodeMultiOutput& other) = delete;
+    OutputPad(const OutputPad&) = delete;
+    OutputPad& operator=(const OutputPad& other) = delete;
 
     /**
      * Connect this output to an input.
      *
      * \param i Input node to connect to.
      */
-    void connectInput(NodeSingleInput *i);
+    void connectInput(InputPad *i);
 
     /**
      * Forward a message.
@@ -111,7 +111,7 @@ public:
 
 private:
     NodeDb* m_nm;
-    std::vector<NodeSingleInput*> m_inputs;
+    std::vector<InputPad*> m_inputs;
 };
 
 
@@ -121,16 +121,16 @@ private:
      * Node database into which to store all nodes.
      */
     class NodeDb {
-    friend class NodeMultiOutput;
-    friend class NodeSingleInput;
+    friend class OutputPad;
+    friend class InputPad;
 
     public:
 
         /**
          * \brief Class instance represents one input for a node.
          *
-         * NodeSingleInput is created when calling registerNodeInput for a node.
-         * Connect multiple NodeSingleInput objects to one NodeMultiOutput.
+         * InputPad is created when calling registerNodeInput for a node.
+         * Connect multiple InputPad objects to one OutputPad.
          */
 
         class FullMsg {
@@ -138,10 +138,10 @@ private:
             /**
              * Constructor for (addressable) message container.
              *
-             * \param o NodeMultiOutput instance where to send this message to.
+             * \param o OutputPad instance where to send this message to.
              * \param s Message buffer to send.
              */
-            FullMsg(NodeMultiOutput* o, MessageBuf& s);
+            FullMsg(OutputPad* o, MessageBuf& s);
             virtual ~FullMsg() {};
 
             // Copy and assignment is not supported.
@@ -149,7 +149,7 @@ private:
             FullMsg& operator=(const FullMsg& other) = delete;
 
         // FIXME Should be private
-            NodeMultiOutput* m_output;
+            OutputPad* m_output;
             MessageBuf m_msg;
         };
 
@@ -189,7 +189,7 @@ private:
          * \param name Name of the interface as "node.node.interface".
          * \param n The instance of the node.
          */
-        NodeSingleInput* registerNodeInput(INodeContext* node, const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> listen);
+        InputPad* registerNodeInput(INodeContext* node, const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> listen);
 
         /**
          * Register an output with the node.
@@ -197,7 +197,7 @@ private:
          * \param name Name of the interface as "node.node.interface".
          * \param n The instance of the node.
          */
-        NodeMultiOutput* registerNodeOutput(INodeContext* node, const std::string& interfaceName);
+        OutputPad* registerNodeOutput(INodeContext* node, const std::string& interfaceName);
 
         /**
          * Start the runtime process by creating and starting thread for it.
@@ -243,7 +243,7 @@ private:
          *
          * \return Found input reference (makes this method non-const).
          */
-        NodeSingleInput* getInput(const std::string& name);
+        InputPad* getInputPad(const std::string& name);
 
         /**
          * Find an output from a name "node.subnode.subsub.output".
@@ -252,12 +252,12 @@ private:
          *
          * \return Found output reference (makes this method non-const).
          */
-        NodeMultiOutput* getOutput(const std::string& name);
+        OutputPad* getOutputPad(const std::string& name);
 
     private:
         Trace m_trace;
-        std::map<std::string, std::unique_ptr<NodeSingleInput> > m_allInputs;
-        std::map<std::string, std::unique_ptr<NodeMultiOutput> > m_allOutputs;
+        std::map<std::string, std::unique_ptr<InputPad> > m_allInputs;
+        std::map<std::string, std::unique_ptr<OutputPad> > m_allOutputs;
         std::map<std::string, std::unique_ptr<INodeContext> > m_allNodes;
         std::queue<FullMsg*> m_inQueue, *m_pInQueue;
         std::queue<FullMsg*> m_outQueue, *m_pOutQueue;

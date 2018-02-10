@@ -66,23 +66,23 @@ namespace Arro
          *
          * \param name Name of input.
          */
-        MessageBuf  getInputData(NodeSingleInput* input) const;
+        MessageBuf  getInputData(InputPad* input) const;
 
         /**
          * Lookup an input by its name, which is internally concatenated: "procesname.name".
          *
          * \param name Name of input.
          */
-        NodeSingleInput* getInput(const std::string& name) const;
+        InputPad* getInputPad(const std::string& name) const;
 
         /**
          * Lookup an output by its name, which is concatenated: "procesname.name".
          *
          * \param name Name of output.
          */
-        NodeMultiOutput* getOutput(const std::string& name) const;
+        OutputPad* getOutputPad(const std::string& name) const;
 
-        virtual void setOutputData(NodeMultiOutput* output, google::protobuf::MessageLite* msg) const;
+        virtual void setOutputData(OutputPad* output, google::protobuf::MessageLite* msg) const;
 
         /**
          * Let implementation of Process run one execution cycle. Only run a

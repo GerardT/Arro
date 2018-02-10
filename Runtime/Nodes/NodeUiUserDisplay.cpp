@@ -37,8 +37,8 @@ private:
     Trace m_trace;
     INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
-    NodeSingleInput* m_input;
-    NodeSingleInput* m_value;
+    InputPad* m_input;
+    InputPad* m_value;
 
 };
 
@@ -79,7 +79,7 @@ void NodeUiUserDisplay::handleMessage(const MessageBuf& /*m*/, const std::string
 }
 
 void NodeUiUserDisplay::runCycle() {
-    m_value = m_elemBlock->getInput("value");
+    m_value = m_elemBlock->getInputPad("value");
 
     MessageBuf buf2 = m_elemBlock->getInputData(m_value);
 

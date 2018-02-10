@@ -163,7 +163,7 @@ SfcTransition::sendActions() {
         action->set_action(it->second);
         auto p = m_parent.getProcess();
 
-        p->setOutputData(p->getOutput(string("_action_") + it->first), action);
+        p->setOutputData(p->getOutputPad(string("_action_") + it->first), action);
     }
 }
 
