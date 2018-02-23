@@ -110,6 +110,20 @@ NodePython::getInputData(const string& pad) {
 }
 
 /**
+ * Python -> C. Returns parameter string.
+ */
+PyObject*
+NodePython::getParameter(const std::string& parm) {
+    std::string val = m_elemBlock->getParameter(parm);
+
+    PyObject* tuple = Py_BuildValue("s", val.c_str());  // Return value: New reference.
+
+    return tuple;
+}
+
+
+
+/**
  * Python -> C. Send message to output Pad of this Process.
  */
 PyObject*

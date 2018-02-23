@@ -42,6 +42,7 @@ Process::Process(NodeDb& db, const string& url, const string& instance, StringMa
 
     m_trace.println("Creating instance of " + url);
 
+    m_params = params;
 
     getPrimitive(url, instance, params, elt);
 
@@ -55,7 +56,9 @@ Process::Process(NodeDb& db, const string& url, const string& instance, StringMa
         kv->set_value(iter->second.c_str());
         MessageBuf msg(new string(kv->SerializeAsString()));
         free(kv);
+#if PARAM_AS_CONFIG
         m_elemBlock->handleMessage(msg, "config");
+#endif
     }
 
     db.registerNode(this, instance);
@@ -68,7 +71,10 @@ Process::~Process() {
 }
 
 void
-Process::sendParameters(StringMap& params) {
+Process::sendParameters(StringMap& /*params*/) {
+#if PARAM_AS_CONFIG
+    m_params = params;
+
     std::map<std::string, std::string>::iterator iter;
 
     auto config = new arro::_Config();
@@ -81,11 +87,12 @@ Process::sendParameters(StringMap& params) {
     }
 
     MessageBuf msg(new string(config->SerializeAsString()));
-    free(config);
 
+    free(config);
     // get _config input and send a message to it.
     auto input = getInputPad("_config");
     input->handleMessage(msg);
+#endif
 }
 
 
@@ -95,6 +102,18 @@ Process::runCycle() {
         m_elemBlock->runCycle();
         m_doRunCycle = false;
     }
+}
+
+std::string
+Process::getParameter(const std::string& parname) {
+    std::string parval = "";
+    try {
+        parval = m_params.at(parname);
+    }
+    catch (std::out_of_range) {
+        throw std::runtime_error("Elementary Block " + m_name + " needs parameter \"" + parname + "\"");
+    }
+    return parval;
 }
 
 void

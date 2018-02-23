@@ -41,6 +41,7 @@ namespace Arro {
         PyObject* getMessage();
         PyObject* getInputData(const std::string& pad);
         PyObject* sendMessage(char* pad, char* message);
+        PyObject* getParameter(const std::string& parm);
 
     private:
         Trace m_trace;

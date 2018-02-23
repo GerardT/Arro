@@ -87,7 +87,7 @@ PythonGlue::getMessage(PyObject * /*self*/, PyObject *args)
 
 
 PyObject*
-PythonGlue::getInputPad(PyObject * /*self*/, PyObject *args)
+PythonGlue::getInput(PyObject * /*self*/, PyObject *args)
 {
     PyObject *obj;
     const char* pad;
@@ -112,6 +112,33 @@ PythonGlue::getInputPad(PyObject * /*self*/, PyObject *args)
         }
     }
 }
+
+PyObject*
+PythonGlue::getParameter(PyObject * /*self*/, PyObject *args) {
+    PyObject *obj;
+    const char* parm;
+
+    if(!PyArg_ParseTuple(args, "Os", &obj, &parm))  // Return value: int
+        return nullptr;
+
+    instance->m_trace.println(string("parameter parm: ") + parm);
+
+    NodePython* np = instance->m_instanceMap[obj];
+    if(!np) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    } else {
+        PyObject* obj = np->getParameter(parm);
+        if(obj == nullptr) {
+            Py_INCREF(Py_None);
+            return Py_None;
+        } else {
+            return obj;
+        }
+    }
+}
+
+
 
 PyObject*
 PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
@@ -139,9 +166,10 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
  * The table of Python funcions that is added to Python module.
  */
 static PyMethodDef ArroMethods[] = {
-    {"getMessage",  PythonGlue::getMessage, METH_VARARGS, "Get a message from the queue."},
-    {"getInputPad",    PythonGlue::getInputPad, METH_VARARGS, "Get a message from the pad."},
-    {"sendMessage", PythonGlue::sendMessage, METH_VARARGS, "Send a message into the queue."},
+    {"getMessage",   PythonGlue::getMessage,   METH_VARARGS, "Get a message from the queue."},
+    {"getInput",     PythonGlue::getInput,     METH_VARARGS, "Get a message from the pad."},
+    {"sendMessage",  PythonGlue::sendMessage,  METH_VARARGS, "Send a message into the queue."},
+    {"getParameter", PythonGlue::getParameter, METH_VARARGS, "Get a parameter value"},
     {nullptr, nullptr, 0, nullptr}        /* Sentinel */
 };
 

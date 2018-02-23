@@ -45,6 +45,7 @@ namespace Arro
         virtual OutputPad* getOutputPad(const std::string& /*name*/) const {return nullptr; };
         virtual void sendParameters(StringMap& /*params*/)  {};
         virtual void setOutputData(OutputPad* /*output*/, google::protobuf::MessageLite* /*msg*/) const {};
+        virtual std::string getParameter(const std::string&) { return ""; };
 
     private:
         Trace trace;

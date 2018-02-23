@@ -41,8 +41,8 @@ public:
         
     }
     void lemonError() {
-        m_trace.println(std::string("Syntax error at ") + m_currentName + " in " + m_input);
-        Arro::SendToConsole(std::string("Syntax error at ") + m_currentName + " in " + m_input);
+        m_trace.println("Syntax error at " + m_currentName + " in " + m_input);
+        Arro::SendToConsole("Syntax error at " + m_currentName + " in " + m_input);
     }
 
     void lemonFailure() {
@@ -51,8 +51,8 @@ public:
     }
 
     void printError() {
-        m_trace.println(std::string("Symbol error at ") + m_currentName + " in " + m_input);
-        Arro::SendToConsole(std::string("Symbol error at ") + m_currentName + " in " + m_input);
+        m_trace.println("Symbol error at " + m_currentName + " in " + m_input);
+        Arro::SendToConsole("Symbol error at " + m_currentName + " in " + m_input);
     }
     
     void printFailure() {

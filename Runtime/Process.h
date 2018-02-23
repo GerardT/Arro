@@ -108,12 +108,15 @@ namespace Arro
 
         virtual const std::string& getName() const { return m_name; };
 
+        virtual std::string getParameter(const std::string& parm);
+
     private:
         Trace m_trace;
         NodeDb& m_nodeDb;
         INodeDefinition* m_elemBlock;
         bool m_doRunCycle;
         std::string m_name;
+        std::map<std::string, std::string> m_params;
     };
 }
 

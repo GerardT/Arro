@@ -282,10 +282,10 @@ void ServerEngine::stop()
     trace.println("server completed.");
 }
 
-void Arro::SendToConsole(string s)
+void Arro::SendToConsole(const string& in)
 {
     if(newsockfd >= 0) {
-        s += "\n";
+        std::string s = in + "\n";
         send(newsockfd, s.c_str(), s.length(), 0);
     }
 }

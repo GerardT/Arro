@@ -28,7 +28,7 @@ namespace Arro
      *
      * \param s String to send to Eclipse console.
      */
-    void SendToConsole(std::string s);
+    void SendToConsole(const std::string& s);
 
 
     class INodeContext {
@@ -65,6 +65,8 @@ namespace Arro
          * \return name Name of the node.
          */
         virtual const std::string& getName() const = 0;
+
+        virtual std::string getParameter(const std::string& parm) = 0;
 
         /**
          * TODO add API for debugging, e.g. single step support for Timer node.

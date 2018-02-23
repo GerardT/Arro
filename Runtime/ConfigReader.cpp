@@ -129,8 +129,10 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             // create Process object; inputs & outputs to be added later.
             processNode = new Process(m_nodeDb, *typeURL, instance, *params);
 
+#if PARAM_AS_CONFIG
             // register config not for parameter reception
             processNode->registerInput("_config", true);
+#endif
 
             // TODO maybe find another place for this invocation..
             processNode->sendParameters(*params);

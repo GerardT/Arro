@@ -74,7 +74,7 @@ namespace Arro {
          * \args Python arguments.
          */
         static PyObject* getMessage(PyObject *self, PyObject *args);
-        static PyObject* getInputPad(PyObject * /*self*/, PyObject *args);
+        static PyObject* getInput(PyObject * /*self*/, PyObject *args);
 
         /**
          * This function sendMessage is inserted in Python module and callable by
@@ -85,6 +85,8 @@ namespace Arro {
          * \args Python arguments.
          */
         static PyObject* sendMessage(PyObject *self, PyObject *args);
+
+        static PyObject* getParameter(PyObject *self, PyObject *args);
 
         /**
          * In case of Python error, capture the error code and send to Eclipse client.

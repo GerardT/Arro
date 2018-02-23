@@ -76,12 +76,13 @@ static RegisterMe<NodeDCMotor> registerMe("DCMotor");
 
 
 
-NodeDCMotor::NodeDCMotor(INodeContext* d, const string& /*name*/, Arro::StringMap& params, TiXmlElement*):
+NodeDCMotor::NodeDCMotor(INodeContext* d, const string& /*name*/, Arro::StringMap&, TiXmlElement*):
     m_trace("NodeDCMotor", true),
     m_elemBlock(d),
     m_Ch(0),
     m_running(true) {
 
+#if 0
     try {
         m_Ch = stod(params.at("Motor"));
     }
@@ -89,6 +90,9 @@ NodeDCMotor::NodeDCMotor(INodeContext* d, const string& /*name*/, Arro::StringMa
         m_trace.println("### param not found Ch ");
         m_Ch = 0;
     }
+#else
+    m_Ch = stod(d->getParameter("Motor"));
+#endif
     m_Ch--; // It's 0 based, but named M1, M2, M3, M4 on PCB.
 
     int pwm;
