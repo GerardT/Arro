@@ -19,6 +19,8 @@
 #include <queue>
 #include <map>
 
+#include "Trace.h"
+
 namespace Arro
 {
 class NodeRef;
@@ -38,6 +40,7 @@ public:
     void generateWebUi();
 
 private:
+    Trace m_trace;
     int sock;
     struct sockaddr_in m_server;
     std::thread* m_thrd;

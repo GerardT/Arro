@@ -110,7 +110,8 @@ Process::getParameter(const std::string& parname) {
     try {
         parval = m_params.at(parname);
     }
-    catch (std::out_of_range) {
+    catch (std::out_of_range&) {
+        SendToConsole("Elementary Block " + m_name + " needs parameter \"" + parname + "\"");
         throw std::runtime_error("Elementary Block " + m_name + " needs parameter \"" + parname + "\"");
     }
     return parval;
@@ -151,7 +152,7 @@ Process::getInputPad(const string& name) const {
         return in;
     } else {
         m_trace.println("no such input registered: " + getName() + ARRO_PAD_SEPARATOR + name);
-        SendToConsole(string("Program uses unknown input: ") + getName() + ARRO_PAD_SEPARATOR + name);
+        SendToConsole("Program uses unknown input: " + getName() + ARRO_PAD_SEPARATOR + name);
         throw std::runtime_error("No such input registered: " + getName() + ARRO_PAD_SEPARATOR + name);
     }
 }
@@ -163,7 +164,7 @@ Process::getOutputPad(const string& name) const {
         return out;
     } else {
         m_trace.println("no such output registered: " + getName() + ARRO_PAD_SEPARATOR + name);
-        SendToConsole(string("Program uses unknown output: ") + getName() + ARRO_PAD_SEPARATOR + name);
+        SendToConsole("Program uses unknown output: " + getName() + ARRO_PAD_SEPARATOR + name);
         throw std::runtime_error("No such output registered: " + getName() + ARRO_PAD_SEPARATOR + name);
     }
 }
@@ -199,7 +200,7 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
             }
             else {
                 m_trace.println("unknown node" + instance );
-                SendToConsole(string("unknown node ") + className);
+                SendToConsole("unknown node " + className);
             }
         } catch(out_of_range &) {
             m_trace.println("UiIn node not found");
@@ -214,7 +215,7 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
             }
             else {
                 m_trace.println("unknown node" + instance );
-                SendToConsole(string("unknown node ") + className);
+                SendToConsole("unknown node " + className);
             }
         } catch(out_of_range &) {
             m_trace.println("UiOut node not found");
@@ -242,7 +243,7 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
             }
             else {
                 m_trace.println("unknown node" + instance );
-                SendToConsole(string("unknown node ") + className);
+                SendToConsole("unknown node " + className);
             }
         } catch(out_of_range &) {
             m_trace.println("native node not found");

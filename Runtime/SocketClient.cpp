@@ -44,6 +44,7 @@ private:
     TCP Client class
 */
 SocketClient::SocketClient(const std::string& address, int port):
+       m_trace{"SocketClient", true},
        m_mutex{}
 {
     sock = -1;
@@ -233,9 +234,9 @@ SocketClient::serve() {
                 //m_stringQueue.push(std::shared_ptr<string>(data));
                 //printf("address %s data %s\n", address.c_str(), data->c_str());
 
-                printf("address %s data %s\n", address.c_str(), data.c_str());
+                m_trace.println("address " + address + " data " + data);
             } else {
-                printf("buffer %s\n", buffer);
+                m_trace.println("buffer " + string(buffer));
 
             }
 
@@ -282,14 +283,14 @@ SocketClient::readln(int sockfd, char* buffer, size_t n/*size*/) {
                 continue;
             else {
                 // Make losing socket to terminate process.
-                printf("ServerEngine losing socket, terminated!");
+                m_inst->m_trace.println("ServerEngine losing socket, terminated!");
                 strcpy(buffer, "terminate");
                 return strlen("terminate");
             }
 
         } else if (numRead == 0) {      /* EOF */
             if (totRead == 0) {         /* No bytes read */
-                printf("ServerEngine terminated!\n");
+                m_inst->m_trace.println("ServerEngine terminated!\n");
                 strcpy(buffer, "terminate");
                 return strlen("terminate");
             }

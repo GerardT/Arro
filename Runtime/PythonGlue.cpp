@@ -123,7 +123,7 @@ PythonGlue::getParameter(PyObject * /*self*/, PyObject *args) {
     if(!PyArg_ParseTuple(args, "Os", &obj, &parm))  // Return value: int
         return nullptr;
 
-    instance->m_trace.println(string("parameter parm: ") + parm);
+    instance->m_trace.println(string("parameter: ") + parm);
 
     NodePython* np = instance->m_instanceMap[obj];
     if(!np) np = instance->m_tempInstance;
