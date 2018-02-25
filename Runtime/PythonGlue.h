@@ -101,9 +101,11 @@ namespace Arro {
         static void captureError();
 
         /**
-         * Cleanup
+         * Since Python code seem not tolerant to throwing exceptions in called C code
+         * we do it this way.
          */
-        void cleanup();
+        static void setFatal();
+        static bool fatal();
 
     private:
 
@@ -124,6 +126,7 @@ namespace Arro {
         PyObject *m_pModule, *m_pModuleApi, *m_pDict, *m_pDictApi;
         std::map<PyObject *, NodePython*> m_instanceMap;
         NodePython* m_tempInstance;
+        static bool m_fatal;
     };
 }
 

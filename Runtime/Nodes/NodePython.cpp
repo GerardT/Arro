@@ -35,7 +35,7 @@ NodePython::NodePython(INodeContext* d, const string& className, StringMap& /*pa
     if (PyCallable_Check(m_pClass))  // Return value: int
     {
         m_pInstance = PyObject_CallObject(m_pClass, nullptr);  // Return value: New reference.
-        if(m_pInstance == nullptr) {
+        if(m_pInstance == nullptr || PythonGlue::fatal()) {
             throw std::runtime_error("Failed to instantiate Python class");
         }
         PythonGlue::registerInstance(m_pInstance, this);

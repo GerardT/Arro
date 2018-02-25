@@ -111,7 +111,6 @@ Process::getParameter(const std::string& parname) {
         parval = m_params.at(parname);
     }
     catch (std::out_of_range&) {
-        SendToConsole("Elementary Block " + m_name + " needs parameter \"" + parname + "\"");
         throw std::runtime_error("Elementary Block " + m_name + " needs parameter \"" + parname + "\"");
     }
     return parval;
