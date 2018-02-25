@@ -100,6 +100,11 @@ namespace Arro {
          */
         static void captureError();
 
+        /**
+         * Cleanup
+         */
+        void cleanup();
+
     private:
 
         /**

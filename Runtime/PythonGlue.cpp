@@ -54,6 +54,11 @@ PythonGlue::~PythonGlue() {
 
     m_trace.println("Deleting PythonGlue.");
 
+    cleanup();
+}
+
+void
+PythonGlue::cleanup() {
     /*
      * Cleanup for Python -> C.
      */
@@ -68,7 +73,6 @@ PythonGlue::~PythonGlue() {
     // Finish the Python Interpreter
     Py_Finalize();
 }
-
 
 PyObject*
 PythonGlue::getMessage(PyObject * /*self*/, PyObject *args)
@@ -131,7 +135,14 @@ PythonGlue::getParameter(PyObject * /*self*/, PyObject *args) {
         Py_INCREF(Py_None);
         return Py_None;
     } else {
-        PyObject* obj = np->getParameter(parm);
+        PyObject* obj = nullptr;
+        try {
+            obj = np->getParameter(parm);
+        }
+        catch (std::runtime_error& error) {
+            instance->cleanup();
+            throw(error);
+        }
         if(obj == nullptr) {
             Py_INCREF(Py_None);
             return Py_None;
