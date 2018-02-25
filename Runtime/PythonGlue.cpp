@@ -11,7 +11,8 @@ PythonGlue::PythonGlue():
     m_trace{"PythonGlue", true},
     m_pModule{nullptr},
     m_pDict{nullptr},
-    m_pDictApi{nullptr}
+    m_pDictApi{nullptr},
+    m_tempInstance{nullptr}
 {
     m_trace.println("Instantiating PythonGlue.");
     if(instance) {
@@ -98,6 +99,7 @@ PythonGlue::getInput(PyObject * /*self*/, PyObject *args)
     instance->m_trace.println(string("parameter padname: ") + pad);
 
     NodePython* np = instance->m_instanceMap[obj];
+    if(!np) np = instance->m_tempInstance;
     if(!np) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -124,6 +126,7 @@ PythonGlue::getParameter(PyObject * /*self*/, PyObject *args) {
     instance->m_trace.println(string("parameter parm: ") + parm);
 
     NodePython* np = instance->m_instanceMap[obj];
+    if(!np) np = instance->m_tempInstance;
     if(!np) {
         Py_INCREF(Py_None);
         return Py_None;
@@ -152,6 +155,7 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
     }
 
     NodePython* np = instance->m_instanceMap[obj];
+    if(!np) np = instance->m_tempInstance;
     if(!np) {
         return nullptr; // FIXME: do i need to set an error?
     } else {
@@ -218,6 +222,10 @@ PythonGlue::insertFunctionToModule() {
 void
 PythonGlue::registerInstance(PyObject* obj, NodePython* node) {
     instance->m_instanceMap[obj] = node;
+}
+void
+PythonGlue::registerTempInstance(NodePython* node) {
+    instance->m_tempInstance = node;
 }
 
 PyObject*

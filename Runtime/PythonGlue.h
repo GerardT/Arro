@@ -64,6 +64,7 @@ namespace Arro {
          * \param node NodePython instance that corresponds to Python instance.
          */
         static void registerInstance(PyObject* instance, NodePython* node);
+        static void registerTempInstance(NodePython* node);
 
         /**
          * This function getMessage is inserted in Python module and callable by
@@ -86,6 +87,12 @@ namespace Arro {
          */
         static PyObject* sendMessage(PyObject *self, PyObject *args);
 
+        /**
+         * Get a parameter and raise an error if it is not provided.
+         *
+         * \param self Python self object.
+         * \args Python arguments.
+         */
         static PyObject* getParameter(PyObject *self, PyObject *args);
 
         /**
@@ -111,6 +118,7 @@ namespace Arro {
         Trace m_trace;
         PyObject *m_pModule, *m_pModuleApi, *m_pDict, *m_pDictApi;
         std::map<PyObject *, NodePython*> m_instanceMap;
+        NodePython* m_tempInstance;
     };
 }
 

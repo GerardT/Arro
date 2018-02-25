@@ -15,9 +15,17 @@ static RegisterMe<NodePython> registerMe("Python");
  * will be used for the lifetime of the Process.
  */
 NodePython::NodePython(INodeContext* d, const string& className, StringMap& /*params*/, TiXmlElement*):
-    m_trace("NodePython", true),
-    m_elemBlock(d)
+    m_trace{"NodePython", true},
+    m_elemBlock{d},
+    m_pFunc{nullptr},
+    m_pValue{nullptr},
+    m_pArgs{nullptr},
+    m_pClass{nullptr},
+    m_pInstance{nullptr}
 {
+    // Since during construction of the object we don't have its pointer yet...
+    PythonGlue::registerTempInstance(this);
+
     PyObject *pDict = PythonGlue::getDict();
 
     // Build the name of a callable class
@@ -32,6 +40,7 @@ NodePython::NodePython(INodeContext* d, const string& className, StringMap& /*pa
         }
         PythonGlue::registerInstance(m_pInstance, this);
     }
+    PythonGlue::registerTempInstance(nullptr);
 }
 
 NodePython::~NodePython() {
