@@ -51,20 +51,11 @@ using namespace arro;
 
 static RegisterMe<NodeUiUserInput> registerMe("SliderInput");
 
-NodeUiUserInput::NodeUiUserInput(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+NodeUiUserInput::NodeUiUserInput(INodeContext* d, const string& /*name*/, StringMap& /*params*/, TiXmlElement*):
     m_trace("NodeUiReceiveNumber", true),
     m_elemBlock(d) {
 
-    std::string name;
-    auto iter = params.find(std::string("name"));
-    if(iter == params.end()) {
-        name = "No Name";
-    } else {
-        name = iter->second;
-        params.erase(iter);
-    }
-
-    //    <arro-slider id=".main.aComposite.aInput1.aSliderInput" name="speed"></arro-slider>
+    std::string name = d->getParameter("name");
 
     std::string inst = std::string("<arro-slider id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-slider>";
 

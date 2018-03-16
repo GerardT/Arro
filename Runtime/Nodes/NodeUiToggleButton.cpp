@@ -51,18 +51,12 @@ using namespace arro;
 
 static RegisterMe<NodeUiToggleButton> registerMe("ToggleButton");
 
-NodeUiToggleButton::NodeUiToggleButton(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+NodeUiToggleButton::NodeUiToggleButton(INodeContext* d, const string& /*name*/, StringMap& /*params*/, TiXmlElement*):
     m_trace("NodeUiUserInput.cpp", true),
     m_elemBlock(d) {
 
-    std::string name;
-    auto iter = params.find(std::string("name"));
-    if(iter == params.end()) {
-        name = "No Name";
-    } else {
-        name = iter->second;
-        params.erase(iter);
-    }
+    std::string name = d->getParameter("name");
+
     std::string inst = std::string("<arro-toggle-button id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-toggle-button>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {

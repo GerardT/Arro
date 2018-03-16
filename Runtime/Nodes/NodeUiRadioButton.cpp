@@ -51,26 +51,13 @@ using namespace arro;
 
 static RegisterMe<NodeUiRadioButton> registerMe("RadioButton");
 
-NodeUiRadioButton::NodeUiRadioButton(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+NodeUiRadioButton::NodeUiRadioButton(INodeContext* d, const string& /*name*/, StringMap& /*params*/, TiXmlElement*):
     m_trace("NodeUiRadioButton", true),
     m_elemBlock(d) {
 
-    std::string name;
-    auto iter = params.find(std::string("name"));
-    if(iter == params.end()) {
-        name = "No Name";
-    } else {
-        name = iter->second;
-        params.erase(iter);
-    }
+    std::string name = d->getParameter("name");
 
-    std::string data;
-    auto iter2 = params.find(std::string("data"));
-    if(iter2 != params.end()) {
-        data = iter2->second;
-        // ? params.erase(iter);
-
-    }
+    std::string data = d->getParameter("data");
 
     //    <arro-radio-button id=".main.aComposite.aRadioButton" name="No Name" data='[
     //         {"name":"small","label":"Small"},{"name":"medium","label":"Medium"}

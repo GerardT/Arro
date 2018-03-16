@@ -51,18 +51,12 @@ using namespace arro;
 
 static RegisterMe<NodeUiCheckBox> registerMe("CheckBox");
 
-NodeUiCheckBox::NodeUiCheckBox(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+NodeUiCheckBox::NodeUiCheckBox(INodeContext* d, const string& /*name*/, StringMap& /*params*/, TiXmlElement*):
     m_trace("NodeUiReceiveNumber", true),
     m_elemBlock(d) {
 
-    std::string name;
-    auto iter = params.find(std::string("name"));
-    if(iter == params.end()) {
-        name = "No Name";
-    } else {
-        name = iter->second;
-        params.erase(iter);
-    }
+    std::string name = d->getParameter("name");
+
     std::string inst = std::string("<arro-check-box id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-check-box>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
