@@ -232,7 +232,7 @@ NodeServo::Servo::start(int ch, int val) {
 NodeServo::Servo* NodeServo::m_pServo = nullptr;
 
 
-NodeServo::NodeServo(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+NodeServo::NodeServo(INodeContext* d, const string& /*name*/, StringMap& /* params */, TiXmlElement*):
     m_trace("NodeServo", true),
     m_elemBlock(d),
     m_previous_position(0),
@@ -245,12 +245,7 @@ NodeServo::NodeServo(INodeContext* d, const string& /*name*/, StringMap& params,
         m_pServo = new Servo();
     }
 
-    try {
-        m_Ch = stod(params.at("Channel"));
-    }
-    catch (std::out_of_range) {
-        m_trace.println("### param not found Ch ");
-    }
+    m_Ch = stod(d->getParameter("Channel"));
 }
 
 void

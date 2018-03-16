@@ -56,7 +56,7 @@ using namespace arro;
 
 static RegisterMe<NodePid> registerMe("pid");
 
-NodePid::NodePid(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+NodePid::NodePid(INodeContext* d, const string& /*name*/, StringMap& /* params */, TiXmlElement*):
     m_trace("NodePid", true),
     m_elemBlock(d) {
 
@@ -68,14 +68,10 @@ NodePid::NodePid(INodeContext* d, const string& /*name*/, StringMap& params, TiX
     m_actual_mode = "Idle";
     m_ms_elapsed = 0;
 
-    try {
-        m_Kp = stod(params.at("Kp"));
-        m_Ki = stod(params.at("Ki"));
-        m_Kd = stod(params.at("Kd"));
-    }
-    catch (std::out_of_range) {
-        m_trace.println("### param not found Kp, Ki, Kd ");
-    }
+    m_Kp = stod(d->getParameter("Kp"));
+    m_Ki = stod(d->getParameter("Ki"));
+    m_Kd = stod(d->getParameter("Kd"));
+
 }
 
 void

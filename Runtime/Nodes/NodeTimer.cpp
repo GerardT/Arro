@@ -21,16 +21,11 @@ static RegisterMe<NodeTimer> registerMe("Timer");
 
 
 
-NodeTimer::NodeTimer(INodeContext* d, const string& /*name*/, StringMap& params, TiXmlElement*):
+NodeTimer::NodeTimer(INodeContext* d, const string& /*name*/, StringMap& /* params */, TiXmlElement*):
     m_trace("NodePid", true),
     m_elemBlock(d) {
 
-    try {
-        m_ticks = stoi(params.at("ms"));
-    }
-    catch (std::out_of_range) {
-        m_trace.println("### param not found ms ");
-    }
+    m_ticks = stod(d->getParameter("ms"));
 
     // Add this instance to array of timers.
     timers.push_back(this);

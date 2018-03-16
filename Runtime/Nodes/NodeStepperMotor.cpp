@@ -97,19 +97,13 @@ static const int MICROSTEP_CURVE[] = {0, 50, 98, 142, 180, 212, 236, 250, 255};
 
 
 
-NodeStepperMotor::NodeStepperMotor(INodeContext* d, const string& /*name*/, Arro::StringMap& params, TiXmlElement*):
+NodeStepperMotor::NodeStepperMotor(INodeContext* d, const string& /*name*/, Arro::StringMap& /* params */, TiXmlElement*):
     m_trace("NodeStepperMotor", true),
     m_elemBlock(d),
     m_Ch(0),
     m_running(true) {
 
-    try {
-        m_Ch = stod(params.at("Motor"));
-    }
-    catch (std::out_of_range) {
-        m_trace.println("### param not found Ch ");
-        m_Ch = 0;
-    }
+    m_Ch = stod(d->getParameter("Motor"));
     m_Ch--; // It's 0 based, but named M1, M2 on PCB.
 
     m_trace.println(string("Init motor ") + std::to_string(m_Ch));
