@@ -43,7 +43,6 @@ namespace Arro
         virtual MessageBuf getInputData(InputPad* /*input*/) const { return MessageBuf{}; };
         virtual InputPad* getInputPad(const std::string& /*name*/) const {return nullptr; };
         virtual OutputPad* getOutputPad(const std::string& /*name*/) const {return nullptr; };
-        virtual void sendParameters(StringMap& /*params*/)  {};
         virtual void setOutputData(OutputPad* /*output*/, google::protobuf::MessageLite* /*msg*/) const {};
         virtual std::string getParameter(const std::string&) { return ""; };
 

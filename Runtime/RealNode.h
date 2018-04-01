@@ -33,6 +33,8 @@ namespace Arro
          */
         virtual void runCycle() = 0;
 
+        virtual void finishConstruction() {};
+
     };
 }
 

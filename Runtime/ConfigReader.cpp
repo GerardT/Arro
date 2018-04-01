@@ -45,6 +45,8 @@ ConfigReader::ConfigReader(const string& filename, NodeDb& db):
     // Recursively process all modules, starting with "Main"
     makeNodeInstance("Main", "main", "", *params, nullptr);
 
+    m_nodeDb.visitNodes([](RealNode& c) { c.finishConstruction();});
+
     SocketClient::getInstance()->generateWebUi();
 }
 
@@ -133,10 +135,6 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             // register config not for parameter reception
             processNode->registerInput("_config", true);
 #endif
-
-            // TODO maybe find another place for this invocation..
-            processNode->sendParameters(*params);
-
 
             delete params;
         }
@@ -306,7 +304,6 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
     // Maybe in future host system can do this check. Or we can use protobuf enum.
     if(parentSfc && sfcNode) parentSfc->registerSfc(instanceName, sfcNode);
     //if(sfcNode) sfcNode->test();
-    if(sfcNode) sfcNode->finishConstruction();
 }
 
 

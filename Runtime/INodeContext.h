@@ -39,8 +39,6 @@ namespace Arro
         INodeContext() {};
         virtual ~INodeContext() {};
 
-        virtual void sendParameters(StringMap& params) = 0;
-
         /**
          * Lookup an input by its name, which is internally concatenated: "nodename#name".
          *

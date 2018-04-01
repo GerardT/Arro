@@ -17,6 +17,7 @@ public:
      * \param params List of parameters passed to this node.
      */
     NodeUiUserDisplay(INodeContext* d, const std::string& name, StringMap& params, TiXmlElement*);
+    virtual void finishConstruction();
 
     virtual ~NodeUiUserDisplay();
 
@@ -57,12 +58,18 @@ NodeUiUserDisplay::NodeUiUserDisplay(INodeContext* d, const string& /*name*/, St
 
     std::string name = d->getParameter("name");
 
+
     std::string inst = std::string("<arro-progress id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-progress>";
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& /*data*/) {
                         // SocketClient::getInstance()->sendMessage(m_uiClient, data);
                     });
 
 }
+
+void
+NodeUiUserDisplay::finishConstruction() {
+    m_value = m_elemBlock->getInputPad("value");
+};
 
 NodeUiUserDisplay::~NodeUiUserDisplay() {
     SocketClient::getInstance()->unsubscribe(m_uiClient);
@@ -72,8 +79,6 @@ void NodeUiUserDisplay::handleMessage(const MessageBuf& /*m*/, const std::string
 }
 
 void NodeUiUserDisplay::runCycle() {
-    m_value = m_elemBlock->getInputPad("value");
-
     MessageBuf buf2 = m_elemBlock->getInputData(m_value);
 
     Value* msg2 = new Value();

@@ -88,7 +88,7 @@ OutputPad::submitMessageBuffer(const char* msg) {
 
 
 
-INodeContext*
+RealNode*
 NodeDb::getNode(const string& name) {
     try {
         auto n = &(*(m_allNodes[name]));
@@ -100,14 +100,14 @@ NodeDb::getNode(const string& name) {
     }
 }
 
-INodeContext*
-NodeDb::registerNode(INodeContext* node, const string& name) {
-     m_allNodes[name] = std::unique_ptr<INodeContext>(node);
+RealNode*
+NodeDb::registerNode(RealNode* node, const string& name) {
+     m_allNodes[name] = std::unique_ptr<RealNode>(node);
      return node;
 }
 
 InputPad*
-NodeDb::registerNodeInput(INodeContext* node, const string& interfaceName,
+NodeDb::registerNodeInput(RealNode* node, const string& interfaceName,
                           std::function<void (const MessageBuf& msg, const std::string& interfaceName)> listen) {
     auto n = new InputPad(interfaceName, listen, node);
     // If NodePass don't use interfaceName
@@ -123,7 +123,7 @@ NodeDb::registerNodeInput(INodeContext* node, const string& interfaceName,
 }
 
 OutputPad*
-NodeDb::registerNodeOutput(INodeContext* node, const string& interfaceName) {
+NodeDb::registerNodeOutput(RealNode* node, const string& interfaceName) {
     auto n = new OutputPad(this);
 
     // If NodePass don't use interfaceName
@@ -189,7 +189,7 @@ NodeDb::runCycle(NodeDb* nm) {
 
             /* Then trigger all runCycle methods on nodes */
             for(auto it = nm->m_allNodes.begin(); it != nm->m_allNodes.end(); ++it) {
-                INodeContext* an = &(*(it->second));
+                RealNode* an = &(*(it->second));
                 ((RealNode*)(an))->runCycle();
 
                 //it->second->runCycle();

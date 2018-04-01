@@ -39,8 +39,6 @@ namespace Arro
         };
 
 
-        void sendParameters(StringMap& params);
-
         void test() {
             m_elemBlock->test();
         }

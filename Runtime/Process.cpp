@@ -70,30 +70,30 @@ Process::~Process() {
     if(m_elemBlock) delete m_elemBlock;
 }
 
-void
-Process::sendParameters(StringMap& /*params*/) {
-#if PARAM_AS_CONFIG
-    m_params = params;
-
-    std::map<std::string, std::string>::iterator iter;
-
-    auto config = new arro::_Config();
-
-    auto map = config->value();
-    for (iter = params.begin(); iter != params.end(); ++iter) {
-        m_trace.println("    parameter " + iter->first + " " + iter->second);
-
-        (*config->mutable_value())[iter->first] = iter->second;
-    }
-
-    MessageBuf msg(new string(config->SerializeAsString()));
-
-    free(config);
-    // get _config input and send a message to it.
-    auto input = getInputPad("_config");
-    input->handleMessage(msg);
-#endif
-}
+//void
+//Process::sendParameters(StringMap& /*params*/) {
+//#if PARAM_AS_CONFIG
+//    m_params = params;
+//
+//    std::map<std::string, std::string>::iterator iter;
+//
+//    auto config = new arro::_Config();
+//
+//    auto map = config->value();
+//    for (iter = params.begin(); iter != params.end(); ++iter) {
+//        m_trace.println("    parameter " + iter->first + " " + iter->second);
+//
+//        (*config->mutable_value())[iter->first] = iter->second;
+//    }
+//
+//    MessageBuf msg(new string(config->SerializeAsString()));
+//
+//    free(config);
+//    // get _config input and send a message to it.
+//    auto input = getInputPad("_config");
+//    input->handleMessage(msg);
+//#endif
+//}
 
 
 void

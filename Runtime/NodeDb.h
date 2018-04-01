@@ -17,7 +17,7 @@
 #include <memory>
 #include <functional>
 
-#include "INodeContext.h"
+#include "RealNode.h"
 #include "INodeDefinition.h"
 #include "Trace.h"
 
@@ -34,7 +34,7 @@ public:
      * \param l Listener
      * \param n Node to which this input is attached.
      */
-    InputPad(const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> l, INodeContext* n):
+    InputPad(const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> l, RealNode* n):
         m_callback(l), m_node(n), m_msg(new std::string()), m_interfaceName(interfaceName) { };
     virtual ~InputPad() {};
 
@@ -53,7 +53,7 @@ public:
 
 private:
     std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> m_callback;
-    INodeContext* m_node;
+    RealNode* m_node;
     MessageBuf m_msg;
 public:
     std::string m_interfaceName;
@@ -176,12 +176,12 @@ private:
         void toggleQueue();
 
         /**
-         * Register an INodeContext by name.
+         * Register an RealNode by name.
          *
          * \param node Node to register.
          * \param name Name to use for registration.
          */
-        INodeContext* registerNode(INodeContext* node, const std::string& name);
+        RealNode* registerNode(RealNode* node, const std::string& name);
 
         /**
          * Register an input with the node.
@@ -189,7 +189,7 @@ private:
          * \param name Name of the interface as "node.node.interface".
          * \param n The instance of the node.
          */
-        InputPad* registerNodeInput(INodeContext* node, const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> listen);
+        InputPad* registerNodeInput(RealNode* node, const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> listen);
 
         /**
          * Register an output with the node.
@@ -197,7 +197,7 @@ private:
          * \param name Name of the interface as "node.node.interface".
          * \param n The instance of the node.
          */
-        OutputPad* registerNodeOutput(INodeContext* node, const std::string& interfaceName);
+        OutputPad* registerNodeOutput(RealNode* node, const std::string& interfaceName);
 
         /**
          * Start the runtime process by creating and starting thread for it.
@@ -234,7 +234,7 @@ private:
          *
          * \return Found node reference (makes this method non-const).
          */
-        INodeContext* getNode(const std::string& name);
+        RealNode* getNode(const std::string& name);
 
         /**
          * Find an input from a name "node.subnode.subsub.input".
@@ -254,11 +254,18 @@ private:
          */
         OutputPad* getOutputPad(const std::string& name);
 
+        void visitNodes(std::function<void(RealNode&)> f) {
+            for(auto const& it : m_allNodes) {
+                f(*(it.second));
+            }
+
+        }
+
     private:
         Trace m_trace;
         std::map<std::string, std::unique_ptr<InputPad> > m_allInputs;
         std::map<std::string, std::unique_ptr<OutputPad> > m_allOutputs;
-        std::map<std::string, std::unique_ptr<INodeContext> > m_allNodes;
+        std::map<std::string, std::unique_ptr<RealNode> > m_allNodes;
         std::queue<FullMsg*> m_inQueue, *m_pInQueue;
         std::queue<FullMsg*> m_outQueue, *m_pOutQueue;
         bool m_running;
