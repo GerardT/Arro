@@ -31,6 +31,11 @@ NodePython::NodePython(INodeContext* d, const string& className, StringMap& /*pa
     // Build the name of a callable class
     m_pClass = PyDict_GetItemString(pDict, className.c_str());  // Return value: Borrowed reference
 
+}
+
+void
+NodePython::finishConstruction() {
+
     // Create an instance of the class
     if (PyCallable_Check(m_pClass))  // Return value: int
     {

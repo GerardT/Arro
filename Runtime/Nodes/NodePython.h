@@ -26,6 +26,8 @@ namespace Arro {
         NodePython(const NodePython&) = delete;
         NodePython& operator=(const NodePython& other) = delete;
 
+        virtual void finishConstruction();
+
         /**
          * Handle a message that is sent to this node.
          *
