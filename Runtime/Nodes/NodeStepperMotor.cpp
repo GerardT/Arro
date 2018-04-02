@@ -285,7 +285,7 @@ void NodeStepperMotor::step(int steps, int direction, int stepstyle) {
         steps *= MICROSTEPS;
     }
 
-    //m_trace("{} sec per step".format(s_per_s));
+    m_trace.println("seconds per step " + std::to_string(s_per_s) + " steps " + std::to_string(steps) + " direction " + std::to_string(direction) + " stepstyle " + std::to_string(stepstyle));
 
     for (int s = 0; s < steps; s++) {
         lateststep = oneStep(direction, stepstyle);
@@ -311,6 +311,7 @@ void
 NodeStepperMotor::setSpeed(int rpm) {
     m_trace.println(std::string("NodeStepperMotor::setSpeed ") + to_string(rpm));
     m_sec_per_step = 60.0 / (m_revsteps * rpm);
+    m_trace.println("m_sec_per_step " + std::to_string(m_sec_per_step));
 }
 
 
