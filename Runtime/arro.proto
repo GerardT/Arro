@@ -45,3 +45,9 @@ message Selection {
 message Json {
     string data = 1;
 }
+
+message Blob {
+    bytes data = 1;
+}
+
+

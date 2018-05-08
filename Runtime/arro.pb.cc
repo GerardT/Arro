@@ -55,6 +55,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* Json_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Json_reflection_ = NULL;
+const ::google::protobuf::Descriptor* Blob_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  Blob_reflection_ = NULL;
 
 }  // namespace
 
@@ -232,6 +235,21 @@ void protobuf_AssignDesc_arro_2eproto() {
       sizeof(Json),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Json, _internal_metadata_),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Json, _is_default_instance_));
+  Blob_descriptor_ = file->message_type(11);
+  static const int Blob_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Blob, data_),
+  };
+  Blob_reflection_ =
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
+      Blob_descriptor_,
+      Blob::default_instance_,
+      Blob_offsets_,
+      -1,
+      -1,
+      -1,
+      sizeof(Blob),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Blob, _internal_metadata_),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Blob, _is_default_instance_));
 }
 
 namespace {
@@ -275,6 +293,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
       Selection_descriptor_, &Selection::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       Json_descriptor_, &Json::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+      Blob_descriptor_, &Blob::default_instance());
 }
 
 }  // namespace
@@ -302,6 +322,8 @@ void protobuf_ShutdownFile_arro_2eproto() {
   delete Selection_reflection_;
   delete Json::default_instance_;
   delete Json_reflection_;
+  delete Blob::default_instance_;
+  delete Blob_reflection_;
 }
 
 void protobuf_AddDesc_arro_2eproto() {
@@ -320,8 +342,8 @@ void protobuf_AddDesc_arro_2eproto() {
     "de\022\014\n\004mode\030\001 \001(\t\"\024\n\004Step\022\014\n\004name\030\001 \001(\t\"\030"
     "\n\006Action\022\016\n\006action\030\001 \001(\t\"\022\n\004Tick\022\n\n\002ms\030\001"
     " \001(\005\"\026\n\005Value\022\r\n\005value\030\001 \001(\005\"\032\n\tSelectio"
-    "n\022\r\n\005value\030\001 \001(\t\"\024\n\004Json\022\014\n\004data\030\001 \001(\tb\006"
-    "proto3", 406);
+    "n\022\r\n\005value\030\001 \001(\t\"\024\n\004Json\022\014\n\004data\030\001 \001(\t\"\024"
+    "\n\004Blob\022\014\n\004data\030\001 \001(\014b\006proto3", 428);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "arro.proto", &protobuf_RegisterTypes);
   KeyValuePair::default_instance_ = new KeyValuePair();
@@ -335,6 +357,7 @@ void protobuf_AddDesc_arro_2eproto() {
   Value::default_instance_ = new Value();
   Selection::default_instance_ = new Selection();
   Json::default_instance_ = new Json();
+  Blob::default_instance_ = new Blob();
   KeyValuePair::default_instance_->InitAsDefaultInstance();
   ParameterBlock::default_instance_->InitAsDefaultInstance();
   _Config::default_instance_->InitAsDefaultInstance();
@@ -346,6 +369,7 @@ void protobuf_AddDesc_arro_2eproto() {
   Value::default_instance_->InitAsDefaultInstance();
   Selection::default_instance_->InitAsDefaultInstance();
   Json::default_instance_->InitAsDefaultInstance();
+  Blob::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_arro_2eproto);
 }
 
@@ -3384,6 +3408,274 @@ void Json::clear_data() {
   }
   data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
   // @@protoc_insertion_point(field_set_allocated:arro.Json.data)
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Blob::kDataFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+Blob::Blob()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:arro.Blob)
+}
+
+void Blob::InitAsDefaultInstance() {
+  _is_default_instance_ = true;
+}
+
+Blob::Blob(const Blob& from)
+  : ::google::protobuf::Message(),
+    _internal_metadata_(NULL) {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:arro.Blob)
+}
+
+void Blob::SharedCtor() {
+    _is_default_instance_ = false;
+  ::google::protobuf::internal::GetEmptyString();
+  _cached_size_ = 0;
+  data_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+Blob::~Blob() {
+  // @@protoc_insertion_point(destructor:arro.Blob)
+  SharedDtor();
+}
+
+void Blob::SharedDtor() {
+  data_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (this != default_instance_) {
+  }
+}
+
+void Blob::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* Blob::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return Blob_descriptor_;
+}
+
+const Blob& Blob::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_arro_2eproto();
+  return *default_instance_;
+}
+
+Blob* Blob::default_instance_ = NULL;
+
+Blob* Blob::New(::google::protobuf::Arena* arena) const {
+  Blob* n = new Blob;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void Blob::Clear() {
+// @@protoc_insertion_point(message_clear_start:arro.Blob)
+  data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+bool Blob::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:arro.Blob)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional bytes data = 1;
+      case 1: {
+        if (tag == 10) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
+                input, this->mutable_data()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:arro.Blob)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:arro.Blob)
+  return false;
+#undef DO_
+}
+
+void Blob::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:arro.Blob)
+  // optional bytes data = 1;
+  if (this->data().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
+      1, this->data(), output);
+  }
+
+  // @@protoc_insertion_point(serialize_end:arro.Blob)
+}
+
+::google::protobuf::uint8* Blob::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:arro.Blob)
+  // optional bytes data = 1;
+  if (this->data().size() > 0) {
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
+        1, this->data(), target);
+  }
+
+  // @@protoc_insertion_point(serialize_to_array_end:arro.Blob)
+  return target;
+}
+
+int Blob::ByteSize() const {
+// @@protoc_insertion_point(message_byte_size_start:arro.Blob)
+  int total_size = 0;
+
+  // optional bytes data = 1;
+  if (this->data().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::BytesSize(
+        this->data());
+  }
+
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void Blob::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:arro.Blob)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  const Blob* source = 
+      ::google::protobuf::internal::DynamicCastToGenerated<const Blob>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:arro.Blob)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:arro.Blob)
+    MergeFrom(*source);
+  }
+}
+
+void Blob::MergeFrom(const Blob& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:arro.Blob)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  if (from.data().size() > 0) {
+
+    data_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.data_);
+  }
+}
+
+void Blob::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:arro.Blob)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Blob::CopyFrom(const Blob& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:arro.Blob)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Blob::IsInitialized() const {
+
+  return true;
+}
+
+void Blob::Swap(Blob* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void Blob::InternalSwap(Blob* other) {
+  data_.Swap(&other->data_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata Blob::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = Blob_descriptor_;
+  metadata.reflection = Blob_reflection_;
+  return metadata;
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// Blob
+
+// optional bytes data = 1;
+void Blob::clear_data() {
+  data_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ const ::std::string& Blob::data() const {
+  // @@protoc_insertion_point(field_get:arro.Blob.data)
+  return data_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Blob::set_data(const ::std::string& value) {
+  
+  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:arro.Blob.data)
+}
+ void Blob::set_data(const char* value) {
+  
+  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:arro.Blob.data)
+}
+ void Blob::set_data(const void* value, size_t size) {
+  
+  data_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:arro.Blob.data)
+}
+ ::std::string* Blob::mutable_data() {
+  
+  // @@protoc_insertion_point(field_mutable:arro.Blob.data)
+  return data_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Blob::release_data() {
+  // @@protoc_insertion_point(field_release:arro.Blob.data)
+  
+  return data_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Blob::set_allocated_data(::std::string* data) {
+  if (data != NULL) {
+    
+  } else {
+    
+  }
+  data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
+  // @@protoc_insertion_point(field_set_allocated:arro.Blob.data)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS

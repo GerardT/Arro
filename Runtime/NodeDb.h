@@ -49,7 +49,7 @@ public:
      */
     void handleMessage(const MessageBuf& msg);
 
-    const MessageBuf& getData() const { return m_msg; };
+    const MessageBuf getData() const { return m_msg; };
 
 private:
     std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> m_callback;

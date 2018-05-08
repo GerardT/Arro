@@ -16,7 +16,7 @@ using namespace Arro;
 using namespace std;
 
 NodeDb::NodeDb():
-    m_trace{"NodeDb", true},
+    m_trace{"NodeDb", false},
     m_allInputs{},
     m_allOutputs{},
     m_allNodes{},
@@ -69,11 +69,17 @@ OutputPad::forwardMessage(const MessageBuf& msg) {
 }
 void
 OutputPad::submitMessage(google::protobuf::MessageLite* msg) {
-    string s = msg->SerializeAsString();
-    submitMessageBuffer(s.c_str());
+    MessageBuf s(new std::string(msg->SerializeAsString()));
+    auto fm = new NodeDb::FullMsg(this, s);
+
+    std::lock_guard<std::mutex> lock(m_nm->m_mutex);
+    m_nm->m_pInQueue->push(fm);
+
+    m_nm->m_condition.notify_one();
     free(msg);
 }
 
+// Seem necessary for Python only..
 void
 OutputPad::submitMessageBuffer(const char* msg) {
     MessageBuf s(new string(msg));

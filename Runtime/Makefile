@@ -56,6 +56,9 @@ SRCS         := main.cpp \
 		Nodes/NodeUiToggleButton.cpp \
 		Nodes/NodeUiUserInput.cpp \
 		Nodes/NodeUiUserDisplay.cpp \
+		Nodes/NodeFileReader.cpp \
+		Nodes/NodeTsReader.cpp \
+		Nodes/NodeDumper.cpp \
 		tinyxmlparser.cpp \
 		tinyxmlerror.cpp \
 		tinyxml.cpp \
