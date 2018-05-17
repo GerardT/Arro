@@ -10,6 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
+#include <list>
 #include <map>
 #include <queue>
 #include <mutex>
@@ -19,6 +20,7 @@
 
 #include "RealNode.h"
 #include "INodeDefinition.h"
+#include "Database.h"
 #include "Trace.h"
 
 
@@ -35,7 +37,11 @@ public:
      * \param n Node to which this input is attached.
      */
     InputPad(const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> l, RealNode* n):
-        m_callback(l), m_node(n), m_msg(new std::string()), m_interfaceName(interfaceName) { };
+        m_callback{l},
+        m_node{n},
+        m_msg{new std::string()},
+        m_interfaceName{interfaceName},
+        m_outputPadId{0} {} // FIXME MAXINT?
     virtual ~InputPad() {};
 
     // Copy and assignment is not supported.
@@ -51,12 +57,17 @@ public:
 
     const MessageBuf getData() const { return m_msg; };
 
+    void addOutput(unsigned int padId) {
+        m_outputPadId = padId;
+    }
+
 private:
     std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> m_callback;
     RealNode* m_node;
     MessageBuf m_msg;
 public:
     std::string m_interfaceName;
+    unsigned int m_outputPadId;
 
 };
 
@@ -74,7 +85,7 @@ public:
      *
      * \param db Node database.
      */
-    OutputPad(NodeDb* db);
+    OutputPad(unsigned int padId, NodeDb* db);
     virtual ~OutputPad() {};
 
     // Copy and assignment is not supported.
@@ -100,7 +111,7 @@ public:
      *
      * \param msg Buffer to submit.
      */
-    void submitMessage(google::protobuf::MessageLite* msg);
+    void submitMessage(unsigned int padId, google::protobuf::MessageLite* msg);
 
     /**
      * Fill a MessageBuf from string and submit Protobuf buffer into queue.
@@ -109,9 +120,19 @@ public:
      */
     void submitMessageBuffer(const char* msg);
 
+    unsigned int getPadId() {
+        return m_padId;
+    }
+
+    //std::list<InputPad*> getInputPads() {
+    //    return m_inputs;
+    //}
+
+
 private:
     NodeDb* m_nm;
-    std::vector<InputPad*> m_inputs;
+    std::list<InputPad*> m_inputs;
+    unsigned int m_padId;
 };
 
 
@@ -197,7 +218,7 @@ private:
          * \param name Name of the interface as "node.node.interface".
          * \param n The instance of the node.
          */
-        OutputPad* registerNodeOutput(RealNode* node, const std::string& interfaceName);
+        OutputPad* registerNodeOutput(RealNode* node, unsigned int padId, const std::string& interfaceName);
 
         /**
          * Start the runtime process by creating and starting thread for it.
@@ -272,6 +293,7 @@ private:
         std::thread* m_thrd;
         std::mutex m_mutex;
         std::condition_variable m_condition;
+        Database m_database;
 
     };
 }

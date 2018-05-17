@@ -48,15 +48,18 @@ InputPad::handleMessage(const MessageBuf& msg) {
     m_callback(msg, m_interfaceName);
 }
 
-OutputPad::OutputPad(NodeDb* n):
+OutputPad::OutputPad(unsigned int padId, NodeDb* n):
     m_nm{n},
-    m_inputs{} {
+    m_inputs{},
+    m_padId{padId} {
 }
 
 void
 OutputPad::connectInput(InputPad* i) {
     if(i) {
+        // Another input is listening to this output pad.
         m_inputs.push_back((InputPad*)i);
+        i->addOutput(m_padId);
     }
     else {
         m_nm->m_trace.println("### cannot connect ");
@@ -68,8 +71,11 @@ OutputPad::forwardMessage(const MessageBuf& msg) {
     for_each(m_inputs.begin(), m_inputs.end(), [msg](InputPad* i) { i->handleMessage(msg); });
 }
 void
-OutputPad::submitMessage(google::protobuf::MessageLite* msg) {
+OutputPad::submitMessage(unsigned int nodeId, google::protobuf::MessageLite* msg) {
     MessageBuf s(new std::string(msg->SerializeAsString()));
+
+    m_nm->m_database.store(nodeId, s);
+
     auto fm = new NodeDb::FullMsg(this, s);
 
     std::lock_guard<std::mutex> lock(m_nm->m_mutex);
@@ -129,8 +135,8 @@ NodeDb::registerNodeInput(RealNode* node, const string& interfaceName,
 }
 
 OutputPad*
-NodeDb::registerNodeOutput(RealNode* node, const string& interfaceName) {
-    auto n = new OutputPad(this);
+NodeDb::registerNodeOutput(RealNode* node, unsigned int padId, const string& interfaceName) {
+    auto n = new OutputPad(padId, this);
 
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
@@ -166,6 +172,8 @@ NodeDb::toggleQueue() {
     queue<FullMsg*>* tmp = m_pOutQueue;
     m_pOutQueue = m_pInQueue;
     m_pInQueue = tmp;
+
+    m_database.incRunCycle();
 }
 
 

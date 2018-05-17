@@ -128,8 +128,8 @@ Process::registerInput(const string& interfName, bool enableRunCycle) {
 }
 
 void
-Process::registerOutput(const string& interfaceName) {
-    m_nodeDb.registerNodeOutput(this, interfaceName);
+Process::registerOutput(unsigned int padId, const string& interfaceName) {
+    m_nodeDb.registerNodeOutput(this, padId, interfaceName);
 }
 
 /**
@@ -170,7 +170,7 @@ Process::getOutputPad(const string& name) const {
 
 void
 Process::setOutputData(OutputPad* output, google::protobuf::MessageLite* value) const {
-    output->submitMessage(value);
+    output->submitMessage(output->getPadId(), value);
 }
 
 

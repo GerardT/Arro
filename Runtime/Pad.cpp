@@ -12,10 +12,9 @@ using namespace Arro;
  * Basically it just installs a listener that forwards incoming messages.
  * TODO: maybe we could remove Pads and connect Process outputs directly to Process inputs.
  */
-Pad::Pad(NodeDb& nodeDb, const string& /*datatype*/, const string& name):
+Pad::Pad(NodeDb& nodeDb, const string& /*datatype*/, const string& name, unsigned int padId):
     RealNode{},
     trace{"Pad", false},
-    m_result{nullptr},
     m_in{nullptr},
     m_out{nullptr},
     m_name{name} {
@@ -27,5 +26,5 @@ Pad::Pad(NodeDb& nodeDb, const string& /*datatype*/, const string& name):
         trace.println(string("Pad forward ") + this->getName());
         m_out->forwardMessage(msg);
     });
-    m_out = nodeDb.registerNodeOutput(this, "");
+    m_out = nodeDb.registerNodeOutput(this, padId,"");
 }

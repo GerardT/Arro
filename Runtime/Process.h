@@ -57,7 +57,7 @@ namespace Arro
          *
          * \param interfaceName Name of the interface to register.
          */
-        virtual void registerOutput(const std::string& interfaceName);
+        virtual void registerOutput(unsigned int padId, const std::string& interfaceName);
 
         /**
          * Lookup an input by its name, which is internally concatenated: "procesname.name".
