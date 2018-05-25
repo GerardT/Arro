@@ -58,6 +58,7 @@ SRCS         := main.cpp \
 		Nodes/NodeUiUserDisplay.cpp \
 		Nodes/NodeFileReader.cpp \
 		Nodes/NodeTsReader.cpp \
+		Nodes/NodeTsSubtable.cpp \
 		Nodes/NodeDumper.cpp \
 		tinyxmlparser.cpp \
 		tinyxmlerror.cpp \

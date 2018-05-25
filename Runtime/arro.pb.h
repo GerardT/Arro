@@ -44,6 +44,7 @@ class Json;
 class KeyValuePair;
 class Mode;
 class ParameterBlock;
+class SectionFilter;
 class Selection;
 class Step;
 class Tick;
@@ -1054,6 +1055,91 @@ class Blob : public ::google::protobuf::Message {
   void InitAsDefaultInstance();
   static Blob* default_instance_;
 };
+// -------------------------------------------------------------------
+
+class SectionFilter : public ::google::protobuf::Message {
+ public:
+  SectionFilter();
+  virtual ~SectionFilter();
+
+  SectionFilter(const SectionFilter& from);
+
+  inline SectionFilter& operator=(const SectionFilter& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const SectionFilter& default_instance();
+
+  void Swap(SectionFilter* other);
+
+  // implements Message ----------------------------------------------
+
+  inline SectionFilter* New() const { return New(NULL); }
+
+  SectionFilter* New(::google::protobuf::Arena* arena) const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const SectionFilter& from);
+  void MergeFrom(const SectionFilter& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(SectionFilter* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _internal_metadata_.arena();
+  }
+  inline void* MaybeArenaPtr() const {
+    return _internal_metadata_.raw_arena_ptr();
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional int32 Pid = 1;
+  void clear_pid();
+  static const int kPidFieldNumber = 1;
+  ::google::protobuf::int32 pid() const;
+  void set_pid(::google::protobuf::int32 value);
+
+  // optional int32 TableId = 2;
+  void clear_tableid();
+  static const int kTableIdFieldNumber = 2;
+  ::google::protobuf::int32 tableid() const;
+  void set_tableid(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:arro.SectionFilter)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  bool _is_default_instance_;
+  ::google::protobuf::int32 pid_;
+  ::google::protobuf::int32 tableid_;
+  mutable int _cached_size_;
+  friend void  protobuf_AddDesc_arro_2eproto();
+  friend void protobuf_AssignDesc_arro_2eproto();
+  friend void protobuf_ShutdownFile_arro_2eproto();
+
+  void InitAsDefaultInstance();
+  static SectionFilter* default_instance_;
+};
 // ===================================================================
 
 
@@ -1548,7 +1634,41 @@ inline void Blob::set_allocated_data(::std::string* data) {
   // @@protoc_insertion_point(field_set_allocated:arro.Blob.data)
 }
 
+// -------------------------------------------------------------------
+
+// SectionFilter
+
+// optional int32 Pid = 1;
+inline void SectionFilter::clear_pid() {
+  pid_ = 0;
+}
+inline ::google::protobuf::int32 SectionFilter::pid() const {
+  // @@protoc_insertion_point(field_get:arro.SectionFilter.Pid)
+  return pid_;
+}
+inline void SectionFilter::set_pid(::google::protobuf::int32 value) {
+  
+  pid_ = value;
+  // @@protoc_insertion_point(field_set:arro.SectionFilter.Pid)
+}
+
+// optional int32 TableId = 2;
+inline void SectionFilter::clear_tableid() {
+  tableid_ = 0;
+}
+inline ::google::protobuf::int32 SectionFilter::tableid() const {
+  // @@protoc_insertion_point(field_get:arro.SectionFilter.TableId)
+  return tableid_;
+}
+inline void SectionFilter::set_tableid(::google::protobuf::int32 value) {
+  
+  tableid_ = value;
+  // @@protoc_insertion_point(field_set:arro.SectionFilter.TableId)
+}
+
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

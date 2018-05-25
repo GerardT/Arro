@@ -58,6 +58,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* Blob_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Blob_reflection_ = NULL;
+const ::google::protobuf::Descriptor* SectionFilter_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  SectionFilter_reflection_ = NULL;
 
 }  // namespace
 
@@ -250,6 +253,22 @@ void protobuf_AssignDesc_arro_2eproto() {
       sizeof(Blob),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Blob, _internal_metadata_),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Blob, _is_default_instance_));
+  SectionFilter_descriptor_ = file->message_type(12);
+  static const int SectionFilter_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SectionFilter, pid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SectionFilter, tableid_),
+  };
+  SectionFilter_reflection_ =
+    ::google::protobuf::internal::GeneratedMessageReflection::NewGeneratedMessageReflection(
+      SectionFilter_descriptor_,
+      SectionFilter::default_instance_,
+      SectionFilter_offsets_,
+      -1,
+      -1,
+      -1,
+      sizeof(SectionFilter),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SectionFilter, _internal_metadata_),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SectionFilter, _is_default_instance_));
 }
 
 namespace {
@@ -295,6 +314,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
       Json_descriptor_, &Json::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
       Blob_descriptor_, &Blob::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+      SectionFilter_descriptor_, &SectionFilter::default_instance());
 }
 
 }  // namespace
@@ -324,6 +345,8 @@ void protobuf_ShutdownFile_arro_2eproto() {
   delete Json_reflection_;
   delete Blob::default_instance_;
   delete Blob_reflection_;
+  delete SectionFilter::default_instance_;
+  delete SectionFilter_reflection_;
 }
 
 void protobuf_AddDesc_arro_2eproto() {
@@ -343,7 +366,8 @@ void protobuf_AddDesc_arro_2eproto() {
     "\n\006Action\022\016\n\006action\030\001 \001(\t\"\022\n\004Tick\022\n\n\002ms\030\001"
     " \001(\005\"\026\n\005Value\022\r\n\005value\030\001 \001(\005\"\032\n\tSelectio"
     "n\022\r\n\005value\030\001 \001(\t\"\024\n\004Json\022\014\n\004data\030\001 \001(\t\"\024"
-    "\n\004Blob\022\014\n\004data\030\001 \001(\014b\006proto3", 428);
+    "\n\004Blob\022\014\n\004data\030\001 \001(\014\"-\n\rSectionFilter\022\013\n"
+    "\003Pid\030\001 \001(\005\022\017\n\007TableId\030\002 \001(\005b\006proto3", 475);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "arro.proto", &protobuf_RegisterTypes);
   KeyValuePair::default_instance_ = new KeyValuePair();
@@ -358,6 +382,7 @@ void protobuf_AddDesc_arro_2eproto() {
   Selection::default_instance_ = new Selection();
   Json::default_instance_ = new Json();
   Blob::default_instance_ = new Blob();
+  SectionFilter::default_instance_ = new SectionFilter();
   KeyValuePair::default_instance_->InitAsDefaultInstance();
   ParameterBlock::default_instance_->InitAsDefaultInstance();
   _Config::default_instance_->InitAsDefaultInstance();
@@ -370,6 +395,7 @@ void protobuf_AddDesc_arro_2eproto() {
   Selection::default_instance_->InitAsDefaultInstance();
   Json::default_instance_->InitAsDefaultInstance();
   Blob::default_instance_->InitAsDefaultInstance();
+  SectionFilter::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_arro_2eproto);
 }
 
@@ -3676,6 +3702,312 @@ void Blob::clear_data() {
   }
   data_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), data);
   // @@protoc_insertion_point(field_set_allocated:arro.Blob.data)
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int SectionFilter::kPidFieldNumber;
+const int SectionFilter::kTableIdFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+SectionFilter::SectionFilter()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:arro.SectionFilter)
+}
+
+void SectionFilter::InitAsDefaultInstance() {
+  _is_default_instance_ = true;
+}
+
+SectionFilter::SectionFilter(const SectionFilter& from)
+  : ::google::protobuf::Message(),
+    _internal_metadata_(NULL) {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:arro.SectionFilter)
+}
+
+void SectionFilter::SharedCtor() {
+    _is_default_instance_ = false;
+  _cached_size_ = 0;
+  pid_ = 0;
+  tableid_ = 0;
+}
+
+SectionFilter::~SectionFilter() {
+  // @@protoc_insertion_point(destructor:arro.SectionFilter)
+  SharedDtor();
+}
+
+void SectionFilter::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void SectionFilter::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* SectionFilter::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return SectionFilter_descriptor_;
+}
+
+const SectionFilter& SectionFilter::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_arro_2eproto();
+  return *default_instance_;
+}
+
+SectionFilter* SectionFilter::default_instance_ = NULL;
+
+SectionFilter* SectionFilter::New(::google::protobuf::Arena* arena) const {
+  SectionFilter* n = new SectionFilter;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void SectionFilter::Clear() {
+// @@protoc_insertion_point(message_clear_start:arro.SectionFilter)
+#if defined(__clang__)
+#define ZR_HELPER_(f) \
+  _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
+  __builtin_offsetof(SectionFilter, f) \
+  _Pragma("clang diagnostic pop")
+#else
+#define ZR_HELPER_(f) reinterpret_cast<char*>(\
+  &reinterpret_cast<SectionFilter*>(16)->f)
+#endif
+
+#define ZR_(first, last) do {\
+  ::memset(&first, 0,\
+           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
+} while (0)
+
+  ZR_(pid_, tableid_);
+
+#undef ZR_HELPER_
+#undef ZR_
+
+}
+
+bool SectionFilter::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:arro.SectionFilter)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional int32 Pid = 1;
+      case 1: {
+        if (tag == 8) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &pid_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_TableId;
+        break;
+      }
+
+      // optional int32 TableId = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_TableId:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &tableid_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:arro.SectionFilter)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:arro.SectionFilter)
+  return false;
+#undef DO_
+}
+
+void SectionFilter::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:arro.SectionFilter)
+  // optional int32 Pid = 1;
+  if (this->pid() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->pid(), output);
+  }
+
+  // optional int32 TableId = 2;
+  if (this->tableid() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->tableid(), output);
+  }
+
+  // @@protoc_insertion_point(serialize_end:arro.SectionFilter)
+}
+
+::google::protobuf::uint8* SectionFilter::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:arro.SectionFilter)
+  // optional int32 Pid = 1;
+  if (this->pid() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->pid(), target);
+  }
+
+  // optional int32 TableId = 2;
+  if (this->tableid() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->tableid(), target);
+  }
+
+  // @@protoc_insertion_point(serialize_to_array_end:arro.SectionFilter)
+  return target;
+}
+
+int SectionFilter::ByteSize() const {
+// @@protoc_insertion_point(message_byte_size_start:arro.SectionFilter)
+  int total_size = 0;
+
+  // optional int32 Pid = 1;
+  if (this->pid() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->pid());
+  }
+
+  // optional int32 TableId = 2;
+  if (this->tableid() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->tableid());
+  }
+
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void SectionFilter::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:arro.SectionFilter)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  const SectionFilter* source = 
+      ::google::protobuf::internal::DynamicCastToGenerated<const SectionFilter>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:arro.SectionFilter)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:arro.SectionFilter)
+    MergeFrom(*source);
+  }
+}
+
+void SectionFilter::MergeFrom(const SectionFilter& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:arro.SectionFilter)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  if (from.pid() != 0) {
+    set_pid(from.pid());
+  }
+  if (from.tableid() != 0) {
+    set_tableid(from.tableid());
+  }
+}
+
+void SectionFilter::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:arro.SectionFilter)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void SectionFilter::CopyFrom(const SectionFilter& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:arro.SectionFilter)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool SectionFilter::IsInitialized() const {
+
+  return true;
+}
+
+void SectionFilter::Swap(SectionFilter* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void SectionFilter::InternalSwap(SectionFilter* other) {
+  std::swap(pid_, other->pid_);
+  std::swap(tableid_, other->tableid_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata SectionFilter::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = SectionFilter_descriptor_;
+  metadata.reflection = SectionFilter_reflection_;
+  return metadata;
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// SectionFilter
+
+// optional int32 Pid = 1;
+void SectionFilter::clear_pid() {
+  pid_ = 0;
+}
+ ::google::protobuf::int32 SectionFilter::pid() const {
+  // @@protoc_insertion_point(field_get:arro.SectionFilter.Pid)
+  return pid_;
+}
+ void SectionFilter::set_pid(::google::protobuf::int32 value) {
+  
+  pid_ = value;
+  // @@protoc_insertion_point(field_set:arro.SectionFilter.Pid)
+}
+
+// optional int32 TableId = 2;
+void SectionFilter::clear_tableid() {
+  tableid_ = 0;
+}
+ ::google::protobuf::int32 SectionFilter::tableid() const {
+  // @@protoc_insertion_point(field_get:arro.SectionFilter.TableId)
+  return tableid_;
+}
+ void SectionFilter::set_tableid(::google::protobuf::int32 value) {
+  
+  tableid_ = value;
+  // @@protoc_insertion_point(field_set:arro.SectionFilter.TableId)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
