@@ -22,14 +22,6 @@ public:
     virtual ~NodeUiUserDisplay();
 
     /**
-     * Handle a message that is sent to this node.
-     *
-     * \param msg Message sent to this node.
-     * \param padName name of pad that message was sent to.
-     */
-    void handleMessage(const MessageBuf& msg, const std::string& padName);
-
-    /**
      * Make the node execute a processing cycle.
      */
     void runCycle();
@@ -73,9 +65,6 @@ NodeUiUserDisplay::finishConstruction() {
 
 NodeUiUserDisplay::~NodeUiUserDisplay() {
     SocketClient::getInstance()->unsubscribe(m_uiClient);
-}
-
-void NodeUiUserDisplay::handleMessage(const MessageBuf& /*m*/, const std::string& /*padName*/) {
 }
 
 void NodeUiUserDisplay::runCycle() {

@@ -22,14 +22,6 @@ public:
     virtual ~NodeUiCheckBox();
 
     /**
-     * Handle a message that is sent to this node.
-     *
-     * \param msg Message sent to this node.
-     * \param padName name of pad that message was sent to.
-     */
-    void handleMessage(const MessageBuf& msg, const std::string& padName);
-
-    /**
      * Make the node execute a processing cycle.
      */
     void runCycle();
@@ -72,9 +64,6 @@ NodeUiCheckBox::NodeUiCheckBox(INodeContext* d, const string& /*name*/, StringMa
 
 NodeUiCheckBox::~NodeUiCheckBox() {
     SocketClient::getInstance()->unsubscribe(m_uiClient);
-}
-
-void NodeUiCheckBox::handleMessage(const MessageBuf& /*m*/, const std::string& /*padName*/) {
 }
 
 void NodeUiCheckBox::runCycle() {

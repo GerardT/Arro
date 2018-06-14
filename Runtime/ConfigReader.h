@@ -108,7 +108,7 @@ namespace Arro
          * \param instancePrefix Prefix to use for this instance.
          * \param importParams list of parameters to be pass to instance.
          */
-        void makeNodeInstance(const std::string& className, const std::string& instanceName, const std::string& instancePrefix, StringMap& importParams, Process* parentSfc);
+        void makeNodeInstance(const std::string& className, const std::string& instanceName, const std::string& instancePrefix, StringMap& importParams, Process* parentSfc, unsigned int& padId);
 
     private:
         Trace m_trace;

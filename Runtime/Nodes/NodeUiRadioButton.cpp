@@ -22,14 +22,6 @@ public:
     virtual ~NodeUiRadioButton();
 
     /**
-     * Handle a message that is sent to this node.
-     *
-     * \param msg Message sent to this node.
-     * \param padName name of pad that message was sent to.
-     */
-    void handleMessage(const MessageBuf& msg, const std::string& padName);
-
-    /**
      * Make the node execute a processing cycle.
      */
     void runCycle();
@@ -91,9 +83,6 @@ NodeUiRadioButton::NodeUiRadioButton(INodeContext* d, const string& /*name*/, St
 
 NodeUiRadioButton::~NodeUiRadioButton() {
     SocketClient::getInstance()->unsubscribe(m_uiClient);
-}
-
-void NodeUiRadioButton::handleMessage(const MessageBuf& /*m*/, const std::string& /*padName*/) {
 }
 
 void NodeUiRadioButton::runCycle() {

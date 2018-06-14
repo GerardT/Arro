@@ -103,8 +103,6 @@ public:
 
     virtual ~NodeTsReader();
 
-    void handleMessage(const MessageBuf& /*msg*/, const std::string& /*padName*/){};
-
     /**
      * Make the node execute a processing cycle.
      */

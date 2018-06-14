@@ -48,8 +48,6 @@ public:
 
     virtual ~NodeTsSubtable();
 
-    void handleMessage(const MessageBuf& /*msg*/, const std::string& /*padName*/){};
-
     /**
      * Make the node execute a processing cycle.
      */
@@ -115,12 +113,12 @@ void NodeTsSubtable::runCycle() {
     const char* buf = bytes.c_str();
 
     unsigned long TableId = parseBits(buf, 0, 8);
-    unsigned long SectionSyntaxIndicator = parseBits(buf, 8, 9);
+//    unsigned long SectionSyntaxIndicator = parseBits(buf, 8, 9);
     unsigned long SectionLength = parseBits(buf, 14, 24);
-    unsigned long TableIdExtension = 0;
-    if(SectionSyntaxIndicator) {
-        TableIdExtension = parseBits(buf, 24, 30);
-    }
+//    unsigned long TableIdExtension = 0;
+//    if(SectionSyntaxIndicator) {
+//        TableIdExtension = parseBits(buf, 24, 30);
+//    }
 
     switch(TableId) {
     case 0:
@@ -159,11 +157,11 @@ void NodeTsSubtable::handlePAT(const char* data, unsigned long dataSize) {
 
 }
 
-void NodeTsSubtable::handleCAT(const char* data, unsigned long dataSize) {
+void NodeTsSubtable::handleCAT(const char* /*data*/, unsigned long /*dataSize*/) {
     m_trace.println("Handling CAT");
 }
 
-void NodeTsSubtable::handlePMT(const char* data, unsigned long dataSize) {
+void NodeTsSubtable::handlePMT(const char* data, unsigned long /*dataSize*/) {
     m_trace.println("Handling PMT");
 
     unsigned long pcrPID = parseBits(data, 3, 13);
@@ -171,7 +169,7 @@ void NodeTsSubtable::handlePMT(const char* data, unsigned long dataSize) {
     m_trace.println("PMT - PCR PID: " + std::to_string(pcrPID) + " programInfoLength " + std::to_string(programInfoLength));
 
     data += 4;
-    const char* end = data + programInfoLength;
+    const char* end = data + std::min((const int)programInfoLength, 30);
     while(data < end) {
 
         unsigned long streamType = parseBits(data, 0, 8);

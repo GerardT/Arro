@@ -22,14 +22,6 @@ public:
     virtual ~NodeUiUserInput();
 
     /**
-     * Handle a message that is sent to this node.
-     *
-     * \param msg Message sent to this node.
-     * \param padName name of pad that message was sent to.
-     */
-    void handleMessage(const MessageBuf& msg, const std::string& padName);
-
-    /**
      * Make the node execute a processing cycle.
      */
     void runCycle();
@@ -73,9 +65,6 @@ NodeUiUserInput::NodeUiUserInput(INodeContext* d, const string& /*name*/, String
 
 NodeUiUserInput::~NodeUiUserInput() {
     SocketClient::getInstance()->unsubscribe(m_uiClient);
-}
-
-void NodeUiUserInput::handleMessage(const MessageBuf& /*m*/, const std::string& /*padName*/) {
 }
 
 void NodeUiUserInput::runCycle() {

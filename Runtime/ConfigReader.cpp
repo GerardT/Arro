@@ -43,7 +43,11 @@ ConfigReader::ConfigReader(const string& filename, NodeDb& db):
     }
 
     // Recursively process all modules, starting with "Main"
-    makeNodeInstance("Main", "main", "", *params, nullptr);
+    unsigned int padId = 1;
+    makeNodeInstance("Main", "main", "", *params, nullptr, padId);
+
+    // fix pads
+    // m_nodeDb.visitNodes([](RealNode& c) { c.fixInputs();});
 
     m_nodeDb.visitNodes([](RealNode& c) { c.finishConstruction();});
 
@@ -100,7 +104,7 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
 
 
 void
-ConfigReader::makeNodeInstance(const string& typeName, const string& instanceName, const string& instancePrefix, StringMap& import_params, Process* parentSfc) {
+ConfigReader::makeNodeInstance(const string& typeName, const string& instanceName, const string& instancePrefix, StringMap& import_params, Process* parentSfc, unsigned int& padId) {
     Definition* def = m_definitions[typeName];
     Process* processNode = nullptr;  // Note: if there is a process node (=elemBlockock) there will be only one in module.
     Process* sfcNode = nullptr;
@@ -164,13 +168,13 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
             sfcNode->registerInput("_action", true);
 
-            sfcNode->registerOutput("_step"); // experimental
+            sfcNode->registerOutput(padId++, "_step"); // experimental
 
             // EXTRA Create an _action and _step pad in every module
             // If processNode != nullptr then we know a 'leaf' node is being added
             if(!processNode) {
-                new Pad(m_nodeDb, "Action", instance + ARRO_PAD_SEPARATOR + "_action");
-                new Pad(m_nodeDb, "Mode", instance + ARRO_PAD_SEPARATOR + "_step");
+                new Pad(m_nodeDb, "Action", instance + ARRO_PAD_SEPARATOR + "_action", padId++);
+                new Pad(m_nodeDb, "Mode", instance + ARRO_PAD_SEPARATOR + "_step", padId++);
 
                 // connect Pad to Sfc
                 {
@@ -195,7 +199,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
                 string from = "_action";
                 string to = "_step";
                 processNode->registerInput(from, true);
-                processNode->registerOutput(to);
+                processNode->registerOutput(padId++, to);
             }
         }
 
@@ -212,13 +216,13 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             StringMap* params = new StringMap();
             getParamsAndSubstitute(elt, import_params, *params);
 
-            makeNodeInstance(*typeAttr,  *idAttr,  instance, *params, sfcNode);
+            makeNodeInstance(*typeAttr,  *idAttr,  instance, *params, sfcNode, padId);
 
             {
                 string from, to;
 
                 // EXTRA Register _action output and _step input for each node with Sfc Node
-                sfcNode->registerOutput("_action_" + *idAttr);
+                sfcNode->registerOutput(padId++, "_action_" + *idAttr);
                 sfcNode->registerInput("_step_" + *idAttr, true);
 
                 // Connect from sfc to just created node (in makeNodeInstance).
@@ -263,12 +267,12 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
                         processNode->registerInput(*idAttr, false);
                     }
                 } else {
-                    processNode->registerOutput(*idAttr);
+                    processNode->registerOutput(padId++, *idAttr);
                 }
             } else {
                 // create Pad object with input and output.
                 m_trace.println("new Pad(" + *datatypeAttr + ", " + inst + ")");
-                new Pad(m_nodeDb, *datatypeAttr, inst);
+                new Pad(m_nodeDb, *datatypeAttr, inst, padId++);
             }
         }
         elt = elt->NextSiblingElement("pad");
