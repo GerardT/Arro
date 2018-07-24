@@ -36,13 +36,7 @@ class NodeDCMotor: public INodeDefinition {
         NodeDCMotor(const NodeDCMotor&) = delete;
         NodeDCMotor& operator=(const NodeDCMotor& other) = delete;
 
-        /**
-         * Handle a message that is sent to this node.
-         *
-         * \param msg Message sent to this node.
-         * \param padName name of pad that message was sent to.
-         */
-        void handleMessage(const MessageBuf& msg, const std::string& padName);
+        virtual void finishConstruction();
 
         /**
          * Make the node execute a processing cycle.
@@ -66,6 +60,11 @@ class NodeDCMotor: public INodeDefinition {
         StringMap m_params;
 
         bool m_running;
+
+        InputPad* m_speed;
+        InputPad* m_direction;
+        InputPad* m_action;
+
     };
 }
 
@@ -77,10 +76,14 @@ static RegisterMe<NodeDCMotor> registerMe("DCMotor");
 
 
 NodeDCMotor::NodeDCMotor(INodeContext* d, const string& /*name*/, Arro::StringMap&, TiXmlElement*):
-    m_trace("NodeDCMotor", true),
-    m_elemBlock(d),
-    m_Ch(0),
-    m_running(true) {
+    m_trace{"NodeDCMotor", true},
+    m_elemBlock{d},
+    m_Ch{0},
+    m_running{true},
+    m_speed{nullptr},
+    m_direction{nullptr},
+    m_action{nullptr}
+{
 
     m_Ch = stod(d->getParameter("Motor"));
     m_Ch--; // It's 0 based, but named M1, M2, M3, M4 on PCB.
@@ -120,7 +123,6 @@ NodeDCMotor::NodeDCMotor(INodeContext* d, const string& /*name*/, Arro::StringMa
     m_IN2pin = in2;
 
 }
-
 void
 NodeDCMotor::run(MotorHAT::dir command) {
     m_trace.println("NodeDCMotor::run");
@@ -154,37 +156,57 @@ NodeDCMotor::setSpeed(int speed) {
 
 
 
+
 void
-NodeDCMotor::handleMessage(const MessageBuf& m, const std::string& padName) {
-    m_trace.println("NodeDCMotor::handleMessage");
-    if(m_running && padName == "speed") {
-        auto msg = new Value();
-        msg->ParseFromString(m->c_str());
+NodeDCMotor::finishConstruction() {
+    m_trace.println("finishConstruction");
 
-        m_trace.println("Speed " + padName + " value " + std::to_string(((Value*)msg)->value()));
+    m_speed = m_elemBlock->getInputPad("speed");
+    m_direction = m_elemBlock->getInputPad("direction");
+    m_action = m_elemBlock->getInputPad("_action");
 
-        assert(msg->GetTypeName() == "arro.Value");
+//    m_statePad = m_elemBlock->getOutputPad("_step");
+//
+//    Step* step = new Step();
+//    step->set_node(m_elemBlock->getName());
+//    step->set_name("_ready");
+//    m_elemBlock->setOutputData(m_statePad, step);
 
-        setSpeed(((Value*)msg)->value());
+}
 
-    } else if(m_running && padName == "direction") {
-        auto msg = new Value();
-        msg->ParseFromString(m->c_str());
+void
+NodeDCMotor::runCycle() {
+    m_trace.println("NodeDCMotor::runCycle");
 
-        m_trace.println(std::string("Dir (1, 2, 4) ") + padName + " value " + std::to_string(((Value*)msg)->value()));
+    Value* speed = new Value();
+    MessageBuf m1 = m_elemBlock->getInputData(m_speed);
+    if(*m1 != "") {
+        speed->ParseFromString(m1->c_str());
 
-        int dir = ((Value*)msg)->value();
+        m_trace.println("Speed " + std::to_string(speed->value()));
+
+        setSpeed(speed->value());
+    }
+
+    Value* direction = new Value();
+    MessageBuf m2 = m_elemBlock->getInputData(m_direction);
+    if(*m2 != "") {
+        direction->ParseFromString(m2->c_str());
+
+        m_trace.println("Dir (1, 2, 4) " + std::to_string(direction->value()));
+
+        int dir = direction->value();
         if(dir >= 0 && dir <= 4) {
             run((MotorHAT::dir)dir);
         }
+    }
 
-        assert(msg->GetTypeName() == "arro.Value");
+    Action* action = new Action();
+    MessageBuf m3 = m_elemBlock->getInputData(m_action);
+    if(*m3 != "") {
+        action->ParseFromString(m3->c_str());
 
-    } else if(padName == "_action") {
-        auto msg = new Action();
-        msg->ParseFromString(m->c_str());
-
-        string a = msg->action();
+        string a = action->action();
 
         if(a == "_terminated") {
             m_trace.println("Received _terminated");
@@ -192,16 +214,6 @@ NodeDCMotor::handleMessage(const MessageBuf& m, const std::string& padName) {
             // Switch off the motor
             run(MotorHAT::RELEASE);
         }
-
-        assert(msg->GetTypeName() == "arro.Action");
-
-    } else {
-        m_trace.println(string("Message received from ") + padName);
     }
-}
-
-void
-NodeDCMotor::runCycle() {
-    m_trace.println("NodeDCMotor::runCycle");
 
 }

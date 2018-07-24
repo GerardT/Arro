@@ -46,8 +46,6 @@ namespace Arro
         virtual void setOutputData(OutputPad* /*output*/, google::protobuf::MessageLite* /*msg*/) const {};
         virtual std::string getParameter(const std::string&) { return ""; };
 
-        unsigned int getInputPadId() { return m_in->m_outputPadId; };
-
     private:
         Trace m_trace;
         InputPad* m_in;

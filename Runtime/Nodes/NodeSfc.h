@@ -110,14 +110,6 @@ namespace Arro {
         virtual void test();
 
         /**
-         * Handle a message that is sent to this node.
-         *
-         * \param msg Message sent to this node.
-         * \param padName name of pad that message was sent to.
-         */
-        void handleMessage(const MessageBuf& msg, const std::string& padName);
-
-        /**
          * Make the node execute a processing cycle.
          */
         void runCycle();
@@ -251,6 +243,8 @@ namespace Arro {
 
         // last inputs: action and steps
         std::map<std::string, std::string> m_currentInputs;
+
+        InputPad* m_stepsPad;
     };
 }
 

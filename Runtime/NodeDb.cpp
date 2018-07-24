@@ -16,7 +16,7 @@ using namespace Arro;
 using namespace std;
 
 NodeDb::NodeDb():
-    m_trace{"NodeDb", false},
+    m_trace{"NodeDb", true},
     m_allInputs{},
     m_allOutputs{},
     m_allNodes{},
@@ -60,10 +60,17 @@ InputPad::getData(unsigned int padId) {
     return tmp;
 };
 
+OutputPad*
+InputPad::getOutputPad(unsigned int padId)
+{
+    return m_nm->getOutputPad(padId);
+};
 
 
-OutputPad::OutputPad(unsigned int padId, NodeDb* n):
-    m_nm{n},
+
+OutputPad::OutputPad(unsigned int padId, NodeDb* db, RealNode* n):
+    m_nm{db},
+    m_node{n},
     m_inputs{},
     m_padId{padId} {
 }
@@ -85,10 +92,10 @@ OutputPad::forwardMessage(const MessageBuf& msg) {
     for_each(m_inputs.begin(), m_inputs.end(), [msg](InputPad* i) { i->handleMessage(msg); });
 }
 void
-OutputPad::submitMessage(unsigned int padId, google::protobuf::MessageLite* msg) {
+OutputPad::submitMessage(google::protobuf::MessageLite* msg) {
     MessageBuf s(new std::string(msg->SerializeAsString()));
 
-    m_nm->m_database.store(padId, s);
+    m_nm->m_database.store(m_padId, s);
 
     auto fm = new NodeDb::FullMsg(this, s);
 
@@ -103,6 +110,8 @@ OutputPad::submitMessage(unsigned int padId, google::protobuf::MessageLite* msg)
 void
 OutputPad::submitMessageBuffer(const char* msg) {
     MessageBuf s(new string(msg));
+    m_nm->m_database.store(m_padId, s);
+
     auto fm = new NodeDb::FullMsg(this, s);
 
     std::lock_guard<std::mutex> lock(m_nm->m_mutex);
@@ -150,7 +159,7 @@ NodeDb::registerNodeInput(RealNode* node, const string& interfaceName,
 
 OutputPad*
 NodeDb::registerNodeOutput(RealNode* node, unsigned int padId, const string& interfaceName) {
-    auto n = new OutputPad(padId, this);
+    auto n = new OutputPad(padId, this, node);
 
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
@@ -167,6 +176,18 @@ NodeDb::registerNodeOutput(RealNode* node, unsigned int padId, const string& int
 OutputPad*
 NodeDb::getOutputPad(const string& name) {
     return (OutputPad*)&(*((m_allOutputs[name])));
+}
+
+OutputPad*
+NodeDb::getOutputPad(unsigned int padId) {
+    for(auto it = m_allOutputs.begin(); it != m_allOutputs.end(); ++it) {
+        OutputPad* op = &(*(it->second));
+
+        if(op->getPadId() == padId) {
+            return op;
+        }
+    }
+    return nullptr;
 }
 
 InputPad*

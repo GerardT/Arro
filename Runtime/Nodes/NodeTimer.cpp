@@ -35,16 +35,6 @@ NodeTimer::~NodeTimer() {
     timers.remove(this);
 }
 
-void NodeTimer::handleMessage(const MessageBuf& m, const std::string& padName) {
-    if (padName == "mode") {
-        Mode* msg = new Mode();
-        msg->ParseFromString(m->c_str());
-
-        assert(msg->GetTypeName() == "tutorial.Mode");
-        m_actual_mode = ((Mode*)msg)->mode();
-    }
-}
-
 void NodeTimer::runCycle() {
     // empty
 }

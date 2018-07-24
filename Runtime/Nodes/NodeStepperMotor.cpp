@@ -41,13 +41,8 @@ class NodeStepperMotor: public INodeDefinition {
         NodeStepperMotor(const NodeStepperMotor&) = delete;
         NodeStepperMotor& operator=(const NodeStepperMotor& other) = delete;
 
-        /**
-         * Handle a message that is sent to this node.
-         *
-         * \param msg Message sent to this node.
-         * \param padName name of pad that message was sent to.
-         */
-        void handleMessage(const MessageBuf& msg, const std::string& padName);
+        virtual void finishConstruction();
+
 
         /**
          * Make the node execute a processing cycle.
@@ -75,7 +70,7 @@ class NodeStepperMotor: public INodeDefinition {
         int m_BIN2;
         int m_BIN1;
 
-        int m_direction;
+        int m_dir;
         int m_revsteps;
         float m_sec_per_step;
         int m_currentstep;
@@ -84,6 +79,11 @@ class NodeStepperMotor: public INodeDefinition {
         StringMap m_params;
 
         bool m_running;
+
+        InputPad* m_speed;
+        InputPad* m_direction;
+        InputPad* m_steps;
+        InputPad* m_action;
     };
 }
 
@@ -101,7 +101,12 @@ NodeStepperMotor::NodeStepperMotor(INodeContext* d, const string& /*name*/, Arro
     m_trace("NodeStepperMotor", true),
     m_elemBlock(d),
     m_Ch(0),
-    m_running(true) {
+    m_running(true),
+    m_speed{nullptr},
+    m_direction{nullptr},
+    m_steps{nullptr},
+    m_action{nullptr}
+{
 
     m_Ch = stod(d->getParameter("Motor"));
     m_Ch--; // It's 0 based, but named M1, M2 on PCB.
@@ -112,7 +117,7 @@ NodeStepperMotor::NodeStepperMotor(INodeContext* d, const string& /*name*/, Arro
     m_revsteps = 200;  // For now, maybe parameter?
     m_sec_per_step = 0.1;
     m_currentstep = 0;
-    m_direction = MotorHAT::BRAKE;
+    m_dir = MotorHAT::BRAKE;
 
     if (m_Ch == 0) {
         m_PWMA = 8;
@@ -316,49 +321,61 @@ NodeStepperMotor::setSpeed(int rpm) {
 
 
 void
-NodeStepperMotor::handleMessage(const MessageBuf& m, const std::string& padName) {
-    m_trace.println("NodeStepperMotor::handleMessage");
-    if(m_running && padName == "speed") {
-        auto msg = new Value();
-        msg->ParseFromString(m->c_str());
+NodeStepperMotor::finishConstruction() {
+    m_trace.println("finishConstruction");
 
-        m_trace.println("Speed " + padName + " value " + std::to_string(((Value*)msg)->value()));
+    m_speed = m_elemBlock->getInputPad("speed");
+    m_direction = m_elemBlock->getInputPad("direction");
+    m_steps = m_elemBlock->getInputPad("steps");
+    m_action = m_elemBlock->getInputPad("_action");
 
-        assert(msg->GetTypeName() == "arro.Value");
+}
 
-        setSpeed(((Value*)msg)->value());
+void
+NodeStepperMotor::runCycle() {
+    m_trace.println("NodeStepperMotor::runCycle");
 
-    } else if(m_running && padName == "direction") {
-        auto msg = new Value();
-        msg->ParseFromString(m->c_str());
+    Value* speed = new Value();
+    MessageBuf m1 = m_elemBlock->getInputData(m_speed);
+    if(*m1 != "") {
+        speed->ParseFromString(m1->c_str());
 
-        m_trace.println(std::string("Dir (1, 2, 4) ") + padName + " value " + std::to_string(((Value*)msg)->value()));
+        m_trace.println("Speed " + std::to_string(speed->value()));
 
-        int dir = ((Value*)msg)->value();
+        setSpeed(speed->value());
+    }
+
+    Value* direction = new Value();
+    MessageBuf m2 = m_elemBlock->getInputData(m_direction);
+    if(*m2 != "") {
+        direction->ParseFromString(m2->c_str());
+
+        m_trace.println("Dir (1, 2, 4) " + std::to_string(direction->value()));
+
+        int dir = direction->value();
         if(dir >= 0 && dir <= 4) {
-            m_direction = dir;
+            m_dir = dir;
         }
+    }
 
-        assert(msg->GetTypeName() == "arro.Value");
+    Value* steps = new Value();
+    MessageBuf m3 = m_elemBlock->getInputData(m_steps);
+    if(*m3 != "") {
+        steps->ParseFromString(m3->c_str());
 
-    } else if(m_running && padName == "steps") {
-        auto msg = new Value();
-        msg->ParseFromString(m->c_str());
+        m_trace.println("Steps " + std::to_string(steps->value()));
 
-        m_trace.println(std::string("Steps ") + padName + " value " + std::to_string(((Value*)msg)->value()));
-
-        int steps = ((Value*)msg)->value();
-        if(steps >= 0) {
-            step(steps, m_direction, MotorHAT::SINGLE);
+        if(steps->value() >= 0) {
+            step(steps->value(), m_dir, MotorHAT::SINGLE);
         }
+    }
 
-        assert(msg->GetTypeName() == "arro.Value");
+    Action* action = new Action();
+    MessageBuf m4 = m_elemBlock->getInputData(m_action);
+    if(*m4 != "") {
+        action->ParseFromString(m4->c_str());
 
-    } else if(padName == "_action") {
-        auto msg = new Action();
-        msg->ParseFromString(m->c_str());
-
-        string a = msg->action();
+        string a = action->action();
 
         if(a == "_terminated") {
             m_trace.println("Received _terminated");
@@ -366,16 +383,6 @@ NodeStepperMotor::handleMessage(const MessageBuf& m, const std::string& padName)
             // Switch off the motor
             // FIXME: reset?
         }
-
-        assert(msg->GetTypeName() == "arro.Action");
-
-    } else {
-        m_trace.println(string("Message received from ") + padName);
     }
-}
-
-void
-NodeStepperMotor::runCycle() {
-    m_trace.println("NodeStepperMotor::runCycle");
 
 }

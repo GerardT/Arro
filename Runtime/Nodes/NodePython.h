@@ -29,14 +29,6 @@ namespace Arro {
         virtual void finishConstruction();
 
         /**
-         * Handle a message that is sent to this node.
-         *
-         * \param msg Message sent to this node.
-         * \param padName name of pad that message was sent to.
-         */
-        void handleMessage(const MessageBuf& msg, const std::string& padName);
-
-        /**
          * Make the node execute a processing cycle.
          */
         void runCycle();
@@ -50,7 +42,6 @@ namespace Arro {
         StringMap m_params;
         INodeContext* m_elemBlock;
         PyObject *m_pFunc, *m_pValue, *m_pArgs, *m_pClass, *m_pInstance;
-        std::queue<PyObject*> m_messages;
     };
 }
 

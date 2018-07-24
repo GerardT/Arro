@@ -24,14 +24,6 @@ namespace Arro
         NodeTimer& operator=(const NodeTimer& other) = delete;
 
         /**
-         * Handle a message that is sent to this node.
-         *
-         * \param msg Message sent to this node.
-         * \param padName name of pad that message was sent to.
-         */
-        void handleMessage(const MessageBuf& msg, const std::string& padName);
-
-        /**
          * Make the node execute a processing cycle.
          */
         void runCycle();
@@ -45,7 +37,6 @@ namespace Arro
         Trace m_trace;
         int m_ticks;
         INodeContext* m_elemBlock;
-        std::string m_actual_mode;
     };
 }
 

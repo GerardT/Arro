@@ -65,6 +65,7 @@ namespace Arro
          * \param name Name of input.
          */
         MessageBuf  getInputData(InputPad* input) const;
+        MessageBuf  getInputData(InputPad* input, unsigned int padId) const;
 
         /**
          * Lookup an input by its name, which is internally concatenated: "procesname.name".

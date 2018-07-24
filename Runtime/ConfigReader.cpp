@@ -137,6 +137,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
 #if PARAM_AS_CONFIG
             // register config not for parameter reception
+            m_trace.println("registerInput(" +instance + "#_config)");
             processNode->registerInput("_config", true);
 #endif
 
@@ -166,9 +167,14 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
             sfcNode = new Process(m_nodeDb, "Sfc:", instanceSfc, *params, elt);
 
+            m_trace.println("registerInput(" +instance + "#_action)");
             sfcNode->registerInput("_action", true);
 
+            m_trace.println("registerOutput(" +instance + "#_step), Id " + std::to_string(padId));
             sfcNode->registerOutput(padId++, "_step"); // experimental
+
+            m_trace.println("registerInput(" +instance + "#_steps)");
+            sfcNode->registerInput("_steps", true);
 
             // EXTRA Create an _action and _step pad in every module
             // If processNode != nullptr then we know a 'leaf' node is being added
@@ -198,7 +204,9 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             else {
                 string from = "_action";
                 string to = "_step";
+                m_trace.println("registerInput(" +instance + "#" + from + ")");
                 processNode->registerInput(from, true);
+                m_trace.println("registerOutput(" +instance + "#" + to + "), Id " + std::to_string(padId));
                 processNode->registerOutput(padId++, to);
             }
         }
@@ -222,7 +230,9 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
                 string from, to;
 
                 // EXTRA Register _action output and _step input for each node with Sfc Node
+                m_trace.println("registerOutput(" +instance + "#_action_" + *idAttr + "), Id " + std::to_string(padId));
                 sfcNode->registerOutput(padId++, "_action_" + *idAttr);
+                m_trace.println("registerInput(" +instance + "#_step_" + *idAttr + ")");
                 sfcNode->registerInput("_step_" + *idAttr, true);
 
                 // Connect from sfc to just created node (in makeNodeInstance).
@@ -235,6 +245,13 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
                 // Connect from just created node (in makeNodeInstance) to sfc.
                 to = instance + ARRO_SFC_INSTANCE + ARRO_PAD_SEPARATOR + "_step_" + *idAttr;
+
+                from = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_PAD_SEPARATOR + "_step";
+
+                m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
+                m_nodeDb.connect(from, to);
+                // Connect from just created node (in makeNodeInstance) to sfc.
+                to = instance + ARRO_SFC_INSTANCE + ARRO_PAD_SEPARATOR + "_steps";
 
                 from = instance + ARRO_NAME_SEPARATOR + *idAttr + ARRO_PAD_SEPARATOR + "_step";
 
@@ -262,11 +279,14 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
             if(processNode) {
                 if(*inputAttr == "true") {
                     if(runAttr != nullptr && *runAttr == "true") {
+                        m_trace.println("registerInput(" +instance + "#" + *idAttr + ")");
                         processNode->registerInput(*idAttr, true);
                     } else {
+                        m_trace.println("registerInput(" +instance + "#" + *idAttr + ")");
                         processNode->registerInput(*idAttr, false);
                     }
                 } else {
+                    m_trace.println("registerOutput(" +instance + "#" + *idAttr + "), Id " + std::to_string(padId));
                     processNode->registerOutput(padId++, *idAttr);
                 }
             } else {

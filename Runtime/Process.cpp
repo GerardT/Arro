@@ -129,7 +129,6 @@ Process::registerInput(const string& interfName, bool enableRunCycle) {
 
 void
 Process::registerOutput(unsigned int padId, const string& interfaceName) {
-    m_trace.println("Output " + std::to_string(padId));
     m_nodeDb.registerNodeOutput(this, padId, interfaceName);
 }
 
@@ -141,7 +140,14 @@ Process::registerOutput(unsigned int padId, const string& interfaceName) {
  */
 MessageBuf
 Process::getInputData(InputPad* input) const {
-    return input->getData(input->getConnection());
+    auto conn = input->getConnections();
+    for(auto c = conn.begin(); c != conn.end(); ++c) {
+        MessageBuf b = input->getData(*c);
+        if((*b) != "") {
+            return b;
+        }
+    }
+    return MessageBuf(new std::string(""));
 }
 
 
@@ -171,7 +177,7 @@ Process::getOutputPad(const string& name) const {
 
 void
 Process::setOutputData(OutputPad* output, google::protobuf::MessageLite* value) const {
-    output->submitMessage(output->getPadId(), value);
+    output->submitMessage(value);
 }
 
 

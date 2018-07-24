@@ -23,7 +23,8 @@ message Mode {
 }
 
 message Step {
-    string name = 1;
+    string node = 1;
+    string name = 2;
 }
 
 message Action {

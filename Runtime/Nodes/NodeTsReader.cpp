@@ -120,6 +120,7 @@ private:
     InputPad* m_inputPad;
     InputPad* m_filterA;
     OutputPad* m_outputPad;
+    OutputPad* m_statePad;
     char m_packet[188];
     char* m_tsPacket;
     int m_tsPacketLen;
@@ -138,6 +139,7 @@ NodeTsReader::NodeTsReader(INodeContext* d, const string& /*name*/, StringMap& /
     m_elemBlock{d},
     m_inputPad{nullptr},
     m_outputPad{nullptr},
+    m_statePad{nullptr},
     m_tsPacket{nullptr} ,
     m_tsPacketLen{0}{
 
@@ -150,9 +152,18 @@ NodeTsReader::NodeTsReader(INodeContext* d, const string& /*name*/, StringMap& /
 
 void
 NodeTsReader::finishConstruction() {
+    m_trace.println("finishConstruction");
+
     m_inputPad = m_elemBlock->getInputPad("input");
     m_filterA = m_elemBlock->getInputPad("filterA");
     m_outputPad = m_elemBlock->getOutputPad("value");
+
+    m_statePad = m_elemBlock->getOutputPad("_step");
+
+    Step* step = new Step();
+    step->set_node(m_elemBlock->getName());
+    step->set_name("_ready");
+    m_elemBlock->setOutputData(m_statePad, step);
 
 }
 

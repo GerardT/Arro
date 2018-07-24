@@ -149,7 +149,8 @@ void protobuf_AssignDesc_arro_2eproto() {
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Mode, _internal_metadata_),
       GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Mode, _is_default_instance_));
   Step_descriptor_ = file->message_type(5);
-  static const int Step_offsets_[1] = {
+  static const int Step_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Step, node_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Step, name_),
   };
   Step_reflection_ =
@@ -362,12 +363,13 @@ void protobuf_AddDesc_arro_2eproto() {
     "fig\022\'\n\005value\030\001 \003(\0132\030.arro._Config.ValueE"
     "ntry\032,\n\nValueEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value"
     "\030\002 \001(\t:\0028\001\"\026\n\005Token\022\r\n\005value\030\001 \001(\005\"\024\n\004Mo"
-    "de\022\014\n\004mode\030\001 \001(\t\"\024\n\004Step\022\014\n\004name\030\001 \001(\t\"\030"
-    "\n\006Action\022\016\n\006action\030\001 \001(\t\"\022\n\004Tick\022\n\n\002ms\030\001"
-    " \001(\005\"\026\n\005Value\022\r\n\005value\030\001 \001(\005\"\032\n\tSelectio"
-    "n\022\r\n\005value\030\001 \001(\t\"\024\n\004Json\022\014\n\004data\030\001 \001(\t\"\024"
-    "\n\004Blob\022\014\n\004data\030\001 \001(\014\"-\n\rSectionFilter\022\013\n"
-    "\003Pid\030\001 \001(\005\022\017\n\007TableId\030\002 \001(\005b\006proto3", 475);
+    "de\022\014\n\004mode\030\001 \001(\t\"\"\n\004Step\022\014\n\004node\030\001 \001(\t\022\014"
+    "\n\004name\030\002 \001(\t\"\030\n\006Action\022\016\n\006action\030\001 \001(\t\"\022"
+    "\n\004Tick\022\n\n\002ms\030\001 \001(\005\"\026\n\005Value\022\r\n\005value\030\001 \001"
+    "(\005\"\032\n\tSelection\022\r\n\005value\030\001 \001(\t\"\024\n\004Json\022\014"
+    "\n\004data\030\001 \001(\t\"\024\n\004Blob\022\014\n\004data\030\001 \001(\014\"-\n\rSe"
+    "ctionFilter\022\013\n\003Pid\030\001 \001(\005\022\017\n\007TableId\030\002 \001("
+    "\005b\006proto3", 489);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "arro.proto", &protobuf_RegisterTypes);
   KeyValuePair::default_instance_ = new KeyValuePair();
@@ -1853,6 +1855,7 @@ void Mode::clear_mode() {
 // ===================================================================
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int Step::kNodeFieldNumber;
 const int Step::kNameFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -1878,6 +1881,7 @@ void Step::SharedCtor() {
     _is_default_instance_ = false;
   ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
+  node_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
@@ -1887,6 +1891,7 @@ Step::~Step() {
 }
 
 void Step::SharedDtor() {
+  node_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != default_instance_) {
   }
@@ -1919,6 +1924,7 @@ Step* Step::New(::google::protobuf::Arena* arena) const {
 
 void Step::Clear() {
 // @@protoc_insertion_point(message_clear_start:arro.Step)
+  node_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
@@ -1932,9 +1938,26 @@ bool Step::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional string name = 1;
+      // optional string node = 1;
       case 1: {
         if (tag == 10) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_node()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->node().data(), this->node().length(),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "arro.Step.node"));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(18)) goto parse_name;
+        break;
+      }
+
+      // optional string name = 2;
+      case 2: {
+        if (tag == 18) {
+         parse_name:
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_name()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -1972,14 +1995,24 @@ failure:
 void Step::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:arro.Step)
-  // optional string name = 1;
+  // optional string node = 1;
+  if (this->node().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->node().data(), this->node().length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "arro.Step.node");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->node(), output);
+  }
+
+  // optional string name = 2;
   if (this->name().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->name().data(), this->name().length(),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
       "arro.Step.name");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->name(), output);
+      2, this->name(), output);
   }
 
   // @@protoc_insertion_point(serialize_end:arro.Step)
@@ -1988,7 +2021,18 @@ void Step::SerializeWithCachedSizes(
 ::google::protobuf::uint8* Step::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:arro.Step)
-  // optional string name = 1;
+  // optional string node = 1;
+  if (this->node().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->node().data(), this->node().length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "arro.Step.node");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->node(), target);
+  }
+
+  // optional string name = 2;
   if (this->name().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->name().data(), this->name().length(),
@@ -1996,7 +2040,7 @@ void Step::SerializeWithCachedSizes(
       "arro.Step.name");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->name(), target);
+        2, this->name(), target);
   }
 
   // @@protoc_insertion_point(serialize_to_array_end:arro.Step)
@@ -2007,7 +2051,14 @@ int Step::ByteSize() const {
 // @@protoc_insertion_point(message_byte_size_start:arro.Step)
   int total_size = 0;
 
-  // optional string name = 1;
+  // optional string node = 1;
+  if (this->node().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->node());
+  }
+
+  // optional string name = 2;
   if (this->name().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
@@ -2038,6 +2089,10 @@ void Step::MergeFrom(const ::google::protobuf::Message& from) {
 void Step::MergeFrom(const Step& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:arro.Step)
   if (GOOGLE_PREDICT_FALSE(&from == this)) MergeFromFail(__LINE__);
+  if (from.node().size() > 0) {
+
+    node_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.node_);
+  }
   if (from.name().size() > 0) {
 
     name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
@@ -2068,6 +2123,7 @@ void Step::Swap(Step* other) {
   InternalSwap(other);
 }
 void Step::InternalSwap(Step* other) {
+  node_.Swap(&other->node_);
   name_.Swap(&other->name_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
@@ -2084,7 +2140,51 @@ void Step::InternalSwap(Step* other) {
 #if PROTOBUF_INLINE_NOT_IN_HEADERS
 // Step
 
-// optional string name = 1;
+// optional string node = 1;
+void Step::clear_node() {
+  node_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ const ::std::string& Step::node() const {
+  // @@protoc_insertion_point(field_get:arro.Step.node)
+  return node_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Step::set_node(const ::std::string& value) {
+  
+  node_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:arro.Step.node)
+}
+ void Step::set_node(const char* value) {
+  
+  node_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:arro.Step.node)
+}
+ void Step::set_node(const char* value, size_t size) {
+  
+  node_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:arro.Step.node)
+}
+ ::std::string* Step::mutable_node() {
+  
+  // @@protoc_insertion_point(field_mutable:arro.Step.node)
+  return node_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* Step::release_node() {
+  // @@protoc_insertion_point(field_release:arro.Step.node)
+  
+  return node_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void Step::set_allocated_node(::std::string* node) {
+  if (node != NULL) {
+    
+  } else {
+    
+  }
+  node_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), node);
+  // @@protoc_insertion_point(field_set_allocated:arro.Step.node)
+}
+
+// optional string name = 2;
 void Step::clear_name() {
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }

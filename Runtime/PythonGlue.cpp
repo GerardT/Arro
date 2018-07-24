@@ -82,23 +82,6 @@ PythonGlue::fatal() {
 }
 
 PyObject*
-PythonGlue::getMessage(PyObject * /*self*/, PyObject *args)
-{
-    PyObject *obj;
-
-    if(!PyArg_ParseTuple(args, "O", &obj))  // Return value: int
-        return nullptr;
-
-    NodePython* np = instance->m_instanceMap[obj];
-    if(!np) {
-        return nullptr; // FIXME: do i need to set an error?
-    } else {
-        return np->getMessage();
-    }
-}
-
-
-PyObject*
 PythonGlue::getInput(PyObject * /*self*/, PyObject *args)
 {
     PyObject *obj;
@@ -188,7 +171,6 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
  * The table of Python funcions that is added to Python module.
  */
 static PyMethodDef ArroMethods[] = {
-    {"getMessage",   PythonGlue::getMessage,   METH_VARARGS, "Get a message from the queue."},
     {"getInput",     PythonGlue::getInput,     METH_VARARGS, "Get a message from the pad."},
     {"sendMessage",  PythonGlue::sendMessage,  METH_VARARGS, "Send a message into the queue."},
     {"getParameter", PythonGlue::getParameter, METH_VARARGS, "Get a parameter value"},

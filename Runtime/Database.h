@@ -61,7 +61,7 @@ namespace Arro
 
     public:
         Database():
-            m_trace{"Database", true},
+            m_trace{"Database", false},
             m_runCycle{0}
         {};
 
@@ -73,6 +73,7 @@ namespace Arro
         Database& operator=(const Database& other) = delete;
 
         void store(unsigned int padId, MessageBuf& buf) {
+            m_trace.println("Storing message for " + std::to_string(padId));
             m_db.push_back(DbRecord(padId, m_runCycle, buf));
         }
 
@@ -83,6 +84,7 @@ namespace Arro
                     return true;
                 }
             }
+            m_trace.println("No message found for " + std::to_string(padId));
             return false;
         }
         bool getLatest(MessageBuf& buf) const {

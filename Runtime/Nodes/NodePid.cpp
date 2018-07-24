@@ -19,13 +19,8 @@ namespace Arro {
         NodePid(const NodePid&) = delete;
         NodePid& operator=(const NodePid& other) = delete;
 
-        /**
-         * Handle a message that is sent to this node.
-         *
-         * \param msg Message sent to this node.
-         * \param padName name of pad that message was sent to.
-         */
-        void handleMessage(const MessageBuf& msg, const std::string& padName);
+        virtual void finishConstruction();
+
 
         /**
          * Make the node execute a processing cycle.
@@ -34,6 +29,11 @@ namespace Arro {
 
     private:
         Trace m_trace;
+        InputPad* m_actualValue;
+        InputPad* m_targetValue;
+        InputPad* m_tick;
+        InputPad* m_mode;
+        OutputPad* m_statePad;
         double m_previous_error;
         double m_integral;
         double m_derivative;
@@ -58,6 +58,11 @@ static RegisterMe<NodePid> registerMe("pid");
 
 NodePid::NodePid(INodeContext* d, const string& /*name*/, StringMap& /* params */, TiXmlElement*):
     m_trace("NodePid", true),
+    m_actualValue{nullptr},
+    m_targetValue{nullptr},
+    m_tick{nullptr},
+    m_mode{nullptr},
+    m_statePad{nullptr},
     m_elemBlock(d) {
 
     m_previous_error = 0;
@@ -75,43 +80,52 @@ NodePid::NodePid(INodeContext* d, const string& /*name*/, StringMap& /* params *
 }
 
 void
-NodePid::handleMessage(const MessageBuf& m, const std::string& padName) {
-    if(padName == "actualValue") {
-        Value* msg = new Value();
-        msg->ParseFromString(m->c_str());
+NodePid::finishConstruction() {
+    m_trace.println("finishConstruction");
 
-        assert(msg->GetTypeName() == "arro.Value");
-        m_actual_position = ((Value*)msg)->value();
-    } else if(padName == "targetValue") {
-        Value* msg = new Value();
-        msg->ParseFromString(m->c_str());
+    m_actualValue = m_elemBlock->getInputPad("actualValue");
+    m_targetValue = m_elemBlock->getInputPad("targetValue");
+    m_tick = m_elemBlock->getInputPad("aTick");
+    m_mode = m_elemBlock->getInputPad("mode");
 
-        assert(msg->GetTypeName() == "arro.Value");
-        m_setpoint = ((Value*)msg)->value();
-    } else if(padName == "aTick") {
-        Tick* msg = new Tick();
-        msg->ParseFromString(m->c_str());
+    m_statePad = m_elemBlock->getOutputPad("_step");
 
-        m_trace.println(string(msg->GetTypeName()));
-        assert(msg->GetTypeName() == "arro.Tick");
-        Tick* tick = (Tick*)msg;
-        m_ms_elapsed = tick->ms();
+    Step* step = new Step();
+    step->set_node(m_elemBlock->getName());
+    step->set_name("_ready");
+    m_elemBlock->setOutputData(m_statePad, step);
 
-    } else if (padName == "mode") {
-        Mode* msg = new Mode();
-        msg->ParseFromString(m->c_str());
-
-        assert(msg->GetTypeName() == "arro.Mode");
-        m_actual_mode = ((Mode*)msg)->mode();
-    } else {
-        m_trace.println(string("Message received from ") + padName);
-    }
 }
 
 void
 NodePid::runCycle() {
 
     m_trace.println(string("NodePid input = ") + to_string((long double)m_actual_position));
+
+
+    Value* actualValue = new Value();
+    MessageBuf m1 = m_elemBlock->getInputData(m_actualValue);
+    actualValue->ParseFromString(m1->c_str());
+
+    m_actual_position = actualValue->value();
+
+    Value* targetValue = new Value();
+    MessageBuf m2 = m_elemBlock->getInputData(m_targetValue);
+    targetValue->ParseFromString(m2->c_str());
+
+    m_setpoint = targetValue->value();
+
+    Tick* tick = new Tick();
+    MessageBuf m3 = m_elemBlock->getInputData(m_tick);
+    tick->ParseFromString(m3->c_str());
+
+    m_ms_elapsed = tick->ms();
+
+    Mode* mode = new Mode();
+    MessageBuf m4 = m_elemBlock->getInputData(m_mode);
+    mode->ParseFromString(m4->c_str());
+
+    m_actual_mode = mode->mode();
 
     if(true /*actual_mode == "Active"*/) {
         m_ms_elapsed /= 100;

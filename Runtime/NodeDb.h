@@ -26,6 +26,7 @@
 namespace Arro
 {
 class NodeDb;
+class OutputPad;
 
 class InputPad {
 public:
@@ -40,8 +41,7 @@ public:
         m_callback{l},
         m_node{n},
         m_msg{new std::string()},
-        m_interfaceName{interfaceName},
-        m_outputPadId{0} {} // FIXME MAXINT?
+        m_interfaceName{interfaceName} {} // FIXME MAXINT?
     virtual ~InputPad() {};
 
     // Copy and assignment is not supported.
@@ -55,13 +55,16 @@ public:
      */
     void handleMessage(const MessageBuf& msg);
 
-    unsigned int getConnection() { return m_outputPadId; };
+    unsigned int getConnection() { return m_outputPadIds.front(); };
+    const std::list<unsigned int>& getConnections() { return m_outputPadIds; };
 
     const MessageBuf getData(unsigned int padId);
 
     void addOutput(unsigned int padId) {
-        m_outputPadId = padId;
+        m_outputPadIds.push_back(padId);
     }
+
+    OutputPad* getOutputPad(unsigned int padId);
 
 private:
     NodeDb* m_nm;
@@ -70,7 +73,7 @@ private:
     MessageBuf m_msg;
 public:
     std::string m_interfaceName;
-    unsigned int m_outputPadId;
+    std::list<unsigned int> m_outputPadIds;
 
 };
 
@@ -89,7 +92,7 @@ public:
      *
      * \param db Node database.
      */
-    OutputPad(unsigned int padId, NodeDb* db);
+    OutputPad(unsigned int padId, NodeDb* db, RealNode* n);
     virtual ~OutputPad() {};
 
     // Copy and assignment is not supported.
@@ -115,7 +118,7 @@ public:
      *
      * \param msg Buffer to submit.
      */
-    void submitMessage(unsigned int padId, google::protobuf::MessageLite* msg);
+    void submitMessage(google::protobuf::MessageLite* msg);
 
     /**
      * Fill a MessageBuf from string and submit Protobuf buffer into queue.
@@ -126,15 +129,17 @@ public:
 
     unsigned int getPadId() {
         return m_padId;
+
     }
 
-    //std::list<InputPad*> getInputPads() {
-    //    return m_inputs;
-    //}
+    std::string getNodeName() {
+        return m_node->getName();
+    }
 
 
 private:
     NodeDb* m_nm;
+    RealNode* m_node;
     std::list<InputPad*> m_inputs;
     unsigned int m_padId;
 };
@@ -279,6 +284,7 @@ private:
          * \return Found output reference (makes this method non-const).
          */
         OutputPad* getOutputPad(const std::string& name);
+        OutputPad* getOutputPad(unsigned int padId);
 
         bool getLatestMessage(int outputPad, MessageBuf& msg) const {
             return m_database.getLatest(outputPad, msg);

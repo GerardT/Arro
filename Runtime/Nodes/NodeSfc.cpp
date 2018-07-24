@@ -1,5 +1,6 @@
 #include <lemon/CodeGenInterface.h>
 #include <Nodes/NodeSfc.h>
+#include <NodeDb.h>
 #include <iostream>
 #include <vector>
 #include <exception>
@@ -16,7 +17,8 @@ static RegisterMe<NodeSfc> registerMe("_SFC");
 
 NodeSfc::NodeSfc(INodeContext* elemBlock, const string& /*name*/, StringMap& /*params*/, TiXmlElement* elt):
     m_trace{"NodeSfc", true},
-    m_process{elemBlock} {
+    m_process{elemBlock},
+    m_stepsPad{nullptr} {
 
     // Define "start" as initial step
     m_activeSteps.insert("_ready");
@@ -65,6 +67,17 @@ NodeSfc::NodeSfc(INodeContext* elemBlock, const string& /*name*/, StringMap& /*p
 
 void
 NodeSfc::finishConstruction() {
+    m_stepsPad = m_process->getInputPad("_steps");
+
+//    auto t = m_stepsPad->getConnections();
+//
+//    for(auto conn = m_stepsPad->getConnections().begin(); conn != m_stepsPad->getConnections().end(); ++conn) {
+//        OutputPad* op = m_stepsPad->getOutputPad(*conn);
+//        if(op) {
+//            m_trace.println("finishConstruction found node " + op->getNodeName());
+//        }
+//    }
+
     m_trace.println("finishConstruction");
     for(auto it = m_transitions.begin(); it != m_transitions.end(); ++it) {
         (*it)->parseExpression();
@@ -80,29 +93,28 @@ NodeSfc::test() {
     }
 }
 
-
-void
-NodeSfc::handleMessage(const MessageBuf& m, const std::string& padName) {
-    string action_input = this->m_process->getName() + ARRO_PAD_SEPARATOR + "_action";
-
-    auto msg = new arro::Step();
-    msg->ParseFromString((m)->c_str());
-
-    m_trace.println(string("SFC: ") + m_process->getName() + " received " + msg->name());
-
-
-    // m_currentInputs hold the values that have been read from input. If entry does
-    // not exist yet, add it.
-    if(m_currentInputs.find(padName) == m_currentInputs.end()) {
-        m_trace.println("Adding input " + padName + " msg " + msg->name());
-    }
-    m_currentInputs[padName] = msg->name();
-}
-
 void
 NodeSfc::runCycle() {
 
     //trace.println(string("NodeSfc input = ") + to_string((long double)actual_position));
+
+
+    Step* step = new Step();
+
+    MessageBuf msgBuf = m_process->getInputData(m_stepsPad);
+    step->ParseFromString((msgBuf)->c_str());
+
+    std::string node = step->node();
+    std::string padName = std::string("_step_") + node.substr(node.rfind(".") + 1);
+
+    m_trace.println(string("SFC2: ") + m_process->getName() + " for node " + padName + " mode " + step->name());
+
+    // m_currentInputs hold the values that have been read from input. If entry does
+    // not exist yet, add it.
+    if(m_currentInputs.find(padName) == m_currentInputs.end()) {
+        m_trace.println("Adding input " + padName + " msg " + step->name());
+    }
+    m_currentInputs[padName] = step->name();
 
     if(true /*actual_mode == "Active"*/) {
         //trace.println(string("NodeSfc output = ") + to_string((long double)output));

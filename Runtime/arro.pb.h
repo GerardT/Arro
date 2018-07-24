@@ -542,9 +542,20 @@ class Step : public ::google::protobuf::Message {
 
   // accessors -------------------------------------------------------
 
-  // optional string name = 1;
+  // optional string node = 1;
+  void clear_node();
+  static const int kNodeFieldNumber = 1;
+  const ::std::string& node() const;
+  void set_node(const ::std::string& value);
+  void set_node(const char* value);
+  void set_node(const char* value, size_t size);
+  ::std::string* mutable_node();
+  ::std::string* release_node();
+  void set_allocated_node(::std::string* node);
+
+  // optional string name = 2;
   void clear_name();
-  static const int kNameFieldNumber = 1;
+  static const int kNameFieldNumber = 2;
   const ::std::string& name() const;
   void set_name(const ::std::string& value);
   void set_name(const char* value);
@@ -558,6 +569,7 @@ class Step : public ::google::protobuf::Message {
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   bool _is_default_instance_;
+  ::google::protobuf::internal::ArenaStringPtr node_;
   ::google::protobuf::internal::ArenaStringPtr name_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_arro_2eproto();
@@ -1362,7 +1374,51 @@ inline void Mode::set_allocated_mode(::std::string* mode) {
 
 // Step
 
-// optional string name = 1;
+// optional string node = 1;
+inline void Step::clear_node() {
+  node_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Step::node() const {
+  // @@protoc_insertion_point(field_get:arro.Step.node)
+  return node_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Step::set_node(const ::std::string& value) {
+  
+  node_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:arro.Step.node)
+}
+inline void Step::set_node(const char* value) {
+  
+  node_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:arro.Step.node)
+}
+inline void Step::set_node(const char* value, size_t size) {
+  
+  node_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:arro.Step.node)
+}
+inline ::std::string* Step::mutable_node() {
+  
+  // @@protoc_insertion_point(field_mutable:arro.Step.node)
+  return node_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Step::release_node() {
+  // @@protoc_insertion_point(field_release:arro.Step.node)
+  
+  return node_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Step::set_allocated_node(::std::string* node) {
+  if (node != NULL) {
+    
+  } else {
+    
+  }
+  node_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), node);
+  // @@protoc_insertion_point(field_set_allocated:arro.Step.node)
+}
+
+// optional string name = 2;
 inline void Step::clear_name() {
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }

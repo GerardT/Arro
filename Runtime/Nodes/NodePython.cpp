@@ -49,24 +49,7 @@ NodePython::finishConstruction() {
 }
 
 NodePython::~NodePython() {
-    while(!m_messages.empty()) {
-        m_messages.pop();  // FIXME messages should be deleted properly
-    }
-
     Py_DECREF(m_pInstance);
-}
-
-/**
- * Store incoming messages into a temp queue so Python code can read them
- * when running execution cycle. Convert message into Python type (tuple) before
- * storing in temp queue.
- */
-void
-NodePython::handleMessage(const MessageBuf& msg, const string& padName) {
-    PyObject* tuple = Py_BuildValue("s s", padName.c_str(), msg->c_str());  // Return value: New reference.
-
-    // TODO: better to store one MessageBuf per padName - move this to Process
-    m_messages.push(tuple);
 }
 
 /**
@@ -85,23 +68,6 @@ NodePython::runCycle() {
         PythonGlue::captureError();
 
         throw std::runtime_error("Calling runCycle inside Python resulted in error");
-    }
-}
-
-/**
- * Python -> C. Returns a message from temp queue to Python.
- */
-PyObject*
-NodePython::getMessage() {
-    if(!m_messages.empty()) {
-        PyObject* tuple = m_messages.front();
-        m_trace.println("====================> new msg");
-        m_messages.pop();
-        return tuple;
-    } else {
-        // insert None object
-        Py_INCREF(Py_None);
-        return Py_None;
     }
 }
 

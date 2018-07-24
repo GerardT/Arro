@@ -37,13 +37,7 @@ namespace Arro {
         NodeServo(const NodeServo&) = delete;
         NodeServo& operator=(const NodeServo& other) = delete;
 
-        /**
-         * Handle a message that is sent to this node.
-         *
-         * \param msg Message sent to this node.
-         * \param padName name of pad that message was sent to.
-         */
-        void handleMessage(const MessageBuf& msg, const std::string& padName);
+        virtual void finishConstruction();
 
         /**
          * Make the node execute a processing cycle.
@@ -104,6 +98,10 @@ namespace Arro {
         std::string m_actual_mode;
         int m_Ch;
         StringMap m_params;
+
+        InputPad* m_sub1;
+        InputPad* m_timer;
+        InputPad* m_mode;
 
         static Servo* m_pServo;
     };
@@ -239,7 +237,11 @@ NodeServo::NodeServo(INodeContext* d, const string& /*name*/, StringMap& /* para
     m_actual_position(0),
     m_ms_elapsed(0),
     m_actual_mode("Idle"),
-    m_Ch(0) {
+    m_Ch(0),
+    m_sub1{nullptr},
+    m_timer{nullptr},
+    m_mode{nullptr}
+    {
 
     if(!m_pServo) {
         m_pServo = new Servo();
@@ -248,36 +250,44 @@ NodeServo::NodeServo(INodeContext* d, const string& /*name*/, StringMap& /* para
     m_Ch = stod(d->getParameter("Channel"));
 }
 
+
 void
-NodeServo::handleMessage(const MessageBuf& m, const std::string& padName) {
-    if(padName == "sub1") {
-        auto msg = new Value();
-        msg->ParseFromString(m->c_str());
+NodeServo::finishConstruction() {
+    m_trace.println("finishConstruction");
 
-        assert(msg->GetTypeName() == "arro.Value");
-        m_actual_position = ((Value*)msg)->value();
-    } else if(padName == "timer") {
-        auto msg = new Tick();
-        msg->ParseFromString(m->c_str());
+    m_sub1 = m_elemBlock->getInputPad("sub1");
+    m_timer = m_elemBlock->getInputPad("timer");
+    m_mode = m_elemBlock->getInputPad("mode");
 
-        m_trace.println(string(msg->GetTypeName()));
-        assert(msg->GetTypeName() == "arro.Tick");
-        auto tick = (Tick*)msg;
-        m_ms_elapsed = tick->ms();
-
-    } else if (padName == "mode") {
-        auto msg = new Mode();
-        msg->ParseFromString(m->c_str());
-
-        assert(msg->GetTypeName() == "arro.Mode");
-        m_actual_mode = ((Mode*)msg)->mode();
-    } else {
-        m_trace.println(string("Message received from ") + padName);
-    }
 }
+
 
 void
 NodeServo::runCycle() {
+
+    Value* position = new Value();
+    MessageBuf m1 = m_elemBlock->getInputData(m_sub1);
+    if(*m1 != "") {
+        position->ParseFromString(m1->c_str());
+
+        m_actual_position = position->value();
+    }
+    Tick* tick = new Tick();
+    MessageBuf m2 = m_elemBlock->getInputData(m_timer);
+    if(*m2 != "") {
+        tick->ParseFromString(m2->c_str());
+
+        m_ms_elapsed = tick->ms();
+    }
+
+    Mode* mode = new Mode();
+    MessageBuf m3 = m_elemBlock->getInputData(m_mode);
+    if(*m3 != "") {
+        mode->ParseFromString(m3->c_str());
+
+        m_actual_mode = mode->mode();
+    }
+
     m_trace.println(string("NodeServo input = ") + to_string((long double)m_actual_position));
 
     if(true /*actual_mode == "Active"*/
