@@ -18,7 +18,7 @@ endif
 CFLAGS        = -pipe -Wall -Wextra $(DEFINES) `python2.7-config --cflags`
 CXXFLAGS      = -pipe -std=c++0x -g -frtti -Wall -Wextra -fexceptions $(DEFINES) `python2.7-config --cflags`
 # INCPATH       = -I"." -I"../../protobuf-2.5.0/src"
-INCPATH       = -I"." -I"NodesBlock" -I"/usr/local/include"
+INCPATH       = -I"." -I"/usr/local/include" -I"../../download"
 LINKER        = g++
 # LFLAGS        = -g -Wl,-subsystem		--> -Wl,-subsystem is MinGW stuff, results in no symbols.
 LFLAGS        = -g
@@ -26,6 +26,7 @@ LIBS          = -L/usr/local/lib -lprotobuf `python2.7-config --ldflags`
 DEL_FILE      = rm
 OBJDIR       := debug
 SRCDIR       := ../Runtime
+DWLDIR       := ../../download
 MKDIR_P      := mkdir -p
 _dummy1      := $(shell mkdir -p debug)
 _dummy2      := $(shell mkdir -p debug/Nodes)
@@ -91,9 +92,9 @@ $(OBJDIR)/CodeGenerator.o $(SRCDIR)/lemon/cfg.h:	$(OBJDIR)/lemon $(SRCDIR)/lemon
 #	asciidoc $<
 
 
-$(OBJDIR)/arro.pb.o: $(SRCDIR)/arro.proto
-	protoc --cpp_out=. arro.proto
-	$(CXX) -MMD -c $(CXXFLAGS) $(INCPATH) -o $(OBJDIR)/arro.pb.o arro.pb.cc
+$(OBJDIR)/arro.pb.o: $(DWLDIR)/arro.proto
+	protoc --cpp_out=$(DWLDIR)  --proto_path=$(DWLDIR) $(DWLDIR)/arro.proto
+	$(CXX) -MMD -c $(CXXFLAGS) $(INCPATH) -o $(OBJDIR)/arro.pb.o $(DWLDIR)/arro.pb.cc
 
 clean:
 	rm -rf debug
