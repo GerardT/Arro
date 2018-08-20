@@ -150,6 +150,16 @@ Process::getInputData(InputPad* input) const {
     return MessageBuf(new std::string(""));
 }
 
+const std::list<unsigned int>&
+Process::getConnections(InputPad* input) {
+    return input->getConnections();
+};
+
+INodeContext::ItRef
+Process::getFirst(InputPad* input, unsigned int connection, INodeContext::Mode mode) {
+    return input->getFirst(connection, mode);
+}
+
 
 InputPad*
 Process::getInputPad(const string& name) const {

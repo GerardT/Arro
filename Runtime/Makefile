@@ -43,6 +43,7 @@ SRCS         := main.cpp \
 		arro.pb.cpp \
 		Pad.cpp \
 		Process.cpp \
+		Database.cpp \
 		PythonGlue.cpp \
 		Nodes/NodeSfc.cpp \
 		Nodes/NodePid.cpp \

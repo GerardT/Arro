@@ -69,6 +69,8 @@ private:
     InputPad* m_inputPad;
     OutputPad* m_outputPad;
     OutputPad* m_pmtFilter;
+    INodeContext::ItRef m_inputIt;
+
 };
 
 
@@ -79,7 +81,8 @@ NodeTsSubtable::NodeTsSubtable(INodeContext* d, const string& /*name*/, StringMa
     m_trace{"NodeTsSubtable", true},
     m_elemBlock{d},
     m_inputPad{nullptr},
-    m_outputPad{nullptr} {
+    m_outputPad{nullptr},
+    m_inputIt{nullptr} {
 
     m_trace.println("Constructor");
 
@@ -94,6 +97,10 @@ NodeTsSubtable::finishConstruction() {
     m_outputPad = m_elemBlock->getOutputPad("value");
     m_pmtFilter = m_elemBlock->getOutputPad("pmtFilter");
 
+    const std::list<unsigned int>conns = m_elemBlock->getConnections(m_inputPad);
+    auto c = conns.begin();
+
+    m_inputIt = m_elemBlock->getFirst(m_inputPad, *c, INodeContext::DELTA);
 }
 
 NodeTsSubtable::~NodeTsSubtable() {
@@ -105,31 +112,33 @@ void NodeTsSubtable::runCycle() {
     Blob* blob = new Blob();
     //blob->set_data(somedata);
 
-    MessageBuf msgBuf = m_elemBlock->getInputData(m_inputPad);
-    blob->ParseFromString((*msgBuf));
+    MessageBuf msgBuf;
+    if(m_inputIt->getNext(msgBuf)) {
+        blob->ParseFromString((*msgBuf));
 
-    std::string bytes = blob->data();
+        std::string bytes = blob->data();
 
-    const char* buf = bytes.c_str();
+        const char* buf = bytes.c_str();
 
-    unsigned long TableId = parseBits(buf, 0, 8);
-//    unsigned long SectionSyntaxIndicator = parseBits(buf, 8, 9);
-    unsigned long SectionLength = parseBits(buf, 14, 24);
-//    unsigned long TableIdExtension = 0;
-//    if(SectionSyntaxIndicator) {
-//        TableIdExtension = parseBits(buf, 24, 30);
-//    }
+        unsigned long TableId = parseBits(buf, 0, 8);
+    //    unsigned long SectionSyntaxIndicator = parseBits(buf, 8, 9);
+        unsigned long SectionLength = parseBits(buf, 14, 24);
+    //    unsigned long TableIdExtension = 0;
+    //    if(SectionSyntaxIndicator) {
+    //        TableIdExtension = parseBits(buf, 24, 30);
+    //    }
 
-    switch(TableId) {
-    case 0:
-        handlePAT(buf + sizeHeader, SectionLength - sizeSubtableHeader - sizeCrc);
-        break;
-    case 1:
-        handleCAT(buf + sizeHeader, SectionLength - sizeSubtableHeader - sizeCrc);
-        break;
-    case 2:
-        handlePMT(buf + sizeHeader, SectionLength - sizeSubtableHeader - sizeCrc);
-        break;
+        switch(TableId) {
+        case 0:
+            handlePAT(buf + sizeHeader, SectionLength - sizeSubtableHeader - sizeCrc);
+            break;
+        case 1:
+            handleCAT(buf + sizeHeader, SectionLength - sizeSubtableHeader - sizeCrc);
+            break;
+        case 2:
+            handlePMT(buf + sizeHeader, SectionLength - sizeSubtableHeader - sizeCrc);
+            break;
+        }
     }
 }
 

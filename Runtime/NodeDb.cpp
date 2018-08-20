@@ -56,9 +56,21 @@ const MessageBuf
 InputPad::getData(unsigned int padId) {
     // check if there is a message at m_outputPadId with latest runCycle
     MessageBuf tmp{new std::string()}; // MessageBuf contains ref count, so this should be ok.
-    m_nm->getLatestMessage(padId, tmp);
+    m_nm->getLatestMessage(this, padId, tmp);
     return tmp;
 };
+
+INodeContext::ItRef
+InputPad::getFirst(unsigned int connection, INodeContext::Mode mode) {
+    return m_nm->getFirst(this, connection, mode);
+}
+
+
+const std::list<unsigned int>&
+InputPad::getConnections() {
+    return m_outputPadIds;
+};
+
 
 OutputPad*
 InputPad::getOutputPad(unsigned int padId)

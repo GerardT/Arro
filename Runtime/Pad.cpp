@@ -17,7 +17,8 @@ Pad::Pad(NodeDb& nodeDb, const string& /*datatype*/, const string& name, unsigne
     m_trace{"Pad", false},
     m_in{nullptr},
     m_out{nullptr},
-    m_name{name} {
+    m_name{name},
+    m_conn{0} {
 
     m_trace.println("Pad " + std::to_string(padId));
 
@@ -34,9 +35,14 @@ Pad::Pad(NodeDb& nodeDb, const string& /*datatype*/, const string& name, unsigne
 }
 
 void
-Pad::runCycle()
-{
-    MessageBuf s = m_in->getData(m_in->getConnection());
+Pad::runCycle() {
+    MessageBuf s = m_in->getData(m_conn);
     m_out->m_nm->m_database.store(m_out->getPadId(), s);
 };
 
+
+void
+Pad::finishConstruction() {
+    std::list<unsigned int> connections = m_in->getConnections();
+    m_conn = connections.front();
+};

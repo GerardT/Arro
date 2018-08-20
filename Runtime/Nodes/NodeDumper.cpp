@@ -34,6 +34,7 @@ private:
     OutputPad* m_outputPad;
     char m_packet[188];
     int m_packetCnt;
+    INodeContext::ItRef m_inputIt;
 
 };
 
@@ -48,8 +49,11 @@ static RegisterMe<NodeDumper> registerMe("Dumper");
 
 NodeDumper::NodeDumper(INodeContext* d, const string& /*name*/, StringMap& /*params*/, TiXmlElement*):
     m_trace{"NodeDumper", true},
+    m_packetFound{false},
     m_elemBlock{d},
-    m_inputPad{nullptr} {
+    m_inputPad{nullptr},
+    m_outputPad{nullptr},
+    m_packetCnt{0} {
 
     m_trace.println("Constructor");
 }
@@ -57,6 +61,9 @@ NodeDumper::NodeDumper(INodeContext* d, const string& /*name*/, StringMap& /*par
 void
 NodeDumper::finishConstruction() {
     m_inputPad = m_elemBlock->getInputPad("input");
+    const std::list<unsigned int>conns = m_elemBlock->getConnections(m_inputPad);
+    auto c = conns.begin();
+    m_inputIt = m_elemBlock->getFirst(m_inputPad, *c, INodeContext::DELTA);
 }
 
 NodeDumper::~NodeDumper() {
@@ -67,22 +74,24 @@ void NodeDumper::runCycle() {
 
     Blob* blob = new Blob();
 
-    MessageBuf msgBuf = m_elemBlock->getInputData(m_inputPad);
-    blob->ParseFromString((*msgBuf));
+    MessageBuf msgBuf;
+    if(m_inputIt->getNext(msgBuf)) {
+        blob->ParseFromString((*msgBuf));
 
-    std::string bytes = blob->data();
+        std::string bytes = blob->data();
 
-    unsigned int i = 0;
+        unsigned int i = 0;
 
-    std::string output;
+        std::string output;
 
-    // search for first start of TS packet in stream
-    while(i < bytes.length()) {
-        char tmp[100];
-        sprintf(tmp, "0x%02x ", (unsigned char)(bytes[i]));
-        output += tmp;
-        i++;
+        // search for first start of TS packet in stream
+        while(i < bytes.length()) {
+            char tmp[100];
+            sprintf(tmp, "0x%02x ", (unsigned char)(bytes[i]));
+            output += tmp;
+            i++;
+        }
+        m_trace.println(output);
     }
-    m_trace.println(output);
 }
 

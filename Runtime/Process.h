@@ -65,7 +65,6 @@ namespace Arro
          * \param name Name of input.
          */
         MessageBuf  getInputData(InputPad* input) const;
-        MessageBuf  getInputData(InputPad* input, unsigned int padId) const;
 
         /**
          * Lookup an input by its name, which is internally concatenated: "procesname.name".
@@ -73,6 +72,10 @@ namespace Arro
          * \param name Name of input.
          */
         InputPad* getInputPad(const std::string& name) const;
+
+        const std::list<unsigned int>& getConnections(InputPad* input);
+
+        ItRef getFirst(InputPad* input, unsigned int connection, Mode mode);
 
         /**
          * Lookup an output by its name, which is concatenated: "procesname.name".

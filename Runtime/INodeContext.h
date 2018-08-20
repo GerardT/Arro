@@ -5,6 +5,7 @@
 #include <functional>
 #include <string>
 #include <map>
+#include <list>
 #include <tinyxml.h>
 #include <google/protobuf/message.h>
 #include "INodeDefinition.h"
@@ -33,6 +34,15 @@ namespace Arro
 
     class INodeContext {
     public:
+        class Iterator {
+        public:
+            virtual ~Iterator() = 0;
+            virtual bool getNext(MessageBuf& /*msg*/) = 0;;
+        };
+
+        typedef std::unique_ptr<Iterator> ItRef;
+        typedef enum { ALL, DELTA, LATEST } Mode;
+
         /**
          * Constructor.
          */
@@ -47,6 +57,35 @@ namespace Arro
         virtual InputPad*  getInputPad(const std::string& name) const = 0;
 
         virtual MessageBuf getInputData(InputPad* input) const = 0;
+
+        virtual const std::list<unsigned int>& getConnections(InputPad* input) = 0;
+
+        /**
+         * Get first record that was changed since previous run-cycle.
+         * @param input
+         * @param connection: 0 = all connections
+         * @param msg
+         * @param mode all / delta since previous run-cycle / latest run-cycle only
+         * @return
+         *
+         * Example, table contains records A, B, C. Then in run-cycle 123:
+         * record A is updated
+         * record D is added
+         * record B is deleted
+         * record A is updated
+         * Contents:
+         * +------------+------------+------------+
+         * | padId      | record     | run-cycle  |
+         * +------------+------------+------------+
+         * | 10         | A          | 123        |
+         * | 10         | B x        | 123        |
+         * | 10         | C          | 122        |
+         * | 10         | D          | 123        |
+         * +------------+------------+------------+
+         * Each node only updates its 'own' records, with its own padId.
+         */
+        virtual ItRef getFirst(InputPad* input, unsigned int connection, Mode mode) = 0;
+
 
         /**
          * Lookup an output by its name, which is concatenated: "procesname#name".

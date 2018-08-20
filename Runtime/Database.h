@@ -12,18 +12,21 @@
 #include <functional>
 
 #include "INodeDefinition.h"
+#include "INodeContext.h"
 #include "Trace.h"
 
 
 namespace Arro
 {
-
+class Database;
+class Iterator;
     /**
      * \brief Message database.
      *
      * Message database into which to store all messages.
      */
     class Database {
+    friend class Iterator;
 
     public:
 
@@ -46,6 +49,10 @@ namespace Arro
                 m_padId{padId},
                 m_runCycle{runCycle},
                 m_msg{s} {};
+            DbRecord():
+                m_padId{0},
+                m_runCycle{0},
+                m_msg{MessageBuf{nullptr}} {};
             virtual ~DbRecord() {};
 
             // Copy and assignment is not supported.
@@ -58,42 +65,60 @@ namespace Arro
             unsigned int m_runCycle;
             MessageBuf m_msg;
         };
+        class Store {
+        public:
+            Store():
+                m_db{nullptr},
+                m_dbCount{0}
+            {
+                m_db = new DbRecord[max_buffer];
+            };
+            ~Store()
+            {
+                delete[] m_db;
+            }
+            unsigned int begin() { return 0; }
+            unsigned int end() { return m_dbCount; };
+
+            const DbRecord* at(unsigned int i) { return &(m_db[i]); };
+
+            void push_back(DbRecord buf) {
+                if(m_dbCount == max_buffer) {
+                    throw std::runtime_error("Database is full!");
+                }
+                m_db[m_dbCount++] = buf;
+            }
+
+            unsigned int erase(unsigned int it)
+            {
+                return it;
+                // TODO
+            }
+
+        private:
+            DbRecord* m_db;
+            unsigned int m_dbCount;
+            static const int max_buffer = 10000;
+        };
 
     public:
         Database():
             m_trace{"Database", false},
             m_runCycle{0}
-        {};
-
-        ~Database() {
-        }
+        {
+        };
 
         // Copy and assignment is not supported.
         Database(const Database&) = delete;
         Database& operator=(const Database& other) = delete;
+
 
         void store(unsigned int padId, MessageBuf& buf) {
             m_trace.println("Storing message for " + std::to_string(padId));
             m_db.push_back(DbRecord(padId, m_runCycle, buf));
         }
 
-        bool getLatest(unsigned int padId, MessageBuf& buf) const {
-            for(std::list<DbRecord>::const_reverse_iterator it = m_db.rbegin(); it!= m_db.rend(); ++it ) {  // reverse iterator
-                if(it->m_padId == padId) {
-                    buf = it->m_msg;
-                    return true;
-                }
-            }
-            m_trace.println("No message found for " + std::to_string(padId));
-            return false;
-        }
-        bool getLatest(MessageBuf& buf) const {
-            for(std::list<DbRecord>::const_reverse_iterator it = m_db.rbegin(); it!= m_db.rend(); ++it ) {  // reverse iterator
-                buf = it->m_msg;
-                return true;
-            }
-            return false;
-        }
+        INodeContext::ItRef getFirst(InputPad* input, unsigned int connection, INodeContext::Mode mode);
 
         /**
          * Swap (full) input queue and (empty) output queue.
@@ -104,17 +129,11 @@ namespace Arro
             //purge();
         }
 
-        void visitMessages(std::function<void(const MessageBuf&)> f) {
-            for(auto const& it : m_db) {
-                f(it.m_msg);
-            }
-
-        }
     private:
         void purge() {
             auto it = m_db.begin();
             while(it != m_db.end()) {
-                if(it->m_runCycle != m_runCycle) {
+                if(m_db.at(it)->m_runCycle != m_runCycle) {
                     it = m_db.erase(it);
                 }
                 else {
@@ -123,12 +142,34 @@ namespace Arro
             }
         }
 
+
     private:
         Trace m_trace;
-        std::list<DbRecord> m_db;
         unsigned int m_runCycle; // current run cycle
+        Store m_db;
 
     };
+
+    class Iterator: public INodeContext::ItRef {
+    public:
+
+        Iterator(Database* db, INodeContext::Mode mode, unsigned int rc, const std::list<unsigned int>& conns);
+        virtual ~Iterator();
+        virtual bool getNext(MessageBuf& msg);
+
+    private:
+        Trace m_trace;
+        Database* m_ref;
+
+        // Search criteria
+        INodeContext::Mode m_mode;
+        unsigned int m_runCycle;
+        const std::list<unsigned int> m_conns;
+
+        // Current position
+        unsigned int m_it;
+    };
 }
+
 
 #endif

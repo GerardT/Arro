@@ -213,7 +213,8 @@ static void server()
             }
             else if(!strcmp(command, "protobuf"))
             {
-                syswrap(string("protoc --python_out=") + ARRO_FOLDER + " arro.proto");
+                std::string cmd = std::string("protoc --cpp_out=")+ARRO_FOLDER+" --proto_path="+ARRO_FOLDER+" "+ARRO_FOLDER+"arro.proto";
+                syswrap(cmd);
                 SendToConsole("protobuf successful");
             }
             else if(!strcmp(command, "run"))
