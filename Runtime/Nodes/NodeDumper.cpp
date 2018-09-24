@@ -63,7 +63,7 @@ NodeDumper::finishConstruction() {
     m_inputPad = m_elemBlock->getInputPad("input");
     const std::list<unsigned int>conns = m_elemBlock->getConnections(m_inputPad);
     auto c = conns.begin();
-    m_inputIt = m_elemBlock->getFirst(m_inputPad, *c, INodeContext::DELTA);
+    m_inputIt = m_elemBlock->begin(m_inputPad, *c, INodeContext::DELTA);
 }
 
 NodeDumper::~NodeDumper() {

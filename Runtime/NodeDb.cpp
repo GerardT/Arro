@@ -52,19 +52,21 @@ InputPad::handleMessage(const MessageBuf& msg) {
 // get in order:
 // * all messages of one input
 // * then next input, etc.
-const MessageBuf
-InputPad::getData(unsigned int padId) {
+bool
+InputPad::getData(unsigned int padId, MessageBuf& tmp) {
     // check if there is a message at m_outputPadId with latest runCycle
-    MessageBuf tmp{new std::string()}; // MessageBuf contains ref count, so this should be ok.
-    m_nm->getLatestMessage(this, padId, tmp);
-    return tmp;
+    return m_nm->getLatestMessage(this, padId, tmp);
 };
 
 INodeContext::ItRef
-InputPad::getFirst(unsigned int connection, INodeContext::Mode mode) {
-    return m_nm->getFirst(this, connection, mode);
+InputPad::begin(unsigned int connection, INodeContext::Mode mode) {
+    return m_nm->begin(this, connection, mode);
 }
 
+INodeContext::ItRef
+OutputPad::end() {
+    return m_nm->end(this, m_padId);
+}
 
 const std::list<unsigned int>&
 InputPad::getConnections() {
@@ -78,13 +80,17 @@ InputPad::getOutputPad(unsigned int padId)
     return m_nm->getOutputPad(padId);
 };
 
-
+#define MAXINT 0xFFFFFFFF
 
 OutputPad::OutputPad(unsigned int padId, NodeDb* db, RealNode* n):
     m_nm{db},
     m_node{n},
     m_inputs{},
-    m_padId{padId} {
+    m_padId{padId},
+    m_lastRunCycle{MAXINT},
+    m_lastPosition{0},
+    m_first{true} {
+        m_it = m_nm->m_database.end(this, padId);
 }
 
 void
@@ -104,10 +110,14 @@ OutputPad::forwardMessage(const MessageBuf& msg) {
     for_each(m_inputs.begin(), m_inputs.end(), [msg](InputPad* i) { i->handleMessage(msg); });
 }
 void
-OutputPad::submitMessage(google::protobuf::MessageLite* msg) {
-    MessageBuf s(new std::string(msg->SerializeAsString()));
+OutputPad::submitMessage(MessageBuf& s) {
 
-    m_nm->m_database.store(m_padId, s);
+    if(m_first) {
+        m_it->insertOutput(s);
+        m_first = false;
+    } else {
+        m_it->updateOutput(s);
+    }
 
     auto fm = new NodeDb::FullMsg(this, s);
 
@@ -115,14 +125,19 @@ OutputPad::submitMessage(google::protobuf::MessageLite* msg) {
     m_nm->m_pInQueue->push(fm);
 
     m_nm->m_condition.notify_one();
-    free(msg);
 }
 
 // Seem necessary for Python only..
 void
 OutputPad::submitMessageBuffer(const char* msg) {
     MessageBuf s(new string(msg));
-    m_nm->m_database.store(m_padId, s);
+
+    if(m_first) {
+        m_it->insertOutput(s);
+        m_first = false;
+    } else {
+        m_it->updateOutput(s);
+    }
 
     auto fm = new NodeDb::FullMsg(this, s);
 

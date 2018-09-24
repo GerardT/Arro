@@ -36,8 +36,13 @@ namespace Arro
     public:
         class Iterator {
         public:
-            virtual ~Iterator() = 0;
-            virtual bool getNext(MessageBuf& /*msg*/) = 0;;
+            virtual ~Iterator() {};
+            virtual bool getNext(MessageBuf& /*msg*/) = 0;
+            virtual void insertOutput(google::protobuf::MessageLite& msg) = 0;
+            virtual void insertOutput(MessageBuf& msg) = 0;
+            virtual void updateOutput(google::protobuf::MessageLite& msg) = 0;
+            virtual void updateOutput(MessageBuf& msg) = 0;
+            virtual void deleteOutput() = 0; // it will be empty again
         };
 
         typedef std::unique_ptr<Iterator> ItRef;
@@ -84,7 +89,8 @@ namespace Arro
          * +------------+------------+------------+
          * Each node only updates its 'own' records, with its own padId.
          */
-        virtual ItRef getFirst(InputPad* input, unsigned int connection, Mode mode) = 0;
+        virtual ItRef begin(InputPad* input, unsigned int connection, Mode mode) = 0;
+        virtual ItRef end(OutputPad* input) = 0;
 
 
         /**

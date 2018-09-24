@@ -142,8 +142,8 @@ MessageBuf
 Process::getInputData(InputPad* input) const {
     auto conn = input->getConnections();
     for(auto c = conn.begin(); c != conn.end(); ++c) {
-        MessageBuf b = input->getData(*c);
-        if((*b) != "") {
+        MessageBuf b;
+        if(input->getData(*c, b)) {
             return b;
         }
     }
@@ -156,10 +156,14 @@ Process::getConnections(InputPad* input) {
 };
 
 INodeContext::ItRef
-Process::getFirst(InputPad* input, unsigned int connection, INodeContext::Mode mode) {
-    return input->getFirst(connection, mode);
+Process::begin(InputPad* input, unsigned int connection, INodeContext::Mode mode) {
+    return input->begin(connection, mode);
 }
 
+INodeContext::ItRef
+Process::end(OutputPad* input) {
+    return input->end();
+}
 
 InputPad*
 Process::getInputPad(const string& name) const {
@@ -187,7 +191,10 @@ Process::getOutputPad(const string& name) const {
 
 void
 Process::setOutputData(OutputPad* output, google::protobuf::MessageLite* value) const {
-    output->submitMessage(value);
+    MessageBuf s(new std::string(value->SerializeAsString()));
+    output->submitMessage(s);
+
+
 }
 
 

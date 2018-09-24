@@ -36,8 +36,13 @@ Pad::Pad(NodeDb& nodeDb, const string& /*datatype*/, const string& name, unsigne
 
 void
 Pad::runCycle() {
-    MessageBuf s = m_in->getData(m_conn);
-    m_out->m_nm->m_database.store(m_out->getPadId(), s);
+    MessageBuf s;
+
+    if(m_in->getData(m_conn, s)) {
+        //m_out->m_nm->m_database.store(m_out->getPadId(), s);
+        m_out->submitMessage(s);
+    }
+
 };
 
 

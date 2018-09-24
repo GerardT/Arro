@@ -75,7 +75,8 @@ namespace Arro
 
         const std::list<unsigned int>& getConnections(InputPad* input);
 
-        ItRef getFirst(InputPad* input, unsigned int connection, Mode mode);
+        ItRef begin(InputPad* input, unsigned int connection, Mode mode);
+        ItRef end(OutputPad* input);
 
         /**
          * Lookup an output by its name, which is concatenated: "procesname.name".

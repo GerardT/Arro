@@ -70,6 +70,7 @@ private:
     OutputPad* m_outputPad;
     OutputPad* m_pmtFilter;
     INodeContext::ItRef m_inputIt;
+    INodeContext::ItRef m_patIt;
 
 };
 
@@ -82,7 +83,8 @@ NodeTsSubtable::NodeTsSubtable(INodeContext* d, const string& /*name*/, StringMa
     m_elemBlock{d},
     m_inputPad{nullptr},
     m_outputPad{nullptr},
-    m_inputIt{nullptr} {
+    m_inputIt{nullptr},
+    m_patIt{nullptr} {
 
     m_trace.println("Constructor");
 
@@ -100,7 +102,18 @@ NodeTsSubtable::finishConstruction() {
     const std::list<unsigned int>conns = m_elemBlock->getConnections(m_inputPad);
     auto c = conns.begin();
 
-    m_inputIt = m_elemBlock->getFirst(m_inputPad, *c, INodeContext::DELTA);
+    m_inputIt = m_elemBlock->begin(m_inputPad, *c, INodeContext::DELTA);
+    m_patIt = m_elemBlock->end(m_elemBlock->getOutputPad("patFilter"));
+
+    SectionFilter* sf = new SectionFilter();
+    sf->set_pid(0 /* PAT pid */);
+    m_elemBlock->setOutputData(m_elemBlock->getOutputPad("patFilter"), sf);
+//    if(m_patIt->empty()) {
+//        m_patIt->insertOutput(sf);
+//    } else {
+//        m_patIt->updateOutput(sf);
+//    }
+
 }
 
 NodeTsSubtable::~NodeTsSubtable() {
@@ -170,15 +183,18 @@ void NodeTsSubtable::handleCAT(const char* /*data*/, unsigned long /*dataSize*/)
     m_trace.println("Handling CAT");
 }
 
-void NodeTsSubtable::handlePMT(const char* data, unsigned long /*dataSize*/) {
+void NodeTsSubtable::handlePMT(const char* data, unsigned long dataSize) {
     m_trace.println("Handling PMT");
+
+    const char* end = data + dataSize;
 
     unsigned long pcrPID = parseBits(data, 3, 13);
     unsigned long programInfoLength = parseBits(data, 22, 32);
     m_trace.println("PMT - PCR PID: " + std::to_string(pcrPID) + " programInfoLength " + std::to_string(programInfoLength));
 
     data += 4;
-    const char* end = data + std::min((const int)programInfoLength, 30);
+    data += programInfoLength;
+
     while(data < end) {
 
         unsigned long streamType = parseBits(data, 0, 8);

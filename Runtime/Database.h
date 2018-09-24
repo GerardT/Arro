@@ -29,6 +29,14 @@ class Iterator;
     friend class Iterator;
 
     public:
+        class Store; // forward declaration
+        class DbUpdate {
+        public:
+            DbUpdate():
+            index{DbRecord::DbEmpty} {
+            }
+            long index;
+        };
 
         /**
          * \brief Class instance represents one input for a node.
@@ -38,6 +46,7 @@ class Iterator;
          */
 
         class DbRecord {
+            friend class Database::Store;
         public:
             /**
              * Constructor for (addressable) message container.
@@ -45,80 +54,143 @@ class Iterator;
              * \param o OutputPad instance where to send this message to.
              * \param s Message buffer to send.
              */
-            DbRecord(unsigned int padId, unsigned int runCycle, const MessageBuf& s):
+            DbRecord(long index, unsigned int padId, unsigned int runCycle, unsigned int deletionRc, const MessageBuf& s):
+                m_id{index},
+                m_updateRef{DbEmpty},
                 m_padId{padId},
-                m_runCycle{runCycle},
+                m_updateRc{runCycle},
+                m_creationRc{runCycle},
+                m_deletionRc{deletionRc},
                 m_msg{s} {};
             DbRecord():
+                m_id{DbEmpty},
+                m_updateRef{DbEmpty},
                 m_padId{0},
-                m_runCycle{0},
+                m_updateRc{0},
+                m_creationRc{0},
+                m_deletionRc{0},
                 m_msg{MessageBuf{nullptr}} {};
             virtual ~DbRecord() {};
+
+            unsigned int getId() {
+                return m_id;
+            }
+
+            void getMessage(MessageBuf& msg) {
+                msg = m_msg;
+            }
+
+            unsigned int getPadId() {
+                return m_padId;
+            }
+
 
             // Copy and assignment is not supported.
             //DbRecord(const DbRecord&) = delete;
             //DbRecord& operator=(const DbRecord& other) = delete;
 
 
-            // FIXME Should be private
+        private:
+            // unique id (think ROWID) for this record
+            long m_id;
+            long m_updateRef;
+
             unsigned int m_padId;
-            unsigned int m_runCycle;
+            unsigned int m_updateRc;
+            unsigned int m_creationRc;
+            unsigned int m_deletionRc;
             MessageBuf m_msg;
+
+        public:
+            static const long DbEmpty = -1;
         };
+
+        /**
+         * Database, with index based on updateRc.
+         */
         class Store {
+            friend class Iterator;
         public:
             Store():
-                m_db{nullptr},
-                m_dbCount{0}
+                m_trace{"Store", true},
+                m_dbCount{0},
+                m_upCount{0}
             {
                 m_db = new DbRecord[max_buffer];
+                m_up = new DbUpdate[max_buffer];
             };
             ~Store()
             {
                 delete[] m_db;
+                delete[] m_up;
             }
-            unsigned int begin() { return 0; }
-            unsigned int end() { return m_dbCount; };
 
-            const DbRecord* at(unsigned int i) { return &(m_db[i]); };
+            void setRecord(DbRecord& rec) {
+                long pos = rec.m_id;
+                long up = m_db[pos].m_updateRef;
+                if(up != DbRecord::DbEmpty) {
+                    m_up[up].index = DbRecord::DbEmpty;
+                }
+                if(m_upCount >= max_buffer - 1) {
+                    throw std::runtime_error("Database index is full!");
+                }
+                rec.m_updateRef = m_upCount;
+                m_up[m_upCount++].index = pos;
 
-            void push_back(DbRecord buf) {
-                if(m_dbCount == max_buffer) {
+                m_db[pos] = rec;
+
+                m_trace.println("Record conn " + std::to_string(rec.m_padId) + " stored at " + std::to_string(pos) + " index " + std::to_string(m_upCount - 1));
+            }
+
+            unsigned int getFree() {
+                if(m_dbCount >= max_buffer - 1) {
                     throw std::runtime_error("Database is full!");
                 }
-                m_db[m_dbCount++] = buf;
+                return m_dbCount++;
             }
 
-            unsigned int erase(unsigned int it)
-            {
-                return it;
-                // TODO
+            void purge() {
+                long ix = 0;
+                while(ix != m_dbCount) {
+    //                if(m_db.at(it)->m_runCycle != m_runCycle) {
+    //                    //it = m_db.erase(it);
+    //                }
+    //                else {
+    //                    ++it;
+    //                }
+                    ix++;
+                }
             }
-
         private:
+            Trace m_trace;
             DbRecord* m_db;
-            unsigned int m_dbCount;
-            static const int max_buffer = 10000;
+            DbUpdate* m_up;
+            long m_dbCount;
+            long m_upCount;
+            static const int max_buffer = 100;
         };
 
     public:
         Database():
             m_trace{"Database", false},
-            m_runCycle{0}
+            m_runCycle{1}
         {
         };
+
+        ~Database() {
+        }
 
         // Copy and assignment is not supported.
         Database(const Database&) = delete;
         Database& operator=(const Database& other) = delete;
 
 
-        void store(unsigned int padId, MessageBuf& buf) {
-            m_trace.println("Storing message for " + std::to_string(padId));
-            m_db.push_back(DbRecord(padId, m_runCycle, buf));
+        unsigned int getCurrentRunCycle() {
+            return m_runCycle;
         }
 
-        INodeContext::ItRef getFirst(InputPad* input, unsigned int connection, INodeContext::Mode mode);
+        INodeContext::ItRef begin(InputPad* input, unsigned int connection, INodeContext::Mode mode);
+        INodeContext::ItRef end(OutputPad* input, unsigned int connection);
 
         /**
          * Swap (full) input queue and (empty) output queue.
@@ -126,20 +198,12 @@ class Iterator;
         void incRunCycle() {
             m_runCycle++;
 
-            //purge();
-        }
-
-    private:
-        void purge() {
-            auto it = m_db.begin();
-            while(it != m_db.end()) {
-                if(m_db.at(it)->m_runCycle != m_runCycle) {
-                    it = m_db.erase(it);
-                }
-                else {
-                    ++it;
-                }
+            for(auto it = m_new.begin(); it != m_new.end(); ++it) {
+                m_db.setRecord(*it);
             }
+            m_new.clear();
+
+            //purge();
         }
 
 
@@ -147,27 +211,36 @@ class Iterator;
         Trace m_trace;
         unsigned int m_runCycle; // current run cycle
         Store m_db;
+        std::list<DbRecord> m_new;
 
     };
 
-    class Iterator: public INodeContext::ItRef {
+    class Iterator: public INodeContext::Iterator {
     public:
 
-        Iterator(Database* db, INodeContext::Mode mode, unsigned int rc, const std::list<unsigned int>& conns);
+        Iterator(Database* db, INodeContext::Mode mode, const std::list<unsigned int>& conns);
         virtual ~Iterator();
         virtual bool getNext(MessageBuf& msg);
+        virtual void insertOutput(google::protobuf::MessageLite& msg);
+        virtual void insertOutput(MessageBuf& msg);
+        virtual void updateOutput(google::protobuf::MessageLite& msg);
+        virtual void updateOutput(MessageBuf& msg);
+        virtual void deleteOutput();
 
     private:
         Trace m_trace;
         Database* m_ref;
+        Database::Store& m_db;
 
         // Search criteria
         INodeContext::Mode m_mode;
-        unsigned int m_runCycle;
+
         const std::list<unsigned int> m_conns;
 
         // Current position
-        unsigned int m_it;
+        long int m_it;
+
+        bool m_currentEmpty;
     };
 }
 

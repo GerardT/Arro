@@ -58,10 +58,9 @@ public:
     //unsigned int getConnection() { return m_outputPadIds.front(); };
     const std::list<unsigned int>& getConnections();
 
-    const MessageBuf getData(unsigned int connection);
+    bool getData(unsigned int connection, MessageBuf& tmp);
 
-    INodeContext::ItRef getFirst(unsigned int connection, INodeContext::Mode mode);
-    bool getNext(INodeContext::ItRef& it, MessageBuf& msg);
+    INodeContext::ItRef begin(unsigned int connection, INodeContext::Mode mode);
 
     void addOutput(unsigned int connectedPadId) {
         m_outputPadIds.push_back(connectedPadId);
@@ -121,7 +120,7 @@ public:
      *
      * \param msg Buffer to submit.
      */
-    void submitMessage(google::protobuf::MessageLite* msg);
+    void submitMessage(MessageBuf& msg);
 
     /**
      * Fill a MessageBuf from string and submit Protobuf buffer into queue.
@@ -129,6 +128,9 @@ public:
      * \param msg String to submit.
      */
     void submitMessageBuffer(const char* msg);
+
+
+    INodeContext::ItRef end();
 
     unsigned int getPadId() {
         return m_padId;
@@ -145,6 +147,10 @@ private:
     RealNode* m_node;
     std::list<InputPad*> m_inputs;
     unsigned int m_padId;
+    unsigned int m_lastRunCycle;
+    unsigned int m_lastPosition;
+    INodeContext::ItRef m_it;
+    bool m_first;
 };
 
 
@@ -290,14 +296,18 @@ private:
         OutputPad* getOutputPad(unsigned int padId);
 #if 1
         bool getLatestMessage(InputPad* input, unsigned int outputPad, MessageBuf& msg)  {
-            INodeContext::ItRef it = m_database.getFirst(input, outputPad, INodeContext::LATEST);
+            INodeContext::ItRef it = m_database.begin(input, outputPad, INodeContext::LATEST);
             return it->getNext(msg);
 //            return m_database.getLatest(outputPad, msg);
 
         }
 #endif
-        INodeContext::ItRef getFirst(InputPad* input, unsigned int connection, INodeContext::Mode mode) {
-            return m_database.getFirst(input, connection, mode);
+        INodeContext::ItRef begin(InputPad* input, unsigned int connection, INodeContext::Mode mode) {
+            return m_database.begin(input, connection, mode);
+        }
+
+        INodeContext::ItRef end(OutputPad* input, unsigned int connection) {
+            return m_database.end(input, connection);
         }
 
         void visitNodes(std::function<void(RealNode&)> f) {

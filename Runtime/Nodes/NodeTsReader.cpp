@@ -127,6 +127,7 @@ private:
     std::map<unsigned int, Section*> m_payload;
 
     std::set<int> m_pids;
+    INodeContext::ItRef m_filterIt;
 
 
 };
@@ -165,24 +166,28 @@ NodeTsReader::finishConstruction() {
     step->set_name("_ready");
     m_elemBlock->setOutputData(m_statePad, step);
 
+    m_filterIt = m_elemBlock->begin(m_filterA, 0, INodeContext::DELTA);
 }
 
 NodeTsReader::~NodeTsReader() {
 }
 
 void NodeTsReader::runCycle() {
-    // m_trace.println("Read bytes");
+    m_trace.println("Read bytes");
 
     Blob* blob = new Blob();
     MessageBuf msgBuf1 = m_elemBlock->getInputData(m_inputPad);
     blob->ParseFromString((*msgBuf1));
 
-    SectionFilter* sf = new SectionFilter();
-    MessageBuf msgBuf2 = m_elemBlock->getInputData(m_filterA);
-    sf->ParseFromString((*msgBuf2));
 
-    m_pids.insert(0); // pid to find PAT..
-    m_pids.insert(sf->pid());
+    MessageBuf msgBuf2;
+    while(m_filterIt->getNext(msgBuf2)) {
+        m_trace.println("Read filter");
+        SectionFilter* sf = new SectionFilter();
+        sf->ParseFromString((*msgBuf2));
+
+        m_pids.insert(sf->pid());
+    }
 
     for(auto it: m_pids) {
         m_trace.println("Filtering PIDs " + std::to_string(it));
