@@ -14,7 +14,7 @@ using namespace Arro;
  */
 Pad::Pad(NodeDb& nodeDb, const string& /*datatype*/, const string& name, unsigned int padId):
     RealNode{},
-    m_trace{"Pad", false},
+    m_trace{"Pad", true},
     m_in{nullptr},
     m_out{nullptr},
     m_name{name},
@@ -34,20 +34,21 @@ Pad::Pad(NodeDb& nodeDb, const string& /*datatype*/, const string& name, unsigne
     m_out = nodeDb.registerNodeOutput(this, padId,"");
 }
 
-void
-Pad::runCycle() {
-    MessageBuf s;
-
-    if(m_in->getData(m_conn, s)) {
-        //m_out->m_nm->m_database.store(m_out->getPadId(), s);
-        m_out->submitMessage(s);
-    }
-
-};
-
 
 void
 Pad::finishConstruction() {
     std::list<unsigned int> connections = m_in->getConnections();
     m_conn = connections.front();
+
+    m_inIt = m_in->begin(0, INodeContext::DELTA);
 };
+
+void
+Pad::runCycle() {
+    MessageBuf s;
+
+    while(m_inIt->getNext(s)) {
+        m_out->submitMessage(s);
+    }
+};
+

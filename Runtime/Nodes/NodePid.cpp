@@ -29,10 +29,10 @@ namespace Arro {
 
     private:
         Trace m_trace;
-        InputPad* m_actualValue;
-        InputPad* m_targetValue;
-        InputPad* m_tick;
-        InputPad* m_mode;
+        INodeContext::ItRef m_actualValue;
+        INodeContext::ItRef m_targetValue;
+        INodeContext::ItRef m_tick;
+        INodeContext::ItRef m_mode;
         OutputPad* m_statePad;
         double m_previous_error;
         double m_integral;
@@ -83,10 +83,10 @@ void
 NodePid::finishConstruction() {
     m_trace.println("finishConstruction");
 
-    m_actualValue = m_elemBlock->getInputPad("actualValue");
-    m_targetValue = m_elemBlock->getInputPad("targetValue");
-    m_tick = m_elemBlock->getInputPad("aTick");
-    m_mode = m_elemBlock->getInputPad("mode");
+    m_actualValue = m_elemBlock->begin(m_elemBlock->getInputPad("actualValue"), 0, INodeContext::DELTA);
+    m_targetValue = m_elemBlock->begin(m_elemBlock->getInputPad("targetValue"), 0, INodeContext::DELTA);
+    m_tick = m_elemBlock->begin(m_elemBlock->getInputPad("aTick"), 0, INodeContext::DELTA);
+    m_mode = m_elemBlock->begin(m_elemBlock->getInputPad("mode"), 0, INodeContext::DELTA);
 
     m_statePad = m_elemBlock->getOutputPad("_step");
 
@@ -103,29 +103,38 @@ NodePid::runCycle() {
     m_trace.println(string("NodePid input = ") + to_string((long double)m_actual_position));
 
 
-    Value* actualValue = new Value();
-    MessageBuf m1 = m_elemBlock->getInputData(m_actualValue);
-    actualValue->ParseFromString(m1->c_str());
+    MessageBuf m1;
+    if(m_actualValue->getNext(m1)) {
+        Value* actualValue = new Value();
+        actualValue->ParseFromString(m1->c_str());
 
-    m_actual_position = actualValue->value();
+        m_actual_position = actualValue->value();
+    }
 
-    Value* targetValue = new Value();
-    MessageBuf m2 = m_elemBlock->getInputData(m_targetValue);
-    targetValue->ParseFromString(m2->c_str());
+    MessageBuf m2;
+    if(m_targetValue->getNext(m2)) {
+        Value* targetValue = new Value();
+        targetValue->ParseFromString(m2->c_str());
 
-    m_setpoint = targetValue->value();
+        m_setpoint = targetValue->value();
+    }
 
-    Tick* tick = new Tick();
-    MessageBuf m3 = m_elemBlock->getInputData(m_tick);
-    tick->ParseFromString(m3->c_str());
+    MessageBuf m3;
+    if(m_tick->getNext(m3)) {
+        Tick* tick = new Tick();
+        tick->ParseFromString(m3->c_str());
 
-    m_ms_elapsed = tick->ms();
+        m_ms_elapsed = tick->ms();
+    }
 
-    Mode* mode = new Mode();
-    MessageBuf m4 = m_elemBlock->getInputData(m_mode);
-    mode->ParseFromString(m4->c_str());
 
-    m_actual_mode = mode->mode();
+    MessageBuf m4;
+    if(m_mode->getNext(m4)) {
+        Mode* mode = new Mode();
+        mode->ParseFromString(m4->c_str());
+
+        m_actual_mode = mode->mode();
+    }
 
     if(true /*actual_mode == "Active"*/) {
         m_ms_elapsed /= 100;

@@ -61,9 +61,9 @@ class NodeDCMotor: public INodeDefinition {
 
         bool m_running;
 
-        InputPad* m_speed;
-        InputPad* m_direction;
-        InputPad* m_action;
+        INodeContext::ItRef m_speed;
+        INodeContext::ItRef m_direction;
+        INodeContext::ItRef m_action;
 
     };
 }
@@ -161,9 +161,9 @@ void
 NodeDCMotor::finishConstruction() {
     m_trace.println("finishConstruction");
 
-    m_speed = m_elemBlock->getInputPad("speed");
-    m_direction = m_elemBlock->getInputPad("direction");
-    m_action = m_elemBlock->getInputPad("_action");
+    m_speed = m_elemBlock->begin(m_elemBlock->getInputPad("speed"), 0, INodeContext::DELTA);
+    m_direction = m_elemBlock->begin(m_elemBlock->getInputPad("direction"), 0, INodeContext::DELTA);
+    m_action = m_elemBlock->begin(m_elemBlock->getInputPad("_action"), 0, INodeContext::DELTA);
 
 //    m_statePad = m_elemBlock->getOutputPad("_step");
 //
@@ -178,9 +178,9 @@ void
 NodeDCMotor::runCycle() {
     m_trace.println("NodeDCMotor::runCycle");
 
-    Value* speed = new Value();
-    MessageBuf m1 = m_elemBlock->getInputData(m_speed);
-    if(*m1 != "") {
+    MessageBuf m1;
+    if(m_speed->getNext(m1)) {
+        Value* speed = new Value();
         speed->ParseFromString(m1->c_str());
 
         m_trace.println("Speed " + std::to_string(speed->value()));
@@ -188,9 +188,9 @@ NodeDCMotor::runCycle() {
         setSpeed(speed->value());
     }
 
-    Value* direction = new Value();
-    MessageBuf m2 = m_elemBlock->getInputData(m_direction);
-    if(*m2 != "") {
+    MessageBuf m2;
+    if(m_direction->getNext(m2)) {
+        Value* direction = new Value();
         direction->ParseFromString(m2->c_str());
 
         m_trace.println("Dir (1, 2, 4) " + std::to_string(direction->value()));
@@ -201,9 +201,9 @@ NodeDCMotor::runCycle() {
         }
     }
 
-    Action* action = new Action();
-    MessageBuf m3 = m_elemBlock->getInputData(m_action);
+    MessageBuf m3;
     if(*m3 != "") {
+        Action* action = new Action();
         action->ParseFromString(m3->c_str());
 
         string a = action->action();

@@ -30,7 +30,7 @@ private:
     Trace m_trace;
     bool m_packetFound;
     INodeContext* m_elemBlock;
-    InputPad* m_inputPad;
+    INodeContext::ItRef m_inputPad;
     OutputPad* m_outputPad;
     char m_packet[188];
     int m_packetCnt;
@@ -51,7 +51,6 @@ NodeDumper::NodeDumper(INodeContext* d, const string& /*name*/, StringMap& /*par
     m_trace{"NodeDumper", true},
     m_packetFound{false},
     m_elemBlock{d},
-    m_inputPad{nullptr},
     m_outputPad{nullptr},
     m_packetCnt{0} {
 
@@ -60,10 +59,10 @@ NodeDumper::NodeDumper(INodeContext* d, const string& /*name*/, StringMap& /*par
 
 void
 NodeDumper::finishConstruction() {
-    m_inputPad = m_elemBlock->getInputPad("input");
-    const std::list<unsigned int>conns = m_elemBlock->getConnections(m_inputPad);
-    auto c = conns.begin();
-    m_inputIt = m_elemBlock->begin(m_inputPad, *c, INodeContext::DELTA);
+    m_inputPad = m_elemBlock->begin(m_elemBlock->getInputPad("input"), 0, INodeContext::DELTA);
+//    const std::list<unsigned int>conns = m_elemBlock->getConnections(m_inputPad);
+//    auto c = conns.begin();
+//    m_inputIt = m_elemBlock->begin(m_inputPad, *c, INodeContext::DELTA);
 }
 
 NodeDumper::~NodeDumper() {
@@ -72,10 +71,10 @@ NodeDumper::~NodeDumper() {
 void NodeDumper::runCycle() {
     m_trace.println("Read bytes");
 
-    Blob* blob = new Blob();
 
     MessageBuf msgBuf;
-    if(m_inputIt->getNext(msgBuf)) {
+    if(m_inputPad->getNext(msgBuf)) {
+        Blob* blob = new Blob();
         blob->ParseFromString((*msgBuf));
 
         std::string bytes = blob->data();

@@ -30,8 +30,8 @@ private:
     Trace m_trace;
     INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
-    InputPad* m_input;
-    InputPad* m_value;
+    INodeContext::ItRef m_input;
+    INodeContext::ItRef m_value;
 
 };
 
@@ -60,7 +60,7 @@ NodeUiUserDisplay::NodeUiUserDisplay(INodeContext* d, const string& /*name*/, St
 
 void
 NodeUiUserDisplay::finishConstruction() {
-    m_value = m_elemBlock->getInputPad("value");
+    m_value = m_elemBlock->begin(m_elemBlock->getInputPad("value"), 0, INodeContext::DELTA);
 };
 
 NodeUiUserDisplay::~NodeUiUserDisplay() {
@@ -68,17 +68,19 @@ NodeUiUserDisplay::~NodeUiUserDisplay() {
 }
 
 void NodeUiUserDisplay::runCycle() {
-    MessageBuf buf2 = m_elemBlock->getInputData(m_value);
+    MessageBuf buf2;
+    if(m_value->getNext(buf2)) {
+        Value* msg2 = new Value();
+        msg2->ParseFromString((*buf2).c_str());
 
-    Value* msg2 = new Value();
-    msg2->ParseFromString((*buf2).c_str());
+        // output { "value": "<val>" }
+        std::string json_string = "{ \"value\": " + std::to_string(msg2->value()) + " }";
 
-    // output { "value": "<val>" }
-    std::string json_string = "{ \"value\": " + std::to_string(msg2->value()) + " }";
-
-    if(buf2 != nullptr) {
-        SocketClient::getInstance()->sendMessage(m_uiClient, json_string);
+        if(buf2 != nullptr) {
+            SocketClient::getInstance()->sendMessage(m_uiClient, json_string);
+        }
     }
+
 
 }
 

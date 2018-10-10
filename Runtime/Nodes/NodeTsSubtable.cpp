@@ -66,7 +66,7 @@ private:
     static const int sizeCrc = 4;
     Trace m_trace;
     INodeContext* m_elemBlock;
-    InputPad* m_inputPad;
+    INodeContext::ItRef m_inputPad;
     OutputPad* m_outputPad;
     OutputPad* m_pmtFilter;
     INodeContext::ItRef m_inputIt;
@@ -95,14 +95,10 @@ NodeTsSubtable::NodeTsSubtable(INodeContext* d, const string& /*name*/, StringMa
 
 void
 NodeTsSubtable::finishConstruction() {
-    m_inputPad = m_elemBlock->getInputPad("input");
+    m_inputPad = m_elemBlock->begin(m_elemBlock->getInputPad("input"), 0, INodeContext::DELTA);
     m_outputPad = m_elemBlock->getOutputPad("value");
     m_pmtFilter = m_elemBlock->getOutputPad("pmtFilter");
 
-    const std::list<unsigned int>conns = m_elemBlock->getConnections(m_inputPad);
-    auto c = conns.begin();
-
-    m_inputIt = m_elemBlock->begin(m_inputPad, *c, INodeContext::DELTA);
     m_patIt = m_elemBlock->end(m_elemBlock->getOutputPad("patFilter"));
 
     SectionFilter* sf = new SectionFilter();
@@ -126,7 +122,7 @@ void NodeTsSubtable::runCycle() {
     //blob->set_data(somedata);
 
     MessageBuf msgBuf;
-    if(m_inputIt->getNext(msgBuf)) {
+    if(m_inputPad->getNext(msgBuf)) {
         blob->ParseFromString((*msgBuf));
 
         std::string bytes = blob->data();

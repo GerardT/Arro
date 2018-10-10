@@ -132,24 +132,6 @@ Process::registerOutput(unsigned int padId, const string& interfaceName) {
     m_nodeDb.registerNodeOutput(this, padId, interfaceName);
 }
 
-/**
- *
- * @param input
- * @return Shared pointer to message. Note: if not initialized then
- * pointer may be nullptr.
- */
-MessageBuf
-Process::getInputData(InputPad* input) const {
-    auto conn = input->getConnections();
-    for(auto c = conn.begin(); c != conn.end(); ++c) {
-        MessageBuf b;
-        if(input->getData(*c, b)) {
-            return b;
-        }
-    }
-    return MessageBuf(new std::string(""));
-}
-
 const std::list<unsigned int>&
 Process::getConnections(InputPad* input) {
     return input->getConnections();

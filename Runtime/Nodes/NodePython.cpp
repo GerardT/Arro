@@ -76,17 +76,29 @@ NodePython::runCycle() {
  */
 PyObject*
 NodePython::getInputData(const string& pad) {
-    MessageBuf data = m_elemBlock->getInputData(m_elemBlock->getInputPad(pad));
-
-    if(data->length() == 0 /* MessageBuf may not be initialized */) {
-        // insert None object
-        Py_INCREF(Py_None);
-        return Py_None;
-    } else {
-        PyObject* tuple = Py_BuildValue("s", data->c_str());  // Return value: New reference.
-
-        return tuple;
+    // if iterator not found, create it
+    if(m_inputs.find(pad) == m_inputs.end()) {
+        INodeContext::ItRef input = m_elemBlock->begin(m_elemBlock->getInputPad(pad), 0, INodeContext::DELTA);
+        INodeContext::Iterator* p = input.get();
+        m_inputs.insert(make_pair(pad, p));
     }
+
+    MessageBuf data;
+    INodeContext::Iterator* it = m_inputs.at(pad);
+    if(it->getNext(data)) {
+        if(data->length() == 0 /* MessageBuf may not be initialized */) {
+            // insert None object
+            Py_INCREF(Py_None);
+            return Py_None;
+        } else {
+            PyObject* tuple = Py_BuildValue("s", data->c_str());  // Return value: New reference.
+
+            return tuple;
+        }
+    }
+
+    //MessageBuf data = m_elemBlock->getInputData(m_elemBlock->getInputPad(pad));
+
 }
 
 /**

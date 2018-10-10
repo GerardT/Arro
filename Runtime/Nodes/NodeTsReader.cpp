@@ -117,8 +117,8 @@ private:
     Trace m_trace;
     bool m_packetFound;
     INodeContext* m_elemBlock;
-    InputPad* m_inputPad;
-    InputPad* m_filterA;
+    INodeContext::ItRef m_inputPad;
+    INodeContext::ItRef m_filterA;
     OutputPad* m_outputPad;
     OutputPad* m_statePad;
     char m_packet[188];
@@ -127,7 +127,6 @@ private:
     std::map<unsigned int, Section*> m_payload;
 
     std::set<int> m_pids;
-    INodeContext::ItRef m_filterIt;
 
 
 };
@@ -138,7 +137,6 @@ NodeTsReader::NodeTsReader(INodeContext* d, const string& /*name*/, StringMap& /
     m_trace{"NodeTsReader", true},
     m_packetFound{false},
     m_elemBlock{d},
-    m_inputPad{nullptr},
     m_outputPad{nullptr},
     m_statePad{nullptr},
     m_tsPacket{nullptr} ,
@@ -155,8 +153,8 @@ void
 NodeTsReader::finishConstruction() {
     m_trace.println("finishConstruction");
 
-    m_inputPad = m_elemBlock->getInputPad("input");
-    m_filterA = m_elemBlock->getInputPad("filterA");
+    m_inputPad = m_elemBlock->begin(m_elemBlock->getInputPad("input"), 0, INodeContext::DELTA);
+    m_filterA = m_elemBlock->begin(m_elemBlock->getInputPad("filterA"), 0, INodeContext::DELTA);
     m_outputPad = m_elemBlock->getOutputPad("value");
 
     m_statePad = m_elemBlock->getOutputPad("_step");
@@ -165,8 +163,6 @@ NodeTsReader::finishConstruction() {
     step->set_node(m_elemBlock->getName());
     step->set_name("_ready");
     m_elemBlock->setOutputData(m_statePad, step);
-
-    m_filterIt = m_elemBlock->begin(m_filterA, 0, INodeContext::DELTA);
 }
 
 NodeTsReader::~NodeTsReader() {
@@ -175,13 +171,9 @@ NodeTsReader::~NodeTsReader() {
 void NodeTsReader::runCycle() {
     m_trace.println("Read bytes");
 
-    Blob* blob = new Blob();
-    MessageBuf msgBuf1 = m_elemBlock->getInputData(m_inputPad);
-    blob->ParseFromString((*msgBuf1));
-
 
     MessageBuf msgBuf2;
-    while(m_filterIt->getNext(msgBuf2)) {
+    while(m_filterA->getNext(msgBuf2)) {
         m_trace.println("Read filter");
         SectionFilter* sf = new SectionFilter();
         sf->ParseFromString((*msgBuf2));
@@ -193,47 +185,54 @@ void NodeTsReader::runCycle() {
         m_trace.println("Filtering PIDs " + std::to_string(it));
     }
 
-    std::string bytes = blob->data();
+    MessageBuf msgBuf1;
+    if(m_inputPad->getNext(msgBuf1)) {
+        Blob* blob = new Blob();
+        blob->ParseFromString((*msgBuf1));
 
-    for(unsigned int i = 0; i < bytes.length(); i++)
-    {
-        if(!m_packetFound)
+        std::string bytes = blob->data();
+
+        for(unsigned int i = 0; i < bytes.length(); i++)
         {
-            if(bytes[i] == 0x47) {
-                //m_trace.println("First TS packet found");
-                m_packetFound = true;
+            if(!m_packetFound)
+            {
+                if(bytes[i] == 0x47) {
+                    //m_trace.println("First TS packet found");
+                    m_packetFound = true;
 
-                if(m_tsPacket) {
-                    free(m_tsPacket);
+                    if(m_tsPacket) {
+                        free(m_tsPacket);
+                    }
+
+                    m_tsPacket = new char[188];
+                    m_tsPacketLen = 0;
                 }
-
-                m_tsPacket = new char[188];
-                m_tsPacketLen = 0;
             }
-        }
-        if(m_packetFound) {
-            // append to packet buffer
-            m_tsPacket[m_tsPacketLen++] = bytes[i];
-            if(m_tsPacketLen == 188) {
-                //m_trace.println("TS packet found");
-                // send packet and reset counter
-//                Blob* out = new Blob();
-//                std::stringstream tmp;
-//                tmp.write(m_tsPacket, m_tsPacketLen);
-//
-//                blob->set_data(tmp.str());
-//
-//                m_trace.println("Sending TS packet");
-//
-//                m_elemBlock->setOutputData(m_outputPad, out);
-//
-                processTsPacket(m_tsPacket);
+            if(m_packetFound) {
+                // append to packet buffer
+                m_tsPacket[m_tsPacketLen++] = bytes[i];
+                if(m_tsPacketLen == 188) {
+                    //m_trace.println("TS packet found");
+                    // send packet and reset counter
+    //                Blob* out = new Blob();
+    //                std::stringstream tmp;
+    //                tmp.write(m_tsPacket, m_tsPacketLen);
+    //
+    //                blob->set_data(tmp.str());
+    //
+    //                m_trace.println("Sending TS packet");
+    //
+    //                m_elemBlock->setOutputData(m_outputPad, out);
+    //
+                    processTsPacket(m_tsPacket);
 
-                m_packetFound = 0;
-                m_tsPacketLen = 0;
+                    m_packetFound = 0;
+                    m_tsPacketLen = 0;
+                }
             }
         }
     }
+
 }
 
 

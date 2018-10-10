@@ -64,13 +64,6 @@ namespace Arro
          *
          * \param name Name of input.
          */
-        MessageBuf  getInputData(InputPad* input) const;
-
-        /**
-         * Lookup an input by its name, which is internally concatenated: "procesname.name".
-         *
-         * \param name Name of input.
-         */
         InputPad* getInputPad(const std::string& name) const;
 
         const std::list<unsigned int>& getConnections(InputPad* input);

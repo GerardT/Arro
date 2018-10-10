@@ -17,7 +17,7 @@ static RegisterMe<NodeSfc> registerMe("_SFC");
 
 NodeSfc::NodeSfc(INodeContext* elemBlock, const string& /*name*/, StringMap& /*params*/, TiXmlElement* elt):
     m_trace{"NodeSfc", true},
-    m_process{elemBlock},
+    m_elemBlock{elemBlock},
     m_stepsPad{nullptr} {
 
     // Define "start" as initial step
@@ -67,7 +67,7 @@ NodeSfc::NodeSfc(INodeContext* elemBlock, const string& /*name*/, StringMap& /*p
 
 void
 NodeSfc::finishConstruction() {
-    m_stepsPad = m_process->getInputPad("_steps");
+    m_stepsPad = m_elemBlock->begin(m_elemBlock->getInputPad("_steps"), 0, INodeContext::DELTA);
 
 //    auto t = m_stepsPad->getConnections();
 //
@@ -99,33 +99,36 @@ NodeSfc::runCycle() {
     //trace.println(string("NodeSfc input = ") + to_string((long double)actual_position));
 
 
-    Step* step = new Step();
+    MessageBuf msgBuf;
+    if(m_stepsPad->getNext(msgBuf)) {
+        Step* step = new Step();
 
-    MessageBuf msgBuf = m_process->getInputData(m_stepsPad);
-    step->ParseFromString((msgBuf)->c_str());
+        step->ParseFromString((msgBuf)->c_str());
 
-    std::string node = step->node();
-    std::string padName = std::string("_step_") + node.substr(node.rfind(".") + 1);
+        std::string node = step->node();
+        std::string padName = std::string("_step_") + node.substr(node.rfind(".") + 1);
 
-    m_trace.println(string("SFC2: ") + m_process->getName() + " for node " + padName + " mode " + step->name());
+        m_trace.println(string("SFC2: ") + m_elemBlock->getName() + " for node " + padName + " mode " + step->name());
 
-    // m_currentInputs hold the values that have been read from input. If entry does
-    // not exist yet, add it.
-    if(m_currentInputs.find(padName) == m_currentInputs.end()) {
-        m_trace.println("Adding input " + padName + " msg " + step->name());
-    }
-    m_currentInputs[padName] = step->name();
-
-    if(true /*actual_mode == "Active"*/) {
-        //trace.println(string("NodeSfc output = ") + to_string((long double)output));
-        m_trace.println("One cycle ");
-
-        std::set<std::string> newSteps{};
-        for(auto it = m_transitions.begin(); it != m_transitions.end(); ++it) {
-            (*it)->runTransition(m_activeSteps, newSteps);
+        // m_currentInputs hold the values that have been read from input. If entry does
+        // not exist yet, add it.
+        if(m_currentInputs.find(padName) == m_currentInputs.end()) {
+            m_trace.println("Adding input " + padName + " msg " + step->name());
         }
-        m_activeSteps = newSteps;
+        m_currentInputs[padName] = step->name();
+
+        if(true /*actual_mode == "Active"*/) {
+            //trace.println(string("NodeSfc output = ") + to_string((long double)output));
+            m_trace.println("One cycle ");
+
+            std::set<std::string> newSteps{};
+            for(auto it = m_transitions.begin(); it != m_transitions.end(); ++it) {
+                (*it)->runTransition(m_activeSteps, newSteps);
+            }
+            m_activeSteps = newSteps;
+        }
     }
+
 }
 
 

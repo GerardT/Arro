@@ -2,6 +2,7 @@
 #define ARRO_NODE_PYTHON_H
 
 #include <queue>
+#include <map>
 #include <Python.h>
 
 #include "arro.pb.h"
@@ -42,6 +43,7 @@ namespace Arro {
         StringMap m_params;
         INodeContext* m_elemBlock;
         PyObject *m_pFunc, *m_pValue, *m_pArgs, *m_pClass, *m_pInstance;
+        std::map<std::string, INodeContext::Iterator*> m_inputs;
     };
 }
 

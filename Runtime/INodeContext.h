@@ -61,8 +61,6 @@ namespace Arro
          */
         virtual InputPad*  getInputPad(const std::string& name) const = 0;
 
-        virtual MessageBuf getInputData(InputPad* input) const = 0;
-
         virtual const std::list<unsigned int>& getConnections(InputPad* input) = 0;
 
         /**

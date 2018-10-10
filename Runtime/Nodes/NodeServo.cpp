@@ -99,9 +99,9 @@ namespace Arro {
         int m_Ch;
         StringMap m_params;
 
-        InputPad* m_sub1;
-        InputPad* m_timer;
-        InputPad* m_mode;
+        INodeContext::ItRef m_sub1;
+        INodeContext::ItRef m_timer;
+        INodeContext::ItRef m_mode;
 
         static Servo* m_pServo;
     };
@@ -255,9 +255,9 @@ void
 NodeServo::finishConstruction() {
     m_trace.println("finishConstruction");
 
-    m_sub1 = m_elemBlock->getInputPad("sub1");
-    m_timer = m_elemBlock->getInputPad("timer");
-    m_mode = m_elemBlock->getInputPad("mode");
+    m_sub1 = m_elemBlock->begin(m_elemBlock->getInputPad("sub1"), 0, INodeContext::DELTA);
+    m_timer = m_elemBlock->begin(m_elemBlock->getInputPad("timer"), 0, INodeContext::DELTA);
+    m_mode = m_elemBlock->begin(m_elemBlock->getInputPad("mode"), 0, INodeContext::DELTA);
 
 }
 
@@ -265,24 +265,25 @@ NodeServo::finishConstruction() {
 void
 NodeServo::runCycle() {
 
-    Value* position = new Value();
-    MessageBuf m1 = m_elemBlock->getInputData(m_sub1);
-    if(*m1 != "") {
+    MessageBuf m1;
+    if(m_sub1->getNext(m1)) {
+        Value* position = new Value();
         position->ParseFromString(m1->c_str());
 
         m_actual_position = position->value();
     }
-    Tick* tick = new Tick();
-    MessageBuf m2 = m_elemBlock->getInputData(m_timer);
-    if(*m2 != "") {
+
+    MessageBuf m2;
+    if(m_timer->getNext(m1)) {
+        Tick* tick = new Tick();
         tick->ParseFromString(m2->c_str());
 
         m_ms_elapsed = tick->ms();
     }
 
-    Mode* mode = new Mode();
-    MessageBuf m3 = m_elemBlock->getInputData(m_mode);
-    if(*m3 != "") {
+    MessageBuf m3;
+    if(m_mode->getNext(m3)) {
+        Mode* mode = new Mode();
         mode->ParseFromString(m3->c_str());
 
         m_actual_mode = mode->mode();

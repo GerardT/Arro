@@ -199,7 +199,7 @@ namespace Arro {
             if(node == "request") {
                 return (m_activeSteps.find(step) != m_activeSteps.end());
             } else {
-                std::string nodeName = /*this->m_process->getName() + ARRO_PAD_SEPARATOR +*/ "_step_" + node;
+                std::string nodeName = /*this->m_elemBlock->getName() + ARRO_PAD_SEPARATOR +*/ "_step_" + node;
 
                 if(m_currentInputs.find(nodeName) != m_currentInputs.end()) {
                     const std::string& value = m_currentInputs.at(nodeName);
@@ -221,17 +221,17 @@ namespace Arro {
         }
 
         const INodeContext* getProcess() const {
-            return m_process;
+            return m_elemBlock;
         }
 
 //        void inputHasValue(const std::string& input, const std::string& value) {
-//            std::string action_input = this->m_process->getName() + ARRO_PAD_SEPARATOR + "_action";
+//            std::string action_input = this->m_elemBlock->getName() + ARRO_PAD_SEPARATOR + "_action";
 //
 //        }
 
     private:
         Trace m_trace;
-        INodeContext* m_process;
+        INodeContext* m_elemBlock;
         // List of steps for this SFC
         std::list<std::unique_ptr<SfcStep> > m_steps;
         // List of transitions for this SFC
@@ -244,7 +244,7 @@ namespace Arro {
         // last inputs: action and steps
         std::map<std::string, std::string> m_currentInputs;
 
-        InputPad* m_stepsPad;
+        INodeContext::ItRef m_stepsPad;
     };
 }
 
