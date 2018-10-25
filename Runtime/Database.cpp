@@ -88,6 +88,7 @@ Iterator::getNext(MessageBuf& msg) {
         m_currentEmpty = true;
         return false;
     }
+    return false;
 }
 
 
@@ -95,49 +96,69 @@ void
 Iterator::insertOutput(google::protobuf::MessageLite& msg) {
     m_trace.println("Inserting message msg");
 
+    std::lock_guard<std::mutex> lock(m_ref->m_mutex);
+
     // get the (only) padId of this output pad
     unsigned int padId = m_conns.front();
 
     MessageBuf s(new std::string(msg.SerializeAsString()));
     m_it = m_db.getFree();
     m_ref->m_new.push_back(Database::DbRecord(m_it, padId, m_ref->m_runCycle, 0, s));
+
+    m_ref->m_condition.notify_one();
 }
 
 void
 Iterator::insertOutput(MessageBuf& msg) {
     m_trace.println("Inserting message buf");
 
+    std::lock_guard<std::mutex> lock(m_ref->m_mutex);
+
     // get the (only) padId of this output pad
     unsigned int padId = m_conns.front();
 
     m_it = m_db.getFree();
     m_ref->m_new.push_back(Database::DbRecord(m_it, padId, m_ref->m_runCycle, 0, msg));
+
+    m_ref->m_condition.notify_one();
 }
 
 void
 Iterator::updateOutput(google::protobuf::MessageLite& msg) {
     m_trace.println("Updating message");
 
+    std::lock_guard<std::mutex> lock(m_ref->m_mutex);
+
     MessageBuf s(new std::string(msg.SerializeAsString()));
     unsigned int padId = m_conns.front();
     m_ref->m_new.push_back(Database::DbRecord(m_it, padId, m_ref->m_runCycle, 0, s));
+
+    m_ref->m_condition.notify_one();
 }
 
 void
 Iterator::updateOutput(MessageBuf& msg) {
     m_trace.println("Updating message");
 
+    std::lock_guard<std::mutex> lock(m_ref->m_mutex);
+
     unsigned int padId = m_conns.front();
     m_ref->m_new.push_back(Database::DbRecord(m_it, padId, m_ref->m_runCycle, 0, msg));
+
+    m_ref->m_condition.notify_one();
 }
 
 void
 Iterator::deleteOutput() {
     m_trace.println("Deleting message");
 
+    std::lock_guard<std::mutex> lock(m_ref->m_mutex);
+
     MessageBuf s(nullptr);
     unsigned int padId = m_conns.front();
     m_ref->m_new.push_back(Database::DbRecord(m_it, padId, m_ref->m_runCycle, m_ref->m_runCycle, s));
+
+    m_ref->m_condition.notify_one();
 }
 
 

@@ -67,8 +67,8 @@ private:
     Trace m_trace;
     INodeContext* m_elemBlock;
     INodeContext::ItRef m_inputPad;
-    OutputPad* m_outputPad;
-    OutputPad* m_pmtFilter;
+    INodeContext::ItRef m_outputPad;
+    INodeContext::ItRef m_pmtFilter;
     INodeContext::ItRef m_inputIt;
     INodeContext::ItRef m_patIt;
 
@@ -82,9 +82,7 @@ NodeTsSubtable::NodeTsSubtable(INodeContext* d, const string& /*name*/, StringMa
     m_trace{"NodeTsSubtable", true},
     m_elemBlock{d},
     m_inputPad{nullptr},
-    m_outputPad{nullptr},
-    m_inputIt{nullptr},
-    m_patIt{nullptr} {
+    m_outputPad{nullptr} {
 
     m_trace.println("Constructor");
 
@@ -96,19 +94,15 @@ NodeTsSubtable::NodeTsSubtable(INodeContext* d, const string& /*name*/, StringMa
 void
 NodeTsSubtable::finishConstruction() {
     m_inputPad = m_elemBlock->begin(m_elemBlock->getInputPad("input"), 0, INodeContext::DELTA);
-    m_outputPad = m_elemBlock->getOutputPad("value");
-    m_pmtFilter = m_elemBlock->getOutputPad("pmtFilter");
+    m_outputPad = m_elemBlock->end(m_elemBlock->getOutputPad("value"));
+    m_pmtFilter = m_elemBlock->end(m_elemBlock->getOutputPad("pmtFilter"));
 
     m_patIt = m_elemBlock->end(m_elemBlock->getOutputPad("patFilter"));
 
     SectionFilter* sf = new SectionFilter();
     sf->set_pid(0 /* PAT pid */);
-    m_elemBlock->setOutputData(m_elemBlock->getOutputPad("patFilter"), sf);
-//    if(m_patIt->empty()) {
-//        m_patIt->insertOutput(sf);
-//    } else {
-//        m_patIt->updateOutput(sf);
-//    }
+//    m_elemBlock->setOutputData(m_elemBlock->getOutputPad("patFilter"), sf);
+    m_patIt->setOutput(*sf);
 
 }
 
@@ -168,7 +162,7 @@ void NodeTsSubtable::handlePAT(const char* data, unsigned long dataSize) {
 
         SectionFilter* sf = new SectionFilter();
         sf->set_pid(ProgramMapPid);
-        m_elemBlock->setOutputData(m_pmtFilter, sf);
+        m_pmtFilter->setOutput(*sf);
     }
 
 

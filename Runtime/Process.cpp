@@ -119,12 +119,18 @@ Process::getParameter(const std::string& parname) {
 void
 Process::registerInput(const string& interfName, bool enableRunCycle) {
     // only need to capture enableRunCycle
-    m_nodeDb.registerNodeInput(this, interfName, [=](const MessageBuf& msg, const std::string& interfaceName) {
-        if(enableRunCycle) {
-            m_doRunCycle = true;
-        }
-        m_elemBlock->handleMessage(msg, interfaceName);
-    });
+    m_nodeDb.registerNodeInput(this, interfName,
+            [=](const MessageBuf& msg, const std::string& interfaceName) {
+                if(enableRunCycle) {
+                    m_doRunCycle = true;
+                }
+                m_elemBlock->handleMessage(msg, interfaceName);
+            },
+            [=]() {
+                if(enableRunCycle) {
+                    m_doRunCycle = true;
+                }
+            });
 }
 
 void

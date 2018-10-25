@@ -99,6 +99,7 @@ NodePython::getInputData(const string& pad) {
 
     //MessageBuf data = m_elemBlock->getInputData(m_elemBlock->getInputPad(pad));
 
+    return nullptr; // to remove compiler warning.
 }
 
 /**

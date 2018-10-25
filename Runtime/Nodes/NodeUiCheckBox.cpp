@@ -21,6 +21,8 @@ public:
 
     virtual ~NodeUiCheckBox();
 
+    virtual void finishConstruction();
+
     /**
      * Make the node execute a processing cycle.
      */
@@ -30,7 +32,7 @@ private:
     Trace m_trace;
     INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
-    OutputPad* m_value;
+    INodeContext::ItRef m_value;
 
 };
 
@@ -47,20 +49,26 @@ NodeUiCheckBox::NodeUiCheckBox(INodeContext* d, const string& /*name*/, StringMa
     m_trace("NodeUiReceiveNumber", true),
     m_elemBlock(d) {
 
+    m_value = m_elemBlock->end(m_elemBlock->getOutputPad("value"));
+
     std::string name = d->getParameter("name");
 
     std::string inst = std::string("<arro-check-box id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-check-box>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
-        m_value = m_elemBlock->getOutputPad("value");
 
-        Selection* sel = new Selection();
-        auto info = nlohmann::json::parse(data.c_str());
-        sel->set_value(info["value"]);
-        m_elemBlock->setOutputData(m_value, sel);
-                    });
+            Selection* sel = new Selection();
+            auto info = nlohmann::json::parse(data.c_str());
+            sel->set_value(info["value"]);
+            m_value->setOutput(*sel);
+        });
 
 }
+
+void
+NodeUiCheckBox::finishConstruction() {
+}
+
 
 NodeUiCheckBox::~NodeUiCheckBox() {
     SocketClient::getInstance()->unsubscribe(m_uiClient);

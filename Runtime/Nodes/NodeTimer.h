@@ -23,6 +23,7 @@ namespace Arro
         NodeTimer(const NodeTimer&) = delete;
         NodeTimer& operator=(const NodeTimer& other) = delete;
 
+        virtual void finishConstruction();
         /**
          * Make the node execute a processing cycle.
          */
@@ -37,6 +38,7 @@ namespace Arro
         Trace m_trace;
         int m_ticks;
         INodeContext* m_elemBlock;
+        INodeContext::ItRef m_tick;
     };
 }
 

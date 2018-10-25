@@ -30,7 +30,7 @@ private:
     Trace m_trace;
     INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
-    OutputPad* m_value;
+    INodeContext::ItRef m_value;
 
 };
 
@@ -70,12 +70,12 @@ NodeUiRadioButton::NodeUiRadioButton(INodeContext* d, const string& /*name*/, St
     }
     inst += "]\'>  </arro-radio-button>";
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
-        m_value = m_elemBlock->getOutputPad("value");
+        m_value = m_elemBlock->end(m_elemBlock->getOutputPad("value"));
 
         Selection* sel = new Selection();
         auto info = nlohmann::json::parse(data.c_str());
         sel->set_value(info["value"]);
-        m_elemBlock->setOutputData(m_value, sel);
+        m_value->setOutput(*sel);
 
                     });
 

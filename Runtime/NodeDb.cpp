@@ -121,10 +121,10 @@ OutputPad::submitMessage(MessageBuf& s) {
 
     auto fm = new NodeDb::FullMsg(this, s);
 
-    std::lock_guard<std::mutex> lock(m_nm->m_mutex);
+    std::lock_guard<std::mutex> lock(m_nm->m_database.m_mutex);
     m_nm->m_pInQueue->push(fm);
 
-    m_nm->m_condition.notify_one();
+    m_nm->m_database.m_condition.notify_one();
 }
 
 // Seem necessary for Python only..
@@ -141,10 +141,10 @@ OutputPad::submitMessageBuffer(const char* msg) {
 
     auto fm = new NodeDb::FullMsg(this, s);
 
-    std::lock_guard<std::mutex> lock(m_nm->m_mutex);
+    std::lock_guard<std::mutex> lock(m_nm->m_database.m_mutex);
     m_nm->m_pInQueue->push(fm);
 
-    m_nm->m_condition.notify_one();
+    m_nm->m_database.m_condition.notify_one();
 
 }
 
@@ -169,9 +169,10 @@ NodeDb::registerNode(RealNode* node, const string& name) {
 }
 
 InputPad*
-NodeDb::registerNodeInput(RealNode* node, const string& interfaceName,
-                          std::function<void (const MessageBuf& msg, const std::string& interfaceName)> listen) {
-    auto n = new InputPad(this, interfaceName, listen, node);
+NodeDb::registerNodeInput(RealNode* node, const std::string& interfaceName,
+        std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> listen,
+        std::function<void ()> listenUpdate) {
+    auto n = new InputPad(this, interfaceName, listen, listenUpdate, node);
     // If NodePass don't use interfaceName
     if(interfaceName == "") {
         m_allInputs [node->getName()] = unique_ptr<InputPad>(n);
@@ -229,13 +230,13 @@ NodeDb::FullMsg::FullMsg(OutputPad* o /*string s*/, MessageBuf& m) {
     m_msg = m;
 }
 
-void
+std::list<unsigned int>
 NodeDb::toggleQueue() {
     queue<FullMsg*>* tmp = m_pOutQueue;
     m_pOutQueue = m_pInQueue;
     m_pInQueue = tmp;
 
-    m_database.incRunCycle();
+    return m_database.incRunCycle();
 }
 
 
@@ -248,7 +249,7 @@ NodeDb::runCycle(NodeDb* nm) {
         {
             // Deliver all messages to the right nodes until empty
             {
-                std::unique_lock<std::mutex> lock(nm->m_mutex);
+                std::unique_lock<std::mutex> lock(nm->m_database.m_mutex);
 
                 while(!(nm->m_pOutQueue->empty())) {
                     FullMsg* fm = nm->m_pOutQueue->front();
@@ -272,13 +273,27 @@ NodeDb::runCycle(NodeDb* nm) {
             }
 
             /* And switch the queues */
-            nm->toggleQueue();
+            std::list<unsigned int> updates = nm->toggleQueue();
 
-            if(nm->m_pOutQueue->empty()) {
-                std::unique_lock<std::mutex> lock(nm->m_mutex);
+            for(auto it = updates.begin(); it != updates.end(); ++it) {
+                unsigned int output = *it;
+
+                for(auto in = nm->m_allInputs.begin(); in != nm->m_allInputs.end(); ++in) {
+                    OutputPad* pad = in->second->getOutputPad(output);
+                    if(pad != nullptr) {
+                        // notify listener
+                        in->second->notifyUpdate();
+                    }
+                }
+
+            }
+
+//            if(nm->m_pOutQueue->empty()) {
+            if(nm->m_database.noMoreUpdates()) {
+                std::unique_lock<std::mutex> lock(nm->m_database.m_mutex);
 
                 // And wait until new message arrive in queue
-                nm->m_condition.wait(lock);  // keep waiting if queue empty
+                nm->m_database.m_condition.wait(lock);  // keep waiting if queue empty
             } // make sure mutex is unlocked here
         }
     } catch (std::runtime_error& e) {
@@ -307,7 +322,7 @@ NodeDb::stop() {
 
         m_running = false;
 
-        m_condition.notify_one();
+        m_database.m_condition.notify_one();
 
         NodeTimer::stop();
 

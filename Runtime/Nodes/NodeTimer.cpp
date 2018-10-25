@@ -31,6 +31,12 @@ NodeTimer::NodeTimer(INodeContext* d, const string& /*name*/, StringMap& /* para
     timers.push_back(this);
 }
 
+void
+NodeTimer::finishConstruction() {
+    m_tick = m_elemBlock->end(m_elemBlock->getOutputPad("aTick"));
+}
+
+
 NodeTimer::~NodeTimer() {
     timers.remove(this);
 }
@@ -46,7 +52,7 @@ void NodeTimer::timer () {
     tick->set_ms(ARRO_TIMEOUT /* elapsed time in ms */);
 
     try {
-        m_elemBlock->setOutputData(m_elemBlock->getOutputPad("aTick"), tick);
+        m_tick->setOutput(*tick);
     }
     catch(runtime_error&) {
         m_trace.println("Timer failed to update");

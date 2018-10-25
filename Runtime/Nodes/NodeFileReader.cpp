@@ -33,7 +33,7 @@ private:
     std::string m_filename;
     unsigned int m_bufsize;
     std::ifstream m_file;
-    OutputPad* m_outputPad;
+    INodeContext::ItRef m_outputPad;
     char* m_buf;
 
 };
@@ -66,7 +66,7 @@ void
 NodeFileReader::finishConstruction() {
     m_file = std::ifstream(m_filename, std::ios_base::in | std::ios_base::binary);
 
-    m_outputPad = m_elemBlock->getOutputPad("value");
+    m_outputPad = m_elemBlock->end(m_elemBlock->getOutputPad("value"));
 
 }
 
@@ -86,7 +86,7 @@ void NodeFileReader::runCycle() {
 
     blob->set_data(tmp.str());
 
-    m_elemBlock->setOutputData(m_outputPad, blob);
+    m_outputPad->setOutput(*blob);
 
 }
 

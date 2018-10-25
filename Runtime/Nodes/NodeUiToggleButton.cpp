@@ -30,7 +30,7 @@ private:
     Trace m_trace;
     INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
-    OutputPad* m_value;
+    INodeContext::ItRef m_value;
 
 };
 
@@ -52,12 +52,12 @@ NodeUiToggleButton::NodeUiToggleButton(INodeContext* d, const string& /*name*/, 
     std::string inst = std::string("<arro-toggle-button id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-toggle-button>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
-        m_value = m_elemBlock->getOutputPad("value");
+        m_value = m_elemBlock->end(m_elemBlock->getOutputPad("value"));
 
         Selection* sel = new Selection();
         auto info = nlohmann::json::parse(data.c_str());
         sel->set_value(info["value"]);
-        m_elemBlock->setOutputData(m_value, sel);
+        m_value->setOutput(*sel);
                     });
 
 }

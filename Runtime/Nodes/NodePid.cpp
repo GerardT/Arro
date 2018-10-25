@@ -33,7 +33,8 @@ namespace Arro {
         INodeContext::ItRef m_targetValue;
         INodeContext::ItRef m_tick;
         INodeContext::ItRef m_mode;
-        OutputPad* m_statePad;
+        INodeContext::ItRef m_statePad;
+        INodeContext::ItRef m_output;
         double m_previous_error;
         double m_integral;
         double m_derivative;
@@ -58,11 +59,6 @@ static RegisterMe<NodePid> registerMe("pid");
 
 NodePid::NodePid(INodeContext* d, const string& /*name*/, StringMap& /* params */, TiXmlElement*):
     m_trace("NodePid", true),
-    m_actualValue{nullptr},
-    m_targetValue{nullptr},
-    m_tick{nullptr},
-    m_mode{nullptr},
-    m_statePad{nullptr},
     m_elemBlock(d) {
 
     m_previous_error = 0;
@@ -88,12 +84,13 @@ NodePid::finishConstruction() {
     m_tick = m_elemBlock->begin(m_elemBlock->getInputPad("aTick"), 0, INodeContext::DELTA);
     m_mode = m_elemBlock->begin(m_elemBlock->getInputPad("mode"), 0, INodeContext::DELTA);
 
-    m_statePad = m_elemBlock->getOutputPad("_step");
+    m_statePad = m_elemBlock->end(m_elemBlock->getOutputPad("_step"));
+    m_output = m_elemBlock->end(m_elemBlock->getOutputPad("output"));
 
     Step* step = new Step();
     step->set_node(m_elemBlock->getName());
     step->set_name("_ready");
-    m_elemBlock->setOutputData(m_statePad, step);
+    m_statePad->setOutput(*step);
 
 }
 
@@ -159,6 +156,6 @@ NodePid::runCycle() {
 
         value->set_value(output);
 
-        m_elemBlock->setOutputData(m_elemBlock->getOutputPad("output"), value);
+        m_output->setOutput(*value);
     }
 }

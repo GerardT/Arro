@@ -195,15 +195,22 @@ class Iterator;
         /**
          * Swap (full) input queue and (empty) output queue.
          */
-        void incRunCycle() {
+        const std::list<unsigned int> incRunCycle() {
             m_runCycle++;
 
+            std::list<unsigned int> pads;
             for(auto it = m_new.begin(); it != m_new.end(); ++it) {
+                pads.push_back(it->getPadId());
                 m_db.setRecord(*it);
             }
             m_new.clear();
 
             //purge();
+            return pads;
+        }
+
+        bool noMoreUpdates() {
+            return m_new.empty();
         }
 
 
@@ -212,6 +219,13 @@ class Iterator;
         unsigned int m_runCycle; // current run cycle
         Store m_db;
         std::list<DbRecord> m_new;
+
+    public:
+        // Updating and waiting for condition variable must be done under mutex
+        std::mutex m_mutex;
+
+        // Condition variable to awaken run-cycle thread when a database update happened
+        std::condition_variable m_condition;
 
     };
 
@@ -225,7 +239,24 @@ class Iterator;
         virtual void insertOutput(MessageBuf& msg);
         virtual void updateOutput(google::protobuf::MessageLite& msg);
         virtual void updateOutput(MessageBuf& msg);
+        virtual void setOutput(google::protobuf::MessageLite& msg) {
+            if(empty()) {
+                insertOutput(msg);
+            } else {
+                updateOutput(msg);
+            }
+        };
+        virtual void setOutput(MessageBuf& msg) {
+            if(empty()) {
+                insertOutput(msg);
+            } else {
+                updateOutput(msg);
+            }
+        };
         virtual void deleteOutput();
+        virtual bool empty() {
+            return m_it == 0;
+        }
 
     private:
         Trace m_trace;

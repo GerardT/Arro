@@ -30,7 +30,7 @@ private:
     Trace m_trace;
     INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
-    OutputPad* m_value;
+    INodeContext::ItRef m_value;
 
 };
 
@@ -52,13 +52,13 @@ NodeUiUserInput::NodeUiUserInput(INodeContext* d, const string& /*name*/, String
     std::string inst = std::string("<arro-slider id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-slider>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
-        m_value = m_elemBlock->getOutputPad("value");
+        m_value = m_elemBlock->end(m_elemBlock->getOutputPad("value"));
 
         Value* sel = new Value();
         auto info = nlohmann::json::parse(data.c_str());
         int value = info["value"];
         sel->set_value(value);
-        m_elemBlock->setOutputData(m_value, sel);
+        m_value->setOutput(*sel);
                     });
 
 }

@@ -36,9 +36,13 @@ public:
      * \param l Listener
      * \param n Node to which this input is attached.
      */
-    InputPad(NodeDb* nm, const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> l, RealNode* n):
+    InputPad(NodeDb* nm, const std::string& interfaceName,
+            std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> l,
+            std::function<void ()> listenUpdate,
+            RealNode* n):
         m_nm{nm},
         m_callback{l},
+        m_listenUpdate{listenUpdate},
         m_node{n},
         m_msg{new std::string()},
         m_interfaceName{interfaceName} {} // FIXME MAXINT?
@@ -68,9 +72,14 @@ public:
 
     OutputPad* getOutputPad(unsigned int padId);
 
+    void notifyUpdate() {
+        m_listenUpdate();
+    }
+
 private:
     NodeDb* m_nm;
     std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> m_callback;
+    std::function<void ()> m_listenUpdate;
     RealNode* m_node;
     MessageBuf m_msg;
 public:
@@ -213,7 +222,7 @@ private:
         /**
          * Swap (full) input queue and (empty) output queue.
          */
-        void toggleQueue();
+        std::list<unsigned int> toggleQueue();
 
         /**
          * Register an RealNode by name.
@@ -229,7 +238,10 @@ private:
          * \param name Name of the interface as "node.node.interface".
          * \param n The instance of the node.
          */
-        InputPad* registerNodeInput(RealNode* node, const std::string& interfaceName, std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> listen);
+        InputPad* registerNodeInput(RealNode* node, const std::string& interfaceName,
+                std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> listen,
+                std::function<void ()> listenUpdate
+                );
 
         /**
          * Register an output with the node.
@@ -326,8 +338,6 @@ private:
         std::queue<FullMsg*> m_outQueue, *m_pOutQueue;
         bool m_running;
         std::thread* m_thrd;
-        std::mutex m_mutex;
-        std::condition_variable m_condition;
         Database m_database;
 
     };

@@ -47,7 +47,7 @@ public:
     }
 
 
-    void addPayload(char* payload, unsigned long cont, INodeContext* elemBlock, OutputPad* outputPad) {
+    void addPayload(char* payload, unsigned long cont, INodeContext::ItRef* outputPad) {
         if(m_packetsReceived != bitmask) {
 
             // TODO I think we need to deal with cont counter differently because when it has
@@ -68,7 +68,7 @@ public:
 
                 blob->set_data(tmp.str());
 
-                elemBlock->setOutputData(outputPad, blob);
+                (*outputPad)->setOutput(*blob);
 
             }
         }
@@ -119,8 +119,8 @@ private:
     INodeContext* m_elemBlock;
     INodeContext::ItRef m_inputPad;
     INodeContext::ItRef m_filterA;
-    OutputPad* m_outputPad;
-    OutputPad* m_statePad;
+    INodeContext::ItRef m_outputPad;
+    INodeContext::ItRef m_statePad;
     char m_packet[188];
     char* m_tsPacket;
     int m_tsPacketLen;
@@ -155,14 +155,14 @@ NodeTsReader::finishConstruction() {
 
     m_inputPad = m_elemBlock->begin(m_elemBlock->getInputPad("input"), 0, INodeContext::DELTA);
     m_filterA = m_elemBlock->begin(m_elemBlock->getInputPad("filterA"), 0, INodeContext::DELTA);
-    m_outputPad = m_elemBlock->getOutputPad("value");
+    m_outputPad = m_elemBlock->end(m_elemBlock->getOutputPad("value"));
 
-    m_statePad = m_elemBlock->getOutputPad("_step");
+    m_statePad = m_elemBlock->end(m_elemBlock->getOutputPad("_step"));
 
     Step* step = new Step();
     step->set_node(m_elemBlock->getName());
     step->set_name("_ready");
-    m_elemBlock->setOutputData(m_statePad, step);
+    m_statePad->setOutput(*step);
 }
 
 NodeTsReader::~NodeTsReader() {
@@ -288,6 +288,6 @@ NodeTsReader::processSectionPayload(unsigned long pid, char* payload, unsigned l
         m_payload[pid] = section;
     }
 
-    section->addPayload(payload, cont, m_elemBlock, m_outputPad);
+    section->addPayload(payload, cont, &m_outputPad);
 }
 

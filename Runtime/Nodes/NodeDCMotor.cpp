@@ -165,7 +165,7 @@ NodeDCMotor::finishConstruction() {
     m_direction = m_elemBlock->begin(m_elemBlock->getInputPad("direction"), 0, INodeContext::DELTA);
     m_action = m_elemBlock->begin(m_elemBlock->getInputPad("_action"), 0, INodeContext::DELTA);
 
-//    m_statePad = m_elemBlock->getOutputPad("_step");
+//    m_statePad = m_elemBlock->end(m_elemBlock->getOutputPad("_step"));
 //
 //    Step* step = new Step();
 //    step->set_node(m_elemBlock->getName());

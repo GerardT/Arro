@@ -72,7 +72,7 @@ NodeSfc::finishConstruction() {
 //    auto t = m_stepsPad->getConnections();
 //
 //    for(auto conn = m_stepsPad->getConnections().begin(); conn != m_stepsPad->getConnections().end(); ++conn) {
-//        OutputPad* op = m_stepsPad->getOutputPad(*conn);
+//        INodeContext::ItRef op = m_stepsPad->getOutputPad(*conn);
 //        if(op) {
 //            m_trace.println("finishConstruction found node " + op->getNodeName());
 //        }

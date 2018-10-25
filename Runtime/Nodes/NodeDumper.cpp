@@ -31,7 +31,7 @@ private:
     bool m_packetFound;
     INodeContext* m_elemBlock;
     INodeContext::ItRef m_inputPad;
-    OutputPad* m_outputPad;
+    INodeContext::ItRef m_outputPad;
     char m_packet[188];
     int m_packetCnt;
     INodeContext::ItRef m_inputIt;
