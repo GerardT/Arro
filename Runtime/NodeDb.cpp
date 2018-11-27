@@ -203,7 +203,14 @@ NodeDb::registerNodeOutput(RealNode* node, unsigned int padId, const string& int
 
 OutputPad*
 NodeDb::getOutputPad(const string& name) {
-    return (OutputPad*)&(*((m_allOutputs[name])));
+    OutputPad* out = nullptr;
+    try {
+        out = m_allOutputs[name].get();
+    }
+    catch (std::out_of_range&) {
+        m_trace.println("### non-registered output " + name);
+    }
+    return out;
 }
 
 OutputPad*
@@ -256,21 +263,11 @@ NodeDb::runCycle(NodeDb* nm) {
                     nm->m_trace.println("new msg");
                     nm->m_pOutQueue->pop();
                     if(fm != nullptr) {
-                        //MessageBuf msg = fm->m_msg;
                         fm->m_output->forwardMessage(fm->m_msg);
-                        // delete msg;
                         delete fm;
                     }
                 }
             } // make sure mutex is unlocked here
-
-            /* Then trigger all runCycle methods on nodes */
-            for(auto it = nm->m_allNodes.begin(); it != nm->m_allNodes.end(); ++it) {
-                RealNode* an = &(*(it->second));
-                ((RealNode*)(an))->runCycle();
-
-                //it->second->runCycle();
-            }
 
             /* And switch the queues */
             std::list<unsigned int> updates = nm->toggleQueue();
@@ -288,7 +285,12 @@ NodeDb::runCycle(NodeDb* nm) {
 
             }
 
-//            if(nm->m_pOutQueue->empty()) {
+            /* Then trigger all runCycle methods on nodes */
+            for(auto it = nm->m_allNodes.begin(); it != nm->m_allNodes.end(); ++it) {
+                RealNode* an = &(*(it->second));
+                ((RealNode*)(an))->runCycle();
+            }
+
             if(nm->m_database.noMoreUpdates()) {
                 std::unique_lock<std::mutex> lock(nm->m_database.m_mutex);
 
@@ -339,15 +341,16 @@ NodeDb::connect(string& output, string& input) {
     InputPad* in = nullptr;
 
     try {
-        out = &(*(m_allOutputs[output]));
+        out = m_allOutputs[output].get();
     }
-    catch (std::out_of_range) {
+    catch (std::out_of_range&) {
         m_trace.println("### non-registered output " + output);
+        throw std::runtime_error("### non-registered output " + output);
     }
     try {
         in = &(*(m_allInputs[input]));
     }
-    catch (std::out_of_range) {
+    catch (std::out_of_range&) {
         m_trace.println("### non-registered input " + input);
     }
     if(in == 0)

@@ -21,6 +21,8 @@ public:
 
     virtual ~NodeUiUserInput();
 
+    void finishConstruction();
+
     /**
      * Make the node execute a processing cycle.
      */
@@ -31,6 +33,7 @@ private:
     INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
     INodeContext::ItRef m_value;
+    std::string m_name;
 
 };
 
@@ -44,15 +47,24 @@ using namespace arro;
 static RegisterMe<NodeUiUserInput> registerMe("SliderInput");
 
 NodeUiUserInput::NodeUiUserInput(INodeContext* d, const string& /*name*/, StringMap& /*params*/, TiXmlElement*):
-    m_trace("NodeUiReceiveNumber", true),
-    m_elemBlock(d) {
+    m_trace{"NodeUiUserInput", true},
+    m_elemBlock{d},
+    m_uiClient{nullptr} {
 
-    std::string name = d->getParameter("name");
+    m_name = d->getParameter("name");
 
-    std::string inst = std::string("<arro-slider id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-slider>";
+}
 
-    m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
-        m_value = m_elemBlock->end(m_elemBlock->getOutputPad("value"));
+void
+NodeUiUserInput::finishConstruction() {
+    m_trace.println("finishConstruction");
+
+    OutputPad* valuePad = m_elemBlock->getOutputPad("value");
+
+    std::string inst = std::string("<arro-slider id=\"") + m_elemBlock->getName() + "\" name=\"" + m_name + "\"></arro-slider>";
+
+    m_uiClient = SocketClient::getInstance()->subscribe(m_elemBlock->getName(), inst, [=](const std::string& data) {
+        m_value = m_elemBlock->end(valuePad);
 
         Value* sel = new Value();
         auto info = nlohmann::json::parse(data.c_str());
@@ -60,7 +72,6 @@ NodeUiUserInput::NodeUiUserInput(INodeContext* d, const string& /*name*/, String
         sel->set_value(value);
         m_value->setOutput(*sel);
                     });
-
 }
 
 NodeUiUserInput::~NodeUiUserInput() {

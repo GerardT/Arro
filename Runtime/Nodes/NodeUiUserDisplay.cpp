@@ -45,11 +45,11 @@ using namespace arro;
 static RegisterMe<NodeUiUserDisplay> registerMe("ProgressOutput");
 
 NodeUiUserDisplay::NodeUiUserDisplay(INodeContext* d, const string& /*name*/, StringMap& /*params*/, TiXmlElement*):
-    m_trace("NodeUiReceiveNumber", true),
-    m_elemBlock(d) {
+    m_trace{"NodeUiUserDisplay", true},
+    m_elemBlock{d},
+    m_uiClient{nullptr} {
 
     std::string name = d->getParameter("name");
-
 
     std::string inst = std::string("<arro-progress id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-progress>";
     m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& /*data*/) {

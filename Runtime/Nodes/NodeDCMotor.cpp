@@ -202,7 +202,7 @@ NodeDCMotor::runCycle() {
     }
 
     MessageBuf m3;
-    if(*m3 != "") {
+    if(m_action->getNext(m3)) {
         Action* action = new Action();
         action->ParseFromString(m3->c_str());
 

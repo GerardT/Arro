@@ -33,6 +33,7 @@ private:
     INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
     INodeContext::ItRef m_value;
+    std::string m_name;
 
 };
 
@@ -46,27 +47,28 @@ using namespace arro;
 static RegisterMe<NodeUiCheckBox> registerMe("CheckBox");
 
 NodeUiCheckBox::NodeUiCheckBox(INodeContext* d, const string& /*name*/, StringMap& /*params*/, TiXmlElement*):
-    m_trace("NodeUiReceiveNumber", true),
-    m_elemBlock(d) {
+    m_trace{"NodeUiCheckBox", true},
+    m_elemBlock{d},
+    m_uiClient{nullptr} {
 
-    m_value = m_elemBlock->end(m_elemBlock->getOutputPad("value"));
-
-    std::string name = d->getParameter("name");
-
-    std::string inst = std::string("<arro-check-box id=\"") + d->getName() + "\" name=\"" + name + "\"></arro-check-box>";
-
-    m_uiClient = SocketClient::getInstance()->subscribe(d->getName(), inst, [=](const std::string& data) {
-
-            Selection* sel = new Selection();
-            auto info = nlohmann::json::parse(data.c_str());
-            sel->set_value(info["value"]);
-            m_value->setOutput(*sel);
-        });
-
+    m_name = d->getParameter("name");
 }
 
 void
 NodeUiCheckBox::finishConstruction() {
+    OutputPad* valuePad = m_elemBlock->getOutputPad("value");
+
+    std::string inst = std::string("<arro-check-box id=\"") + m_elemBlock->getName() + "\" name=\"" + m_name + "\"></arro-check-box>";
+
+    m_uiClient = SocketClient::getInstance()->subscribe(m_elemBlock->getName(), inst, [=](const std::string& data) {
+        m_value = m_elemBlock->end(valuePad);
+
+        Selection* sel = new Selection();
+        auto info = nlohmann::json::parse(data.c_str());
+        sel->set_value(info["value"]);
+        m_value->setOutput(*sel);
+            });
+
 }
 
 

@@ -142,6 +142,13 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 #endif
 
             delete params;
+
+            string from = "_action";
+            string to = "_step";
+            m_trace.println("registerInput(" +instance + "#" + from + ")");
+            processNode->registerInput(from, true);
+            m_trace.println("registerOutput(" +instance + "#" + to + "), Id " + std::to_string(padId));
+            processNode->registerOutput(padId++, to);
         }
         elt = elt->NextSiblingElement("elem_block");
     }
@@ -200,14 +207,6 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
                     m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
                     m_nodeDb.connect(from, to);
                 }
-            }
-            else {
-                string from = "_action";
-                string to = "_step";
-                m_trace.println("registerInput(" +instance + "#" + from + ")");
-                processNode->registerInput(from, true);
-                m_trace.println("registerOutput(" +instance + "#" + to + "), Id " + std::to_string(padId));
-                processNode->registerOutput(padId++, to);
             }
         }
 
