@@ -121,10 +121,10 @@ OutputPad::submitMessage(MessageBuf& s) {
 
     auto fm = new NodeDb::FullMsg(this, s);
 
-    std::lock_guard<std::mutex> lock(m_nm->m_database.m_mutex);
+    std::lock_guard<std::mutex> lock(m_nm->m_database.getDbLock());
     m_nm->m_pInQueue->push(fm);
 
-    m_nm->m_database.m_condition.notify_one();
+    m_nm->m_database.getConditionVariable().notify_one();
 }
 
 // Seem necessary for Python only..
@@ -141,10 +141,10 @@ OutputPad::submitMessageBuffer(const char* msg) {
 
     auto fm = new NodeDb::FullMsg(this, s);
 
-    std::lock_guard<std::mutex> lock(m_nm->m_database.m_mutex);
+    std::lock_guard<std::mutex> lock(m_nm->m_database.getDbLock());
     m_nm->m_pInQueue->push(fm);
 
-    m_nm->m_database.m_condition.notify_one();
+    m_nm->m_database.getConditionVariable().notify_one();
 
 }
 
@@ -256,7 +256,7 @@ NodeDb::runCycle(NodeDb* nm) {
         {
             // Deliver all messages to the right nodes until empty
             {
-                std::unique_lock<std::mutex> lock(nm->m_database.m_mutex);
+                std::unique_lock<std::mutex> lock(nm->m_database.getDbLock());
 
                 while(!(nm->m_pOutQueue->empty())) {
                     FullMsg* fm = nm->m_pOutQueue->front();
@@ -292,10 +292,10 @@ NodeDb::runCycle(NodeDb* nm) {
             }
 
             if(nm->m_database.noMoreUpdates()) {
-                std::unique_lock<std::mutex> lock(nm->m_database.m_mutex);
+                std::unique_lock<std::mutex> lock(nm->m_database.getDbLock());
 
                 // And wait until new message arrive in queue
-                nm->m_database.m_condition.wait(lock);  // keep waiting if queue empty
+                nm->m_database.getConditionVariable().wait(lock);  // keep waiting if queue empty
             } // make sure mutex is unlocked here
         }
     } catch (std::runtime_error& e) {
@@ -324,7 +324,7 @@ NodeDb::stop() {
 
         m_running = false;
 
-        m_database.m_condition.notify_one();
+        m_database.getConditionVariable().notify_one();
 
         NodeTimer::stop();
 

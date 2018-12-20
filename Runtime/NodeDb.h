@@ -17,9 +17,9 @@
 #include <memory>
 #include <functional>
 
+#include "Database.h"
 #include "RealNode.h"
 #include "INodeDefinition.h"
-#include "Database.h"
 #include "Trace.h"
 
 
