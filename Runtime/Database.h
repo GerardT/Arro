@@ -54,8 +54,9 @@ class Iterator;
          * Return iterator for input pad.
          *
          * @param input
-         * @param connection
-         * @param mode
+         * @param connection: padId of the connected output pad. So only records
+         *                    marked with that padId as origin. If 0 than padId not considered.
+         * @param mode: ALL, DELTA, LATEST. Currently only DELTA supported.
          * @return
          */
         INodeContext::ItRef begin(InputPad* input, unsigned int connection, INodeContext::Mode mode);
@@ -115,7 +116,7 @@ class Iterator;
         };
         virtual void deleteOutput();
         virtual bool empty() {
-            return m_it == 0;
+            return m_readIt == 0;
         }
 
     private:
@@ -128,7 +129,8 @@ class Iterator;
         const std::list<unsigned int> m_conns;
 
         // Current position
-        long int m_it;
+        long int m_readIt;
+        long int m_writeIt;
 
         bool m_currentEmpty;
     };

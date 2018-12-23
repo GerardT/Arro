@@ -5,9 +5,97 @@
 #include "Trace.h"
 #include "algorithm"
 #include "string"
+#include <list>
 
 namespace Arro
 {
+
+    /**
+     * \brief Class instance represents one input for a node.
+     *
+     * InputPad is created when calling registerNodeInput for a node.
+     * Connect multiple InputPad objects to one OutputPad.
+     */
+
+    class DbRecord {
+    public:
+        /**
+         * Constructor for (addressable) message container.
+         *
+         * \param o OutputPad instance where to send this message to.
+         * \param s Message buffer to send.
+         */
+        DbRecord(long index, unsigned int padId, unsigned int runCycle, unsigned int deletionRc, const MessageBuf& s):
+            m_id{index},
+            m_updateRef{DbEmpty},
+            m_padId{padId},
+            m_updateRc{runCycle},
+            m_creationRc{runCycle},
+            m_deletionRc{deletionRc},
+            m_msg{s} {};
+        DbRecord():
+            m_id{DbEmpty},
+            m_updateRef{DbEmpty},
+            m_padId{0},
+            m_updateRc{0},
+            m_creationRc{0},
+            m_deletionRc{0},
+            m_msg{MessageBuf{nullptr}} {};
+        virtual ~DbRecord() {};
+
+        long getId() {
+            return m_id;
+        }
+
+        void getMessage(MessageBuf& msg) {
+            msg = m_msg;
+        }
+
+        unsigned int getPadId() {
+            return m_padId;
+        }
+
+        long getUpdateRef() {
+            return m_updateRef;
+        }
+
+        void setUpdateRef(long r) {
+            m_updateRef = r;
+        }
+
+        // Copy and assignment is not supported.
+        //DbRecord(const DbRecord&) = delete;
+        //DbRecord& operator=(const DbRecord& other) = delete;
+
+
+    private:
+        // Index where this record is/will be stored
+        long m_id;
+
+        // Back reference to index.
+        long m_updateRef;
+
+        unsigned int m_padId;
+        unsigned int m_updateRc;
+        unsigned int m_creationRc;
+        unsigned int m_deletionRc;
+        MessageBuf m_msg;
+
+    public:
+        static const long DbEmpty = -1;
+    };
+
+
+    class DbUpdate {
+    public:
+        DbUpdate():
+        index{DbRecord::DbEmpty} {
+        }
+        // Index where this record is/will be stored in index
+        long index;
+    };
+
+
 
     /**
      * \brief Message database.
@@ -17,87 +105,15 @@ namespace Arro
     class DatabaseImpl {
 
     public:
-        class Store; // forward declaration
-
-
-
-        class DbUpdate {
-        public:
-            DbUpdate():
-            index{DbRecord::DbEmpty} {
-            }
-            long index;
-        };
 
         /**
-         * \brief Class instance represents one input for a node.
+         * The actual storage of the records (DbRecord). There are 2 tables:
+         * - Table of records
+         * - Table of references (DbUpdate) to records, where any update to a records
+         *   results in its reference moved to the end of the table. This
+         *   table will be used for reading the latest updates on DB records.
          *
-         * InputPad is created when calling registerNodeInput for a node.
-         * Connect multiple InputPad objects to one OutputPad.
-         */
-
-        class DbRecord {
-            friend class DatabaseImpl::Store;
-        public:
-            /**
-             * Constructor for (addressable) message container.
-             *
-             * \param o OutputPad instance where to send this message to.
-             * \param s Message buffer to send.
-             */
-            DbRecord(long index, unsigned int padId, unsigned int runCycle, unsigned int deletionRc, const MessageBuf& s):
-                m_id{index},
-                m_updateRef{DbEmpty},
-                m_padId{padId},
-                m_updateRc{runCycle},
-                m_creationRc{runCycle},
-                m_deletionRc{deletionRc},
-                m_msg{s} {};
-            DbRecord():
-                m_id{DbEmpty},
-                m_updateRef{DbEmpty},
-                m_padId{0},
-                m_updateRc{0},
-                m_creationRc{0},
-                m_deletionRc{0},
-                m_msg{MessageBuf{nullptr}} {};
-            virtual ~DbRecord() {};
-
-            unsigned int getId() {
-                return m_id;
-            }
-
-            void getMessage(MessageBuf& msg) {
-                msg = m_msg;
-            }
-
-            unsigned int getPadId() {
-                return m_padId;
-            }
-
-
-            // Copy and assignment is not supported.
-            //DbRecord(const DbRecord&) = delete;
-            //DbRecord& operator=(const DbRecord& other) = delete;
-
-
-        private:
-            // unique id (think ROWID) for this record
-            long m_id;
-            long m_updateRef;
-
-            unsigned int m_padId;
-            unsigned int m_updateRc;
-            unsigned int m_creationRc;
-            unsigned int m_deletionRc;
-            MessageBuf m_msg;
-
-        public:
-            static const long DbEmpty = -1;
-        };
-
-        /**
-         * Database, with index based on updateRc.
+         * The only mechanism to add/update/delete records is by setRecord.
          */
         class Store {
             friend class Iterator;
@@ -117,20 +133,22 @@ namespace Arro
             }
 
             void setRecord(DbRecord& rec) {
-                long pos = rec.m_id;
-                long up = m_db[pos].m_updateRef;
+                // get position where this record should be stored
+                long pos = rec.getId();
+                // get current position of reference in m_up, this must be cleared
+                long up = m_db[pos].getUpdateRef();
                 if(up != DbRecord::DbEmpty) {
                     m_up[up].index = DbRecord::DbEmpty;
                 }
                 if(m_upCount >= max_buffer - 1) {
                     throw std::runtime_error("Database index is full!");
                 }
-                rec.m_updateRef = m_upCount;
+                rec.setUpdateRef(m_upCount);
                 m_up[m_upCount++].index = pos;
 
                 m_db[pos] = rec;
 
-                m_trace.println("Record conn " + std::to_string(rec.m_padId) + " stored at " + std::to_string(pos) + " index " + std::to_string(m_upCount - 1));
+                m_trace.println("Record conn " + std::to_string(rec.getPadId()) + " stored at " + std::to_string(pos) + " index " + std::to_string(m_upCount - 1));
             }
 
             unsigned int getFree() {
@@ -226,6 +244,8 @@ namespace Arro
         // Condition variable to awaken run-cycle thread when a database update happened
         std::condition_variable m_condition;
 
+        std::list<Iterator*> m_iterators;
+
     };
 }
 
@@ -261,7 +281,7 @@ Database::end(OutputPad* input, unsigned int connection) {
 }
 
 std::mutex&
-Database::getMutex() {
+Database::getDbLock() {
     return m_db->getMutex();
 }
 std::condition_variable&
@@ -313,16 +333,19 @@ DatabaseImpl::end(OutputPad* /*input*/, unsigned int connection) {
 Iterator::Iterator(DatabaseImpl* db, INodeContext::Mode mode, const std::list<unsigned int>& conns):
     m_trace{"Iterator", false},
     m_ref{db},
-    //m_db{db},
     m_mode{mode},
     m_conns{conns},
-    m_it{0},
+    m_readIt{0},
+    m_writeIt{0},
     m_currentEmpty{true}
 {
+    m_ref->m_iterators.push_back(this);
 };
 
 
-Iterator::~Iterator() {};
+Iterator::~Iterator() {
+    m_ref->m_iterators.remove(this);
+};
 
 /**
  * If last time it returned false (no more records) a next call will test if new records
@@ -336,30 +359,30 @@ Iterator::getNext(MessageBuf& msg) {
     m_trace.println("getNext");
 
     if(m_currentEmpty == false) {
-        m_it++;
+        m_readIt++;
     }
 
     for(auto it = m_conns.begin(); it != m_conns.end(); ++it) {
         m_trace.println("Conn " + std::to_string(*it));
     }
 
-    while(m_it < m_ref->m_db.m_upCount) {
-        if(m_ref->m_db.m_up[m_it].index == DatabaseImpl::DbRecord::DbEmpty) {
+    while(m_readIt < m_ref->m_db.m_upCount) {
+        if(m_ref->m_db.m_up[m_readIt].index == DbRecord::DbEmpty) {
             // skip
         } else {
-            unsigned int ix = m_ref->m_db.m_up[m_it].index;
-            DatabaseImpl::DbRecord r = m_ref->m_db.m_db[ix];
-            m_trace.println("Record checking " + std::to_string(ix) + " index " + std::to_string(m_it) + " pad " + std::to_string(r.getPadId()));
+            m_writeIt = m_ref->m_db.m_up[m_readIt].index;
+            DbRecord r = m_ref->m_db.m_db[m_writeIt];
+            m_trace.println("Record checking " + std::to_string(m_writeIt) + " index " + std::to_string(m_readIt) + " pad " + std::to_string(r.getPadId()));
             if(std::find(m_conns.begin(), m_conns.end(), r.getPadId()) != m_conns.end()) {
                 r.getMessage(msg);
                 m_currentEmpty = false;
-                m_trace.println("Record found at " + std::to_string(ix) + " index " + std::to_string(m_it));
+                m_trace.println("Record found at " + std::to_string(m_writeIt) + " index " + std::to_string(m_readIt));
                return true;
             }
         }
-        m_it++;
+        m_readIt++;
     }
-    if(m_it == m_ref->m_db.m_upCount) {
+    if(m_readIt == m_ref->m_db.m_upCount) {
         m_trace.println("No more messages found");
         m_currentEmpty = true;
         return false;
@@ -378,8 +401,8 @@ Iterator::insertOutput(google::protobuf::MessageLite& msg) {
     unsigned int padId = m_conns.front();
 
     MessageBuf s(new std::string(msg.SerializeAsString()));
-    m_it = m_ref->m_db.getFree();
-    m_ref->m_new.push_back(DatabaseImpl::DbRecord(m_it, padId, m_ref->m_runCycle, 0, s));
+    m_writeIt = m_ref->m_db.getFree();
+    m_ref->m_new.push_back(DbRecord(m_writeIt, padId, m_ref->m_runCycle, 0, s));
 
     m_ref->m_condition.notify_one();
 }
@@ -393,8 +416,8 @@ Iterator::insertOutput(MessageBuf& msg) {
     // get the (only) padId of this output pad
     unsigned int padId = m_conns.front();
 
-    m_it = m_ref->m_db.getFree();
-    m_ref->m_new.push_back(DatabaseImpl::DbRecord(m_it, padId, m_ref->m_runCycle, 0, msg));
+    m_writeIt = m_ref->m_db.getFree();
+    m_ref->m_new.push_back(DbRecord(m_writeIt, padId, m_ref->m_runCycle, 0, msg));
 
     m_ref->m_condition.notify_one();
 }
@@ -407,7 +430,7 @@ Iterator::updateOutput(google::protobuf::MessageLite& msg) {
 
     MessageBuf s(new std::string(msg.SerializeAsString()));
     unsigned int padId = m_conns.front();
-    m_ref->m_new.push_back(DatabaseImpl::DbRecord(m_it, padId, m_ref->m_runCycle, 0, s));
+    m_ref->m_new.push_back(DbRecord(m_writeIt, padId, m_ref->m_runCycle, 0, s));
 
     m_ref->m_condition.notify_one();
 }
@@ -419,7 +442,7 @@ Iterator::updateOutput(MessageBuf& msg) {
     std::lock_guard<std::mutex> lock(m_ref->m_mutex);
 
     unsigned int padId = m_conns.front();
-    m_ref->m_new.push_back(DatabaseImpl::DbRecord(m_it, padId, m_ref->m_runCycle, 0, msg));
+    m_ref->m_new.push_back(DbRecord(m_writeIt, padId, m_ref->m_runCycle, 0, msg));
 
     m_ref->m_condition.notify_one();
 }
@@ -432,7 +455,7 @@ Iterator::deleteOutput() {
 
     MessageBuf s(nullptr);
     unsigned int padId = m_conns.front();
-    m_ref->m_new.push_back(DatabaseImpl::DbRecord(m_it, padId, m_ref->m_runCycle, m_ref->m_runCycle, s));
+    m_ref->m_new.push_back(DbRecord(m_writeIt, padId, m_ref->m_runCycle, m_ref->m_runCycle, s));
 
     m_ref->m_condition.notify_one();
 }
