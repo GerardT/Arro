@@ -106,7 +106,7 @@ ConfigReader::getParamsAndSubstitute(TiXmlElement* node, StringMap& import_param
 void
 ConfigReader::makeNodeInstance(const string& typeName, const string& instanceName, const string& instancePrefix, StringMap& import_params, Process* parentSfc, unsigned int& padId) {
     Definition* def = m_definitions[typeName];
-    Process* processNode = nullptr;  // Note: if there is a process node (=elemBlockock) there will be only one in module.
+    Process* processNode = nullptr;  // Note: there is always just one elem_block (= Process node) in a module
     Process* sfcNode = nullptr;
 
     if(def == nullptr)
@@ -225,6 +225,12 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
             makeNodeInstance(*typeAttr,  *idAttr,  instance, *params, sfcNode, padId);
 
+
+            // Every time a function block <f> is added to parent <p>:
+            // Register <p>._Sfc#_action_<f>
+            // Register <p>._Sfc#_step_<f>
+            // Connect <p>._Sfc#_action_<f> to <p>.<f>#_action
+            // Connect <p>.<f>#_step to <p>._Sfc#_step_<f>
             {
                 string from, to;
 
@@ -249,6 +255,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
                 m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
                 m_nodeDb.connect(from, to);
+
                 // Connect from just created node (in makeNodeInstance) to sfc.
                 to = instance + ARRO_SFC_INSTANCE + ARRO_PAD_SEPARATOR + "_steps";
 
@@ -256,6 +263,20 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
                 m_trace.println("nodeDb.connect(" + from + ", " + to + ")");
                 m_nodeDb.connect(from, to);
+
+
+                // for Main/main, add dummy output to SFC
+                // Register main._Sfc#_special_action
+                // Connect main._Sfc#_special_action to main._Sfc#_action
+                if(typeName == "Main" && instanceName == "main") {
+                    sfcNode->registerOutput(padId++, "_special_action");
+
+                    from = instance + ARRO_SFC_INSTANCE + ARRO_PAD_SEPARATOR + "_special_action";
+
+                    to = instance + ARRO_SFC_INSTANCE + ARRO_PAD_SEPARATOR + "_action";
+
+                    m_nodeDb.connect(from, to);
+                }
             }
             delete params;
         }

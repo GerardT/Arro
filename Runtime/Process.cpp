@@ -138,7 +138,7 @@ Process::registerOutput(unsigned int padId, const string& interfaceName) {
     m_nodeDb.registerNodeOutput(this, padId, interfaceName);
 }
 
-const std::list<unsigned int>&
+const std::list<unsigned int>
 Process::getConnections(InputPad* input) {
     return input->getConnections();
 };

@@ -307,7 +307,7 @@ Database::incRunCycle() {
 
 INodeContext::ItRef
 DatabaseImpl::begin(InputPad* input, unsigned int connection, INodeContext::Mode mode) {
-    m_trace.println("New iterator " + input->m_interfaceName);
+    m_trace.println("New iterator "/* + input->m_interfaceName*/);
     if(connection == 0) {
         return INodeContext::ItRef(new Iterator(this, mode, input->getConnections()));
     }

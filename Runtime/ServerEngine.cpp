@@ -42,19 +42,22 @@ static void cleanup()
 
     if(nodeDb) {
         /* 1: request change to _terminated */
-        auto input = nodeDb->getInputPad(".main._action");
-        if(input) {
+        auto output = nodeDb->getOutputPad(".main._Sfc#_special_action");
+        if(output) {
             // send "terminate" message.
             auto act = new arro::Action();
             act->set_action("_terminated");
             MessageBuf msg(new string(act->SerializeAsString()));
             free(act);
 
-            input->handleMessage(msg);
+            output->submitMessage(msg);
 
             // FIXME Now sleep 1 sec
             std::chrono::milliseconds timespan(10000);
             std::this_thread::sleep_for(timespan);
+        }
+        else {
+            trace.println("Cleanup failed!");
         }
 
         /* 1: stop message flow */

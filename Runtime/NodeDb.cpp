@@ -41,6 +41,19 @@ NodeDb::~NodeDb() {
     }
 }
 
+InputPad::InputPad(NodeDb* nm, const std::string& interfaceName,
+        std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> l,
+        std::function<void ()> listenUpdate,
+        RealNode* n):
+    m_nm{nm},
+    m_callback{l},
+    m_listenUpdate{listenUpdate},
+    m_outputs{},
+    m_node{n},
+    m_msg{new std::string()},
+    m_interfaceName{interfaceName} {} // FIXME MAXINT?
+
+
 void
 InputPad::handleMessage(const MessageBuf& msg) {
     m_msg = msg;
@@ -68,9 +81,13 @@ OutputPad::end() {
     return m_nm->end(this, m_padId);
 }
 
-const std::list<unsigned int>&
+const std::list<unsigned int>
 InputPad::getConnections() {
-    return m_outputPadIds;
+    std::list<unsigned int> pads;
+    for(auto it = m_outputs.begin(); it != m_outputs.end(); ++it) {
+        pads.push_back((*it)->getPadId());
+    }
+    return pads;
 };
 
 
@@ -94,11 +111,11 @@ OutputPad::OutputPad(unsigned int padId, NodeDb* db, RealNode* n):
 }
 
 void
-OutputPad::connectInput(InputPad* i) {
-    if(i) {
-        // Another input is listening to this output pad.
-        m_inputs.push_back((InputPad*)i);
-        i->addOutput(m_padId);
+OutputPad::connectInput(InputPad* pad) {
+    if(pad) {
+        // Make 2-way connection
+        addInput(pad);
+        pad->addOutput(this);
     }
     else {
         m_nm->m_trace.println("### cannot connect ");
@@ -125,6 +142,14 @@ OutputPad::submitMessage(MessageBuf& s) {
     m_nm->m_pInQueue->push(fm);
 
     m_nm->m_database.getConditionVariable().notify_one();
+}
+
+void
+OutputPad::notifyInputs() {
+    for(auto it = m_inputs.begin(); it != m_inputs.end(); ++it) {
+        // notify listener
+        (*it)->notifyUpdate();
+    }
 }
 
 // Seem necessary for Python only..
@@ -209,6 +234,7 @@ NodeDb::getOutputPad(const string& name) {
     }
     catch (std::out_of_range&) {
         m_trace.println("### non-registered output " + name);
+        throw std::runtime_error("### non-registered output " + name);
     }
     return out;
 }
@@ -216,7 +242,7 @@ NodeDb::getOutputPad(const string& name) {
 OutputPad*
 NodeDb::getOutputPad(unsigned int padId) {
     for(auto it = m_allOutputs.begin(); it != m_allOutputs.end(); ++it) {
-        OutputPad* op = &(*(it->second));
+        OutputPad* op = it->second.get();
 
         if(op->getPadId() == padId) {
             return op;
@@ -272,22 +298,20 @@ NodeDb::runCycle(NodeDb* nm) {
             /* And switch the queues */
             std::list<unsigned int> updates = nm->toggleQueue();
 
+
+            // Complicated way to notify inputs if output(s) changed:
+            // Find all inputs that are connected to updated outputs
             for(auto it = updates.begin(); it != updates.end(); ++it) {
                 unsigned int output = *it;
 
-                for(auto in = nm->m_allInputs.begin(); in != nm->m_allInputs.end(); ++in) {
-                    OutputPad* pad = in->second->getOutputPad(output);
-                    if(pad != nullptr) {
-                        // notify listener
-                        in->second->notifyUpdate();
-                    }
-                }
+                OutputPad* out = nm->getOutputPad(output);
 
+                out->notifyInputs();
             }
 
             /* Then trigger all runCycle methods on nodes */
             for(auto it = nm->m_allNodes.begin(); it != nm->m_allNodes.end(); ++it) {
-                RealNode* an = &(*(it->second));
+                RealNode* an = it->second.get();
                 ((RealNode*)(an))->runCycle();
             }
 
@@ -336,7 +360,7 @@ NodeDb::stop() {
 
 
 void
-NodeDb::connect(string& output, string& input) {
+NodeDb::connect(const string& output, const string& input) {
     OutputPad* out = nullptr;
     InputPad* in = nullptr;
 

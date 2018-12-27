@@ -64,7 +64,7 @@ namespace Arro
          */
         virtual InputPad*  getInputPad(const std::string& name) const = 0;
 
-        virtual const std::list<unsigned int>& getConnections(InputPad* input) = 0;
+        virtual const std::list<unsigned int> getConnections(InputPad* input) = 0;
 
         /**
          * Get first record that was changed since previous run-cycle.

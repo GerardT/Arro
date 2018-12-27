@@ -66,7 +66,7 @@ namespace Arro
          */
         InputPad* getInputPad(const std::string& name) const;
 
-        const std::list<unsigned int>& getConnections(InputPad* input);
+        const std::list<unsigned int> getConnections(InputPad* input);
 
         ItRef begin(InputPad* input, unsigned int connection, Mode mode);
         ItRef end(OutputPad* input);

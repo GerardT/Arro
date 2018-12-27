@@ -39,13 +39,7 @@ public:
     InputPad(NodeDb* nm, const std::string& interfaceName,
             std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> l,
             std::function<void ()> listenUpdate,
-            RealNode* n):
-        m_nm{nm},
-        m_callback{l},
-        m_listenUpdate{listenUpdate},
-        m_node{n},
-        m_msg{new std::string()},
-        m_interfaceName{interfaceName} {} // FIXME MAXINT?
+            RealNode* n);
     virtual ~InputPad() {};
 
     // Copy and assignment is not supported.
@@ -60,14 +54,14 @@ public:
     void handleMessage(const MessageBuf& msg);
 
     //unsigned int getConnection() { return m_outputPadIds.front(); };
-    const std::list<unsigned int>& getConnections();
+    const std::list<unsigned int> getConnections();
 
     bool getData(unsigned int connection, MessageBuf& tmp);
 
     INodeContext::ItRef begin(unsigned int connection, INodeContext::Mode mode);
 
-    void addOutput(unsigned int connectedPadId) {
-        m_outputPadIds.push_back(connectedPadId);
+    void addOutput(OutputPad* pad) {
+        m_outputs.push_back(pad);
     }
 
     OutputPad* getOutputPad(unsigned int padId);
@@ -80,18 +74,19 @@ private:
     NodeDb* m_nm;
     std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> m_callback;
     std::function<void ()> m_listenUpdate;
+    std::list<OutputPad*> m_outputs;
     RealNode* m_node;
     MessageBuf m_msg;
-public:
     std::string m_interfaceName;
-    std::list<unsigned int> m_outputPadIds;
+public:
+    //std::list<unsigned int> m_outputPadIds;
 
 };
 
 /**
  * \brief Class instance represents one output for a node.
  *
- * NodeSingleOutputRef is created when calling registerNodeOutput for a node.
+ * OutputPad is created when calling registerNodeOutput for a node.
  * It keeps a list 'inputs' that contains all connected inputs.
  * Connect multiple InputPad objects to one OutputPad.
  */
@@ -115,7 +110,11 @@ public:
      *
      * \param i Input node to connect to.
      */
-    void connectInput(InputPad *i);
+    void connectInput(InputPad* pad);
+
+    void addInput(InputPad* pad) {
+        m_inputs.push_back(pad);
+    }
 
     /**
      * Forward a message.
@@ -137,6 +136,8 @@ public:
      * \param msg String to submit.
      */
     void submitMessageBuffer(const char* msg);
+
+    void notifyInputs();
 
 
     INodeContext::ItRef end();
@@ -268,7 +269,7 @@ private:
          * \param output Name of node output.
          * \param input Name of node input.
          */
-        void connect(std::string& output, std::string& input);
+        void connect(const std::string& output, const std::string& input);
 
         /**
          * Send all messages in queue to nodes, trigger runCycle methods on nodes.
@@ -331,6 +332,7 @@ private:
 
     private:
         Trace m_trace;
+        Database m_database; // order matters: database last one to be deleted!
         std::map<std::string, std::unique_ptr<InputPad> > m_allInputs;
         std::map<std::string, std::unique_ptr<OutputPad> > m_allOutputs;
         std::map<std::string, std::unique_ptr<RealNode> > m_allNodes;
@@ -338,7 +340,6 @@ private:
         std::queue<FullMsg*> m_outQueue, *m_pOutQueue;
         bool m_running;
         std::thread* m_thrd;
-        Database m_database;
 
     };
 }

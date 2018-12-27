@@ -42,7 +42,7 @@ namespace Arro
         /**
          * More dummy implementations of virtual functions.
          */
-        virtual const std::list<unsigned int>& getConnections(InputPad* input) {return input->getConnections();}
+        virtual const std::list<unsigned int> getConnections(InputPad* input) {return input->getConnections();}
         virtual ItRef begin(InputPad* /*input*/, unsigned int /*connection*/, Mode /*mode*/) { return ItRef(nullptr); };
         virtual ItRef end(OutputPad* /*input*/) { return ItRef(nullptr); };
         virtual InputPad* getInputPad(const std::string& /*name*/) const {return nullptr; };
