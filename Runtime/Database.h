@@ -116,8 +116,9 @@ class Iterator;
         };
         virtual void deleteOutput();
         virtual bool empty() {
-            return m_readIt == 0;
+            return m_writeIt == -1;
         }
+        virtual void update();
 
     private:
         Trace m_trace;

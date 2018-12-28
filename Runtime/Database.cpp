@@ -18,6 +18,7 @@ namespace Arro
      */
 
     class DbRecord {
+        friend DatabaseImpl;
     public:
         /**
          * Constructor for (addressable) message container.
@@ -89,10 +90,10 @@ namespace Arro
     class DbUpdate {
     public:
         DbUpdate():
-        index{DbRecord::DbEmpty} {
+        m_index{DbRecord::DbEmpty} {
         }
         // Index where this record is/will be stored in index
-        long index;
+        long m_index;
     };
 
 
@@ -118,10 +119,11 @@ namespace Arro
         class Store {
             friend class Iterator;
         public:
-            Store():
+            Store(std::function<void ()> update):
                 m_trace{"Store", true},
                 m_dbCount{0},
-                m_upCount{0}
+                m_upCount{0},
+                m_update{update}
             {
                 m_db = new DbRecord[max_buffer];
                 m_up = new DbUpdate[max_buffer];
@@ -138,17 +140,37 @@ namespace Arro
                 // get current position of reference in m_up, this must be cleared
                 long up = m_db[pos].getUpdateRef();
                 if(up != DbRecord::DbEmpty) {
-                    m_up[up].index = DbRecord::DbEmpty;
+                    m_up[up].m_index = DbRecord::DbEmpty;
                 }
                 if(m_upCount >= max_buffer - 1) {
-                    throw std::runtime_error("Database index is full!");
+                    cleanup();
+                    //throw std::runtime_error("Database index is full!");
                 }
                 rec.setUpdateRef(m_upCount);
-                m_up[m_upCount++].index = pos;
+                m_up[m_upCount++].m_index = pos;
 
                 m_db[pos] = rec;
 
                 m_trace.println("Record conn " + std::to_string(rec.getPadId()) + " stored at " + std::to_string(pos) + " index " + std::to_string(m_upCount - 1));
+            }
+
+            void cleanup() {
+                m_trace.println("Cleanup");
+
+                long shift = 0;
+                long i = 0;
+                for(; (i + shift) < max_buffer; i++) {
+                    while((i + shift) < max_buffer && m_up[i + shift].m_index == DbRecord::DbEmpty) {
+                        shift++;
+                    }
+                    if((i + shift) < max_buffer) {
+                        m_up[i].m_index = m_up[i + shift].m_index;
+                        m_db[m_up[i].m_index].m_updateRef = i;
+                        m_up[i + shift].m_index = DbRecord::DbEmpty;
+                    }
+                }
+                m_upCount = i;
+                m_update();
             }
 
             unsigned int getFree() {
@@ -176,13 +198,15 @@ namespace Arro
             DbUpdate* m_up;
             long m_dbCount;
             long m_upCount;
-            static const int max_buffer = 100;
+            std::function<void ()> m_update;
+            static const int max_buffer = 20;
         };
 
     public:
         DatabaseImpl():
             m_trace{"Database", false},
-            m_runCycle{1}
+            m_runCycle{1},
+            m_db{ [this]() { for(auto it = m_iterators.begin(); it != m_iterators.end(); ++it) (*it)->update(); } }
         {
         };
 
@@ -336,7 +360,7 @@ Iterator::Iterator(DatabaseImpl* db, INodeContext::Mode mode, const std::list<un
     m_mode{mode},
     m_conns{conns},
     m_readIt{0},
-    m_writeIt{0},
+    m_writeIt{-1},  // nothing stored yet
     m_currentEmpty{true}
 {
     m_ref->m_iterators.push_back(this);
@@ -367,10 +391,10 @@ Iterator::getNext(MessageBuf& msg) {
     }
 
     while(m_readIt < m_ref->m_db.m_upCount) {
-        if(m_ref->m_db.m_up[m_readIt].index == DbRecord::DbEmpty) {
+        if(m_ref->m_db.m_up[m_readIt].m_index == DbRecord::DbEmpty) {
             // skip
         } else {
-            m_writeIt = m_ref->m_db.m_up[m_readIt].index;
+            m_writeIt = m_ref->m_db.m_up[m_readIt].m_index;
             DbRecord r = m_ref->m_db.m_db[m_writeIt];
             m_trace.println("Record checking " + std::to_string(m_writeIt) + " index " + std::to_string(m_readIt) + " pad " + std::to_string(r.getPadId()));
             if(std::find(m_conns.begin(), m_conns.end(), r.getPadId()) != m_conns.end()) {
@@ -458,6 +482,11 @@ Iterator::deleteOutput() {
     m_ref->m_new.push_back(DbRecord(m_writeIt, padId, m_ref->m_runCycle, m_ref->m_runCycle, s));
 
     m_ref->m_condition.notify_one();
+}
+
+void
+Iterator::update() {
+    m_readIt = m_ref->m_db.m_db[m_writeIt].getUpdateRef();
 }
 
 

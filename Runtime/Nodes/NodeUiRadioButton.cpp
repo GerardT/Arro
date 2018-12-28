@@ -68,6 +68,7 @@ NodeUiRadioButton::finishConstruction() {
     m_trace.println("finishConstruction");
 
     OutputPad* valuePad = m_elemBlock->getOutputPad("value");
+    m_value = m_elemBlock->end(valuePad);
 
     std::istringstream l(m_data);
     std::string s;
@@ -83,7 +84,6 @@ NodeUiRadioButton::finishConstruction() {
     }
     inst += "]\'>  </arro-radio-button>";
     m_uiClient = SocketClient::getInstance()->subscribe(m_elemBlock->getName(), inst, [=](const std::string& data) {
-        m_value = m_elemBlock->end(valuePad);
 
         Selection* sel = new Selection();
         auto info = nlohmann::json::parse(data.c_str());

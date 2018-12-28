@@ -60,11 +60,11 @@ NodeUiUserInput::finishConstruction() {
     m_trace.println("finishConstruction");
 
     OutputPad* valuePad = m_elemBlock->getOutputPad("value");
+    m_value = m_elemBlock->end(valuePad);
 
     std::string inst = std::string("<arro-slider id=\"") + m_elemBlock->getName() + "\" name=\"" + m_name + "\"></arro-slider>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(m_elemBlock->getName(), inst, [=](const std::string& data) {
-        m_value = m_elemBlock->end(valuePad);
 
         Value* sel = new Value();
         auto info = nlohmann::json::parse(data.c_str());
