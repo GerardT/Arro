@@ -96,29 +96,29 @@ class Iterator;
         Iterator(DatabaseImpl* db, INodeContext::Mode mode, const std::list<unsigned int>& conns);
         virtual ~Iterator();
         virtual bool getNext(MessageBuf& msg);
-        virtual void insertOutput(google::protobuf::MessageLite& msg);
-        virtual void insertOutput(MessageBuf& msg);
-        virtual void updateOutput(google::protobuf::MessageLite& msg);
-        virtual void updateOutput(MessageBuf& msg);
+        virtual void insertRecord(google::protobuf::MessageLite& msg);
+        virtual void insertRecord(MessageBuf& msg);
+        virtual void updateRecord(google::protobuf::MessageLite& msg);
+        virtual void updateRecord(MessageBuf& msg);
         virtual void setOutput(google::protobuf::MessageLite& msg) {
             if(empty()) {
-                insertOutput(msg);
+                insertRecord(msg);
             } else {
-                updateOutput(msg);
+                updateRecord(msg);
             }
         };
         virtual void setOutput(MessageBuf& msg) {
             if(empty()) {
-                insertOutput(msg);
+                insertRecord(msg);
             } else {
-                updateOutput(msg);
+                updateRecord(msg);
             }
         };
         virtual void deleteOutput();
         virtual bool empty() {
             return m_writeIt == -1;
         }
-        virtual void update();
+        virtual void update(long* shiftList);
 
     private:
         Trace m_trace;
@@ -130,10 +130,8 @@ class Iterator;
         const std::list<unsigned int> m_conns;
 
         // Current position
-        long int m_readIt;
+        long int m_journalIt;
         long int m_writeIt;
-
-        bool m_currentEmpty;
     };
 }
 

@@ -130,10 +130,10 @@ void
 OutputPad::submitMessage(MessageBuf& s) {
 
     if(m_first) {
-        m_it->insertOutput(s);
+        m_it->insertRecord(s);
         m_first = false;
     } else {
-        m_it->updateOutput(s);
+        m_it->updateRecord(s);
     }
 
     auto fm = new NodeDb::FullMsg(this, s);
@@ -158,10 +158,10 @@ OutputPad::submitMessageBuffer(const char* msg) {
     MessageBuf s(new string(msg));
 
     if(m_first) {
-        m_it->insertOutput(s);
+        m_it->insertRecord(s);
         m_first = false;
     } else {
-        m_it->updateOutput(s);
+        m_it->updateRecord(s);
     }
 
     auto fm = new NodeDb::FullMsg(this, s);

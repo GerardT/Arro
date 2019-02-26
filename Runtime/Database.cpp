@@ -119,58 +119,80 @@ namespace Arro
         class Store {
             friend class Iterator;
         public:
-            Store(std::function<void ()> update):
+            Store(std::function<void (long*)> update):
                 m_trace{"Store", true},
                 m_dbCount{0},
-                m_upCount{0},
+                m_journalCount{0},
                 m_update{update}
             {
                 m_db = new DbRecord[max_buffer];
-                m_up = new DbUpdate[max_buffer];
+                m_journal = new DbUpdate[max_buffer];
+
+                // Store one empty element in journal, since iterators are assumed to be on
+                // last found element
+                m_journal[0].m_index = DbRecord::DbEmpty;
+                m_journalCount = 1;
+
             };
             ~Store()
             {
                 delete[] m_db;
-                delete[] m_up;
+                delete[] m_journal;
             }
 
-            void setRecord(DbRecord& rec) {
-                // get position where this record should be stored
-                long pos = rec.getId();
-                // get current position of reference in m_up, this must be cleared
-                long up = m_db[pos].getUpdateRef();
-                if(up != DbRecord::DbEmpty) {
-                    m_up[up].m_index = DbRecord::DbEmpty;
-                }
-                if(m_upCount >= max_buffer - 1) {
-                    cleanup();
-                    //throw std::runtime_error("Database index is full!");
-                }
-                rec.setUpdateRef(m_upCount);
-                m_up[m_upCount++].m_index = pos;
 
-                m_db[pos] = rec;
 
-                m_trace.println("Record conn " + std::to_string(rec.getPadId()) + " stored at " + std::to_string(pos) + " index " + std::to_string(m_upCount - 1));
-            }
+            void cleanJournal() {
+                m_trace.println("Clean Journal");
 
-            void cleanup() {
-                m_trace.println("Cleanup");
+                long* shiftList = new long[m_journalCount];
 
                 long shift = 0;
                 long i = 0;
-                for(; (i + shift) < max_buffer; i++) {
-                    while((i + shift) < max_buffer && m_up[i + shift].m_index == DbRecord::DbEmpty) {
+                while (i + shift < m_journalCount) {
+                    shiftList[i + shift] = i;
+                    if(m_journal[i + shift].m_index == DbRecord::DbEmpty) {
                         shift++;
                     }
-                    if((i + shift) < max_buffer) {
-                        m_up[i].m_index = m_up[i + shift].m_index;
-                        m_db[m_up[i].m_index].m_updateRef = i;
-                        m_up[i + shift].m_index = DbRecord::DbEmpty;
+                    else {
+                        m_journal[i].m_index = m_journal[i + shift].m_index;
+                        m_db[m_journal[i].m_index].m_updateRef = i;
+                        m_journal[i + shift].m_index = DbRecord::DbEmpty;
+                        i++;
                     }
                 }
-                m_upCount = i;
-                m_update();
+                m_journalCount = i;
+                m_update(shiftList);
+
+                free((void*)shiftList);
+            }
+
+            // Update index: each and every record update gets stored in update index, in the order
+            // that the updates happened.
+            void updateJournal(long& up, long pos) {
+                // get current position of reference in m_up, this must be cleared
+                if(up != DbRecord::DbEmpty) {
+                    m_journal[up].m_index = DbRecord::DbEmpty;
+                }
+                if(m_journalCount >= max_buffer - 1) {
+                    cleanJournal();
+                    //throw std::runtime_error("Database index is full!");
+                }
+                up = m_journalCount;
+                m_journal[m_journalCount++].m_index = pos;
+            }
+
+            // Update a db record.
+            // TODO: it should not overwrite since we want an immutable db.
+            void setRecord(DbRecord& rec) {
+                // get position where this record should be stored
+                long pos = rec.getId();
+
+                updateJournal(m_db[pos].m_updateRef, pos);
+
+                m_db[pos] = rec;
+
+                m_trace.println("Record conn " + std::to_string(rec.getPadId()) + " stored at " + std::to_string(pos) + " index " + std::to_string(m_journalCount - 1));
             }
 
             unsigned int getFree() {
@@ -195,10 +217,10 @@ namespace Arro
         private:
             Trace m_trace;
             DbRecord* m_db;
-            DbUpdate* m_up;
+            DbUpdate* m_journal;
             long m_dbCount;
-            long m_upCount;
-            std::function<void ()> m_update;
+            long m_journalCount;
+            std::function<void (long* shiftList)> m_update;
             static const int max_buffer = 20;
         };
 
@@ -206,7 +228,7 @@ namespace Arro
         DatabaseImpl():
             m_trace{"Database", false},
             m_runCycle{1},
-            m_db{ [this]() { for(auto it = m_iterators.begin(); it != m_iterators.end(); ++it) (*it)->update(); } }
+            m_store{ [this](long* shiftList) { for(auto it = m_iterators.begin(); it != m_iterators.end(); ++it) (*it)->update(shiftList); } }
         {
         };
 
@@ -234,7 +256,7 @@ namespace Arro
             std::list<unsigned int> pads;
             for(auto it = m_new.begin(); it != m_new.end(); ++it) {
                 pads.push_back(it->getPadId());
-                m_db.setRecord(*it);
+                m_store.setRecord(*it);
             }
             m_new.clear();
 
@@ -258,7 +280,7 @@ namespace Arro
     public:
         Trace m_trace;
         unsigned int m_runCycle; // current run cycle
-        Store m_db;
+        Store m_store;
         std::list<DbRecord> m_new;
 
     public:
@@ -359,9 +381,8 @@ Iterator::Iterator(DatabaseImpl* db, INodeContext::Mode mode, const std::list<un
     m_ref{db},
     m_mode{mode},
     m_conns{conns},
-    m_readIt{0},
-    m_writeIt{-1},  // nothing stored yet
-    m_currentEmpty{true}
+    m_journalIt{0},
+    m_writeIt{-1}  // nothing stored yet
 {
     m_ref->m_iterators.push_back(this);
 };
@@ -382,33 +403,29 @@ bool
 Iterator::getNext(MessageBuf& msg) {
     m_trace.println("getNext");
 
-    if(m_currentEmpty == false) {
-        m_readIt++;
-    }
-
     for(auto it = m_conns.begin(); it != m_conns.end(); ++it) {
         m_trace.println("Conn " + std::to_string(*it));
     }
 
-    while(m_readIt < m_ref->m_db.m_upCount) {
-        if(m_ref->m_db.m_up[m_readIt].m_index == DbRecord::DbEmpty) {
+    // m_journalIt must point to element being processed, so first look ahead..
+    while(m_journalIt + 1 < m_ref->m_store.m_journalCount) {
+        m_journalIt++;
+
+        if(m_ref->m_store.m_journal[m_journalIt].m_index == DbRecord::DbEmpty) {
             // skip
         } else {
-            m_writeIt = m_ref->m_db.m_up[m_readIt].m_index;
-            DbRecord r = m_ref->m_db.m_db[m_writeIt];
-            m_trace.println("Record checking " + std::to_string(m_writeIt) + " index " + std::to_string(m_readIt) + " pad " + std::to_string(r.getPadId()));
+            m_writeIt = m_ref->m_store.m_journal[m_journalIt].m_index;
+            DbRecord r = m_ref->m_store.m_db[m_writeIt];
+            m_trace.println("Record checking " + std::to_string(m_writeIt) + " index " + std::to_string(m_journalIt) + " pad " + std::to_string(r.getPadId()));
             if(std::find(m_conns.begin(), m_conns.end(), r.getPadId()) != m_conns.end()) {
                 r.getMessage(msg);
-                m_currentEmpty = false;
-                m_trace.println("Record found at " + std::to_string(m_writeIt) + " index " + std::to_string(m_readIt));
+                m_trace.println("Record found at " + std::to_string(m_writeIt) + " index " + std::to_string(m_journalIt));
                return true;
             }
         }
-        m_readIt++;
     }
-    if(m_readIt == m_ref->m_db.m_upCount) {
+    if(m_journalIt + 1 == m_ref->m_store.m_journalCount) {
         m_trace.println("No more messages found");
-        m_currentEmpty = true;
         return false;
     }
     return false;
@@ -416,7 +433,7 @@ Iterator::getNext(MessageBuf& msg) {
 
 
 void
-Iterator::insertOutput(google::protobuf::MessageLite& msg) {
+Iterator::insertRecord(google::protobuf::MessageLite& msg) {
     m_trace.println("Inserting message msg");
 
     std::lock_guard<std::mutex> lock(m_ref->m_mutex);
@@ -425,14 +442,14 @@ Iterator::insertOutput(google::protobuf::MessageLite& msg) {
     unsigned int padId = m_conns.front();
 
     MessageBuf s(new std::string(msg.SerializeAsString()));
-    m_writeIt = m_ref->m_db.getFree();
+    m_writeIt = m_ref->m_store.getFree();
     m_ref->m_new.push_back(DbRecord(m_writeIt, padId, m_ref->m_runCycle, 0, s));
 
     m_ref->m_condition.notify_one();
 }
 
 void
-Iterator::insertOutput(MessageBuf& msg) {
+Iterator::insertRecord(MessageBuf& msg) {
     m_trace.println("Inserting message buf");
 
     std::lock_guard<std::mutex> lock(m_ref->m_mutex);
@@ -440,14 +457,14 @@ Iterator::insertOutput(MessageBuf& msg) {
     // get the (only) padId of this output pad
     unsigned int padId = m_conns.front();
 
-    m_writeIt = m_ref->m_db.getFree();
+    m_writeIt = m_ref->m_store.getFree();
     m_ref->m_new.push_back(DbRecord(m_writeIt, padId, m_ref->m_runCycle, 0, msg));
 
     m_ref->m_condition.notify_one();
 }
 
 void
-Iterator::updateOutput(google::protobuf::MessageLite& msg) {
+Iterator::updateRecord(google::protobuf::MessageLite& msg) {
     m_trace.println("Updating message");
 
     std::lock_guard<std::mutex> lock(m_ref->m_mutex);
@@ -460,7 +477,7 @@ Iterator::updateOutput(google::protobuf::MessageLite& msg) {
 }
 
 void
-Iterator::updateOutput(MessageBuf& msg) {
+Iterator::updateRecord(MessageBuf& msg) {
     m_trace.println("Updating message");
 
     std::lock_guard<std::mutex> lock(m_ref->m_mutex);
@@ -485,8 +502,9 @@ Iterator::deleteOutput() {
 }
 
 void
-Iterator::update() {
-    m_readIt = m_ref->m_db.m_db[m_writeIt].getUpdateRef();
+Iterator::update(long* shiftList) {
+    //m_journalIt = m_ref->m_store.m_db[m_writeIt].getUpdateRef();
+    m_journalIt = shiftList[m_journalIt];
 }
 
 

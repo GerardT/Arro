@@ -31,7 +31,7 @@ public:
         MICROSTEP = 4
     };
 
-    MotorHAT(int address = 0x60, const char* filename = "/dev/i2c-1", int freq = 1600);
+    MotorHAT(int address = 0x60, const char* filename = "/dev/i2c-1", float freq = 50.0);
     ~MotorHAT() {};
     void setPin(int pin, int value);
     static MotorHAT* getInstance();

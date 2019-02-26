@@ -125,7 +125,7 @@ MotorHAT::setPWMFreq(double freq) {
     i2c_write8(__MODE1, oldmode | 0x80);
 }
 
-MotorHAT::MotorHAT(int address, const char* filename, int freq):
+MotorHAT::MotorHAT(int address, const char* filename, float freq):
     m_trace("DCMotor", false),
     m_prescaleval(0),
     m_i2caddr(address),

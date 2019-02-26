@@ -38,10 +38,10 @@ namespace Arro
         public:
             virtual ~Iterator() {};
             virtual bool getNext(MessageBuf& /*msg*/) = 0;
-            virtual void insertOutput(google::protobuf::MessageLite& msg) = 0;
-            virtual void insertOutput(MessageBuf& msg) = 0;
-            virtual void updateOutput(google::protobuf::MessageLite& msg) = 0;
-            virtual void updateOutput(MessageBuf& msg) = 0;
+            virtual void insertRecord(google::protobuf::MessageLite& msg) = 0;
+            virtual void insertRecord(MessageBuf& msg) = 0;
+            virtual void updateRecord(google::protobuf::MessageLite& msg) = 0;
+            virtual void updateRecord(MessageBuf& msg) = 0;
             virtual void setOutput(google::protobuf::MessageLite& msg) = 0;
             virtual void setOutput(MessageBuf& msg) = 0;
             virtual void deleteOutput() = 0; // it will be empty again
