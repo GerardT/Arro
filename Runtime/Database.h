@@ -100,21 +100,21 @@ class Iterator;
         virtual void insertRecord(MessageBuf& msg);
         virtual void updateRecord(google::protobuf::MessageLite& msg);
         virtual void updateRecord(MessageBuf& msg);
-        virtual void setOutput(google::protobuf::MessageLite& msg) {
+        virtual void setRecord(google::protobuf::MessageLite& msg) {
             if(empty()) {
                 insertRecord(msg);
             } else {
                 updateRecord(msg);
             }
         };
-        virtual void setOutput(MessageBuf& msg) {
+        virtual void setRecord(MessageBuf& msg) {
             if(empty()) {
                 insertRecord(msg);
             } else {
                 updateRecord(msg);
             }
         };
-        virtual void deleteOutput();
+        virtual void deleteRecord();
         virtual bool empty() {
             return m_writeIt == -1;
         }

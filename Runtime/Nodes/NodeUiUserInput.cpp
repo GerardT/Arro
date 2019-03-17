@@ -70,7 +70,7 @@ NodeUiUserInput::finishConstruction() {
         auto info = nlohmann::json::parse(data.c_str());
         int value = info["value"];
         sel->set_value(value);
-        m_value->setOutput(*sel);
+        m_value->setRecord(*sel);
                     });
 }
 

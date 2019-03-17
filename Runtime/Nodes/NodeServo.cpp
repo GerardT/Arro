@@ -207,6 +207,8 @@ NodeServo::Servo::Servo(int address, const char* filename):
     m_prescaleval(0),
     m_addr(address){
 
+// To stub out
+#ifdef RPI
     if ((m_file = open(filename,O_RDWR)) < 0) {
         m_trace.fatal("Failed to open the bus errno", errno);
     }
@@ -214,7 +216,7 @@ NodeServo::Servo::Servo(int address, const char* filename):
     if (ioctl(m_file,I2C_SLAVE,m_addr) < 0) {
         m_trace.fatal("Failed to acquire bus access and/or talk to slave");
     }
-
+#endif
     /* Reseting PCA9685 */
     i2c_smbus_write_byte_data(m_file, __MODE1, 0x00);
 

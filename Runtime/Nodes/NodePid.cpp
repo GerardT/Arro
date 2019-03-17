@@ -90,7 +90,7 @@ NodePid::finishConstruction() {
     Step* step = new Step();
     step->set_node(m_elemBlock->getName());
     step->set_name("_ready");
-    m_statePad->setOutput(*step);
+    m_statePad->setRecord(*step);
 
 }
 
@@ -156,6 +156,6 @@ NodePid::runCycle() {
 
         value->set_value(output);
 
-        m_output->setOutput(*value);
+        m_output->setRecord(*value);
     }
 }

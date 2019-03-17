@@ -489,7 +489,7 @@ Iterator::updateRecord(MessageBuf& msg) {
 }
 
 void
-Iterator::deleteOutput() {
+Iterator::deleteRecord() {
     m_trace.println("Deleting message");
 
     std::lock_guard<std::mutex> lock(m_ref->m_mutex);

@@ -86,7 +86,7 @@ void NodeFileReader::runCycle() {
 
     blob->set_data(tmp.str());
 
-    m_outputPad->setOutput(*blob);
+    m_outputPad->setRecord(*blob);
 
 }
 

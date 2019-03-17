@@ -66,7 +66,7 @@ NodeUiCheckBox::finishConstruction() {
         Selection* sel = new Selection();
         auto info = nlohmann::json::parse(data.c_str());
         sel->set_value(info["value"]);
-        m_value->setOutput(*sel);
+        m_value->setRecord(*sel);
             });
 
 }

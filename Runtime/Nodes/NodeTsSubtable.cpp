@@ -102,7 +102,7 @@ NodeTsSubtable::finishConstruction() {
     SectionFilter* sf = new SectionFilter();
     sf->set_pid(0 /* PAT pid */);
 //    m_elemBlock->setOutputData(m_elemBlock->getOutputPad("patFilter"), sf);
-    m_patIt->setOutput(*sf);
+    m_patIt->setRecord(*sf);
 
 }
 
@@ -162,7 +162,7 @@ void NodeTsSubtable::handlePAT(const char* data, unsigned long dataSize) {
 
         SectionFilter* sf = new SectionFilter();
         sf->set_pid(ProgramMapPid);
-        m_pmtFilter->setOutput(*sf);
+        m_pmtFilter->setRecord(*sf);
     }
 
 

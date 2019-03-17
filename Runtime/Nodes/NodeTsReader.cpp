@@ -68,7 +68,7 @@ public:
 
                 blob->set_data(tmp.str());
 
-                (*outputPad)->setOutput(*blob);
+                (*outputPad)->setRecord(*blob);
 
             }
         }
@@ -162,7 +162,7 @@ NodeTsReader::finishConstruction() {
     Step* step = new Step();
     step->set_node(m_elemBlock->getName());
     step->set_name("_ready");
-    m_statePad->setOutput(*step);
+    m_statePad->setRecord(*step);
 }
 
 NodeTsReader::~NodeTsReader() {

@@ -57,7 +57,7 @@ Process::Process(NodeDb& db, const string& url, const string& instance, StringMa
         MessageBuf msg(new string(kv->SerializeAsString()));
         free(kv);
 #if PARAM_AS_CONFIG
-        m_elemBlock->handleMessage(msg, "config");
+        //m_elemBlock->handleMessage(msg, "config");
 #endif
     }
 
@@ -120,12 +120,6 @@ void
 Process::registerInput(const string& interfName, bool enableRunCycle) {
     // only need to capture enableRunCycle
     m_nodeDb.registerNodeInput(this, interfName,
-            [=](const MessageBuf& msg, const std::string& interfaceName) {
-                if(enableRunCycle) {
-                    m_doRunCycle = true;
-                }
-                m_elemBlock->handleMessage(msg, interfaceName);
-            },
             [=]() {
                 if(enableRunCycle) {
                     m_doRunCycle = true;

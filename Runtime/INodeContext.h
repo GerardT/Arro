@@ -42,9 +42,9 @@ namespace Arro
             virtual void insertRecord(MessageBuf& msg) = 0;
             virtual void updateRecord(google::protobuf::MessageLite& msg) = 0;
             virtual void updateRecord(MessageBuf& msg) = 0;
-            virtual void setOutput(google::protobuf::MessageLite& msg) = 0;
-            virtual void setOutput(MessageBuf& msg) = 0;
-            virtual void deleteOutput() = 0; // it will be empty again
+            virtual void setRecord(google::protobuf::MessageLite& msg) = 0;
+            virtual void setRecord(MessageBuf& msg) = 0;
+            virtual void deleteRecord() = 0; // it will be empty again
             virtual bool empty() = 0;
         };
 

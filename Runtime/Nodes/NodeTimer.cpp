@@ -52,7 +52,7 @@ void NodeTimer::timer () {
     tick->set_ms(ARRO_TIMEOUT /* elapsed time in ms */);
 
     try {
-        m_tick->setOutput(*tick);
+        m_tick->setRecord(*tick);
     }
     catch(runtime_error&) {
         m_trace.println("Timer failed to update");

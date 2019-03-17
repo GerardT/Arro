@@ -37,7 +37,6 @@ public:
      * \param n Node to which this input is attached.
      */
     InputPad(NodeDb* nm, const std::string& interfaceName,
-            std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> l,
             std::function<void ()> listenUpdate,
             RealNode* n);
     virtual ~InputPad() {};
@@ -46,12 +45,12 @@ public:
     InputPad(const InputPad&) = delete;
     InputPad& operator=(const InputPad& other) = delete;
 
-    /**
-     * Passes the message on to the listener.
-     *
-     * \param msg Message to pass on.
-     */
-    void handleMessage(const MessageBuf& msg);
+//    /**
+//     * Passes the message on to the listener.
+//     *
+//     * \param msg Message to pass on.
+//     */
+//    void handleMessage(const MessageBuf& msg);
 
     //unsigned int getConnection() { return m_outputPadIds.front(); };
     const std::list<unsigned int> getConnections();
@@ -72,15 +71,11 @@ public:
 
 private:
     NodeDb* m_nm;
-    std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> m_callback;
     std::function<void ()> m_listenUpdate;
     std::list<OutputPad*> m_outputs;
     RealNode* m_node;
-    MessageBuf m_msg;
+//    MessageBuf m_msg;
     std::string m_interfaceName;
-public:
-    //std::list<unsigned int> m_outputPadIds;
-
 };
 
 /**
@@ -116,12 +111,12 @@ public:
         m_inputs.push_back(pad);
     }
 
-    /**
-     * Forward a message.
-     *
-     * \param msg Message to forward.
-     */
-    void forwardMessage(const MessageBuf& msg);
+//    /**
+//     * Forward a message.
+//     *
+//     * \param msg Message to forward.
+//     */
+//    void forwardMessage(const MessageBuf& msg);
 
     /**
      * Submit a Protobuf buffer into msg queue.
@@ -157,8 +152,8 @@ private:
     RealNode* m_node;
     std::list<InputPad*> m_inputs;
     unsigned int m_padId;
-    unsigned int m_lastRunCycle;
-    unsigned int m_lastPosition;
+    //unsigned int m_lastRunCycle;
+    //unsigned int m_lastPosition;
     INodeContext::ItRef m_it;
     bool m_first;
 };
@@ -183,25 +178,25 @@ private:
          * Connect multiple InputPad objects to one OutputPad.
          */
 
-        class FullMsg {
-        public:
-            /**
-             * Constructor for (addressable) message container.
-             *
-             * \param o OutputPad instance where to send this message to.
-             * \param s Message buffer to send.
-             */
-            FullMsg(OutputPad* o, MessageBuf& s);
-            virtual ~FullMsg() {};
-
-            // Copy and assignment is not supported.
-            FullMsg(const FullMsg&) = delete;
-            FullMsg& operator=(const FullMsg& other) = delete;
-
-        // FIXME Should be private
-            OutputPad* m_output;
-            MessageBuf m_msg;
-        };
+//        class FullMsg {
+//        public:
+//            /**
+//             * Constructor for (addressable) message container.
+//             *
+//             * \param o OutputPad instance where to send this message to.
+//             * \param s Message buffer to send.
+//             */
+//            FullMsg(OutputPad* o, MessageBuf& s);
+//            virtual ~FullMsg() {};
+//
+//            // Copy and assignment is not supported.
+//            FullMsg(const FullMsg&) = delete;
+//            FullMsg& operator=(const FullMsg& other) = delete;
+//
+//        // FIXME Should be private
+//            OutputPad* m_output;
+//            MessageBuf m_msg;
+//        };
 
     public:
         /**
@@ -220,11 +215,11 @@ private:
         NodeDb(const NodeDb&) = delete;
         NodeDb& operator=(const NodeDb& other) = delete;
 
-        /**
-         * Swap (full) input queue and (empty) output queue.
-         */
-        std::list<unsigned int> toggleQueue();
-
+//        /**
+//         * Swap (full) input queue and (empty) output queue.
+//         */
+//        std::list<unsigned int> toggleQueue();
+//
         /**
          * Register an RealNode by name.
          *
@@ -240,7 +235,6 @@ private:
          * \param n The instance of the node.
          */
         InputPad* registerNodeInput(RealNode* node, const std::string& interfaceName,
-                std::function<void (const MessageBuf& m_msg, const std::string& interfaceName)> listen,
                 std::function<void ()> listenUpdate
                 );
 
@@ -336,8 +330,8 @@ private:
         std::map<std::string, std::unique_ptr<InputPad> > m_allInputs;
         std::map<std::string, std::unique_ptr<OutputPad> > m_allOutputs;
         std::map<std::string, std::unique_ptr<RealNode> > m_allNodes;
-        std::queue<FullMsg*> m_inQueue, *m_pInQueue;
-        std::queue<FullMsg*> m_outQueue, *m_pOutQueue;
+//        std::queue<FullMsg*> m_inQueue, *m_pInQueue;
+//        std::queue<FullMsg*> m_outQueue, *m_pOutQueue;
         bool m_running;
         std::thread* m_thrd;
 
