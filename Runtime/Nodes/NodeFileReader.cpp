@@ -64,8 +64,9 @@ NodeFileReader::NodeFileReader(INodeContext* d, const string& /*name*/, StringMa
 
 void
 NodeFileReader::finishConstruction() {
+#ifdef RPI
     m_file = std::ifstream(m_filename, std::ios_base::in | std::ios_base::binary);
-
+#endif
     m_outputPad = m_elemBlock->end(m_elemBlock->getOutputPad("value"));
 
 }
