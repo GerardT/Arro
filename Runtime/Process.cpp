@@ -1,7 +1,3 @@
-
-#include "arro.pb.h"
-
-
 #include <iostream>
 #include <vector>
 #include <exception>
@@ -49,6 +45,8 @@ Process::Process(NodeDb& db, const string& url, const string& instance, StringMa
 
     getPrimitive(url, instance, params, elt);
 
+    /*
+    #include "arro.pb.h"
     std::map<std::string, std::string>::iterator iter;
 
     for (iter = params.begin(); iter != params.end(); ++iter) {
@@ -63,6 +61,7 @@ Process::Process(NodeDb& db, const string& url, const string& instance, StringMa
         //m_elemBlock->handleMessage(msg, "config");
 #endif
     }
+    */
 
     db.registerNode(this, instance);
 
