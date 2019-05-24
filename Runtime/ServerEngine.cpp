@@ -139,7 +139,7 @@ static void server()
          trace.fatal("ERROR on binding");
     }
 
-    NodeTimer::init (); //FIXME: here?
+    //NodeTimer::init (); //FIXME: here?
 
     // Enter the listening loop. 
     while ( true )

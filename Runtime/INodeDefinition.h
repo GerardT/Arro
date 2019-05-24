@@ -26,6 +26,13 @@ namespace Arro {
         virtual void finishConstruction() {};
 
         /**
+         * Only for SFC nodes
+         * @param name
+         * @param sfc
+         */
+        void registerChildSfc(const std::string& /*name*/, INodeDefinition* /*sfc*/) {};
+
+        /**
          * Handle a message that is sent to this node.
          *
          * \param msg Message sent to this node.

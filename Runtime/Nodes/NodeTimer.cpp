@@ -19,11 +19,20 @@ static bool running = false;
 
 static RegisterMe<NodeTimer> registerMe("Timer");
 
+static bool instantiated = false;
 
+void registerTimerStartStop(std::function<void()> start, std::function<void()> stop);
 
 NodeTimer::NodeTimer(INodeContext* d, const string& /*name*/, StringMap& /* params */, TiXmlElement*):
     m_trace("NodePid", true),
     m_elemBlock(d) {
+
+    if(!instantiated) {
+        instantiated = true;
+
+        NodeTimer::init ();
+        registerTimerStartStop(NodeTimer::start, NodeTimer::stop);
+    }
 
     m_ticks = stod(d->getParameter("ms"));
 

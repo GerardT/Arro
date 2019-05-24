@@ -1,4 +1,7 @@
-#include <Nodes/NodeSfc.h>
+
+#include "arro.pb.h"
+
+
 #include <iostream>
 #include <vector>
 #include <exception>
@@ -266,7 +269,7 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
  */
 void
 Process::registerSfc(const std::string& name, Process* sfc) {
-    ((NodeSfc*)m_elemBlock)->registerSfc(name, (NodeSfc*)(sfc->m_elemBlock));
+    m_elemBlock->registerChildSfc(name, sfc->m_elemBlock);
 }
 
 

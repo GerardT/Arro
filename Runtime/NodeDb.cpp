@@ -15,6 +15,10 @@
 using namespace Arro;
 using namespace std;
 
+static std::function<void()> timerStart = nullptr;
+static std::function<void()> timerStop = nullptr;
+
+
 NodeDb::NodeDb():
     m_trace{"NodeDb", true},
     m_allInputs{},
@@ -329,7 +333,11 @@ NodeDb::start() {
 
     m_thrd = new thread(&NodeDb::runCycle, this);
 
-    NodeTimer::start();
+    if(timerStart) {
+        timerStart();
+    } else {
+        m_trace.println("timerStart not initialized ...");
+    }
 }
 
 void
@@ -341,7 +349,11 @@ NodeDb::stop() {
 
         m_database.getConditionVariable().notify_one();
 
-        NodeTimer::stop();
+        if(timerStop) {
+            timerStop();
+        } else {
+            m_trace.println("timerStop not initialized ...");
+        }
 
         m_thrd->join();
         delete m_thrd;
@@ -380,6 +392,13 @@ NodeDb::connect(const string& output, const string& input) {
     {
         out->connectInput((InputPad*)in);
     }
+}
+
+
+
+void registerTimerStartStop(std::function<void()> start, std::function<void()> stop) {
+    timerStart = start;
+    timerStop = stop;
 }
 
 

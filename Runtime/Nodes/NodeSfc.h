@@ -118,9 +118,10 @@ namespace Arro {
          * TODO this is not the happiest function, it is for SFC only. Should be something more elegant.
          * @param sfc
          */
-        void registerSfc(const std::string& name, NodeSfc* sfc) {
+        void registerChildSfc(const std::string& name, INodeDefinition* sfc) {
+
             m_trace.println(std::string("Registering node: ") + name);
-            m_childSfc[name] = sfc;
+            m_childSfc[name] = (NodeSfc*)sfc;
         }
 
         /**

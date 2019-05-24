@@ -1,7 +1,7 @@
 #ifndef ARRO_PYTHON_GLUE_H
 #define ARRO_PYTHON_GLUE_H
 
-
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
 #include <tinyxml.h>
@@ -9,7 +9,6 @@
 #include <sstream>
 #include <map>
 
-#include "arro.pb.h"
 #include "ConfigReader.h"
 #include "NodeDb.h"
 #include "Nodes/NodePython.h"
