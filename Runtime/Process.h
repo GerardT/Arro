@@ -100,7 +100,10 @@ namespace Arro
          * TODO this is not the happiest function, it is for SFC only. Should be something more elegant.
          * @param sfc
          */
-        void registerSfc(const std::string& name, Process* sfc);
+        void registerChildSfc(const std::string& name, Process* sfc);
+        void sendTerminate() {
+            m_elemBlock->sendTerminate();
+        }
 
         virtual const std::string& getName() const { return m_name; };
 

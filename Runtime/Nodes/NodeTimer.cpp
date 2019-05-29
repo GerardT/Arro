@@ -56,12 +56,12 @@ void NodeTimer::runCycle() {
 
 
 void NodeTimer::timer () {
-    Tick* tick = new Tick();
+    Tick tick;
 
-    tick->set_ms(ARRO_TIMEOUT /* elapsed time in ms */);
+    tick.set_ms(ARRO_TIMEOUT /* elapsed time in ms */);
 
     try {
-        m_tick->setRecord(*tick);
+        m_tick->setRecord(tick);
     }
     catch(runtime_error&) {
         m_trace.println("Timer failed to update");

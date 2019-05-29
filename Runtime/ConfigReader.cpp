@@ -276,6 +276,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
                     to = instance + ARRO_SFC_INSTANCE + ARRO_PAD_SEPARATOR + "_action";
 
                     m_nodeDb.connect(from, to);
+                    m_nodeDb.registerMainSfc(sfcNode);
                 }
             }
             delete params;
@@ -346,7 +347,7 @@ ConfigReader::makeNodeInstance(const string& typeName, const string& instanceNam
 
     // Provide steps and actions to parentSfc so parent Sfc can check that its conditions and actions are legal.
     // Maybe in future host system can do this check. Or we can use protobuf enum.
-    if(parentSfc && sfcNode) parentSfc->registerSfc(instanceName, sfcNode);
+    if(parentSfc && sfcNode) parentSfc->registerChildSfc(instanceName, sfcNode);
     //if(sfcNode) sfcNode->test();
 }
 

@@ -1,4 +1,3 @@
-#include <arro.pb.h>
 #include <NodeDb.h>
 #include <Nodes/NodePython.h>
 #include <PythonGlue.h>

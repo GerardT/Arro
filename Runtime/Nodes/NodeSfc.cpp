@@ -69,6 +69,8 @@ void
 NodeSfc::finishConstruction() {
     m_stepsPad = m_elemBlock->begin(m_elemBlock->getInputPad("_steps"), 0, INodeContext::DELTA);
 
+    //m_specialActionPad = m_elemBlock->end(m_elemBlock->getOutputPad("_special_action"));
+
 //    auto t = m_stepsPad->getConnections();
 //
 //    for(auto conn = m_stepsPad->getConnections().begin(); conn != m_stepsPad->getConnections().end(); ++conn) {
@@ -84,6 +86,19 @@ NodeSfc::finishConstruction() {
     }
 }
 
+// Only to be called for 'Main' node
+void
+NodeSfc::sendTerminate() {
+    Action act;
+
+    act.set_action("_terminated");
+    try {
+        //m_specialActionPad->setRecord(*act);
+    }
+    catch(runtime_error&) {
+        m_trace.println("Cleanup failed! - SFC failed to terminate");
+    }
+}
 
 void
 NodeSfc::test() {

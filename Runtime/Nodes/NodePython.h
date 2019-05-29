@@ -5,7 +5,7 @@
 #include <map>
 #include <Python.h>
 
-#include "arro.pb.h"
+//#include "arro.pb.h"
 #include "Trace.h"
 #include "INodeContext.h"
 

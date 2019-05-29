@@ -40,14 +40,15 @@ SRCS         := main.cpp \
 		SocketClient.cpp \
 		ConfigReader.cpp \
 		NodeDb.cpp \
-		arro.pb.cpp \
 		Pad.cpp \
 		Process.cpp \
 		Database.cpp \
+		Nodes/NodePython.cpp \
 		PythonGlue.cpp \
+		\
+		arro.pb.cpp \
 		Nodes/NodeSfc.cpp \
 		Nodes/NodePid.cpp \
-		Nodes/NodePython.cpp \
 		Nodes/NodeTimer.cpp \
 		Nodes/NodeServo.cpp \
 		Nodes/NodeDCMotor.cpp \
@@ -62,6 +63,7 @@ SRCS         := main.cpp \
 		Nodes/NodeTsReader.cpp \
 		Nodes/NodeTsSubtable.cpp \
 		Nodes/NodeDumper.cpp \
+		\
 		tinyxmlparser.cpp \
 		tinyxmlerror.cpp \
 		tinyxml.cpp \

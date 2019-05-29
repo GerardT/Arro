@@ -267,7 +267,7 @@ Process::getPrimitive(const string& url, const string& instance, StringMap& para
  * @param sfc
  */
 void
-Process::registerSfc(const std::string& name, Process* sfc) {
+Process::registerChildSfc(const std::string& name, Process* sfc) {
     m_elemBlock->registerChildSfc(name, sfc->m_elemBlock);
 }
 

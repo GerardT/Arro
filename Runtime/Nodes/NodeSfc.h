@@ -112,17 +112,18 @@ namespace Arro {
         /**
          * Make the node execute a processing cycle.
          */
-        void runCycle();
+        virtual void runCycle();
 
         /**
          * TODO this is not the happiest function, it is for SFC only. Should be something more elegant.
          * @param sfc
          */
-        void registerChildSfc(const std::string& name, INodeDefinition* sfc) {
+        virtual void registerChildSfc(const std::string& name, INodeDefinition* sfc) {
 
             m_trace.println(std::string("Registering node: ") + name);
             m_childSfc[name] = (NodeSfc*)sfc;
         }
+        virtual void sendTerminate();
 
         /**
          * Check if there is a node with specified nodeName, which has
@@ -246,6 +247,8 @@ namespace Arro {
         std::map<std::string, std::string> m_currentInputs;
 
         INodeContext::ItRef m_stepsPad;
+
+        INodeContext::ItRef m_specialActionPad;
     };
 }
 

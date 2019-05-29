@@ -30,7 +30,8 @@ namespace Arro {
          * @param name
          * @param sfc
          */
-        void registerChildSfc(const std::string& /*name*/, INodeDefinition* /*sfc*/) {};
+        virtual void registerChildSfc(const std::string& /*name*/, INodeDefinition* /*sfc*/) {};
+        virtual void sendTerminate() {}  // Only from 'Main' node
 
         /**
          * Handle a message that is sent to this node.

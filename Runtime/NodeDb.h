@@ -27,6 +27,7 @@ namespace Arro
 {
 class NodeDb;
 class OutputPad;
+class Process;
 
 class InputPad {
 public:
@@ -323,6 +324,11 @@ private:
             }
 
         }
+        void registerMainSfc(Process* sfcNode);
+
+        Process* getMainSfc() {
+            return m_sfcNode;
+        }
 
     private:
         Trace m_trace;
@@ -334,6 +340,7 @@ private:
 //        std::queue<FullMsg*> m_outQueue, *m_pOutQueue;
         bool m_running;
         std::thread* m_thrd;
+        Process* m_sfcNode;
 
     };
 }

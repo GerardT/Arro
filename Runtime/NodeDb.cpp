@@ -29,7 +29,8 @@ NodeDb::NodeDb():
 //    m_outQueue{},
 //    m_pOutQueue{&m_outQueue},
     m_running{false},
-    m_thrd{nullptr} {
+    m_thrd{nullptr},
+    m_sfcNode{nullptr} {
 }
 
 NodeDb::~NodeDb() {
@@ -394,11 +395,16 @@ NodeDb::connect(const string& output, const string& input) {
     }
 }
 
+void
+NodeDb::registerMainSfc(Process* sfcNode) {
+    m_sfcNode = sfcNode;
+}
 
 
 void registerTimerStartStop(std::function<void()> start, std::function<void()> stop) {
     timerStart = start;
     timerStop = stop;
 }
+
 
 

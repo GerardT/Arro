@@ -8,7 +8,6 @@
 #include <sys/stat.h>  /*for getting file size using stat()*/
 #include <sys/sendfile.h>  /*for sendfile()*/
 #include <fcntl.h>  /*for O_RDONLY*/
-#include <Nodes/NodeTimer.h>
 
 #include "SocketClient.h"
 #include "ServerEngine.h"
@@ -42,15 +41,9 @@ static void cleanup()
 
     if(nodeDb) {
         /* 1: request change to _terminated */
-        auto output = nodeDb->getOutputPad(".main._Sfc#_special_action");
-        if(output) {
-            // send "terminate" message.
-            auto act = new arro::Action();
-            act->set_action("_terminated");
-            MessageBuf msg(new string(act->SerializeAsString()));
-            free(act);
-
-            output->submitMessage(msg);
+        Process* mainNode = nodeDb->getMainSfc();
+        if(mainNode) {
+            mainNode->sendTerminate();
 
             // FIXME Now sleep 1 sec
             std::chrono::milliseconds timespan(10000);
@@ -215,6 +208,12 @@ static void server()
                 }
             }
             else if(!strcmp(command, "protobuf"))
+            {
+                std::string cmd = std::string("protoc --cpp_out=")+ARRO_FOLDER+" --proto_path="+ARRO_FOLDER+" "+ARRO_FOLDER+"arro.proto";
+                syswrap(cmd);
+                SendToConsole("protobuf successful");
+            }
+            else if(!strcmp(command, "build"))
             {
                 std::string cmd = std::string("protoc --cpp_out=")+ARRO_FOLDER+" --proto_path="+ARRO_FOLDER+" "+ARRO_FOLDER+"arro.proto";
                 syswrap(cmd);
