@@ -235,6 +235,7 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 	        // Write prolog for arro.proto
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			baos.write(("syntax = \"proto3\";\n" +
+			            "option optimize_for = LITE_RUNTIME;\n" + /* see https://github.com/protocolbuffers/protobuf/issues/4126 */
 						"package arro;\n").getBytes());
 
 			IFile resultFileMessages = folder.getFile("arro.proto");
