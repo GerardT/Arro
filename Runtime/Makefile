@@ -16,7 +16,7 @@ DEFINES       = -DUNICODE
 endif
 
 CFLAGS        = -pipe -Wall -Wextra $(DEFINES) `python2.7-config --cflags`
-CXXFLAGS      = -pipe -std=c++0x -g -frtti -Wall -Wextra -fexceptions $(DEFINES) `python2.7-config --cflags`
+CXXFLAGS      = -fPIC -pipe -std=c++0x -g -frtti -Wall -Wextra -fexceptions $(DEFINES) `python2.7-config --cflags`
 # INCPATH       = -I"." -I"../../protobuf-2.5.0/src"
 INCPATH       = -I"." -I"/usr/local/include" -I"../../download"
 LINKER        = g++
@@ -24,9 +24,12 @@ LINKER        = g++
 LFLAGS        = -g
 LIBS          = -L/usr/local/lib -lprotobuf `python2.7-config --ldflags`
 DEL_FILE      = rm
+
 OBJDIR       := debug
 SRCDIR       := ../Runtime
+NODESRCDIR   := ../Runtime/Nodes
 DWLDIR       := ../../download
+
 MKDIR_P      := mkdir -p
 _dummy1      := $(shell mkdir -p debug)
 _dummy2      := $(shell mkdir -p debug/Nodes)
@@ -34,7 +37,7 @@ _dummy2      := $(shell mkdir -p debug/Nodes)
 DEPS         := $(SRCS:.cpp=.d)
 -include $(DEPS)
 
-SRCS         := main.cpp \
+SRCS  = main.cpp \
 		Trace.cpp \
 		ServerEngine.cpp \
 		SocketClient.cpp \
@@ -45,42 +48,53 @@ SRCS         := main.cpp \
 		Database.cpp \
 		Nodes/NodePython.cpp \
 		PythonGlue.cpp \
-		\
-		arro.pb.cpp \
-		Nodes/NodeSfc.cpp \
-		Nodes/NodePid.cpp \
-		Nodes/NodeTimer.cpp \
-		Nodes/NodeServo.cpp \
-		Nodes/NodeDCMotor.cpp \
-		Nodes/NodeStepperMotor.cpp \
-		Nodes/MotorHat.cpp \
-		Nodes/NodeUiCheckBox.cpp \
-		Nodes/NodeUiRadioButton.cpp \
-		Nodes/NodeUiToggleButton.cpp \
-		Nodes/NodeUiUserInput.cpp \
-		Nodes/NodeUiUserDisplay.cpp \
-		Nodes/NodeFileReader.cpp \
-		Nodes/NodeTsReader.cpp \
-		Nodes/NodeTsSubtable.cpp \
-		Nodes/NodeDumper.cpp \
-		\
 		tinyxmlparser.cpp \
 		tinyxmlerror.cpp \
 		tinyxml.cpp \
 		tinystr.cpp
 
+NODESRCS := \
+		arro.pb.cpp \
+		NodeSfc.cpp \
+		NodePid.cpp \
+		NodeTimer.cpp \
+		NodeServo.cpp \
+		NodeDCMotor.cpp \
+		NodeStepperMotor.cpp \
+		MotorHat.cpp \
+		NodeUiCheckBox.cpp \
+		NodeUiRadioButton.cpp \
+		NodeUiToggleButton.cpp \
+		NodeUiUserInput.cpp \
+		NodeUiUserDisplay.cpp \
+		NodeFileReader.cpp \
+		NodeTsReader.cpp \
+		NodeTsSubtable.cpp \
+		NodeDumper.cpp \
+
 OBJS         := $(addprefix $(OBJDIR)/,$(SRCS:.cpp=.o))
 SRCS         := $(addprefix $(SRCDIR)/,$(SRCS))
 
+NODEOBJS     := $(addprefix $(OBJDIR)/,$(NODESRCS:.cpp=.o))
+NODESRCS     := $(addprefix $(NODESRCDIR)/,$(NODESRCS))
+
 -include $(OBJS:.o=.d)
 
-.PHONY: all clean
+.PHONY: all clean core nodes
 
-all: $(OBJDIR)/arro.pb.o $(OBJDIR)/CodeGenerator.o $(OBJS)
+all: core nodes
+	
+core: $(OBJDIR)/CodeGenerator.o $(OBJS)
 	$(CXX) -o Arro $(LFLAGS) $(OBJDIR)/CodeGenerator.o $(OBJS) $(LIBS) 
+
+nodes: $(OBJDIR)/arro.pb.o $(NODEOBJS)
+	$(CXX) -fPIC -shared $(LFLAGS) -Wl,-soname,libnodes.so -o libnodes.so $(NODEOBJS) $(LIBS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) -MMD -c $(CXXFLAGS) $(INCPATH) -o $@ $<
+	
+$(OBJDIR)/%.o: $(NODESRCDIR)/%.cpp
+	$(CXX) -fPIC -MMD -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 	
 $(OBJDIR)/lemon: $(SRCDIR)/lemon/lemon.c
 	$(CC) -g $(INCPATH) -o $(OBJDIR)/lemon $(SRCDIR)/lemon/lemon.c

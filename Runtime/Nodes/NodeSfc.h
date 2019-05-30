@@ -8,8 +8,6 @@
 #include <string>
 #include <iostream>
 
-#include "../lemon/CodeGenInterface.h"
-
 
 namespace Arro {
 

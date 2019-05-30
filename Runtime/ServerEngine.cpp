@@ -9,6 +9,8 @@
 #include <sys/sendfile.h>  /*for sendfile()*/
 #include <fcntl.h>  /*for O_RDONLY*/
 
+#include <dlfcn.h>
+
 #include "SocketClient.h"
 #include "ServerEngine.h"
 #include "ConfigReader.h"
@@ -26,6 +28,7 @@ static NodeDb* nodeDb = nullptr;
 static PythonGlue* pg = nullptr;
 static Trace trace("ServerEngine", true);
 static std::map<std::string, Factory > m_elemBlockRegister;
+static void* dlib = nullptr;
 
 
 
@@ -68,6 +71,8 @@ static void cleanup()
         delete pg;
         pg = nullptr;
     }
+
+    dlclose(dlib);
 
     /* 4: close socket - probably already closed by Eclipse client */
     if(newsockfd != -1) {
@@ -209,15 +214,31 @@ static void server()
             }
             else if(!strcmp(command, "protobuf"))
             {
-                std::string cmd = std::string("protoc --cpp_out=")+ARRO_FOLDER+" --proto_path="+ARRO_FOLDER+" "+ARRO_FOLDER+"arro.proto";
+                std::string cmd;
+
+                cmd= std::string("protoc --python_out=")+ARRO_FOLDER+" --proto_path="+ARRO_FOLDER+" "+ARRO_FOLDER+"arro.proto";
+                syswrap(cmd);
+                SendToConsole("protobuf successful");
+                
+                cmd = std::string("protoc --cpp_out=")+ARRO_FOLDER+" --proto_path="+ARRO_FOLDER+" "+ARRO_FOLDER+"arro.proto";
                 syswrap(cmd);
                 SendToConsole("protobuf successful");
             }
             else if(!strcmp(command, "build"))
             {
-                std::string cmd = std::string("protoc --cpp_out=")+ARRO_FOLDER+" --proto_path="+ARRO_FOLDER+" "+ARRO_FOLDER+"arro.proto";
+                std::string cmd;
+
+                cmd = std::string("protoc --cpp_out=")+ARRO_FOLDER+" --proto_path="+ARRO_FOLDER+" "+ARRO_FOLDER+"arro.proto";
                 syswrap(cmd);
                 SendToConsole("protobuf successful");
+
+                cmd = std::string("cp Nodes/* ")+ARRO_FOLDER;
+                syswrap(cmd);
+                SendToConsole("cp successful");
+
+                cmd = std::string("make nodes");
+                syswrap(cmd);
+                SendToConsole("make successful");
             }
             else if(!strcmp(command, "run"))
             {
@@ -228,6 +249,15 @@ static void server()
                 else
                 {
                     nodeDb = new NodeDb();
+
+                    dlib = dlopen("./libnodes.so", RTLD_NOW);
+                    if(dlib == NULL){
+                        SendToConsole(dlerror());
+                        trace.println(string("Runtime error ") + dlerror());
+
+                        cleanup();
+                    }
+
                     try {
                         pg = new PythonGlue();
 
