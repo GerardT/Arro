@@ -1,4 +1,4 @@
-#include "PythonGlue.h"
+#include <PythonGlue.h>  // include before anything else
 #include "ServerEngine.h"
 
 using namespace Arro;
@@ -266,7 +266,7 @@ PythonGlue::captureError() {
     for(Py_ssize_t i = 0; i < size; i++) {
         PyObject *item = PyList_GetItem(list, i);  // Return value: Borrowed reference.
 
-#if 0 /* Python3 */
+#ifdef PYTHON3
         SendToConsole(string("Python ") + PyUnicode_AsUTF8(item));
 #else
         SendToConsole(string("Python ") + PyString_AsString(item));

@@ -1,9 +1,11 @@
 #ifndef ARRO_NODE_PYTHON_H
 #define ARRO_NODE_PYTHON_H
 
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>  // must be included before anything else
+
 #include <queue>
 #include <map>
-#include <Python.h>
 
 //#include "arro.pb.h"
 #include "Trace.h"

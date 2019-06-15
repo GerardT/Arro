@@ -9,20 +9,29 @@
 CC            = gcc
 CXX           = g++
 HOST          = $(shell hostname)
+PYTHON_VER    = 2
 ifeq ($(HOST), raspberrypi)
 DEFINES       = -DUNICODE -DRPI
 else
 DEFINES       = -DUNICODE
 endif
 
+ifeq ($(PYTHON_VER), 3)
+DEFINES       +=  -DPYTHON3
+CFLAGS        = -pipe -Wall -Wextra $(DEFINES) `python3-config --cflags`
+CXXFLAGS      = -fPIC -pipe -std=c++0x -g -frtti -Wall -Wextra -fexceptions $(DEFINES) `python3-config --cflags`
+LIBS          = -L/usr/local/lib -lprotobuf `python3-config --ldflags`
+else
 CFLAGS        = -pipe -Wall -Wextra $(DEFINES) `python2.7-config --cflags`
 CXXFLAGS      = -fPIC -pipe -std=c++0x -g -frtti -Wall -Wextra -fexceptions $(DEFINES) `python2.7-config --cflags`
+LIBS          = -L/usr/local/lib -lprotobuf `python2.7-config --ldflags`
+endif
+
 # INCPATH       = -I"." -I"../../protobuf-2.5.0/src"
 INCPATH       = -I"." -I"/usr/local/include" -I"../../download"
 LINKER        = g++
 # LFLAGS        = -g -Wl,-subsystem		--> -Wl,-subsystem is MinGW stuff, results in no symbols.
 LFLAGS        = -g
-LIBS          = -L/usr/local/lib -lprotobuf `python2.7-config --ldflags`
 DEL_FILE      = rm
 
 OBJDIR       := debug

@@ -1,6 +1,6 @@
+#include <PythonGlue.h>  // include before anything else
 #include <NodeDb.h>
 #include <Nodes/NodePython.h>
-#include <PythonGlue.h>
 #include <ServerEngine.h>
 
 using namespace std;
