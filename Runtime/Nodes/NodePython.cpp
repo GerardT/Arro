@@ -39,7 +39,11 @@ NodePython::finishConstruction() {
     if (PyCallable_Check(m_pClass))  // Return value: int
     {
         m_pInstance = PyObject_CallObject(m_pClass, nullptr);  // Return value: New reference.
-        if(m_pInstance == nullptr || PythonGlue::fatal()) {
+        if(m_pInstance == nullptr) {
+            throw std::runtime_error("Failed to instantiate Python class");
+        }
+        if(PythonGlue::fatal()) {
+            m_pInstance = nullptr;
             throw std::runtime_error("Failed to instantiate Python class");
         }
         PythonGlue::registerInstance(m_pInstance, this);
@@ -48,7 +52,7 @@ NodePython::finishConstruction() {
 }
 
 NodePython::~NodePython() {
-    Py_DECREF(m_pInstance);
+    if(m_pInstance) Py_DECREF(m_pInstance);
 }
 
 /**
