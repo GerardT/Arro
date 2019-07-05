@@ -34,6 +34,8 @@ private:
     NodeRef* m_uiClient;
     INodeContext::ItRef m_value;
     std::string m_name;
+    int m_bot;
+    int m_top;
 
 };
 
@@ -51,7 +53,9 @@ NodeUiUserInput::NodeUiUserInput(INodeContext* d, const string& /*name*/, String
     m_elemBlock{d},
     m_uiClient{nullptr} {
 
-    m_name = d->getParameter("name");
+        m_name = d->getParameter("name");
+        m_bot = std::stoi(d->getParameter("botValue"));
+        m_top = std::stoi(d->getParameter("topValue"));
 
 }
 
@@ -69,6 +73,10 @@ NodeUiUserInput::finishConstruction() {
         Value* sel = new Value();
         auto info = nlohmann::json::parse(data.c_str());
         int value = info["value"];
+
+        // Value is 0..100, convert to bot..top
+        value =  (((float)value / 100) * (m_top - m_bot)) + m_bot;
+
         sel->set_value(value);
         m_value->setRecord(*sel);
                     });
