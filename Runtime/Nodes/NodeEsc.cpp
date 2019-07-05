@@ -21,7 +21,7 @@
 
 
 /**
- * The PCA9685 PWM generator (used on the Servo Hat) has four main layers of structure:
+ * The PCA9685 PWM generator (used on the Esc Hat) has four main layers of structure:
  *
  * - a 25MHz internal clock
  * - a prescaler that emits 1 tick for every N ticks of the 25MHz clock
@@ -62,11 +62,11 @@ namespace Arro {
         void runCycle();
 
     private:
-        class Servo {
+        class PWM {
         public:
-            Servo(int address = 0x40, const char* filename = "/dev/i2c-1");
-            // Servo(int address = 0x60, const char* filename = "/dev/i2c-1");
-            virtual ~Servo() {};
+            PWM(double freq, int address = 0x40, const char* filename = "/dev/i2c-1");
+            // Esc(int address = 0x60, const char* filename = "/dev/i2c-1");
+            virtual ~PWM() {};
             void start(int ch, int val);
 
             /**
@@ -115,7 +115,7 @@ namespace Arro {
 
         INodeContext::ItRef m_speedPad;
 
-        static Servo* m_pServo;
+        static PWM* m_pPWM;
     };
 }
 
@@ -149,7 +149,7 @@ using namespace arro;
 static RegisterMe<NodeEsc> registerMe("Esc");
 
 unsigned char
-NodeEsc::Servo::i2c_readU8(unsigned char command) {
+NodeEsc::PWM::i2c_readU8(unsigned char command) {
     // Using I2C Read, equivalent of i2c_smbus_read_byte(file)
     // if (read(file, buf, 1) != 1) {
     __s32 ret  = i2c_smbus_read_byte_data(m_file, command);
@@ -163,7 +163,7 @@ NodeEsc::Servo::i2c_readU8(unsigned char command) {
 }
 
 void
-NodeEsc::Servo::i2c_write8(unsigned char command, unsigned short value) {
+NodeEsc::PWM::i2c_write8(unsigned char command, unsigned short value) {
     // Using I2C Write, equivalent of
     // i2c_smbus_write_word_data(file, register, 0x6543)
 
@@ -183,7 +183,7 @@ NodeEsc::Servo::i2c_write8(unsigned char command, unsigned short value) {
 }
 
 void
-NodeEsc::Servo::setPWM(int channel, int on, int off) {
+NodeEsc::PWM::setPWM(int channel, int on, int off) {
     i2c_write8(__LED0_ON_L+4*channel, on & 0xFF);
     i2c_write8(__LED0_ON_H+4*channel, on >> 8);
     i2c_write8(__LED0_OFF_L+4*channel, off & 0xFF);
@@ -191,7 +191,7 @@ NodeEsc::Servo::setPWM(int channel, int on, int off) {
 }
 
 void
-NodeEsc::Servo::setPWMFreq(double freq) {
+NodeEsc::PWM::setPWMFreq(double freq) {
     m_prescaleval = 25000000.0;   // 25MHz
     m_prescaleval /= 4096.0;      // 12-bit
     m_prescaleval /= float(freq);
@@ -214,8 +214,8 @@ NodeEsc::Servo::setPWMFreq(double freq) {
     i2c_write8(__MODE1, oldmode | 0x80);
 }
 
-NodeEsc::Servo::Servo(int address, const char* filename):
-    m_trace("Servo", true),
+NodeEsc::PWM::PWM(double freq, int address, const char* filename):
+    m_trace("Esc", true),
     m_prescaleval(0),
     m_addr(address){
 
@@ -232,16 +232,16 @@ NodeEsc::Servo::Servo(int address, const char* filename):
     /* Reseting PCA9685 */
     i2c_smbus_write_byte_data(m_file, __MODE1, 0x00);
 
-    setPWMFreq(50.0);
+    setPWMFreq(freq);
 
 }
 
 void
-NodeEsc::Servo::start(int ch, int val) {
+NodeEsc::PWM::start(int ch, int val) {
     setPWM(ch, 0, val);
 }
 
-NodeEsc::Servo* NodeEsc::m_pServo = nullptr;
+NodeEsc::PWM* NodeEsc::m_pPWM = nullptr;
 
 
 NodeEsc::NodeEsc(INodeContext* d, const string& /*name*/, StringMap& /* params */, TiXmlElement*):
@@ -252,11 +252,13 @@ NodeEsc::NodeEsc(INodeContext* d, const string& /*name*/, StringMap& /* params *
     m_speedPad{nullptr}
     {
 
-    if(!m_pServo) {
-        m_pServo = new Servo();
+    m_Ch = stod(d->getParameter("Channel"));
+    int freq = stod(d->getParameter("Freq"));
+
+    if(!m_pPWM) {
+        m_pPWM = new PWM((float)freq);
     }
 
-    m_Ch = stod(d->getParameter("Channel"));
 }
 
 
@@ -281,6 +283,6 @@ NodeEsc::runCycle() {
 
         m_trace.println(string("NodeEsc speed = ") + to_string((long double)m_speed));
 
-        m_pServo->start(m_Ch, m_speed);
+        m_pPWM->start(m_Ch, m_speed);
     }
 }
