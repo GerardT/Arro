@@ -46,9 +46,12 @@ _dummy2      := $(shell mkdir -p debug/Nodes)
 DEPS         := $(SRCS:.cpp=.d)
 -include $(DEPS)
 
+SRVRSRCS := ServerEngine.cpp \
+		Trace.cpp \
+		SocketClient.cpp
+
 SRCS  = main.cpp \
 		Trace.cpp \
-		ServerEngine.cpp \
 		SocketClient.cpp \
 		ConfigReader.cpp \
 		NodeDb.cpp \
@@ -68,6 +71,7 @@ NODESRCS := \
 		NodePid.cpp \
 		NodeTimer.cpp \
 		NodeServo.cpp \
+		NodeEsc.cpp \
 		NodeDCMotor.cpp \
 		NodeStepperMotor.cpp \
 		MotorHat.cpp \
@@ -87,17 +91,23 @@ SRCS         := $(addprefix $(SRCDIR)/,$(SRCS))
 NODEOBJS     := $(addprefix $(OBJDIR)/,$(NODESRCS:.cpp=.o))
 NODESRCS     := $(addprefix $(NODESRCDIR)/,$(NODESRCS))
 
+SRVROBJS     := $(addprefix $(OBJDIR)/,$(SRVRSRCS:.cpp=.o))
+SRVRSRCS     := $(addprefix $(SRCDIR)/,$(SRVRSRCS))
+
 -include $(OBJS:.o=.d)
 
-.PHONY: all clean core nodes
+.PHONY: all clean core nodes server
 
-all: core nodes
+all: core nodes server
 	
 core: $(OBJDIR)/CodeGenerator.o $(OBJS)
-	$(CXX) -o Arro $(LFLAGS) $(OBJDIR)/CodeGenerator.o $(OBJS) $(LIBS) 
+	$(CXX) -o Core $(LFLAGS) $(OBJDIR)/CodeGenerator.o $(OBJS) $(LIBS) 
 
 nodes: $(OBJDIR)/arro.pb.o $(NODEOBJS)
 	$(CXX) -fPIC -shared $(LFLAGS) -Wl,-soname,libnodes.so -o libnodes.so $(NODEOBJS) $(LIBS)
+
+server: $(SRVROBJS)
+	$(CXX) -o Arro $(LFLAGS) $(SRVROBJS) $(LIBS) 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) -MMD -c $(CXXFLAGS) $(INCPATH) -o $@ $<

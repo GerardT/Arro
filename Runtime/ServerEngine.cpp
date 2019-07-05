@@ -1,6 +1,8 @@
 #include <PythonGlue.h>  // include before anything else
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
@@ -9,26 +11,66 @@
 #include <sys/stat.h>  /*for getting file size using stat()*/
 #include <sys/sendfile.h>  /*for sendfile()*/
 #include <fcntl.h>  /*for O_RDONLY*/
-
-#include <dlfcn.h>
-
-#include "SocketClient.h"
 #include "ServerEngine.h"
-#include "ConfigReader.h"
-#include "NodeDb.h"
+#include "SocketClient.h"
+#include "Trace.h"
+
+
+// Debugger wants to have 'real' main.
+extern "C" {
+   int main();
+}
+
 
 #define ARRO_BUFFER_SIZE 250
 
 using namespace std;
 using namespace Arro;
 
-static thread* thrd = nullptr;
 static int newsockfd = -1;
-static NodeDb* nodeDb = nullptr;
-static PythonGlue* pg = nullptr;
-static Trace trace("ServerEngine", true);
-static std::map<std::string, Factory > m_elemBlockRegister;
-static void* dlib = nullptr;
+
+Trace* pTrace;
+
+static pid_t childPid;
+
+void startChild() {
+
+    char cwd[PATH_MAX];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        printf("Current working dir: %s\n", cwd);
+    } else {
+        perror("getcwd() error");
+        return;
+    }
+    std::string pathName(cwd);
+    pathName += "/Core";
+
+    childPid = fork(); /* Create a child process */
+
+    switch (childPid) {
+        case -1: /* Error */
+            std::cerr << "fork() failed.\n";
+            exit(1);
+        case 0: /* Child process */
+            execl(pathName.c_str(), "", 0); /* Execute the program */
+            std::cerr << "execl() failed!"; /* execl doesn't return unless there's an error */
+            exit(1);
+        default: /* Parent process */
+            std::cout << "Process created with pid " << childPid << "\n";
+//            int status;
+//
+//            while (!WIFEXITED(status)) {
+//                waitpid(pid, status, 0); /* Wait for the process to complete */
+//            }
+//
+//            std::cout << "Process exited with " << WEXITSTATUS(status) << "\n";
+    }
+}
+
+void killChild()
+{
+    kill(childPid,SIGKILL);
+}
 
 
 
@@ -38,49 +80,15 @@ static void* dlib = nullptr;
  */
 static void cleanup()
 {
-    trace.println("Cleanup");
+    pTrace->println("Cleanup");
 
-
-
-    if(nodeDb) {
-        /* 1: request change to _terminated */
-        Process* mainNode = nodeDb->getMainSfc();
-        if(mainNode) {
-            mainNode->sendTerminate();
-
-            // FIXME Now sleep 1 sec
-            std::chrono::milliseconds timespan(10000);
-            std::this_thread::sleep_for(timespan);
-        }
-        else {
-            trace.println("Cleanup failed!");
-        }
-
-        /* 1: stop message flow */
-        trace.println("-- nodeDb");
-        nodeDb->stop();
-
-        /* 2: delete node database */
-        delete nodeDb; // will automatically stop timers etc.
-        nodeDb = nullptr;
-    }
-
-    /* 3: stop python */
-    if(pg) {
-        trace.println("-- PythonGlue");
-        delete pg;
-        pg = nullptr;
-    }
-
-    dlclose(dlib);
-
-    /* 4: close socket - probably already closed by Eclipse client */
+    /* close socket - probably already closed by Eclipse client */
     if(newsockfd != -1) {
-        trace.println("-- socket");
+        pTrace->println("-- socket");
         close(newsockfd);
         newsockfd = -1;
     }
-    trace.println("Cleanup done");
+    pTrace->println("Cleanup done");
 }
 
 /**
@@ -93,7 +101,7 @@ int syswrap(const string& command)
 {
     int ret = system(command.c_str());
     if(ret != 0) {
-        trace.fatal("system command failed");
+        pTrace->fatal("system command failed");
     }
     return ret;
 }
@@ -122,7 +130,7 @@ static void server()
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) 
     {
-        trace.fatal("ERROR opening socket");
+        pTrace->fatal("ERROR opening socket");
     }
     /* Initialize socket structure */
     bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -134,7 +142,7 @@ static void server()
     /* Now bind the host address using bind() call.*/
     if (::bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
     {
-         trace.fatal("ERROR on binding");
+         pTrace->fatal("ERROR on binding");
     }
 
     //NodeTimer::init (); //FIXME: here?
@@ -150,11 +158,11 @@ static void server()
 
         /* Accept actual connection from the client, we only accept one connection. */
         newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
-        trace.println("new socket " + newsockfd);
+        pTrace->println("new socket " + newsockfd);
         if (newsockfd < 0) 
         {
             newsockfd = -1;
-            trace.fatal("ERROR on accept");
+            pTrace->fatal("ERROR on accept");
         }
 
         SendToConsole("========================");
@@ -163,7 +171,7 @@ static void server()
         bzero(buffer, ARRO_BUFFER_SIZE);
         while ((n = SocketClient::readln( newsockfd, buffer, ARRO_BUFFER_SIZE - 1 )) != 0)
         {
-            trace.println(string("command: ") + buffer);
+            pTrace->println(string("command: ") + buffer);
 
             sscanf(buffer, "%s", command);
 
@@ -172,7 +180,7 @@ static void server()
 
             if(!strcmp(command, "echo"))
             {
-                trace.println(string("got line ") + buffer);
+                pTrace->println(string("got line ") + buffer);
                 SendToConsole("ServerEngine::console echo\n");
                 break;
             }
@@ -242,41 +250,17 @@ static void server()
             }
             else if(!strcmp(command, "run"))
             {
-                if(nodeDb)
-                {
-                    SendToConsole("run failed, engine running, terminate first");
-                }
-                else
-                {
-                    nodeDb = new NodeDb();
+                // Run Core
+                startChild();
 
-                    dlib = dlopen("./libnodes.so", RTLD_NOW);
-                    if(dlib == NULL){
-                        SendToConsole(dlerror());
-                        trace.println(string("Runtime error ") + dlerror());
-
-                        cleanup();
-                    }
-
-                    try {
-                        pg = new PythonGlue();
-
-                        ConfigReader reader(ARRO_CONFIG_FILE, *nodeDb);
-                        SendToConsole("loading successful");
-
-                        nodeDb->start();
-                        SendToConsole("run successful");
-                    } catch ( const std::runtime_error& e ) {
-                        SendToConsole(e.what());
-                        trace.println(string("Runtime error ") + e.what());
-
-                        cleanup();
-                    }
-                }
+                SendToConsole("run successful");
             }
             else if(!strcmp(command, "terminate"))
             {
+                // kill Core
                 cleanup();
+
+                killChild();
                 break;
             }
             else if(!strcmp(command, "pwd"))
@@ -293,28 +277,6 @@ static void server()
     }
 }
 
-void ServerEngine::start()
-{
-    if(!thrd) {
-        thrd = new std::thread(server);     // spawn new thread that calls server()
-    }
-    else {
-        trace.fatal("Thread already present");
-    }
-
-    trace.println("server started...");
-}
-
-void ServerEngine::stop()
-{
-    // synchronize threads:
-    thrd->join();                // pauses until finishes
-
-    delete thrd;
-
-    trace.println("server completed.");
-}
-
 void Arro::SendToConsole(const string& in)
 {
     if(newsockfd >= 0) {
@@ -323,16 +285,12 @@ void Arro::SendToConsole(const string& in)
     }
 }
 
-void Arro::registerFactory(const std::string& name, Factory factory) {
-    m_elemBlockRegister[name] = factory;
+int main() {
+    pTrace = new Trace("Server", true);
+
+    //SocketClient c{"localhost" , 9000};
+
+    server();
+
+    return 0;
 }
-
-bool ServerEngine::getFactory(const std::string& name, Factory& factory) {
-    if(m_elemBlockRegister.find(name) != m_elemBlockRegister.end()) {
-        factory =  m_elemBlockRegister.at(name);
-        return true;
-    }
-    return false;
-}
-
-

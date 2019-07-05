@@ -38,17 +38,6 @@ class INodeDefinition;
         ServerEngine(const ServerEngine&) = delete;
         ServerEngine& operator=(const ServerEngine& other) = delete;
 
-        /**
-         * Start server thread for Eclipse client.
-         */
-        static void start();
-
-        /**
-         * Stop server thread for Eclipse client. Will never be called.
-         */
-        static void stop();
-
-
         static bool getFactory(const std::string& name, Factory& factory);
 
     };
