@@ -67,7 +67,7 @@ namespace Arro {
             PWM(double freq, int address = 0x40, const char* filename = "/dev/i2c-1");
             // Esc(int address = 0x60, const char* filename = "/dev/i2c-1");
             virtual ~PWM() {};
-            void start(int ch, int val);
+            void setPulse(int ch, int val);
 
             /**
              * Read 1 byte from specified register.
@@ -111,7 +111,9 @@ namespace Arro {
         INodeContext* m_elemBlock;
         double m_speed;
         int m_Ch;
-        StringMap m_params;
+        int m_maxPulse;
+        int m_minPulse;
+        int m_zeroPulse;
 
         INodeContext::ItRef m_speedPad;
 
@@ -237,12 +239,32 @@ NodeEsc::PWM::PWM(double freq, int address, const char* filename):
 }
 
 void
-NodeEsc::PWM::start(int ch, int val) {
+NodeEsc::PWM::setPulse(int ch, int val) {
     setPWM(ch, 0, val);
 }
 
 NodeEsc::PWM* NodeEsc::m_pPWM = nullptr;
 
+/*
+def __init__(self, controller=None,
+                   max_pulse=300,
+                   min_pulse=490,
+                   zero_pulse=350):
+
+    self.controller = controller
+    self.max_pulse = max_pulse
+    self.min_pulse = min_pulse
+    self.zero_pulse = zero_pulse
+
+    #send zero pulse to calibrate ESC
+    print("Init ESC")
+    self.controller.set_pulse(self.max_pulse)
+    time.sleep(0.01)
+    self.controller.set_pulse(self.min_pulse)
+    time.sleep(0.01)
+    self.controller.set_pulse(self.zero_pulse)
+    time.sleep(1)
+*/
 
 NodeEsc::NodeEsc(INodeContext* d, const string& /*name*/, StringMap& /* params */, TiXmlElement*):
     m_trace("NodeEsc", true),
@@ -254,11 +276,24 @@ NodeEsc::NodeEsc(INodeContext* d, const string& /*name*/, StringMap& /* params *
 
     m_Ch = stod(d->getParameter("Channel"));
     int freq = stod(d->getParameter("Freq"));
+    m_maxPulse = stod(d->getParameter("MaxPulse"));
+    m_minPulse = stod(d->getParameter("MinPulse"));
+    m_zeroPulse = stod(d->getParameter("ZeroPulse"));
 
     if(!m_pPWM) {
         m_pPWM = new PWM((float)freq);
     }
 
+    // Init ESC
+    m_trace.println("Init ESC");
+    std::chrono::milliseconds timespan(10);
+    m_pPWM->setPulse(m_Ch, m_maxPulse);
+    std::this_thread::sleep_for(timespan);
+    m_pPWM->setPulse(m_Ch, m_minPulse);
+    std::this_thread::sleep_for(timespan);
+    m_pPWM->setPulse(m_Ch, m_zeroPulse);
+    std::chrono::milliseconds timespan1(1000);
+    std::this_thread::sleep_for(timespan1);
 }
 
 
@@ -283,6 +318,6 @@ NodeEsc::runCycle() {
 
         m_trace.println(string("NodeEsc speed = ") + to_string((long double)m_speed));
 
-        m_pPWM->start(m_Ch, m_speed);
+        m_pPWM->setPulse(m_Ch, m_speed);
     }
 }
