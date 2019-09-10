@@ -109,7 +109,7 @@ namespace Arro {
 
         Trace m_trace;
         INodeContext* m_elemBlock;
-        double m_speed;
+        int m_speed;
         int m_Ch;
         int m_maxPulse;
         int m_minPulse;
@@ -272,7 +272,7 @@ NodeEsc::NodeEsc(INodeContext* d, const string& /*name*/, StringMap& /* params *
     m_speed(0),
     m_Ch(0),
     m_speedPad{nullptr}
-    {
+{
 
     m_Ch = stod(d->getParameter("Channel"));
     int freq = stod(d->getParameter("Freq"));
@@ -316,7 +316,18 @@ NodeEsc::runCycle() {
 
         m_speed = speed->value();
 
-        m_trace.println(string("NodeEsc speed = ") + to_string((long double)m_speed));
+        // Limit speed
+        if(m_speed > 0) {
+            m_speed = std::min(m_speed, 30);
+        }
+        else
+        {
+            m_speed = std::max(m_speed, -30);
+        }
+        m_speed += m_zeroPulse;
+
+
+        m_trace.println(string("NodeEsc speed = ") + to_string(m_speed));
 
         m_pPWM->setPulse(m_Ch, m_speed);
     }
