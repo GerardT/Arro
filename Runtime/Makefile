@@ -72,6 +72,7 @@ NODESRCS := \
 		NodeTimer.cpp \
 		NodeServo.cpp \
 		NodeEsc.cpp \
+		NodePulseWidthModulator.cpp \
 		NodeDCMotor.cpp \
 		NodeStepperMotor.cpp \
 		MotorHat.cpp \

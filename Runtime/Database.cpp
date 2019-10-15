@@ -120,7 +120,7 @@ namespace Arro
             friend class Iterator;
         public:
             Store(std::function<void (long*)> update):
-                m_trace{"Store", true},
+                m_trace{"Store", false},
                 m_dbCount{0},
                 m_journalCount{0},
                 m_update{update}

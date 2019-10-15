@@ -114,6 +114,9 @@ void startSystem() {
 
         dlib = dlopen("./libnodes.so", RTLD_NOW);
         if(dlib == NULL){
+            std::string error{"Failed to load nodes"};
+            error += dlerror();
+            trace.println(error);
             SendToConsole(dlerror());
             trace.println(string("Runtime error ") + dlerror());
 
