@@ -165,6 +165,7 @@ NodeEsc::runCycle() {
             Tick* timer = new Tick();
             timer->ParseFromString(m1->c_str());
 
+<<<<<<< HEAD
             if(timer->tag() == 1) {
                 // step 1
                 control.set_channel(m_Ch);
@@ -200,6 +201,20 @@ NodeEsc::runCycle() {
             }
         }
         else if(m_speedPad->getNext(m1)) {
+=======
+        // Limit speed
+        if(m_speed > 0) {
+            m_speed = std::min(m_speed, 30);
+        }
+        else
+        {
+            m_speed = std::max(m_speed, -30);
+        }
+        m_speed += m_zeroPulse;
+
+
+        m_trace.println(string("NodeEsc speed = ") + to_string(m_speed));
+>>>>>>> branch 'master' of https://github.com/GerardT/Arro.git
 
             Value* speed = new Value();
             speed->ParseFromString(m1->c_str());
