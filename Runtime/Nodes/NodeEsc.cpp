@@ -116,18 +116,6 @@ NodeEsc::NodeEsc(INodeContext* d, const string& /*name*/, StringMap& /* params *
     m_maxPulse = stod(d->getParameter("MaxPulse"));
     m_minPulse = stod(d->getParameter("MinPulse"));
     m_zeroPulse = stod(d->getParameter("ZeroPulse"));
-#if 0
-    // Init ESC
-    m_trace.println("Init ESC");
-    std::chrono::milliseconds timespan(10);
-    m_pPWM->setPulse(m_Ch, m_maxPulse);
-    std::this_thread::sleep_for(timespan);
-    m_pPWM->setPulse(m_Ch, m_minPulse);
-    std::this_thread::sleep_for(timespan);
-    m_pPWM->setPulse(m_Ch, m_zeroPulse);
-    std::chrono::milliseconds timespan1(1000);
-    std::this_thread::sleep_for(timespan1);
-#endif
 }
 
 
@@ -165,7 +153,6 @@ NodeEsc::runCycle() {
             Tick* timer = new Tick();
             timer->ParseFromString(m1->c_str());
 
-<<<<<<< HEAD
             if(timer->tag() == 1) {
                 // step 1
                 control.set_channel(m_Ch);
@@ -176,7 +163,7 @@ NodeEsc::runCycle() {
                 m_request->setRecord(request);
             }
             else if(timer->tag() == 2) {
-                // step 1
+                // step 2
                 control.set_channel(m_Ch);
                 control.set_pulsewidth(m_minPulse);
                 m_control->setRecord(control);
@@ -185,7 +172,7 @@ NodeEsc::runCycle() {
                 m_request->setRecord(request);
             }
             else if(timer->tag() == 3) {
-                // step 1
+                // step 3
                 control.set_channel(m_Ch);
                 control.set_pulsewidth(m_zeroPulse);
                 m_control->setRecord(control);
@@ -194,27 +181,13 @@ NodeEsc::runCycle() {
                 m_request->setRecord(request);
             }
             else if(timer->tag() == 4) {
-                // step 1
+                // step 4
                 request.set_ms(1000);
                 request.set_tag(5 /* done */);
                 m_request->setRecord(request);
             }
         }
         else if(m_speedPad->getNext(m1)) {
-=======
-        // Limit speed
-        if(m_speed > 0) {
-            m_speed = std::min(m_speed, 30);
-        }
-        else
-        {
-            m_speed = std::max(m_speed, -30);
-        }
-        m_speed += m_zeroPulse;
-
-
-        m_trace.println(string("NodeEsc speed = ") + to_string(m_speed));
->>>>>>> branch 'master' of https://github.com/GerardT/Arro.git
 
             Value* speed = new Value();
             speed->ParseFromString(m1->c_str());
