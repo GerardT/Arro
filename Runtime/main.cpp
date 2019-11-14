@@ -83,8 +83,9 @@ static void cleanup()
 
 void Arro::SendToConsole(const string& in)
 {
+    std::string s = in + "\n";
+    trace.println(s);
     if(newsockfd >= 0) {
-        std::string s = in + "\n";
         send(newsockfd, s.c_str(), s.length(), 0);
     }
 }

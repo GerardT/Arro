@@ -20,11 +20,9 @@ NodePython::NodePython(INodeContext* d, const string& className, StringMap& /*pa
     m_pValue{nullptr},
     m_pArgs{nullptr},
     m_pClass{nullptr},
-    m_pInstance{nullptr}
+    m_pInstance{nullptr},
+    m_className{className}
 {
-    // Since during construction of the object we don't have its pointer yet...
-    PythonGlue::registerTempInstance(this);
-
     PyObject *pDict = PythonGlue::getDict();
 
     // Build the name of a callable class
@@ -35,16 +33,19 @@ NodePython::NodePython(INodeContext* d, const string& className, StringMap& /*pa
 void
 NodePython::finishConstruction() {
 
+    // Since during construction of the object we don't have its pointer yet...
+    PythonGlue::registerTempInstance(this);
+
     // Create an instance of the class
     if (PyCallable_Check(m_pClass))  // Return value: int
     {
         m_pInstance = PyObject_CallObject(m_pClass, nullptr);  // Return value: New reference.
         if(m_pInstance == nullptr) {
-            throw std::runtime_error("Failed to instantiate Python class");
+            throw std::runtime_error("Failed to instantiate Python class" + m_className);
         }
         if(PythonGlue::fatal()) {
             m_pInstance = nullptr;
-            throw std::runtime_error("Failed to instantiate Python class");
+            throw std::runtime_error("Failed to instantiate Python class" + m_className);
         }
         PythonGlue::registerInstance(m_pInstance, this);
     }

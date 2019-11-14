@@ -149,9 +149,10 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
 {
     PyObject *obj;
     char* pad;
-    char* string;
+    char* blob;
+    Py_ssize_t count;
 
-    if(!PyArg_ParseTuple(args, "Oss", &obj, &pad, &string)) {  // Return value: int
+    if(!PyArg_ParseTuple(args, "Oss#", &obj, &pad, &blob, &count)) {  // Return value: int
         return nullptr;
     }
 
@@ -160,7 +161,7 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
     if(!np) {
         return nullptr; // FIXME: do i need to set an error?
     } else {
-        return np->sendMessage(pad, string);
+        return np->sendMessage(pad, blob);
     }
 
     Py_INCREF(Py_None);

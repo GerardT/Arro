@@ -46,6 +46,7 @@ namespace Arro {
         INodeContext* m_elemBlock;
         PyObject *m_pFunc, *m_pValue, *m_pArgs, *m_pClass, *m_pInstance;
         std::map<std::string, INodeContext::ItRef> m_inputs;
+        std::string m_className;
     };
 }
 
