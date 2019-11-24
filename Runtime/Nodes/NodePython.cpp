@@ -8,6 +8,20 @@ using namespace Arro;
 
 static RegisterMe<NodePython> registerMe("Python");
 
+
+std::string hexdump(const char* input, int n)
+{
+    char dump[100];
+    char* d = dump;
+
+    for(int i = 0; i < n && i < 100; i++) {
+        sprintf(d, "0x%02X ", input[i]);
+        d+=4;
+    }
+    *d = '\0';
+    return std::string(dump);
+}
+
 /**
  * Create Process instance that executes Python code.
  * Will instantiate an object of class className inside Python that
@@ -87,12 +101,13 @@ NodePython::getInputData(const string& pad) {
 
     MessageBuf data;
     if(m_inputs.at(pad)->getNext(data)) {
+        // m_trace.println(std::string("Get string from ") + pad + " size " + std::to_string(data->length()) + " data " + hexdump(data->c_str(), data->length()));
         if(data->length() == 0 /* MessageBuf may not be initialized */) {
             // insert None object
             Py_INCREF(Py_None);
             return Py_None;
         } else {
-            PyObject* tuple = Py_BuildValue("s", data->c_str());  // Return value: New reference.
+            PyObject* tuple = Py_BuildValue("s#", data->c_str(), data->length());  // Return value: New reference.
 
             return tuple;
         }
@@ -119,11 +134,13 @@ NodePython::getParameter(const std::string& parm) {
  * Python -> C. Send message to output Pad of this Process.
  */
 PyObject*
-NodePython::sendMessage(char* padName, char* message) {
+NodePython::sendMessage(char* padName, char* message, int size) {
     OutputPad* pad = m_elemBlock->getOutputPad(padName);
 
+    // m_trace.println(std::string("Send string to ") + padName + " size " + std::to_string(size) + " data " + hexdump(message, strlen(message)));
     if(pad) {
-        pad->submitMessageBuffer(message);
+        MessageBuf s(new string(message, size));
+        pad->submitMessage(s);
 
         Py_INCREF(Py_None);
         return Py_None;

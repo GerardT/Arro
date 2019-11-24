@@ -26,21 +26,15 @@ namespace Arro
          * \param o OutputPad instance where to send this message to.
          * \param s Message buffer to send.
          */
-        DbRecord(long index, unsigned int padId, unsigned int runCycle, unsigned int deletionRc, const MessageBuf& s):
+        DbRecord(long index, unsigned int padId, const MessageBuf& s):
             m_id{index},
-            m_updateRef{DbEmpty},
+            m_journalRef{DbEmpty},
             m_padId{padId},
-            m_updateRc{runCycle},
-            m_creationRc{runCycle},
-            m_deletionRc{deletionRc},
             m_msg{s} {};
         DbRecord():
             m_id{DbEmpty},
-            m_updateRef{DbEmpty},
+            m_journalRef{DbEmpty},
             m_padId{0},
-            m_updateRc{0},
-            m_creationRc{0},
-            m_deletionRc{0},
             m_msg{MessageBuf{nullptr}} {};
         virtual ~DbRecord() {};
 
@@ -57,11 +51,11 @@ namespace Arro
         }
 
         long getUpdateRef() {
-            return m_updateRef;
+            return m_journalRef;
         }
 
         void setUpdateRef(long r) {
-            m_updateRef = r;
+            m_journalRef = r;
         }
 
         // Copy and assignment is not supported.
@@ -70,16 +64,13 @@ namespace Arro
 
 
     private:
-        // Index where this record is/will be stored
+        // Index where this record is/will be stored (ROWID)
         long m_id;
 
         // Back reference to index.
-        long m_updateRef;
+        long m_journalRef;
 
         unsigned int m_padId;
-        unsigned int m_updateRc;
-        unsigned int m_creationRc;
-        unsigned int m_deletionRc;
         MessageBuf m_msg;
 
     public:
@@ -156,7 +147,7 @@ namespace Arro
                     }
                     else {
                         m_journal[i].m_index = m_journal[i + shift].m_index;
-                        m_db[m_journal[i].m_index].m_updateRef = i;
+                        m_db[m_journal[i].m_index].m_journalRef = i;
                         m_journal[i + shift].m_index = DbRecord::DbEmpty;
                         i++;
                     }
@@ -188,7 +179,7 @@ namespace Arro
                 // get position where this record should be stored
                 long pos = rec.getId();
 
-                updateJournal(m_db[pos].m_updateRef, pos);
+                updateJournal(m_db[pos].m_journalRef, pos);
 
                 m_db[pos] = rec;
 
@@ -381,8 +372,8 @@ Iterator::Iterator(DatabaseImpl* db, INodeContext::Mode mode, const std::list<un
     m_ref{db},
     m_mode{mode},
     m_conns{conns},
-    m_journalIt{0},
-    m_writeIt{-1}  // nothing stored yet
+    m_journalRowId{0},
+    m_rowId{-1}  // nothing stored yet
 {
     m_ref->m_iterators.push_back(this);
 };
@@ -407,24 +398,24 @@ Iterator::getNext(MessageBuf& msg) {
         m_trace.println("Conn " + std::to_string(*it));
     }
 
-    // m_journalIt must point to element being processed, so first look ahead..
-    while(m_journalIt + 1 < m_ref->m_store.m_journalCount) {
-        m_journalIt++;
+    // m_journalRowId must point to element being processed, so first look ahead..
+    while(m_journalRowId + 1 < m_ref->m_store.m_journalCount) {
+        m_journalRowId++;
 
-        if(m_ref->m_store.m_journal[m_journalIt].m_index == DbRecord::DbEmpty) {
+        if(m_ref->m_store.m_journal[m_journalRowId].m_index == DbRecord::DbEmpty) {
             // skip
         } else {
-            m_writeIt = m_ref->m_store.m_journal[m_journalIt].m_index;
-            DbRecord r = m_ref->m_store.m_db[m_writeIt];
-            m_trace.println("Record checking " + std::to_string(m_writeIt) + " index " + std::to_string(m_journalIt) + " pad " + std::to_string(r.getPadId()));
+            m_rowId = m_ref->m_store.m_journal[m_journalRowId].m_index;
+            DbRecord r = m_ref->m_store.m_db[m_rowId];
+            m_trace.println("Record checking " + std::to_string(m_rowId) + " index " + std::to_string(m_journalRowId) + " pad " + std::to_string(r.getPadId()));
             if(std::find(m_conns.begin(), m_conns.end(), r.getPadId()) != m_conns.end()) {
                 r.getMessage(msg);
-                m_trace.println("Record found at " + std::to_string(m_writeIt) + " index " + std::to_string(m_journalIt));
+                m_trace.println("Record found at " + std::to_string(m_rowId) + " index " + std::to_string(m_journalRowId));
                return true;
             }
         }
     }
-    if(m_journalIt + 1 == m_ref->m_store.m_journalCount) {
+    if(m_journalRowId + 1 == m_ref->m_store.m_journalCount) {
         m_trace.println("No more messages found");
         return false;
     }
@@ -434,18 +425,9 @@ Iterator::getNext(MessageBuf& msg) {
 
 void
 Iterator::insertRecord(google::protobuf::MessageLite& msg) {
-    m_trace.println("Inserting message msg");
-
-    std::lock_guard<std::mutex> lock(m_ref->m_mutex);
-
-    // get the (only) padId of this output pad
-    unsigned int padId = m_conns.front();
-
     MessageBuf s(new std::string(msg.SerializeAsString()));
-    m_writeIt = m_ref->m_store.getFree();
-    m_ref->m_new.push_back(DbRecord(m_writeIt, padId, m_ref->m_runCycle, 0, s));
 
-    m_ref->m_condition.notify_one();
+    insertRecord(s);
 }
 
 void
@@ -457,23 +439,17 @@ Iterator::insertRecord(MessageBuf& msg) {
     // get the (only) padId of this output pad
     unsigned int padId = m_conns.front();
 
-    m_writeIt = m_ref->m_store.getFree();
-    m_ref->m_new.push_back(DbRecord(m_writeIt, padId, m_ref->m_runCycle, 0, msg));
+    m_rowId = m_ref->m_store.getFree();
+    m_ref->m_new.push_back(DbRecord(m_rowId, padId, msg));
 
     m_ref->m_condition.notify_one();
 }
 
 void
 Iterator::updateRecord(google::protobuf::MessageLite& msg) {
-    m_trace.println("Updating message");
-
-    std::lock_guard<std::mutex> lock(m_ref->m_mutex);
-
     MessageBuf s(new std::string(msg.SerializeAsString()));
-    unsigned int padId = m_conns.front();
-    m_ref->m_new.push_back(DbRecord(m_writeIt, padId, m_ref->m_runCycle, 0, s));
 
-    m_ref->m_condition.notify_one();
+    updateRecord(s);
 }
 
 void
@@ -483,7 +459,7 @@ Iterator::updateRecord(MessageBuf& msg) {
     std::lock_guard<std::mutex> lock(m_ref->m_mutex);
 
     unsigned int padId = m_conns.front();
-    m_ref->m_new.push_back(DbRecord(m_writeIt, padId, m_ref->m_runCycle, 0, msg));
+    m_ref->m_new.push_back(DbRecord(m_rowId, padId, msg));
 
     m_ref->m_condition.notify_one();
 }
@@ -496,15 +472,15 @@ Iterator::deleteRecord() {
 
     MessageBuf s(nullptr);
     unsigned int padId = m_conns.front();
-    m_ref->m_new.push_back(DbRecord(m_writeIt, padId, m_ref->m_runCycle, m_ref->m_runCycle, s));
+    m_ref->m_new.push_back(DbRecord(m_rowId, padId, s));
 
     m_ref->m_condition.notify_one();
 }
 
 void
 Iterator::update(long* shiftList) {
-    //m_journalIt = m_ref->m_store.m_db[m_writeIt].getUpdateRef();
-    m_journalIt = shiftList[m_journalIt];
+    //m_journalRowId = m_ref->m_store.m_db[m_rowId].getUpdateRef();
+    m_journalRowId = shiftList[m_journalRowId];
 }
 
 

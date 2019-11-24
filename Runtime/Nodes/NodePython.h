@@ -37,7 +37,7 @@ namespace Arro {
         void runCycle();
         PyObject* getMessage();
         PyObject* getInputData(const std::string& pad);
-        PyObject* sendMessage(char* pad, char* message);
+        PyObject* sendMessage(char* pad, char* message, int count);
         PyObject* getParameter(const std::string& parm);
 
     private:

@@ -116,7 +116,7 @@ class Iterator;
         };
         virtual void deleteRecord();
         virtual bool empty() {
-            return m_writeIt == -1;
+            return m_rowId == -1;
         }
         virtual void update(long* shiftList);
 
@@ -130,8 +130,8 @@ class Iterator;
         const std::list<unsigned int> m_conns;
 
         // Current position
-        long int m_journalIt;
-        long int m_writeIt;
+        long int m_journalRowId;
+        long int m_rowId;
     };
 }
 

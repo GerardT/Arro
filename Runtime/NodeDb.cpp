@@ -3,7 +3,6 @@
 #include <sstream>
 #include <unordered_map>
 #include <map>
-//#include <queue>
 #include <algorithm>
 
 #include "ServerEngine.h"
@@ -23,26 +22,12 @@ NodeDb::NodeDb():
     m_allInputs{},
     m_allOutputs{},
     m_allNodes{},
-//    m_inQueue{},
-//    m_pInQueue{&m_inQueue},
-//    m_outQueue{},
-//    m_pOutQueue{&m_outQueue},
     m_running{false},
     m_thrd{nullptr},
     m_sfcNode{nullptr} {
 }
 
 NodeDb::~NodeDb() {
-//    while(m_inQueue.empty() != true) {
-//        auto fm = m_inQueue.front();
-//        m_inQueue.pop();
-//        delete fm;
-//    }
-//    while(m_outQueue.empty() != true) {
-//        auto fm = m_outQueue.front();
-//        m_outQueue.pop();
-//        delete fm;
-//    }
 }
 
 InputPad::InputPad(NodeDb* nm, const std::string& interfaceName,
@@ -52,19 +37,14 @@ InputPad::InputPad(NodeDb* nm, const std::string& interfaceName,
     m_listenUpdate{listenUpdate},
     m_outputs{},
     m_node{n},
-//    m_msg{new std::string()},
-    m_interfaceName{interfaceName} {} // FIXME MAXINT?
+    m_interfaceName{interfaceName} {}
 
 
-//void
-//InputPad::handleMessage(const MessageBuf& msg) {
-////    m_msg = msg;
-//}
 //
 // get in order:
 // * all messages of one input
 // * then next input, etc.
-bool
+/*deprecated*/ bool
 InputPad::getData(unsigned int padId, MessageBuf& tmp) {
     // check if there is a message at m_outputPadId with latest runCycle
     return m_nm->getLatestMessage(this, padId, tmp);
@@ -73,11 +53,6 @@ InputPad::getData(unsigned int padId, MessageBuf& tmp) {
 INodeContext::ItRef
 InputPad::begin(unsigned int connection, INodeContext::Mode mode) {
     return m_nm->begin(this, connection, mode);
-}
-
-INodeContext::ItRef
-OutputPad::end() {
-    return m_nm->end(this, m_padId);
 }
 
 const std::list<unsigned int>
@@ -96,17 +71,18 @@ InputPad::getOutputPad(unsigned int padId)
     return m_nm->getOutputPad(padId);
 };
 
-//#define MAXINT 0xFFFFFFFF
-
 OutputPad::OutputPad(unsigned int padId, NodeDb* db, RealNode* n):
     m_nm{db},
     m_node{n},
     m_inputs{},
     m_padId{padId},
-    //m_lastRunCycle{MAXINT},
-    //m_lastPosition{0},
     m_first{true} {
         m_it = m_nm->m_database.end(this, padId);
+}
+
+INodeContext::ItRef
+OutputPad::end() {
+    return m_nm->end(this, m_padId);
 }
 
 void
@@ -121,10 +97,8 @@ OutputPad::connectInput(InputPad* pad) {
     }
 }
 
-//void
-//OutputPad::forwardMessage(const MessageBuf& msg) {
-//}
-void
+// Change to ReplaceInto (as in SQLite)
+/*deprecated*/ void
 OutputPad::submitMessage(MessageBuf& s) {
 
     if(m_first) {
@@ -134,11 +108,6 @@ OutputPad::submitMessage(MessageBuf& s) {
         m_it->updateRecord(s);
     }
 
-//    auto fm = new NodeDb::FullMsg(this, s);
-//
-//    std::lock_guard<std::mutex> lock(m_nm->m_database.getDbLock());
-//    m_nm->m_pInQueue->push(fm);
-//
     m_nm->m_database.getConditionVariable().notify_one();
 }
 
@@ -149,28 +118,6 @@ OutputPad::notifyInputs() {
         (*it)->notifyUpdate();
     }
 }
-
-// Seem necessary for Python only..
-void
-OutputPad::submitMessageBuffer(const char* msg) {
-    MessageBuf s(new string(msg));
-
-    if(m_first) {
-        m_it->insertRecord(s);
-        m_first = false;
-    } else {
-        m_it->updateRecord(s);
-    }
-
-//    auto fm = new NodeDb::FullMsg(this, s);
-//
-//    std::lock_guard<std::mutex> lock(m_nm->m_database.getDbLock());
-//    m_nm->m_pInQueue->push(fm);
-//
-    m_nm->m_database.getConditionVariable().notify_one();
-
-}
-
 
 
 RealNode*
@@ -253,46 +200,13 @@ NodeDb::getInputPad(const std::string& name) {
     return (InputPad*)&(*(m_allInputs[name]));  // Since using unique_ptr, we have to get pointer first (*)
 }
 
-
-//NodeDb::FullMsg::FullMsg(OutputPad* o /*string s*/, MessageBuf& m) {
-//    //target = s;
-//    m_output = o;
-//    m_msg = m;
-//}
-//
-//std::list<unsigned int>
-//NodeDb::toggleQueue() {
-//    queue<FullMsg*>* tmp = m_pOutQueue;
-//    m_pOutQueue = m_pInQueue;
-//    m_pInQueue = tmp;
-//
-//    return m_database.incRunCycle();
-//}
-//
 void
 NodeDb::runCycle(NodeDb* nm) {
 
     try {
         while(nm->m_running)
         {
-//            // Deliver all messages to the right nodes until empty
-//            {
-//                std::unique_lock<std::mutex> lock(nm->m_database.getDbLock());
-//
-//                while(!(nm->m_pOutQueue->empty())) {
-//                    FullMsg* fm = nm->m_pOutQueue->front();
-//                    nm->m_trace.println("new msg");
-//                    nm->m_pOutQueue->pop();
-//                    if(fm != nullptr) {
-//                        fm->m_output->forwardMessage(fm->m_msg);
-//                        delete fm;
-//                    }
-//                }
-//            } // make sure mutex is unlocked here
-
-            /* And switch the queues */
             std::list<unsigned int> updates = nm->m_database.incRunCycle();
-
 
             // Complicated way to notify inputs if output(s) changed:
             // Find all inputs that are connected to updated outputs

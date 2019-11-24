@@ -161,7 +161,7 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
     if(!np) {
         return nullptr; // FIXME: do i need to set an error?
     } else {
-        return np->sendMessage(pad, blob);
+        return np->sendMessage(pad, blob, count);
     }
 
     Py_INCREF(Py_None);

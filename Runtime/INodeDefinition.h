@@ -5,6 +5,7 @@
 #include <memory>
 
 namespace Arro {
+    // note the prototype: std::string MessageLite::SerializeToString() const;
     typedef std::shared_ptr<const std::string> MessageBuf;
 
 
