@@ -264,26 +264,28 @@ public class ArroBuilder extends IncrementalProjectBuilder {
             // Write prolog for arro.html
             baos = new ByteArrayOutputStream();
             baos.write((
-"<!DOCTYPE html>\n" +
-"<meta charset=\"UTF-8\"> \n" +
-"<html lang=\"en\">\n" +
-"  <head>\n" +
-"    <script src=\"https://polygit.org/components/webcomponentsjs/webcomponents-loader.js\"></script>\n" +
-"    <link rel=\"import\" href=\"bower_components/paper-button/paper-button.html\">\n" +
-"    <link rel=\"import\" href=\"bower_components/paper-checkbox/paper-checkbox.html\">\n" +
-"    <link rel=\"import\" href=\"bower_components/paper-slider/paper-slider.html\">\n" +
-"    <link rel=\"import\" href=\"bower_components/paper-progress/paper-progress.html\">\n" +
-"    <!-- Import all elements here -->\n" +
-"    <link rel=\"import\" href=\"arro-slider.html\">\n" +
-"    <link rel=\"import\" href=\"arro-toggle-button.html\">\n" +
-"    <link rel=\"import\" href=\"arro-radio-button.html\">\n" +
-"    <link rel=\"import\" href=\"arro-check-box.html\">\n" +
-"    <link rel=\"import\" href=\"arro-progress.html\">\n" +
-"    <style>\n" +
-"    </style>\n" +
-"  </head>\n" +
-"  <body>\n" +
-"      <!-- Instantiate all elements here -->\n\n").getBytes());
+                    "<html>\n" +
+                    "<head>\n" +
+                    "  <title>Arro UI</title>\n" +
+                    "  <base href=\"/\"></base>\n" +
+                    "  <script defer src=\"./web_modules/es-module-shims.js\"></script>\n" +
+                    "  <link rel=\"manifest\" href=\"./manifest.json\">\n" +
+                    "  <link rel=\"shortcut icon\" href=\"#\">\n" +
+                    "  <meta name=\"theme-color\" content=\"#0077ff\"/>\n" +
+                    "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
+                    "  <script type=\"importmap-shim\">\n" +
+                    "    {\n" +
+                    "      \"imports\": {\n" +
+                    "        \"lit-element\": \"/web_modules/lit-element.js\"\n" +
+                    "      }\n" +
+                    "    }\n" +
+                    "  </script>\n" +
+                    "  <!-- Import all elements here -->\n" +
+                    "  <script src=\"./src/arro-slider.js\" type=\"module-shim\"></script>\n" +
+                    "  <script src=\"./src/arro-progress.js\" type=\"module-shim\"></script>\n" +
+                    "</head>\n" +
+                    "<body>\n" +
+                    "      <!-- Instantiate all elements here -->\n\n").getBytes());
             
             IFile resultFileHtml = folder.getFile("arro.html");
 
@@ -329,24 +331,34 @@ public class ArroBuilder extends IncrementalProjectBuilder {
 
             // Write epilog for arro.html
             resultFileHtml.appendContents(new ByteArrayInputStream((
-"    <script type=\"text/javascript\">\n" +
-"    // use vanilla JS because why not\n" +
-"    mySocket = 0; \n" +
-"    window.addEventListener(\"load\", function() {\n" +
-"        // create websocket instance\n" +
-"        mySocket = new WebSocket(\"ws://\" + location.host + \"/ws\");\n" +
-"        // Display output\n" +
-"        // add event listener reacting when message is received\n" +
-"        mySocket.onmessage = function (event) {\n" +
-"            json = JSON.parse(event.data);\n" +
-"            address = json.address;\n" +
-"            var web_component = document.getElementById(address);\n" +
-"            web_component.value = json.data.value;\n" +
-"        };\n" +
-"    });\n" +
-"    </script>\n" +
-"  </body>\n" +
-"</html>\n").getBytes()), true, true, null);
+                    "    <script type=\"text/javascript\">\n" +
+                    "    // use vanilla JS because why not\n" +
+                    "    Window.mySocket = 0; \n" +
+                    "    window.addEventListener(\"load\", function() {\n" +
+                    "        // create websocket instance\n" +
+                    "        Window.mySocket = new WebSocket(\"ws://\" + location.host + \"/ws\");\n" +
+                    "        // Display output\n" +
+                    "        // add event listener reacting when message is received\n" +
+                    "        Window.mySocket.onmessage = function (event) {\n" +
+                    "            json = JSON.parse(event.data);\n" +
+                    "            address = json.address;\n" +
+                    "            var web_component = document.getElementById(address);\n" +
+                    "            web_component.value = json.data.value;\n" +
+                    "        };  \n" +
+                    "    }); \n" +
+                    "    /* Do we need below? */\n" +
+                    "    if ('serviceWorker' in navigator) {\n" +
+                    "      window.addEventListener('load', () => {\n" +
+                    "        navigator.serviceWorker.register('./sw.js').then(() => { // eslint-disable-line\n" +
+                    "          console.log('ServiceWorker registered!');\n" +
+                    "        }, (err) => {\n" +
+                    "          console.log('ServiceWorker registration failed: ', err);\n" +
+                    "                });\n" +
+                    "              });\n" +
+                    "            }\n" +
+                    "          </script>\n" +
+                    "        </body>\n" +
+                    "      </html>\n").getBytes()), true, true, null);
 
 	    } catch (Exception e) {
 	    	e.printStackTrace();
