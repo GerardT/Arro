@@ -254,6 +254,8 @@ SocketClient::serve() {
  * Blocking read from socket until '\n' received. If socket is closed
  * then 'terminate' is returned in string buffer.
  *
+ * This function is also used as stand-alone, so don't use Trace!
+ *
  * \param sockfd File descriptor for IP socket.
  * \param buffer Buffer to return string into. May contain "terminate" if socket closed or EOF received.
  * \param n Max nr of characters to read.
@@ -283,14 +285,14 @@ SocketClient::readln(int sockfd, char* buffer, size_t n/*size*/) {
                 continue;
             else {
                 // Make losing socket to terminate process.
-                m_inst->m_trace.println("ServerEngine losing socket, terminated!");
+                printf("ServerEngine losing socket, terminated!\n");
                 strcpy(buffer, "terminate");
                 return strlen("terminate");
             }
 
         } else if (numRead == 0) {      /* EOF */
             if (totRead == 0) {         /* No bytes read */
-                m_inst->m_trace.println("ServerEngine terminated!\n");
+                printf("ServerEngine terminated!\n");
                 strcpy(buffer, "terminate");
                 return strlen("terminate");
             }

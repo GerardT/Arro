@@ -1,9 +1,11 @@
 #ifndef ARRO_NODE_PYTHON_H
 #define ARRO_NODE_PYTHON_H
 
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>  // must be included before anything else
+
 #include <queue>
 #include <map>
-#include <Python.h>
 
 //#include "arro.pb.h"
 #include "Trace.h"
@@ -35,7 +37,7 @@ namespace Arro {
         void runCycle();
         PyObject* getMessage();
         PyObject* getInputData(const std::string& pad);
-        PyObject* sendMessage(char* pad, char* message);
+        PyObject* sendMessage(char* pad, char* message, int count);
         PyObject* getParameter(const std::string& parm);
 
     private:
@@ -44,6 +46,7 @@ namespace Arro {
         INodeContext* m_elemBlock;
         PyObject *m_pFunc, *m_pValue, *m_pArgs, *m_pClass, *m_pInstance;
         std::map<std::string, INodeContext::ItRef> m_inputs;
+        std::string m_className;
     };
 }
 

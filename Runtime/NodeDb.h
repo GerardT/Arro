@@ -46,24 +46,20 @@ public:
     InputPad(const InputPad&) = delete;
     InputPad& operator=(const InputPad& other) = delete;
 
-//    /**
-//     * Passes the message on to the listener.
-//     *
-//     * \param msg Message to pass on.
-//     */
-//    void handleMessage(const MessageBuf& msg);
-
-    //unsigned int getConnection() { return m_outputPadIds.front(); };
+    // Get list of connected output pads
     const std::list<unsigned int> getConnections();
 
+    // Deprecated, use iterator
     bool getData(unsigned int connection, MessageBuf& tmp);
 
     INodeContext::ItRef begin(unsigned int connection, INodeContext::Mode mode);
 
+    // deprecated, use iterator
     void addOutput(OutputPad* pad) {
         m_outputs.push_back(pad);
     }
 
+    // Get OutputPad reference from Id
     OutputPad* getOutputPad(unsigned int padId);
 
     void notifyUpdate() {
@@ -75,7 +71,6 @@ private:
     std::function<void ()> m_listenUpdate;
     std::list<OutputPad*> m_outputs;
     RealNode* m_node;
-//    MessageBuf m_msg;
     std::string m_interfaceName;
 };
 
@@ -112,26 +107,9 @@ public:
         m_inputs.push_back(pad);
     }
 
-//    /**
-//     * Forward a message.
-//     *
-//     * \param msg Message to forward.
-//     */
-//    void forwardMessage(const MessageBuf& msg);
 
-    /**
-     * Submit a Protobuf buffer into msg queue.
-     *
-     * \param msg Buffer to submit.
-     */
+    // Deprecated, use iterator
     void submitMessage(MessageBuf& msg);
-
-    /**
-     * Fill a MessageBuf from string and submit Protobuf buffer into queue.
-     *
-     * \param msg String to submit.
-     */
-    void submitMessageBuffer(const char* msg);
 
     void notifyInputs();
 
@@ -153,8 +131,6 @@ private:
     RealNode* m_node;
     std::list<InputPad*> m_inputs;
     unsigned int m_padId;
-    //unsigned int m_lastRunCycle;
-    //unsigned int m_lastPosition;
     INodeContext::ItRef m_it;
     bool m_first;
 };
@@ -169,35 +145,6 @@ private:
     friend class OutputPad;
     friend class InputPad;
     friend class Pad;
-
-    public:
-
-        /**
-         * \brief Class instance represents one input for a node.
-         *
-         * InputPad is created when calling registerNodeInput for a node.
-         * Connect multiple InputPad objects to one OutputPad.
-         */
-
-//        class FullMsg {
-//        public:
-//            /**
-//             * Constructor for (addressable) message container.
-//             *
-//             * \param o OutputPad instance where to send this message to.
-//             * \param s Message buffer to send.
-//             */
-//            FullMsg(OutputPad* o, MessageBuf& s);
-//            virtual ~FullMsg() {};
-//
-//            // Copy and assignment is not supported.
-//            FullMsg(const FullMsg&) = delete;
-//            FullMsg& operator=(const FullMsg& other) = delete;
-//
-//        // FIXME Should be private
-//            OutputPad* m_output;
-//            MessageBuf m_msg;
-//        };
 
     public:
         /**
@@ -336,8 +283,6 @@ private:
         std::map<std::string, std::unique_ptr<InputPad> > m_allInputs;
         std::map<std::string, std::unique_ptr<OutputPad> > m_allOutputs;
         std::map<std::string, std::unique_ptr<RealNode> > m_allNodes;
-//        std::queue<FullMsg*> m_inQueue, *m_pInQueue;
-//        std::queue<FullMsg*> m_outQueue, *m_pOutQueue;
         bool m_running;
         std::thread* m_thrd;
         Process* m_sfcNode;

@@ -1,4 +1,4 @@
-#include "PythonGlue.h"
+#include <PythonGlue.h>  // include before anything else
 #include "ServerEngine.h"
 
 using namespace Arro;
@@ -149,9 +149,10 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
 {
     PyObject *obj;
     char* pad;
-    char* string;
+    char* blob;
+    Py_ssize_t count;
 
-    if(!PyArg_ParseTuple(args, "Oss", &obj, &pad, &string)) {  // Return value: int
+    if(!PyArg_ParseTuple(args, "Oss#", &obj, &pad, &blob, &count)) {  // Return value: int
         return nullptr;
     }
 
@@ -160,7 +161,7 @@ PythonGlue::sendMessage(PyObject * /*self*/, PyObject *args)
     if(!np) {
         return nullptr; // FIXME: do i need to set an error?
     } else {
-        return np->sendMessage(pad, string);
+        return np->sendMessage(pad, blob, count);
     }
 
     Py_INCREF(Py_None);
@@ -266,7 +267,7 @@ PythonGlue::captureError() {
     for(Py_ssize_t i = 0; i < size; i++) {
         PyObject *item = PyList_GetItem(list, i);  // Return value: Borrowed reference.
 
-#if 0 /* Python3 */
+#ifdef PYTHON3
         SendToConsole(string("Python ") + PyUnicode_AsUTF8(item));
 #else
         SendToConsole(string("Python ") + PyString_AsString(item));

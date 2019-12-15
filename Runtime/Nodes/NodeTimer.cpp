@@ -15,6 +15,7 @@
 
 namespace Arro
 {
+
     class NodeTimer: public INodeDefinition {
     public:
         /**
@@ -36,17 +37,18 @@ namespace Arro
          * Make the node execute a processing cycle.
          */
         void runCycle();
+        void sendMessage();
+        void stop();
 
-        void timer ();
-        static void init ();
-        static void start ();
-        static void stop ();
 
     private:
         Trace m_trace;
-        int m_ticks;
+        int m_ms;
+        int m_tag;
         INodeContext* m_elemBlock;
+        INodeContext::ItRef m_request;
         INodeContext::ItRef m_tick;
+        bool m_clear = false;
     };
 }
 
@@ -56,53 +58,57 @@ using namespace std;
 using namespace Arro;
 using namespace arro;
 
-#define ARRO_TIMEOUT 1000
-
-static list<NodeTimer*> timers;
-static bool running = false;
-
 static RegisterMe<NodeTimer> registerMe("Timer");
 
-static bool instantiated = false;
-
-void registerTimerStartStop(std::function<void()> start, std::function<void()> stop);
 
 NodeTimer::NodeTimer(INodeContext* d, const string& /*name*/, StringMap& /* params */, TiXmlElement*):
-    m_trace("NodePid", true),
+    m_trace("NodeTimer", true),
     m_elemBlock(d) {
-
-    if(!instantiated) {
-        instantiated = true;
-
-        NodeTimer::init ();
-        registerTimerStartStop(NodeTimer::start, NodeTimer::stop);
-    }
-
-    m_ticks = stod(d->getParameter("ms"));
-
-    // Add this instance to array of timers.
-    timers.push_back(this);
 }
 
 void
 NodeTimer::finishConstruction() {
+    m_request = m_elemBlock->begin(m_elemBlock->getInputPad("timerRequest"), 0, INodeContext::DELTA);
     m_tick = m_elemBlock->end(m_elemBlock->getOutputPad("aTick"));
 }
 
 
 NodeTimer::~NodeTimer() {
-    timers.remove(this);
+    stop();
 }
 
 void NodeTimer::runCycle() {
-    // empty
+
+    MessageBuf m1;
+    while(m_request->getNext(m1)) {
+        TimerRequest* value = new TimerRequest();
+        value->ParseFromString(m1->c_str());
+
+        m_ms = value->ms();
+        m_tag = value->tag();
+        m_trace.println("Setting timer for ms: " + std::to_string(m_ms));
+
+        std::thread t([=]() {
+                if(this->m_clear) return;
+                std::this_thread::sleep_for(std::chrono::milliseconds(m_ms));
+                if(this->m_clear) return;
+                sendMessage();
+            });
+        t.detach();
+    }
+}
+
+void NodeTimer::stop() {
+    this->m_clear = true;
 }
 
 
-void NodeTimer::timer () {
+void NodeTimer::sendMessage() {
+
     Tick tick;
 
-    tick.set_ms(ARRO_TIMEOUT /* elapsed time in ms */);
+    tick.set_ms(m_ms /* elapsed time in ms */);
+    tick.set_tag(m_tag);
 
     try {
         m_tick->setRecord(tick);
@@ -110,30 +116,5 @@ void NodeTimer::timer () {
     catch(runtime_error&) {
         m_trace.println("Timer failed to update");
     }
-}
-
-
-static void refresh() {
-    while(true)
-    {
-        if(running) {
-            for_each(timers.begin(), timers.end(), [](NodeTimer* t) {t->timer(); });
-        }
-        std::chrono::milliseconds timespan(ARRO_TIMEOUT);
-        std::this_thread::sleep_for(timespan);
-    }
-}
-
-
-void NodeTimer::init () {
-    // thread will run forever
-    /* std::thread* first = */new std::thread(refresh);     // spawn new thread that calls refresh()
-}
-
-void NodeTimer::start() {
-    running = true;
-}
-void NodeTimer::stop() {
-    running = false;
 }
 

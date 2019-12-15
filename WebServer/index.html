@@ -1,1 +1,54 @@
-../../download/index.html
+<html>
+  <head>
+    <title>Arro UI</title>
+    <base href="/"></base>
+    <script defer src="./web_modules/es-module-shims.js"></script>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="shortcut icon" href="#">
+    <meta name="theme-color" content="#0077ff"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="importmap-shim">
+      {
+        "imports": {
+          "lit-element": "/web_modules/lit-element.js"
+        }
+      }
+    </script>
+    <script src="./src/arro-slider.js" type="module-shim"></script>
+    <script src="./src/arro-progress.js" type="module-shim"></script>
+  </head>
+  <body>
+    <arro-slider id=".main.aComposite.speed" name="Speed" value="0"></arro-slider>
+    <p> hello </p>
+    <arro-slider id=".main.aComposite.steering" name="Steering" value="50"></arro-slider>
+    <arro-progress id=".main.aProgressOutput" name="Main progress bar"></arro-progress>
+
+    <script type="text/javascript">
+      // use vanilla JS because why not
+      Window.mySocket = 0; 
+      window.addEventListener("load", function() {
+          // create websocket instance
+          Window.mySocket = new WebSocket("ws://" + location.host + "/ws");
+          // Display output
+          // add event listener reacting when message is received
+          Window.mySocket.onmessage = function (event) {
+              json = JSON.parse(event.data);
+              address = json.address;
+              var web_component = document.getElementById(address);
+              web_component.value = json.data.value;
+          };  
+      }); 
+
+      /* Do we need below? */
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').then(() => { // eslint-disable-line
+            console.log('ServiceWorker registered!');
+          }, (err) => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
