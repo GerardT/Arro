@@ -66,11 +66,13 @@ namespace Arro {
         int m_zeroPulse;
 
         INodeContext::ItRef m_speedPad;
+        INodeContext::ItRef m_directionPad;
         INodeContext::ItRef m_control;
         INodeContext::ItRef m_request;
         INodeContext::ItRef m_timer;
 
         bool m_started;
+        int m_direction;
     };
 }
 
@@ -109,7 +111,9 @@ NodeEsc::NodeEsc(INodeContext* d, const string& /*name*/, StringMap& /* params *
     m_speed(0),
     m_Ch(0),
     m_speedPad{nullptr},
-    m_started{false}
+    m_directionPad{nullptr},
+    m_started{false},
+    m_direction{1}
 {
 
     m_Ch = stod(d->getParameter("Channel"));
@@ -124,12 +128,11 @@ NodeEsc::finishConstruction() {
     m_trace.println("finishConstruction");
 
     m_speedPad = m_elemBlock->begin(m_elemBlock->getInputPad("speed"), 0, INodeContext::DELTA);
+    m_directionPad = m_elemBlock->begin(m_elemBlock->getInputPad("direction"), 0, INodeContext::DELTA);
     m_timer    = m_elemBlock->begin(m_elemBlock->getInputPad("timer"), 0, INodeContext::DELTA);
 
     m_control = m_elemBlock->end(m_elemBlock->getOutputPad("control"));
     m_request = m_elemBlock->end(m_elemBlock->getOutputPad("timerRequest"));
-
-
 }
 
 
@@ -139,7 +142,7 @@ NodeEsc::runCycle() {
     PwmControl control;
     TimerRequest request;
 
-    MessageBuf m1;
+    MessageBuf buf;
     try {
         if(!m_started) {
             m_started = true;
@@ -149,9 +152,9 @@ NodeEsc::runCycle() {
             request.set_tag(1);
             m_request->setRecord(request);
         }
-        else if(m_timer->getNext(m1)) {
+        else if(m_timer->getNext(buf)) {
             Tick* timer = new Tick();
-            timer->ParseFromString(m1->c_str());
+            timer->ParseFromString(buf->c_str());
 
             if(timer->tag() == 1) {
                 // step 1
@@ -187,10 +190,10 @@ NodeEsc::runCycle() {
                 m_request->setRecord(request);
             }
         }
-        else if(m_speedPad->getNext(m1)) {
+        else if(m_speedPad->getNext(buf)) {
 
             Value* speed = new Value();
-            speed->ParseFromString(m1->c_str());
+            speed->ParseFromString(buf->c_str());
 
             m_speed = speed->value();
 
@@ -200,8 +203,10 @@ NodeEsc::runCycle() {
             }
             else
             {
-                m_speed = std::max(m_speed, -30);
+                m_speed = std::max(m_speed, 0);
             }
+            m_speed *= m_direction;
+
             m_speed += m_zeroPulse;
 
 
@@ -211,6 +216,19 @@ NodeEsc::runCycle() {
             control.set_pulsewidth(m_speed);
             m_control->setRecord(control);
         }
+        else if(m_directionPad->getNext(buf)) {
+
+            Selection* selection = new Selection();
+            selection->ParseFromString(buf->c_str());
+
+            if(selection->value() == "on") {
+                m_direction = 1;
+            }
+            else {
+                m_direction = -1;
+            }
+        }
+
     }
     catch(runtime_error&) {
         m_trace.println("Timer failed to update");

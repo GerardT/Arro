@@ -32,7 +32,7 @@ private:
     Trace m_trace;
     INodeContext* m_elemBlock;
     NodeRef* m_uiClient;
-    INodeContext::ItRef m_value;
+    INodeContext::ItRef m_selection;
     std::string m_name;
     INodeContext::ItRef m_disable;
 
@@ -63,8 +63,7 @@ NodeUiToggleButton::finishConstruction() {
 
     m_disable = m_elemBlock->begin(m_elemBlock->getInputPad("disable"), 0, INodeContext::DELTA);
 
-    OutputPad* valuePad = m_elemBlock->getOutputPad("value");
-    m_value = m_elemBlock->end(valuePad);
+    m_selection = m_elemBlock->end(m_elemBlock->getOutputPad("selection"));
 
     std::string inst = std::string("<arro-toggle-button id=\"") + m_elemBlock->getName() + "\" name=\"" + m_name + "\"></arro-toggle-button>";
 
@@ -73,7 +72,7 @@ NodeUiToggleButton::finishConstruction() {
         Selection* sel = new Selection();
         auto info = nlohmann::json::parse(data.c_str());
         sel->set_value(info["value"]);
-        m_value->setRecord(*sel);
+        m_selection->setRecord(*sel);
                     });
 
 }
