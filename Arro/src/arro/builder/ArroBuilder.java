@@ -281,6 +281,7 @@ public class ArroBuilder extends IncrementalProjectBuilder {
                     "    }\n" +
                     "  </script>\n" +
                     "  <!-- Import all elements here -->\n" +
+                    "  <script src=\"./src/arro-toggle-button.js\" type=\"module-shim\"></script>\n" +
                     "  <script src=\"./src/arro-slider.js\" type=\"module-shim\"></script>\n" +
                     "  <script src=\"./src/arro-progress.js\" type=\"module-shim\"></script>\n" +
                     "</head>\n" +
