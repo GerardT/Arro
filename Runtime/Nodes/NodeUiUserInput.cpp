@@ -36,6 +36,7 @@ private:
     std::string m_name;
     int m_bot;
     int m_top;
+    int m_start;
 
 };
 
@@ -56,6 +57,7 @@ NodeUiUserInput::NodeUiUserInput(INodeContext* d, const string& /*name*/, String
         m_name = d->getParameter("name");
         m_bot = std::stoi(d->getParameter("botValue"));
         m_top = std::stoi(d->getParameter("topValue"));
+        m_start = std::stoi(d->getParameter("startValue"));
 
 }
 
@@ -66,16 +68,19 @@ NodeUiUserInput::finishConstruction() {
     OutputPad* valuePad = m_elemBlock->getOutputPad("value");
     m_value = m_elemBlock->end(valuePad);
 
-    std::string inst = std::string("<arro-slider id=\"") + m_elemBlock->getName() + "\" name=\"" + m_name + "\"></arro-slider>";
+    std::string inst = std::string(
+                            "<arro-slider id=\"") + m_elemBlock->getName() + "\" " +
+                                    "name=\"" + m_name + "\" " +
+                                    "min=\"" + std::to_string(m_bot) + "\" " +
+                                    "max=\"" + std::to_string(m_top) + "\" " +
+                                    "value=\"" + std::to_string(m_start) + "\" " +
+                            "></arro-slider>";
 
     m_uiClient = SocketClient::getInstance()->subscribe(m_elemBlock->getName(), inst, [=](const std::string& data) {
 
         Value* sel = new Value();
         auto info = nlohmann::json::parse(data.c_str());
         int value = info["value"];
-
-        // Value is 0..100, convert to bot..top
-        value =  (((float)value / 100) * (m_top - m_bot)) + m_bot;
 
         sel->set_value(value);
         m_value->setRecord(*sel);

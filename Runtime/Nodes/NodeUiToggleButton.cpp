@@ -34,6 +34,7 @@ private:
     NodeRef* m_uiClient;
     INodeContext::ItRef m_value;
     std::string m_name;
+    INodeContext::ItRef m_disable;
 
 };
 
@@ -60,6 +61,8 @@ void
 NodeUiToggleButton::finishConstruction() {
     m_trace.println("finishConstruction");
 
+    m_disable = m_elemBlock->begin(m_elemBlock->getInputPad("disable"), 0, INodeContext::DELTA);
+
     OutputPad* valuePad = m_elemBlock->getOutputPad("value");
     m_value = m_elemBlock->end(valuePad);
 
@@ -80,5 +83,17 @@ NodeUiToggleButton::~NodeUiToggleButton() {
 }
 
 void NodeUiToggleButton::runCycle() {
+    MessageBuf buf;
+    if(m_disable->getNext(buf)) {
+        Value* msg = new Value();
+        msg->ParseFromString((*buf).c_str());
+
+        // output { "value": "<val>" }
+        std::string json_string = "{ \"value\": " + std::to_string(msg->value()) + " }";
+
+        if(buf != nullptr) {
+            SocketClient::getInstance()->sendMessage(m_uiClient, json_string);
+        }
+    }
 }
 
