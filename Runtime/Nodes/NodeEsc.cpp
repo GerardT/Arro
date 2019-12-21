@@ -205,6 +205,10 @@ NodeEsc::runCycle() {
             {
                 m_speed = std::max(m_speed, 0);
             }
+            if(m_speed < 25) {
+                m_speed = 0;
+            }
+
             m_speed *= m_direction;
 
             m_speed += m_zeroPulse;
