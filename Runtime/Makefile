@@ -81,6 +81,7 @@ NODESRCS := \
 		NodeUiToggleButton.cpp \
 		NodeUiUserInput.cpp \
 		NodeUiUserDisplay.cpp \
+		NodeUiMap.cpp \
 		NodeFileReader.cpp \
 		NodeTsReader.cpp \
 		NodeTsSubtable.cpp \
