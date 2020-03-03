@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -46,6 +43,8 @@ import arro.domain.ArroDevice;
 import arro.domain.ArroModule;
 import arro.domain.ArroPad;
 import arro.wizards.FileService;
+import workspace.FileEntry;
+import workspace.OutputStreamWrapper;
 import workspace.ResourceCache;
 
 /**
@@ -159,12 +158,12 @@ public class NewUiOutputBlockWizard extends Wizard implements INewWizard {
             
             ByteArrayOutputStream bao = new ByteArrayOutputStream();
                     
-            // works like a filter, writing to ZipOutputStream writes to Zip file (after selecting an entry).
-            ZipOutputStream out = new ZipOutputStream(bao);
+            // works like a filter, writing to OutputStreamWrapper writes to Zip file (after selecting an entry).
+            OutputStreamWrapper out = new OutputStreamWrapper(bao);
             {
 
                 // name the META file inside the zip file 
-                out.putNextEntry(new ZipEntry("META"));
+                out.putNextEntry(new FileEntry("META"));
                 
                 // fill with initial data
                 // Not very nice: we borrow the file for temporarily writing the diagram data into.
@@ -181,7 +180,7 @@ public class NewUiOutputBlockWizard extends Wizard implements INewWizard {
             {
 
                 // name the file inside the zip file 
-                out.putNextEntry(new ZipEntry(Constants.FUNCTION_FILE_NAME));
+                out.putNextEntry(new FileEntry(Constants.FUNCTION_FILE_NAME));
                 
                 // fill with initial data
                 // Not very nice: we borrow the file for temporarily writing the diagram data into.
@@ -197,7 +196,7 @@ public class NewUiOutputBlockWizard extends Wizard implements INewWizard {
             }
             {
                 // name the xml file inside the zip file 
-                out.putNextEntry(new ZipEntry(Constants.MODULE_FILE_NAME));
+                out.putNextEntry(new FileEntry(Constants.MODULE_FILE_NAME));
                 
                 // fill with initial data
                 // Not very nice: we borrow the file for temporarily writing the diagram data into.
@@ -214,7 +213,7 @@ public class NewUiOutputBlockWizard extends Wizard implements INewWizard {
             }
             {
                 // name the html file inside the zip file 
-                out.putNextEntry(new ZipEntry(Constants.UI_FILE_NAME));
+                out.putNextEntry(new FileEntry(Constants.UI_FILE_NAME));
                 
                 // fill with initial data
                 // Not very nice: we borrow the file for temporarily writing the diagram data into.

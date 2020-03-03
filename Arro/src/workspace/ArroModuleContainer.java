@@ -4,9 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,7 +29,7 @@ import arro.editors.MultiPageEditor;
 import util.Logger;
 import util.PathUtil;
 
-public class ArroModuleContainer extends  ArroZipFile {
+public class ArroModuleContainer extends  ArroContainerManager {
     private NonEmfDomainObject domainDiagram = null;
     private MultiPageEditor editor = null;
     
@@ -112,9 +109,9 @@ public class ArroModuleContainer extends  ArroZipFile {
     public static void unzipAndConcatenateBody(IFolder folder, IFile zipFile, String entryName, IFile file, boolean skipFirstLine) {
         try {
             InputStream source = zipFile.getContents(true);
-            ZipInputStream in = new ZipInputStream(source);
+            InputStreamWrapper in = new InputStreamWrapper(source);
             
-            ZipEntry entry = in.getNextEntry();
+            FileEntry entry = in.getNextEntry();
             while(entry != null) {
                 if(entry.getName().equals(entryName)) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -155,10 +152,10 @@ public class ArroModuleContainer extends  ArroZipFile {
         boolean retval = false;
         try {
             InputStream source = zipFile.getContents(true);
-            ZipInputStream in = new ZipInputStream(source);
+            InputStreamWrapper in = new InputStreamWrapper(source);
             IFile pythonFile = folder.getFile(PathUtil.truncExtension(zipFile.getName()) + ".py");
             
-            ZipEntry entry = in.getNextEntry();
+            FileEntry entry = in.getNextEntry();
             while(entry != null) {
                 if(entry.getName().equals(entryName)) {
                     retval = true;

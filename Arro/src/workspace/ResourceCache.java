@@ -110,7 +110,7 @@ public class ResourceCache {
         if(lock.tryLock()) {
             Map<String, String> meta = new HashMap<String, String>();
             
-            ArroZipFile.getMeta((IFile) res, meta );
+            ArroContainerManager.getMeta((IFile) res, meta );
             String uuid = meta.get("UUID");
             
             // now check if this entry is already in list

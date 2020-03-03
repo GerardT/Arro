@@ -8,10 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -35,34 +31,33 @@ import org.w3c.dom.NodeList;
 import util.Logger;
 
 /**
- * Class supporting zip files. By creating an instance it will
- * upzip the contents of the zip file and maintain those temp files
+ * Class supporting container files (such as zip). By creating an instance it will
+ * unpack the contents of the container file and maintain those temp files
  * (starting with "." to make them hidden).
  * 
  */
-public class ArroZipFile {
+public class ArroContainerManager {
 	private Map<String, IFile> files = new HashMap<String, IFile>();
 	private Map<String, String> meta = new HashMap<String, String>();
-	private IFile zipFile;
+	private IFile container;
 	private DocumentBuilderFactory builderFactory;
     private IFolder tempFolder;
 
 	/**
 	 * Constructor.
-	 * Open a zipfile with the specified names in it. If the
-	 * zip file exists, unzip only the specified names.
+	 * Open a container with the specified names in it. If the
+	 * container file exists, unpack the names as stated in META file.
 	 * 
-	 * @param names
-	 * @param zipFile
+	 * @param containerFile - zip file or other container format.
 	 */
-	public ArroZipFile(IFile zipFile) {
-		this.zipFile = zipFile;
+	public ArroContainerManager(IFile containerFile) {
+		container = containerFile;
 		
-		getMeta(zipFile, meta);
+		getMeta(container, meta);
 		
 		builderFactory = DocumentBuilderFactory.newInstance();
 
-    	if(zipFile.exists()) {
+    	if(container.exists()) {
             try {
                 tempFolder = getTempFolder();
                 if(tempFolder.exists()) {
@@ -72,10 +67,10 @@ public class ArroZipFile {
                 }
 
                 // Open rest
-                InputStream source = zipFile.getContents(true);
-                ZipInputStream in = new ZipInputStream(source);
+                InputStream source = container.getContents(true);
+                InputStreamWrapper in = new InputStreamWrapper(source);
                 
-                ZipEntry entry = in.getNextEntry();
+                FileEntry entry = in.getNextEntry();
                 while(entry != null) {
             		String fileName = entry.getName();
                     IFile file = tempFolder.getFile(fileName);
@@ -101,7 +96,9 @@ public class ArroZipFile {
                     }
                 	entry = in.getNextEntry();        			
                 }
-                readMETA(files.get("META").getContents(), meta);
+                parseMETA(files.get("META").getContents(), meta);
+                
+                in.close();
             } catch (CoreException e) {
                 throw new RuntimeException(e.getMessage());
             } catch (IOException e) {
@@ -113,30 +110,31 @@ public class ArroZipFile {
 
 	/**
 	 * Change the resource that should be used for zipping / unzipping
-	 * from now oon.
+	 * from now on.
 	 * 
 	 * @param res
 	 */
     public void changeFile(IResource res) {
-        zipFile = (IFile) res;
+        container = (IFile) res;
     }
     
     /**
-     * Get Meta data from zip file without creating ArroZipFile object.
+     * Get Meta data from container file without creating ArroContainerFile object and
+     * (thus) unpacking all files from container.
      * 
-     * @param zipFile
+     * @param container
      * @param metaDb
      */
-    public static void getMeta(IFile zipFile, Map<String, String> metaDb) {
+    public static void getMeta(IFile container, Map<String, String> metaDb) {
         
-        if(zipFile.exists()) {
+        if(container.exists()) {
             try {
-                InputStream sourceMeta = zipFile.getContents(true);
+                InputStream sourceMeta = container.getContents(true);
                 
                 // Search for META
-                ZipInputStream inMeta = new ZipInputStream(sourceMeta);
+                InputStreamWrapper inMeta = new InputStreamWrapper(sourceMeta);
                 
-                ZipEntry entryMeta = inMeta.getNextEntry();
+                FileEntry entryMeta = inMeta.getNextEntry();
                 while(entryMeta != null) {
                     if(entryMeta.getName().equals("META")) {
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -146,10 +144,11 @@ public class ArroZipFile {
                             baos.write(buffer, 0, count);
                         }
                         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-                        readMETA(bais, metaDb);
+                        parseMETA(bais, metaDb);
                     }
                     entryMeta = inMeta.getNextEntry();                  
                 }
+                inMeta.close();
                 
             } catch (CoreException e) {
                 throw new RuntimeException(e.getMessage());
@@ -187,7 +186,7 @@ public class ArroZipFile {
      * @return
      */
 	public IFolder getTempFolder() {
-	    IFolder folder = (IFolder)zipFile.getParent();
+	    IFolder folder = (IFolder)container.getParent();
         folder = folder.getFolder("." + meta.get("UUID"));
 	    if(!folder.exists()) {
 	        try {
@@ -218,7 +217,7 @@ public class ArroZipFile {
 	}
 	
     /**
-	 * Save the zip file. Leave unzipped files open.
+	 * Save the container file. Leave unpacked files open.
 	 */
     public void save() {
 		
@@ -233,7 +232,7 @@ public class ArroZipFile {
 			
 			ByteArrayOutputStream bao = new ByteArrayOutputStream();
 					
-			ZipOutputStream out = new ZipOutputStream(bao);
+			OutputStreamWrapper out = new OutputStreamWrapper(bao);
 			
 			Set<Entry<String, IFile>> set = files.entrySet();
 			for(Entry<String, IFile> entry: set) {
@@ -241,7 +240,7 @@ public class ArroZipFile {
 	            source = entry.getValue().getContents(true);
 
 	            // name the file inside the zip file  - use same name as if unzipped
-		        out.putNextEntry(new ZipEntry(entry.getKey()));
+		        out.putNextEntry(new FileEntry(entry.getKey()));
 		        
 		        while ((count = source.read(b)) > 0) {
 		            out.write(b, 0, count);
@@ -253,10 +252,10 @@ public class ArroZipFile {
 	        out.close();
 			
 			// Now read the new file again into a resource...
-			if (zipFile.exists()) {
-				zipFile.setContents(new ByteArrayInputStream(bao.toByteArray()), true, true, null /*monitor*/);
+			if (container.exists()) {
+				container.setContents(new ByteArrayInputStream(bao.toByteArray()), true, true, null /*monitor*/);
 			} else {
-				zipFile.create(new ByteArrayInputStream(bao.toByteArray()), true, null /*monitor*/);
+				container.create(new ByteArrayInputStream(bao.toByteArray()), true, null /*monitor*/);
 			}
 			
 			bao.close();
@@ -278,11 +277,11 @@ public class ArroZipFile {
 	 * @return
 	 */
 	public String getName() {
-		return zipFile.getName();
+		return container.getName();
 	}
 
 
-    private static void readMETA(InputStream fXmlFile, Map<String, String> metaDb) {
+    private static void parseMETA(InputStream fXmlFile, Map<String, String> metaDb) {
         try {
             
             Logger.out.trace(Logger.WS, "Reading META");
@@ -315,6 +314,9 @@ public class ArroZipFile {
         }
     }
     
+    /**
+     * Save key/values in META container entry.
+     */
     private void saveMETA() {
         try {
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
