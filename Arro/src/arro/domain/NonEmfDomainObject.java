@@ -2,7 +2,7 @@ package arro.domain;
 
 import java.util.UUID;
 
-import workspace.ArroModuleContainer;
+import arro.workspace.ModuleContainer;
 
 public class NonEmfDomainObject {
 
@@ -33,7 +33,7 @@ public class NonEmfDomainObject {
 		POJOIndependenceSolver.getInstance().RegisterPOJOObject(this);
 	}
 	
-	public ArroModuleContainer update() {
+	public ModuleContainer update() {
 	    return null;
 	}
 

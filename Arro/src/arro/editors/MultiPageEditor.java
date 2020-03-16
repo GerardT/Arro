@@ -34,9 +34,9 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import arro.Constants;
+import arro.workspace.ModuleContainer;
+import arro.workspace.ResourceCache;
 import util.Logger;
-import workspace.ArroModuleContainer;
-import workspace.ResourceCache;
 
 /**
  * An example showing how to create a multi-page editor. This example has 3
@@ -57,7 +57,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     private TextEditor pythonEditor = null;
     private TextEditor htmlEditor = null;
     
-    private ArroModuleContainer zip = null;
+    private ModuleContainer zip = null;
 
 	private int documentType = Constants.FunctionBlock;
 
@@ -78,7 +78,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Creates page 0 of the multi-page editor, which contains the function diagram.
      */
-    void createPage0(String fileName, ArroModuleContainer zip) {
+    void createPage0(String fileName, ModuleContainer zip) {
 
         IFile file = zip.getFile(Constants.FUNCTION_FILE_NAME);
         if(file != null) {
@@ -100,7 +100,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Creates page 1 of the multi-page editor, which shows the Python code.
      */
-    void createPage1(String fileName, ArroModuleContainer zip) {
+    void createPage1(String fileName, ModuleContainer zip) {
         IFile file = zip.getFile(Constants.PYTHON_FILE_NAME);
         if(file != null) {
             FileEditorInput fei2 = new FileEditorInput(file);
@@ -124,7 +124,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Creates page 1 of the multi-page editor, which shows the Python code.
      */
-    void createPageHtml(String fileName, ArroModuleContainer zip) {
+    void createPageHtml(String fileName, ModuleContainer zip) {
         IFile file = zip.getFile(Constants.UI_FILE_NAME);
         if(file != null) {
             FileEditorInput fei2 = new FileEditorInput(file);
@@ -148,7 +148,7 @@ public class MultiPageEditor extends MultiPageEditorPart implements
     /**
      * Creates page 2 of the multi-page editor, which contains the sequence diagram.
      */
-    void createPage2(String fileName, ArroModuleContainer zip) {
+    void createPage2(String fileName, ModuleContainer zip) {
 
         IFile file = zip.getFile(Constants.SFC_FILE_NAME);
         if(file != null) {

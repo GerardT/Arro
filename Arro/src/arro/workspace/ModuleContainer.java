@@ -1,4 +1,4 @@
-package workspace;
+package arro.workspace;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,7 +29,7 @@ import arro.editors.MultiPageEditor;
 import util.Logger;
 import util.PathUtil;
 
-public class ArroModuleContainer extends  ArroContainerManager {
+public class ModuleContainer extends  ContainerManager {
     private NonEmfDomainObject domainDiagram = null;
     private MultiPageEditor editor = null;
     
@@ -37,7 +37,7 @@ public class ArroModuleContainer extends  ArroContainerManager {
     DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 
 
-    public ArroModuleContainer(IFile zipFile)
+    public ModuleContainer(IFile zipFile)
     {
         super(zipFile);
         
@@ -141,7 +141,7 @@ public class ArroModuleContainer extends  ArroContainerManager {
     }
 
     /**
-     * Used during build process. FIXME: might have some improvement.
+     * Used during build process for collecting Python sources. FIXME: might have some improvement.
      * 
      * @param folder
      * @param zipFile
@@ -179,7 +179,7 @@ public class ArroModuleContainer extends  ArroContainerManager {
 
     
     
-    private synchronized ArroModule loadModule(ArroModuleContainer zip) {
+    private synchronized ArroModule loadModule(ModuleContainer zip) {
         // TODO: handle error if zip file removed.
         String fileName = zip.getName();
         String typeName = fileName.substring(0, fileName.indexOf(".anod"));
@@ -224,7 +224,7 @@ public class ArroModuleContainer extends  ArroContainerManager {
         return n;
     }
 
-    private void storeModule(ArroModule domainModule, ArroModuleContainer zip, String fileName) {
+    private void storeModule(ArroModule domainModule, ModuleContainer zip, String fileName) {
         DocumentBuilder builder = null;
         
         try {

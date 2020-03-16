@@ -45,9 +45,9 @@ import arro.domain.ArroModule;
 import arro.domain.ArroSequenceChart;
 import arro.domain.ArroStep;
 import arro.wizards.FileService;
-import workspace.FileEntry;
-import workspace.OutputStreamWrapper;
-import workspace.ResourceCache;
+import arro.workspace.FileEntry;
+import arro.workspace.OutputStreamWrapper;
+import arro.workspace.ResourceCache;
 
 /**
  * This is a sample new wizard. Its role is to create a new file 

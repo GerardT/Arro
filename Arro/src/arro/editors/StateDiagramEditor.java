@@ -1,10 +1,10 @@
 package arro.editors;
 
 import arro.Constants;
-import workspace.ArroModuleContainer;
+import arro.workspace.ModuleContainer;
 
 public class StateDiagramEditor extends FunctionDiagramEditor {
-    public StateDiagramEditor(ArroModuleContainer zip) {
+    public StateDiagramEditor(ModuleContainer zip) {
         super(zip, Constants.FunctionBlock);
     }
 }

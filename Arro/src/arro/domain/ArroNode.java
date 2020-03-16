@@ -10,9 +10,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import arro.workspace.ModuleContainer;
+import arro.workspace.ResourceCache;
 import util.Logger;
-import workspace.ArroModuleContainer;
-import workspace.ResourceCache;
 
 /**
  * This class represents a node as shown in a diagram, the diagram
@@ -58,15 +58,15 @@ public class ArroNode extends NonEmfDomainObject {
      * 
      */
     @Override
-    public ArroModuleContainer update() {
-        ArroModuleContainer moduleByName = ResourceCache.getInstance().getZip(nodeType);
+    public ModuleContainer update() {
+        ModuleContainer moduleByName = ResourceCache.getInstance().getZip(nodeType);
         if(moduleByName != null) {
             if(moduleByName.getUuid().equals(uuid)) {
                 // all OK, do nothing
                 return moduleByName;
             } else {
                 // search for UUID
-                ArroModuleContainer moduleByUuid = ResourceCache.getInstance().getZipByUuid(uuid);
+                ModuleContainer moduleByUuid = ResourceCache.getInstance().getZipByUuid(uuid);
                 if(moduleByUuid != null) {
                     // update name
                     nodeType = moduleByUuid.getName();
@@ -82,7 +82,7 @@ public class ArroNode extends NonEmfDomainObject {
             }
         } else {
             // search for UUID
-            ArroModuleContainer moduleByUuid = ResourceCache.getInstance().getZipByUuid(uuid);
+            ModuleContainer moduleByUuid = ResourceCache.getInstance().getZipByUuid(uuid);
             if(moduleByUuid != null) {
                 // update name
                 nodeType = moduleByUuid.getName();
@@ -109,7 +109,7 @@ public class ArroNode extends NonEmfDomainObject {
 	 * @return
 	 */
 	public ArroModule getAssociatedModule() {
-	    ArroModuleContainer m = update();
+	    ModuleContainer m = update();
 	    if(m != null) {
 	        return (ArroModule) update().getDomainDiagram();
 	    } else {

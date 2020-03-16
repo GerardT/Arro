@@ -1,4 +1,4 @@
-package workspace;
+package arro.workspace;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;

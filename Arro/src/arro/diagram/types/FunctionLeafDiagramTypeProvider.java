@@ -12,8 +12,8 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.platform.IDiagramBehavior;
 import org.eclipse.graphiti.tb.IToolBehaviorProvider;
 
+import arro.workspace.MyResourceChangeReporter;
 import util.Logger;
-import workspace.MyResourceChangeReporter;
 
 /**
  * Even for same diagram type there will be one instance of this class.

@@ -1,4 +1,4 @@
-package workspace;
+package arro.workspace;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;

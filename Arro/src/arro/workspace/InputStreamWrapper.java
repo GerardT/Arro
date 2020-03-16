@@ -1,4 +1,4 @@
-package workspace;
+package arro.workspace;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -52,6 +52,7 @@ public class InputStreamWrapper {
                 if(line == null) {
                     return null;
                 }
+                line += "\n";
                 int pos1 = line.indexOf(" ") + 1;
                 int pos2 = line.indexOf(" ", pos1);
                 int pos3 = pos2 + 3;
@@ -61,7 +62,7 @@ public class InputStreamWrapper {
                 
                 String buf = "";
                 while(nrOfLines > 0) {
-                    buf += reader.readLine();
+                    buf += reader.readLine() + "\n";
                     nrOfLines--;
                 }
                 Logger.out.trace(Logger.WS, buf);

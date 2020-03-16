@@ -1,4 +1,4 @@
-package workspace;
+package arro.workspace;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,7 +36,7 @@ import util.Logger;
  * (starting with "." to make them hidden).
  * 
  */
-public class ArroContainerManager {
+public class ContainerManager {
 	private Map<String, IFile> files = new HashMap<String, IFile>();
 	private Map<String, String> meta = new HashMap<String, String>();
 	private IFile container;
@@ -50,7 +50,7 @@ public class ArroContainerManager {
 	 * 
 	 * @param containerFile - zip file or other container format.
 	 */
-	public ArroContainerManager(IFile containerFile) {
+	public ContainerManager(IFile containerFile) {
 		container = containerFile;
 		
 		getMeta(container, meta);

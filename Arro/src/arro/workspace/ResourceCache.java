@@ -1,4 +1,4 @@
-package workspace;
+package arro.workspace;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import util.PathUtil;
  */
 public class ResourceCache {
     private static ResourceCache myCache = null;
-    private ConcurrentHashMap<String, ArroModuleContainer> cache;
+    private ConcurrentHashMap<String, ModuleContainer> cache;
     private Lock lock;
     
     /* for XML load / store */
@@ -40,7 +40,7 @@ public class ResourceCache {
     public ResourceCache() {
         removeTempFiles();
         lock = new ReentrantLock();
-        cache = new ConcurrentHashMap<String, ArroModuleContainer>();
+        cache = new ConcurrentHashMap<String, ModuleContainer>();
         
         loadResourcesFromWorkspace();
     }
@@ -110,13 +110,13 @@ public class ResourceCache {
         if(lock.tryLock()) {
             Map<String, String> meta = new HashMap<String, String>();
             
-            ArroContainerManager.getMeta((IFile) res, meta );
+            ContainerManager.getMeta((IFile) res, meta );
             String uuid = meta.get("UUID");
             
             // now check if this entry is already in list
-            ArroModuleContainer zip = getZipByUuid(uuid);
+            ModuleContainer zip = getZipByUuid(uuid);
             if(zip == null) {
-                zip = new ArroModuleContainer((IFile) res);
+                zip = new ModuleContainer((IFile) res);
                 cache.put(PathUtil.truncExtension(typeName), zip);  
                 Logger.out.trace(Logger.WS, "New " + typeName + " was added.");
                 updateDependents();
@@ -163,8 +163,8 @@ public class ResourceCache {
      * update in the Graphiti diagram as well.
      */
      public void updateDependents() {
-         Collection<ArroModuleContainer> zips = cache.values();
-         for(ArroModuleContainer zip: zips) {
+         Collection<ModuleContainer> zips = cache.values();
+         for(ModuleContainer zip: zips) {
              //getZip(zip.getName());
              zip.updateDependencies();
          }
@@ -177,16 +177,16 @@ public class ResourceCache {
      * 
      * FIXME: must search all resources in the open project.
      */
-    public ArroModuleContainer getZip(String typeName) throws RuntimeException {
+    public ModuleContainer getZip(String typeName) throws RuntimeException {
         //loadResourcesFromWorkspace();
         return cache.get(typeName);
     }
     
-    public ArroModuleContainer getZipByFile(IFile zipFile) {
+    public ModuleContainer getZipByFile(IFile zipFile) {
         //Map<String, String> meta = new HashMap<String, String>();
         
         String fileName = zipFile.getName();
-        ArroModuleContainer zip = new ArroModuleContainer(zipFile);
+        ModuleContainer zip = new ModuleContainer(zipFile);
         cache.put(PathUtil.truncExtension(fileName), zip);  
         Logger.out.trace(Logger.WS, "New " + fileName + " was added.");
         return zip;
@@ -204,9 +204,9 @@ public class ResourceCache {
         return myCache;
     }
 
-    public ArroModuleContainer getZipByUuid(String uuid) {
-        Collection<ArroModuleContainer> zips = cache.values();
-        for(ArroModuleContainer zip: zips) {
+    public ModuleContainer getZipByUuid(String uuid) {
+        Collection<ModuleContainer> zips = cache.values();
+        for(ModuleContainer zip: zips) {
             String value = zip.getMETA("UUID");
             if(value != null && value.equals(uuid)) {
                 return zip;

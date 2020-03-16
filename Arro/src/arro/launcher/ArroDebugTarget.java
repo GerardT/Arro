@@ -56,9 +56,9 @@ public class ArroDebugTarget implements IDebugTarget {
     
     			terminated = false;
             } catch (ExecutionException e) {
-                Logger.writeToConsole("Lost socket: could not download");
+                Logger.writeToConsole("Lost socket: could not download " + e.getMessage());
             } catch (CoreException e) {
-                Logger.writeToConsole("Error: could not download");
+                Logger.writeToConsole("Error: could not download " + e.getMessage());
             }
 		}
 	}

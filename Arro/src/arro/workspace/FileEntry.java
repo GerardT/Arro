@@ -1,4 +1,4 @@
-package workspace;
+package arro.workspace;
 
 import java.util.zip.ZipEntry;
 
